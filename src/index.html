@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repasse Médico v@@VERSAO@@</title>
+<style>
+@@CSS@@
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">RM</div><div><strong>Repasse Médico</strong><small>v@@VERSAO@@ · alpha</small></div></div>
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="#inicio" data-pag="inicio"><span aria-hidden="true">⌂</span>Início</a>
+      <a href="#conferencia" data-pag="conferencia"><span aria-hidden="true">⇄</span>Conferência cruzada</a>
+      <a href="#correcao" data-pag="correcao"><span aria-hidden="true">♙</span>Correção de prestador</a>
+      <a href="#equivalencias" data-pag="equivalencias"><span aria-hidden="true">≡</span>Equivalências TUSS<b id="navPend" class="pill" hidden></b></a>
+      <a href="#bases" data-pag="bases"><span aria-hidden="true">▦</span>Bases</a>
+      <a href="#rodadas" data-pag="rodadas"><span aria-hidden="true">↻</span>Rodadas</a>
+      <a href="#configuracoes" data-pag="configuracoes"><span aria-hidden="true">⚙</span>Configurações</a>
+    </nav>
+    <div class="side-note"><strong>Modo local</strong><p>Os arquivos são lidos só neste navegador. Nada é enviado à internet.</p></div>
+  </aside>
+  <main class="main">
+    <header class="topo">
+      <div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
+      <div class="topo-dir"><span id="operadorTopo" class="chip"></span><span id="stInit" class="badge warn">Carregando componentes…</span></div>
+    </header>
+    <div id="aviso" class="aviso" role="status" hidden></div>
+    <section id="pag-inicio" class="pag"></section>
+    <section id="pag-conferencia" class="pag" hidden></section>
+    <section id="pag-correcao" class="pag" hidden></section>
+    <section id="pag-equivalencias" class="pag" hidden></section>
+    <section id="pag-bases" class="pag" hidden></section>
+    <section id="pag-rodadas" class="pag" hidden></section>
+    <section id="pag-configuracoes" class="pag" hidden></section>
+    <footer class="rodape">Ferramenta de apoio à conferência: não altera o MV nem substitui o aceite do responsável. Os arquivos contêm dados de pacientes (LGPD).</footer>
+  </main>
+</div>
+<dialog id="dlg"><form method="dialog" id="dlgForm"><h3 id="dlgTitulo"></h3><div id="dlgCorpo"></div><div class="dlg-botoes" id="dlgBotoes"></div></form></dialog>
+<script id="lib-jszip" type="text/plain">@@LIB_JSZIP@@</script>
+<script id="lib-pdf" type="text/plain">@@LIB_PDF@@</script>
+<script id="lib-worker" type="text/plain">@@LIB_WORKER@@</script>
+<script type="module">
+@@ENGINE@@
+@@UI@@
+</script>
+</body>
+</html>
