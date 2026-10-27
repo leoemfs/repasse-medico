@@ -1,0 +1,7 @@
+# Dados reais de pacientes nunca entram no repositório
+dados/
+test/saida/
+*.xlsx
+*.pdf
+dist/
+node_modules/

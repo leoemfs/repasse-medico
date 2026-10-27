@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>Harness do motor</title></head>
+<body>
+<script id="lib-jszip" type="text/plain">@@LIB_JSZIP@@</script>
+<script id="lib-pdf" type="text/plain">@@LIB_PDF@@</script>
+<script id="lib-worker" type="text/plain">@@LIB_WORKER@@</script>
+<script type="module">
+@@ENGINE@@
+const bytes = id => { const s = atob(document.getElementById(id).textContent.trim()); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
+const blobUrl = id => URL.createObjectURL(new Blob([bytes(id)], { type: 'text/javascript' }));
+const s = document.createElement('script'); s.textContent = new TextDecoder().decode(bytes('lib-jszip')); document.head.appendChild(s);
+const pdfjs = await import(blobUrl('lib-pdf'));
+pdfjs.GlobalWorkerOptions.workerSrc = blobUrl('lib-worker');
+window.H = { pdfjs, lerLinhasPdf, interpretarMV, lerApolo, lerPowerBI, importarPlanilhaEquivalencias, eqVazia, mesclarEquivalencias, alterarStatusEq,
+  configPadrao, registrarPrestadorDoMV, conferirCruzado, corrigirPrestador, xlsxConferencia, xlsxCorrecao, xlsxExtracao, conflitosEquivalencias,
+  registroRodada, compararRodadas, STATUS_CONF, ESTADO_CORR, MARCADORES, MOTIVOS_CORR, norm, nivelNome, avaliarProcedimento, indiceEquivalencias, chaveTitulo };
+window.PRONTO = true;
+</script></body></html>
