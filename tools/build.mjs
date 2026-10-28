@@ -17,6 +17,7 @@ const partes = {
   '@@ENGINE@@': juntar('src/engine'),
   '@@UI@@': harness ? '' : juntar('src/ui'),
   '@@VERSAO@@': versao,
+  '@@ICONE@@': b64('src/icone.svg'),
   '@@LIB_JSZIP@@': b64('lib/jszip.min.js'),
   '@@LIB_PDF@@': b64('lib/pdf.min.mjs'),
   '@@LIB_WORKER@@': b64('lib/pdf.worker.min.mjs')
