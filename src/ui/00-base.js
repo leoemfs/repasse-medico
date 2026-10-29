@@ -24,7 +24,7 @@ const S = {
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema' };
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu' };
 function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 // Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
 function gravarLocal(k, v) {
@@ -136,6 +136,24 @@ function irPara(pag) {
 function atualizarNavPendencias() {
   const n = S.eq ? S.eq.itens.filter(e => e.status === 'pendente').length : 0;
   const b = $('navPend'); b.hidden = !n; b.textContent = n; b.title = `${n} equivalências pendentes de validação`;
+  // A dica e o nome lido pelo leitor de tela levam o número; recolhido/celular, o selo vira só um ponto.
+  const a = b.closest('a'), nome = n ? `Equivalências TUSS · ${n} pendentes` : 'Equivalências TUSS';
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+}
+
+/* ---------- Menu lateral recolhível (☰ e Ctrl+B); a escolha fica salva neste navegador ---------- */
+function aplicarMenu(recolhido) {
+  document.querySelector('.shell').classList.toggle('recolhido', recolhido);
+  const b = $('btnMenu'); b.setAttribute('aria-expanded', String(!recolhido)); b.setAttribute('aria-label', recolhido ? 'Expandir menu' : 'Recolher menu');
+}
+function alternarMenu() {
+  const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
+  aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
+}
+function iniciarMenu() {
+  aplicarMenu(lerLocal(CHAVES.menu) === true);
+  $('btnMenu').onclick = alternarMenu;
+  document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
 
 /* ---------- Tabela paginada com detalhe expansível ---------- */

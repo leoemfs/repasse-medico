@@ -11,7 +11,7 @@ Aplicação local, em um único HTML, para conferir o repasse médico: relatóri
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
-| `test/` | `motor.mjs` (motor no Chromium) e `e2e.mjs` (ponta a ponta, por file://) |
+| `test/` | `motor.mjs` (motor no Chromium), `e2e.mjs` (ponta a ponta, por file://) e `menu.mjs` (navegação) |
 | `dados/` | Arquivos reais para teste. **Fora do Git** (dados de pacientes) |
 
 ## Comandos
@@ -21,6 +21,7 @@ node tools/build.mjs            # gera o HTML final em dist/
 node tools/build.mjs --harness  # gera dist/harness.html para test/motor.mjs
 node test/motor.mjs             # motor com os arquivos de dados/
 node test/e2e.mjs               # interface completa com os arquivos de dados/
+node test/menu.mjs              # menu recolhível, Ctrl+B e barra do celular
 ```
 
 ## Regras de desenvolvimento

@@ -11,17 +11,28 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--side) 232px,var(--bg) 232px)}
-.sidebar{background:var(--side);color:var(--side-t);padding:20px 12px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow-y:auto}
-.brand{display:flex;gap:10px;align-items:center;padding:0 6px 16px;border-bottom:1px solid #2c3b4e}
-.brand-mark{width:40px;height:40px;border-radius:10px;display:block}
-.brand strong{display:block;color:#fff;font-size:14px}.brand small{color:#93a4b9;font-size:11px}
+.shell{--menu:232px;display:grid;grid-template-columns:var(--menu) minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--side) var(--menu),var(--bg) var(--menu))}
+.shell.recolhido{--menu:64px}
+.sidebar{background:var(--side);color:var(--side-t);padding:16px 10px;display:flex;flex-direction:column;gap:16px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:4}
+.brand{display:flex;gap:8px;align-items:center;padding:0 2px 14px 4px;border-bottom:1px solid #2c3b4e;white-space:nowrap}
+.brand-mark{width:36px;height:36px;border-radius:10px;display:block;flex:none}
+.brand-nome{min-width:0;flex:1;overflow:hidden}.brand strong{display:block;color:#fff;font-size:14px}.brand small{color:#93a4b9;font-size:11px}
+.hamb{margin-left:auto;flex:none;width:32px;height:32px;padding:0;display:grid;place-items:center;background:none;border:0;border-radius:8px;color:var(--side-t);cursor:pointer}
+.hamb:hover{background:#223349;color:#fff;border:0}.hamb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 .nav{display:flex;flex-direction:column;gap:4px}
-.nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px}
-.nav a span{width:18px;text-align:center;font-size:16px}
+.nav a{position:relative;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
+.nav a svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .nav a:hover{background:#223349;color:#fff}.nav a.ativo{background:#2a5d8c;color:#fff}
-.pill{margin-left:auto;background:#d97b29;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
+.nav .curto,.nav .dica{display:none}
+.pill{margin-left:auto;flex:none;background:#d97b29;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
 .side-note{margin-top:auto;background:#1f2f42;border:1px solid #2f4258;border-radius:10px;padding:10px 12px;font-size:11.5px}.side-note strong{color:#fff}.side-note p{margin:4px 0 0}
+/* Menu recolhido: só ícones, como atalhos; nome em dica ao passar o mouse; pendências como ponto */
+.recolhido .sidebar{overflow:visible}
+.recolhido .brand{justify-content:center;padding:2px 0 14px}.recolhido .brand-mark,.recolhido .brand-nome,.recolhido .rot,.recolhido .side-note{display:none}
+.recolhido .hamb{margin:0}
+.recolhido .nav a{justify-content:center;padding:10px 0}
+.recolhido .pill{position:absolute;top:6px;left:calc(50% + 6px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box}
+.recolhido .nav a:hover .dica,.recolhido .nav a:focus-visible .dica{display:block;position:absolute;left:56px;top:50%;transform:translateY(-50%);background:#0d131b;color:#fff;font-size:12px;padding:5px 9px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:10;pointer-events:none}
 .main{padding:22px clamp(16px,2.6vw,36px) 40px;min-width:0}
 .topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .topo h1{margin:2px 0 0;font-size:24px}.eyebrow{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--muted)}
@@ -86,9 +97,16 @@ dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-bo
 code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
 @media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
 @media (max-width:760px){
-  .shell{display:block;background:var(--bg)}
-  .sidebar{position:sticky;top:0;height:auto;z-index:5;padding:8px 10px;gap:8px}
-  .brand,.side-note{display:none}
-  .nav{flex-direction:row;overflow-x:auto;gap:4px;scrollbar-width:none}.nav a{white-space:nowrap;padding:8px 10px;font-size:12px}
-  .main{padding:16px 16px 32px}.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}
+  /* Celular: topo enxuto e barra de atalhos fixa no rodapé */
+  .shell,.shell.recolhido{display:block;background:var(--bg)}
+  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible}
+  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start}
+  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.hamb,.side-note{display:none!important}
+  .nav{position:fixed;left:0;right:0;bottom:0;flex-direction:row;gap:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
+  .nav a,.recolhido .nav a{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:7px 0;border-radius:10px;font-size:9.5px;overflow:hidden}
+  .nav a svg{width:22px;height:22px}
+  .nav .rot,.nav .dica,.recolhido .nav a:hover .dica{display:none}.nav .curto{display:block}
+  .pill,.recolhido .pill{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box;margin:0}
+  .main{padding:16px 16px calc(84px + env(safe-area-inset-bottom))}.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}
+}
 }
