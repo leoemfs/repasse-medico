@@ -20,11 +20,12 @@ const S = {
   relatorios: [],          // [{id, nome, tamanho, hash, rel}]
   apolo: null, pbi: null,
   conf: null, corr: null,  // {res, ctx, rodada, comparacao}
-  rodadas: []
+  rodadas: [],
+  fluxo: null             // {schema, versaoSchema, modelo, competencias:{chave: competência}}
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu' };
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior' };
 function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 // Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
 function gravarLocal(k, v) {
@@ -85,7 +86,7 @@ function dialogo(titulo, corpoHtml, botoes = [['ok', 'OK']]) {
     const d = $('dlg'); $('dlgTitulo').textContent = titulo; $('dlgCorpo').innerHTML = corpoHtml;
     $('dlgBotoes').innerHTML = botoes.map(([v, t, cls]) => `<button value="${esc(v)}" class="${cls || ''}">${esc(t)}</button>`).join('');
     d.onclose = () => {
-      const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
+      const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { if (el.type === 'radio') { if (el.checked) campos[el.name] = el.value; else if (!(el.name in campos)) campos[el.name] = ''; } else campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
       res({ botao: d.returnValue, campos });
     };
     d.returnValue = ''; d.showModal();
@@ -123,7 +124,7 @@ function zonaArquivo(el, input, aoReceber) {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';

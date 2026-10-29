@@ -8,7 +8,8 @@
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   S.operador = lerLocal(CHAVES.operador) || '';
-  iniciarMenu(); mostrarOperador(); atualizarNavPendencias();
+  carregarFluxo();
+  iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo();
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';
   await abrirDB(); S.rodadas = await dbTodas();

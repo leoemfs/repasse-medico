@@ -30,7 +30,7 @@ const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isM
 m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#inicio'); await m.waitForFunction(() => window.__RM);
 const barra = await m.evaluate(() => { const r = document.querySelector('.nav').getBoundingClientRect(); return { y: Math.round(r.bottom), h: Math.round(r.height), n: [...document.querySelectorAll('.nav .curto')].filter(e => e.offsetParent).length, hamb: !!document.getElementById('btnMenu').offsetParent }; });
-ok(barra.y === 844 && barra.n === 7 && !barra.hamb, `barra fixa no rodapé com 7 atalhos e sem ☰ (${JSON.stringify(barra)})`);
+ok(barra.y === 844 && barra.n === 8 && !barra.hamb, `barra fixa no rodapé com 8 atalhos e sem ☰ (${JSON.stringify(barra)})`);
 await m.tap('.nav a[data-pag="correcao"]'); await m.waitForFunction(() => document.getElementById('titulo').textContent !== 'Início', null, { timeout: 3000 }).catch(() => {});
 ok(await m.textContent('#titulo') === 'Correção de prestador', 'toque na barra navega');
 ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'sem rolagem horizontal');

@@ -1,9 +1,13 @@
 # Próximas funções — requisitos registrados
 
-Situação: **em levantamento** (não codificar até o usuário enviar as informações e aprovar a prévia visual).
+Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); **SOL-F3 em levantamento** (prévia visual antes de codificar).
 Registrado em 29/10/2026 a partir da conversa com o usuário. Referência visual atual: Microsoft To Do (listas por tipo de repasse).
 
-## SOL-F1 — Aba «Fluxo»
+## SOL-F1 — Aba «Fluxo mensal» — IMPLEMENTADA na v2.0.0-alpha.2
+
+Especificação final em `especificacao-fluxo-mensal.md`; guia em `como-usar-fluxo-mensal.md`. Decisões de 29/10/2026: 15º dia útil (não dia 15) para NCs de USG e início do IMG; NCs não bloqueiam o IMG; pagamento de IMG, Curitiba e Sedação no último dia útil; só feriados nacionais; rodada vinculada nunca conclui etapa sozinha; «Fluxo mensal» por extenso, «Fluxo» só onde não couber.
+
+### Requisito original
 
 Nome aprovado pelo usuário: **Fluxo** (substitui as sugestões «Fechamento» / «Checklist do repasse»). Motivo: acompanhar, cadastrar e manter fluxos.
 
@@ -23,7 +27,9 @@ Aguardando do usuário:
 3. Prazos de cada tipo (USG até o dia 15; demais a informar).
 4. Se mais alguém usará (hoje os dados ficam só no navegador).
 
-## SOL-F2 — Anotações
+## SOL-F2 — Anotações — IMPLEMENTADA dentro do Fluxo mensal (anotações por competência e observações por seção)
+
+### Requisito original
 
 Hoje o usuário usa bloco de notas e anotações soltas no e-mail.
 - Área de anotações **junto do Fluxo ou separada** (decidir na prévia).

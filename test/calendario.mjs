@@ -1,0 +1,27 @@
+// Testes do calendário de dias úteis e dos marcos do fluxo mensal (Node puro).
+import fs from 'fs'; import vm from 'vm';
+const raiz = new URL('..', import.meta.url).pathname;
+const ctx = vm.createContext({ TextDecoder, console });
+for (const f of ['00-util.js', '85-fluxo.js']) vm.runInContext(fs.readFileSync(raiz + 'src/engine/' + f, 'utf8'), ctx);
+const ev = s => vm.runInContext(s, ctx);
+let falhas = 0;
+const ok = (desc, obtido, esperado) => { const b = JSON.stringify(obtido) === JSON.stringify(esperado); if (!b) falhas++; console.log(`${b ? '✔' : '✘'} ${desc}: ${obtido}${b ? '' : ` (esperado ${esperado})`}`); };
+ok('Páscoa 2026', ev("isoDia(pascoa(2026))"), '2026-04-05');
+ok('Páscoa 2027', ev("isoDia(pascoa(2027))"), '2027-03-28');
+ok('Sexta-feira Santa 2026 é feriado', ev("calendario(2026).feriado(dataUTC(2026,4,3))"), 'Sexta-feira Santa');
+ok('20/11 é feriado nacional', ev("calendario(2026).feriado(dataUTC(2026,11,20))"), 'Dia Nacional de Zumbi e da Consciência Negra');
+ok('Carnaval não é feriado por padrão', ev("calendario(2026).util(dataUTC(2026,2,17))"), true);
+const m = ev("(() => { const r = calcularMarcos(modeloFluxoPadrao(), 2026, 10, {}); return Object.fromEntries(Object.entries(r.datas).map(([k,v]) => [k, isoDia(v)])); })()");
+ok('Out/2026 5º dia útil (fechamento USG = Dt. Repasse do PDF)', m.fechUSG, '2026-10-07');
+ok('Out/2026 pagamento USG', m.pagUSG, '2026-10-15');
+ok('Envio USG: 15/10 − 5 = 10/10 (sábado) → 09/10', m.envioUSG, '2026-10-09');
+ok('NCs de USG: 15º dia útil', m.ncUSG, '2026-10-22');
+ok('Curitiba: 20º dia útil', m.fimCuritiba, '2026-10-29');
+ok('Pagamento IMG: último dia útil', m.pagIMG, '2026-10-30');
+ok('Envio Sedação: 30/10 − 5 = 25/10 (domingo) → 23/10', m.envioSedacao, '2026-10-23');
+ok('Envio Curitiba: o que vier primeiro (20º d.u. × 5 dias antes do pagto)', m.envioCuritiba, '2026-10-23');
+const n = ev("(() => { const r = calcularMarcos(modeloFluxoPadrao(), 2026, 11, {}); return [isoDia(r.datas.fechUSG), isoDia(r.datas.pagUSG), isoDia(r.datas.pagIMG)]; })()");
+ok('Nov/2026: 5º d.u. (02/11 feriado), pagto USG 15/11 (dom) → 13/11, último d.u.', n, ['2026-11-09', '2026-11-13', '2026-11-30']);
+const man = ev("isoDia(calcularMarcos(modeloFluxoPadrao(), 2026, 10, {}, { pagIMG: { data: '2026-10-29', justificativa: 'teste' } }).datas.envioIMG)");
+ok('Data manual de pagamento recalcula o envio', man, '2026-10-23');
+process.exitCode = falhas ? 1 : 0;
