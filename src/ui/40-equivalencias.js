@@ -14,7 +14,8 @@ RENDER.equivalencias = () => {
       <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div></div>
-  ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul>${conf.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')}</li>`).join('')}</ul></div>` : ''}
+  ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
+    <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
     <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas']], FE.status)}</select></label>
@@ -23,6 +24,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
+  $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
   const filtrar = () => {
@@ -88,4 +90,19 @@ async function novaRelacaoManual() {
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
   if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual', S.comp);
   salvarEq('Relação cadastrada.'); RENDER.equivalencias();
+}
+
+async function desfazerConflito(c) {
+  const op = await exigirOperador(); if (!op) return;
+  const porCodigo = [...new Map(c.relacoes.map(e => [e.codigo, e])).values()];
+  const r = await dialogo('Desfazer conflito', `<p class="small">«${esc(c.titulo)}» está validado para ${porCodigo.length} códigos. Escolha o correto: as validações dos outros voltam a pendente.</p>
+    ${porCodigo.map((e, i) => `<label class="opcao-conf"><input type="radio" name="codigo" value="${esc(e.codigo)}"${i ? '' : ' checked'}> <b>${esc(e.codigo)}</b> — ${esc(e.descMV || '')} <span class="muted small">(validada por ${esc(e.responsavel || '—')}${e.validadoEm ? ' em ' + new Date(e.validadoEm).toLocaleDateString('pt-BR') : ''})</span></label>`).join('')}
+    <label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Manter o escolhido']]);
+  if (r.botao !== 'ok') return;
+  if (!r.campos.just.trim()) return avisar('Informe a justificativa para desfazer o conflito.', 'warn');
+  try {
+    const n = resolverConflito(S.eq, c.chave, r.campos.codigo, op, r.campos.just, S.comp);
+    salvarEq(`Conflito desfeito em «${c.titulo}»: mantido ${r.campos.codigo}; ${n} relação(ões) voltaram a pendente.`);
+  } catch (e) { return avisar(e.message, 'err'); }
+  RENDER.equivalencias();
 }

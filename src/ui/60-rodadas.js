@@ -30,8 +30,8 @@ RENDER.rodadas = async () => {
     const r = S.rodadas.find(x => x.id === b.dataset.ac);
     if (!exigirAberta(competenciaDaRodada(r), 'registrar aceite')) return;
     const op = await exigirOperador(); if (!op) return;
-    const pend = r.linhas.filter(l => !['conferido', 'identificado'].includes(l.estado)).length;
-    const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
+    const pend = pendenciasDaRodada(r, indiceDecisoesComp(competenciaDaRodada(r))).length;
+    const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas (já descontadas as NCs e as linhas consideradas no repasse)</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
     if (d.botao !== 'ok') return;
     if (pend && !d.campos.obs.trim()) return avisar('Com pendências abertas, informe uma observação para o aceite.', 'warn');
     r.aceite = { por: op, em: agoraISO(), obs: d.campos.obs.trim(), pendencias: pend };

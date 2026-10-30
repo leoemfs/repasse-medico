@@ -10,7 +10,10 @@ function registroRodada(res, ctx) {
     repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, chaveCompetencia: ctx.chaveCompetencia || '', descricao: ctx.relatorio.cab.descricao,
     parametros: ctx.parametros, versoes: { motor: MOTOR_VERSAO, equivalencias: res.eqRevisao, configuracao: ctx.cfgRevisao },
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
-    linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse })),
+    // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
+    linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
+      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
+      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '' })),
     aceite: null
   };
 }

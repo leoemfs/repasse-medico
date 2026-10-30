@@ -36,14 +36,15 @@ function xlsxExtracao(rel) {
 
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
-  const cabConf = [...cabecalho(['Origem', 'Categoria principal', 'Marcadores', 'Motivo / evidências']), ...cabecalho(colunasMV), ...cabecalho(colunasLaudo, { ...CAB, fill: '2E7D32' }), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação'], { ...CAB, fill: '5B5B5B' })];
+  const cabConf = [...cabecalho(['Origem', 'Categoria principal', 'Marcadores', 'Motivo / evidências']), ...cabecalho(colunasMV), ...cabecalho(colunasLaudo, { ...CAB, fill: '2E7D32' }), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação', 'Decisão na competência'], { ...CAB, fill: '5B5B5B' })];
   const linhaConf = x => {
     const f = st(x.status), p = x.par;
     return [{ v: x.origem, st: f }, { v: STATUS_CONF[x.status].nome, st: { ...f, b: true } }, { v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { ...f, wrap: true } }, { v: x.motivos.join(' | '), st: { ...f, wrap: true } },
       ...celulasMV(x.r, x.tipo, f), ...celulasLaudo(x.l, f),
-      { v: p ? p.tier : '', st: f }, { v: p?.proc?.relacao ? `${p.proc.relacao.codigo} × ${p.proc.relacao.titulo} (${STATUS_EQ[p.proc.relacao.status]})` : '', st: f }, { v: p?.proc?.relacao?.responsavel || '', st: f }];
+      { v: p ? p.tier : '', st: f }, { v: p?.proc?.relacao ? `${p.proc.relacao.codigo} × ${p.proc.relacao.titulo} (${STATUS_EQ[p.proc.relacao.status]})` : '', st: f }, { v: p?.proc?.relacao?.responsavel || '', st: f },
+      { v: x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo]}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : '', st: f }];
   };
-  const larg = [8, 22, 34, 70, 8, 30, 7, 12, 46, 26, 9, 10, 11, 30, 26, 11, 7, 11, 9, 11, 20, 12, 10, 22, 30, 12, 40, 34, 11, 26, 10, 30, 8, 50, 22];
+  const larg = [8, 22, 34, 70, 8, 30, 7, 12, 46, 26, 9, 10, 11, 30, 26, 11, 7, 11, 9, 11, 20, 12, 10, 22, 30, 12, 40, 34, 11, 26, 10, 30, 8, 50, 22, 40];
   const todas = [cabConf, ...res.linhas.map(linhaConf)];
   const abas = [];
   // Resumo

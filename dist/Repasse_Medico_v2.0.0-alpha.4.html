@@ -200,6 +200,9 @@ button.mini{padding:4px 10px;font-size:12px}
 .nota-global{margin:0 0 10px}
 @media (max-width:760px){.topo-dir{width:100%}.comp-global{flex:1 1 100%;justify-content:space-between}.comp-rot{min-width:0}.comp-rot small{white-space:normal}}
 .comp-global[hidden]{display:none}
+.conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
+.st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
+td .st.dec-nc,td .st.dec-considerar{margin-left:4px}
 
 </style>
 </head>
@@ -1093,9 +1096,17 @@ function conflitosEquivalencias(base) {
   for (const [kt, rel] of idx.porTitulo) {
     const val = rel.filter(e => e.status === 'validada');
     const cods = [...new Set(val.map(e => e.codigo))];
-    if (cods.length > 1) out.push({ titulo: val[0].titulo, codigos: cods, ids: val.map(e => e.id) });
+    if (cods.length > 1) out.push({ chave: kt, titulo: val[0].titulo, codigos: cods, ids: val.map(e => e.id), relacoes: val });
   }
   return out;
+}
+// Desfazer conflito: ficam validadas só as relações do código escolhido; as demais do mesmo título voltam a pendente.
+function resolverConflito(base, chaveT, codigoManter, responsavel, justificativa, competencia = '') {
+  if (!String(justificativa || '').trim()) throw new Error('Informe a justificativa para desfazer o conflito.');
+  const doTitulo = base.itens.filter(e => e.status === 'validada' && chaveTitulo(e.titulo) === chaveT);
+  if (!doTitulo.some(e => e.codigo === codigoManter)) throw new Error(`O código ${codigoManter} não está validado para este título.`);
+  const ids = doTitulo.filter(e => e.codigo !== codigoManter).map(e => e.id);
+  return alterarStatusEq(base, ids, 'pendente', responsavel, `Conflito desfeito: mantido o código ${codigoManter}. ${justificativa.trim()}`, competencia);
 }
 
 /* ---- src/engine/60-conferencia.js ---- */
@@ -1402,7 +1413,10 @@ function registroRodada(res, ctx) {
     repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, chaveCompetencia: ctx.chaveCompetencia || '', descricao: ctx.relatorio.cab.descricao,
     parametros: ctx.parametros, versoes: { motor: MOTOR_VERSAO, equivalencias: res.eqRevisao, configuracao: ctx.cfgRevisao },
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
-    linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse })),
+    // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
+    linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
+      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
+      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '' })),
     aceite: null
   };
 }
@@ -1488,6 +1502,54 @@ function conferirProducao(datas, chave) {
 const rotuloMes = m => m ? `${m.slice(5)}/${m.slice(0, 4)}` : '—';
 // Competência de uma rodada: a escolhida no topo quando ela foi executada (rodadas antigas: mês da execução).
 const competenciaDaRodada = r => r.chaveCompetencia || (r.em ? r.em.slice(0, 7) : '');
+
+/* ---- src/engine/84-decisoes.js ---- */
+/* ============================================================
+ * Memória das decisões por linha na competência (SOL-F6)
+ * - «Tratado: NC»: vem das próprias NCs da competência (menos «não procede»), pelas chaves
+ *   da linha guardadas na origem da NC. Se o procedimento sair do relatório e o laudo
+ *   aparecer «Só no laudo» na próxima rodada, ele continua reconhecido como NC.
+ * - «Considerado no repasse»: a linha não bate, mas entra no repasse; justificativa obrigatória.
+ * - Linha do MV reconhecida por conta + atendimento + código + data; laudo pelo ID do Apolo.
+ *   Nenhuma das chaves leva nome de paciente.
+ * ============================================================ */
+const TIPOS_DECISAO = { nc: 'Tratado: NC', considerar: 'Considerado no repasse' };
+const chaveMVDecisao = r => r ? `M|${r.conta}|${r.atendimento}|${r.codigo}|${isoDia(r.data)}` : '';
+const chaveLaudoDecisao = l => !l ? '' : l.idLaudo ? `L|${l.idLaudo}` : `L|${l.idPac}|${isoDia(l.data)}|${chaveTitulo(l.titulo)}`;
+const chavesDaLinha = (r, l) => [chaveMVDecisao(r), chaveLaudoDecisao(l)].filter(Boolean);
+
+function indiceDecisoes(ncs, considerar) {
+  const m = new Map();
+  for (const d of considerar || []) for (const k of d.chaves) m.set(k, { tipo: 'considerar', id: d.id, justificativa: d.justificativa, por: d.por, em: d.em });
+  for (const nc of ncs || []) {
+    if (nc.situacao === 'nao-procede') continue;
+    for (const k of nc.origem?.chavesLinha || []) m.set(k, { tipo: 'nc', ncId: nc.id, natureza: nc.natureza, situacao: nc.situacao, por: nc.criadaPor, em: nc.criadaEm });
+  }
+  return m;
+}
+const decisaoDaLinha = (idx, r, l) => chavesDaLinha(r, l).map(k => idx.get(k)).find(Boolean) || null;
+function aplicarDecisoes(res, idx) {
+  const n = { nc: 0, considerar: 0 };
+  for (const x of res.linhas) { x.decisao = decisaoDaLinha(idx, x.r, x.l); if (x.decisao) n[x.decisao.tipo]++; }
+  res.porDecisao = n;
+  return res;
+}
+function registrarConsiderar(reg, chave, chaves, justificativa, por, resumo = {}) {
+  if (!String(justificativa || '').trim()) throw new Error('Informe a justificativa para considerar a linha no repasse.');
+  const c = itemCompetencia(reg, chave);
+  c.decisoes = c.decisoes || [];
+  const d = { id: novoId('dec'), chaves, justificativa: justificativa.trim(), por, em: agoraISO(), resumo };
+  c.decisoes.push(d);
+  return d;
+}
+function removerConsiderar(reg, chave, id) {
+  const c = itemCompetencia(reg, chave), antes = (c.decisoes || []).length;
+  c.decisoes = (c.decisoes || []).filter(d => d.id !== id);
+  return antes !== c.decisoes.length;
+}
+// Linhas de uma rodada que continuam pendentes depois das decisões (para o aceite e o fechamento).
+const linhaResolvida = l => ['conferido', 'identificado'].includes(l.estado);
+const pendenciasDaRodada = (rodada, idx) => rodada.linhas.filter(l => !linhaResolvida(l) && !idx.has(l.kd) && !(l.kl && idx.has(l.kl)));
 
 /* ---- src/engine/85-fluxo.js ---- */
 /* ============================================================
@@ -1949,6 +2011,7 @@ function montarCandidato(tipo, campos, ctx, motivo, extra = {}) {
     competencia: ctx.competencia || competenciaDaProducao(paraData(campos.data)),
     origem: { tipo: ctx.tipoAnalise, rodadaId: ctx.rodadaId || '', relatorio: ctx.relatorio ? `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome} · ${ctx.relatorio.cab.repasse}` : '' } };
   c.chave = chaveNC({ ...c.campos, categoria: c.categoria });
+  c.chavesLinha = extra.chavesLinha || [];
   return c;
 }
 function tipoCandidatoConferencia(x) {
@@ -1963,17 +2026,18 @@ function tipoCandidatoConferencia(x) {
 const competenciaDoRelatorio = rel => { const p = periodoDoRelatorio(rel.regs); return p ? competenciaDaProducao(p[1]) : ''; };
 function candidatoDaLinhaConferencia(x, ctx, cfg, tipo = null) {
   const t = tipo || tipoCandidatoConferencia(x) || 'manual';
-  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
+  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '), { chavesLinha: chavesDaLinha(x.r, x.l) });
 }
 function candidatosDaConferencia(res, ctx, cfg) {
   const out = [];
-  for (const x of res.linhas) { const t = tipoCandidatoConferencia(x); if (t) out.push(candidatoDaLinhaConferencia(x, ctx, cfg, t)); }
+  // Linha com decisão na competência (NC registrada ou considerada no repasse) não volta como candidata.
+  for (const x of res.linhas) { const t = !x.decisao && tipoCandidatoConferencia(x); if (t) out.push(candidatoDaLinhaConferencia(x, ctx, cfg, t)); }
   return out;
 }
 function candidatoDaLinhaCorrecao(o, ctx, cfg, tipo = null) {
   const campos = camposDaLinha(o.r, o.laudo, ctx, cfg);
   const ehPrestador = tipo === 'prestador-identificado' || o.estado === 'identificado';
-  const extra = ehPrestador ? { campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '' };
+  const extra = ehPrestador ? { chavesLinha: chavesDaLinha(o.r, o.laudo), campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '', chavesLinha: chavesDaLinha(o.r, o.laudo) };
   return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
 }
 // Só vira candidato o laudo de médico diferente do prestador do relatório.
@@ -1984,7 +2048,7 @@ function candidatosDaCorrecao(res, ctx, cfg) {
 // Candidato → dados de uma NC nova, com as escolhas do usuário por cima da sugestão.
 const dadosDoCandidato = (c, escolha) => ({ ...c.campos, categoria: escolha.categoria || c.categoria, natureza: escolha.natureza || c.natureza, competencia: escolha.competencia || c.competencia,
   responsavel: escolha.responsavel ?? c.campos.responsavel ?? '', detalhe: escolha.detalhe || '', obs: escolha.obs || '', impactaPagamento: escolha.impactaPagamento,
-  origem: { ...c.origem, tipoCandidato: c.tipo, motivo: c.motivo, chaveCandidato: c.chave } });
+  origem: { ...c.origem, tipoCandidato: c.tipo, motivo: c.motivo, chaveCandidato: c.chave, chavesLinha: c.chavesLinha || [] } });
 
 /* ---------- Faturista do atendimento (Power BI, quando a planilha trouxer a coluna) ---------- */
 function faturistaDoAtendimento(pbi, atendimento, conta) {
@@ -2115,14 +2179,15 @@ function xlsxExtracao(rel) {
 
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
-  const cabConf = [...cabecalho(['Origem', 'Categoria principal', 'Marcadores', 'Motivo / evidências']), ...cabecalho(colunasMV), ...cabecalho(colunasLaudo, { ...CAB, fill: '2E7D32' }), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação'], { ...CAB, fill: '5B5B5B' })];
+  const cabConf = [...cabecalho(['Origem', 'Categoria principal', 'Marcadores', 'Motivo / evidências']), ...cabecalho(colunasMV), ...cabecalho(colunasLaudo, { ...CAB, fill: '2E7D32' }), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação', 'Decisão na competência'], { ...CAB, fill: '5B5B5B' })];
   const linhaConf = x => {
     const f = st(x.status), p = x.par;
     return [{ v: x.origem, st: f }, { v: STATUS_CONF[x.status].nome, st: { ...f, b: true } }, { v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { ...f, wrap: true } }, { v: x.motivos.join(' | '), st: { ...f, wrap: true } },
       ...celulasMV(x.r, x.tipo, f), ...celulasLaudo(x.l, f),
-      { v: p ? p.tier : '', st: f }, { v: p?.proc?.relacao ? `${p.proc.relacao.codigo} × ${p.proc.relacao.titulo} (${STATUS_EQ[p.proc.relacao.status]})` : '', st: f }, { v: p?.proc?.relacao?.responsavel || '', st: f }];
+      { v: p ? p.tier : '', st: f }, { v: p?.proc?.relacao ? `${p.proc.relacao.codigo} × ${p.proc.relacao.titulo} (${STATUS_EQ[p.proc.relacao.status]})` : '', st: f }, { v: p?.proc?.relacao?.responsavel || '', st: f },
+      { v: x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo]}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : '', st: f }];
   };
-  const larg = [8, 22, 34, 70, 8, 30, 7, 12, 46, 26, 9, 10, 11, 30, 26, 11, 7, 11, 9, 11, 20, 12, 10, 22, 30, 12, 40, 34, 11, 26, 10, 30, 8, 50, 22];
+  const larg = [8, 22, 34, 70, 8, 30, 7, 12, 46, 26, 9, 10, 11, 30, 26, 11, 7, 11, 9, 11, 20, 12, 10, 22, 30, 12, 40, 34, 11, 26, 10, 30, 8, 50, 22, 40];
   const todas = [cabConf, ...res.linhas.map(linhaConf)];
   const abas = [];
   // Resumo
@@ -2777,6 +2842,9 @@ function seletoresAnalise(prefixo, tolPadrao) {
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
     <div id="${prefixo}Extra"></div></div>`;
 }
+// Decisões da competência do topo: NCs registradas (pelas chaves da linha) e linhas consideradas no repasse.
+const indiceDecisoesComp = (chave = S.comp) => indiceDecisoes(S.nc.itens.filter(x => x.competencia === chave), estadoCompetencia(S.compReg, chave).decisoes);
+const chipDecisao = d => d ? ` <span class="st dec-${d.tipo}" title="${esc(d.tipo === 'nc' ? `NC ${SITUACAO_NC[d.situacao] || ''}` : d.justificativa)}">${esc(TIPOS_DECISAO[d.tipo])}</span>` : '';
 function relSelecionado(prefixo) { return S.relatorios.find(r => r.id === $(prefixo + 'Rel').value); }
 
 /* ---------- Competência: produção dos arquivos e resultado de outra competência ---------- */
@@ -2833,7 +2901,7 @@ async function executarConferencia() {
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
   if (!exigirAberta(S.comp, 'executar uma conferência')) return;
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
-  const res = conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos });
+  const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos }), indiceDecisoesComp());
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
   const medicosNomes = medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '';
   const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
@@ -2850,6 +2918,7 @@ async function executarConferencia() {
 
 function desenharConferencia() {
   const { res, ctx, comparacao } = S.conf, c = $('cfRes'); if (!c) return;
+  aplicarDecisoes(res, indiceDecisoesComp(ctx.chaveCompetencia));
   const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
   c.innerHTML = `<div class="card"><h2>Resultado <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
     <dl class="kv"><dt>Relatório</dt><dd>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · repasse ${esc(ctx.relatorio.cab.repasse)} · ${esc(ctx.relatorio.cab.descricao)}</dd>
@@ -2859,7 +2928,7 @@ function desenharConferencia() {
     <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
     ${comparacao ? resumoComparacao(comparacao) : ''}
     <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
-    <div class="marcadores">${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
+    <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
     <div class="acoes"><input type="search" id="cfBusca" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}" style="max-width:420px"><button id="cfExcel">Exportar Excel</button><button id="cfLimpar" class="sec">Limpar filtros</button></div>
     <div id="cfTab" style="margin-top:10px"></div></div>
@@ -2873,25 +2942,32 @@ function desenharConferencia() {
   const filtrar = () => {
     const q = norm(S.conf.busca);
     return res.linhas.filter(x => (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
-      && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => x.marcadores.has(m)))
+      && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => m.startsWith('dec-') ? x.decisao?.tipo === m.slice(4) : x.marcadores.has(m)))
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
       { t: 'Linha', n: true, v: x => x.r ? x.r.seq : '—' }, { t: 'Origem', v: x => x.origem },
-      { t: 'Categoria', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) },
+      { t: 'Categoria', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) },
       { t: 'Código', v: x => x.r?.codigo || '' }, { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente },
       { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) }, { t: 'TITLE do laudo', v: x => x.l?.titulo || '' },
       { t: 'Médico do laudo', v: x => x.l?.medico || '' }, { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' },
       { t: 'Marcadores', v: x => [...x.marcadores].map(m => MARCADORES[m]).join(' · ') }
     ],
-    detalhe: x => `<div class="acoes" style="margin:0 0 8px"><button class="sec mini" data-nc-linha="${res.linhas.indexOf(x)}">Apontar como NC…</button></div><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+    detalhe: x => `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, res.linhas.indexOf(x))}</div><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
       ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map(cd => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]})${cd.l === x.l ? '</strong>' : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; t.atualizar(filtrar()); };
-  $('cfTab').addEventListener('click', e => { const b = e.target.closest('[data-nc-linha]'); if (b) abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]).then(ok => ok && desenharConferencia()); });
+  $('cfTab').addEventListener('click', async e => {
+    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar]'); if (!b) return;
+    let ok = false;
+    if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
+    else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
+    else ok = await removerDecisaoConsiderar(res.linhas[+b.dataset.desconsiderar]);
+    if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
+  });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
 
@@ -2900,6 +2976,31 @@ function resumoComparacao({ ant, grupos }) {
   return `<div class="card" style="background:var(--infobg);border-color:transparent;margin-top:12px"><strong>Comparação com a rodada de ${new Date(ant.em).toLocaleString('pt-BR')}</strong>
     <div class="small" style="margin-top:4px">${n('agoraIdentificados')} passaram a conferido/identificado · ${n('continuamPendentes')} continuam pendentes · ${n('mudaramEstado')} mudaram de categoria · ${n('mudaramMedico')} mudaram de médico · ${n('novos')} linhas novas · ${n('desapareceram')} saíram da extração · ${n('semMudanca')} sem mudança.</div>
     <div class="small muted">A nova extração mostra o que mudou nos dados; não prova quem fez a correção no MV.</div></div>`;
+}
+
+/* ---------- Decisões por linha (memória da competência) ---------- */
+function botoesDecisao(x, i) {
+  if (x.decisao?.tipo === 'nc') return `<span class="small">NC registrada (${esc(SITUACAO_NC[x.decisao.situacao] || '')}) — <a href="#nc">ver na aba Não conformidades</a>. Para desfazer, mude a NC para «Não procede».</span>`;
+  if (x.decisao?.tipo === 'considerar') return `<span class="small">Considerado no repasse por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
+  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}`;
+}
+async function considerarNoRepasse(x) {
+  if (!exigirAberta(S.comp, 'registrar decisões')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const r = await dialogo('Considerar no repasse', `<p class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · ${esc(fmtData(x.r.data))} · R$ ${fmtBR(x.r.vlRepasse)}</p>
+    <p class="small muted">A linha não bate, mas entra no repasse. A decisão vale para toda nova rodada da competência ${rotuloCompetencia(S.comp)} e não conta como pendência no aceite.</p>
+    <label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Considerar no repasse']]);
+  if (r.botao !== 'ok') return false;
+  if (!r.campos.just.trim()) { avisar('Informe a justificativa.', 'warn'); return false; }
+  registrarConsiderar(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.just, op, { codigo: x.r.codigo, desc: x.r.procDesc, titulo: x.l?.titulo || '' });
+  salvarCompReg(); avisar('Linha considerada no repasse nesta competência.', 'ok');
+  return true;
+}
+async function removerDecisaoConsiderar(x) {
+  if (!exigirAberta(S.comp, 'alterar decisões')) return false;
+  if (!await confirmar('Remover decisão?', 'A linha volta a aparecer como pendente na conferência.', 'Remover')) return false;
+  removerConsiderar(S.compReg, S.comp, x.decisao.id); salvarCompReg(); avisar('Decisão removida.', 'ok');
+  return true;
 }
 
 /* ---- src/ui/25-fluxo.js ---- */
@@ -3762,7 +3863,8 @@ RENDER.equivalencias = () => {
       <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div></div>
-  ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul>${conf.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')}</li>`).join('')}</ul></div>` : ''}
+  ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
+    <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
     <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas']], FE.status)}</select></label>
@@ -3771,6 +3873,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
+  $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
   const filtrar = () => {
@@ -3836,6 +3939,21 @@ async function novaRelacaoManual() {
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
   if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual', S.comp);
   salvarEq('Relação cadastrada.'); RENDER.equivalencias();
+}
+
+async function desfazerConflito(c) {
+  const op = await exigirOperador(); if (!op) return;
+  const porCodigo = [...new Map(c.relacoes.map(e => [e.codigo, e])).values()];
+  const r = await dialogo('Desfazer conflito', `<p class="small">«${esc(c.titulo)}» está validado para ${porCodigo.length} códigos. Escolha o correto: as validações dos outros voltam a pendente.</p>
+    ${porCodigo.map((e, i) => `<label class="opcao-conf"><input type="radio" name="codigo" value="${esc(e.codigo)}"${i ? '' : ' checked'}> <b>${esc(e.codigo)}</b> — ${esc(e.descMV || '')} <span class="muted small">(validada por ${esc(e.responsavel || '—')}${e.validadoEm ? ' em ' + new Date(e.validadoEm).toLocaleDateString('pt-BR') : ''})</span></label>`).join('')}
+    <label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Manter o escolhido']]);
+  if (r.botao !== 'ok') return;
+  if (!r.campos.just.trim()) return avisar('Informe a justificativa para desfazer o conflito.', 'warn');
+  try {
+    const n = resolverConflito(S.eq, c.chave, r.campos.codigo, op, r.campos.just, S.comp);
+    salvarEq(`Conflito desfeito em «${c.titulo}»: mantido ${r.campos.codigo}; ${n} relação(ões) voltaram a pendente.`);
+  } catch (e) { return avisar(e.message, 'err'); }
+  RENDER.equivalencias();
 }
 
 /* ---- src/ui/50-bases.js ---- */
@@ -3995,8 +4113,8 @@ RENDER.rodadas = async () => {
     const r = S.rodadas.find(x => x.id === b.dataset.ac);
     if (!exigirAberta(competenciaDaRodada(r), 'registrar aceite')) return;
     const op = await exigirOperador(); if (!op) return;
-    const pend = r.linhas.filter(l => !['conferido', 'identificado'].includes(l.estado)).length;
-    const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
+    const pend = pendenciasDaRodada(r, indiceDecisoesComp(competenciaDaRodada(r))).length;
+    const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas (já descontadas as NCs e as linhas consideradas no repasse)</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
     if (d.botao !== 'ok') return;
     if (pend && !d.campos.obs.trim()) return avisar('Com pendências abertas, informe uma observação para o aceite.', 'warn');
     r.aceite = { por: op, em: agoraISO(), obs: d.campos.obs.trim(), pendencias: pend };

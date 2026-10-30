@@ -153,7 +153,15 @@ function conflitosEquivalencias(base) {
   for (const [kt, rel] of idx.porTitulo) {
     const val = rel.filter(e => e.status === 'validada');
     const cods = [...new Set(val.map(e => e.codigo))];
-    if (cods.length > 1) out.push({ titulo: val[0].titulo, codigos: cods, ids: val.map(e => e.id) });
+    if (cods.length > 1) out.push({ chave: kt, titulo: val[0].titulo, codigos: cods, ids: val.map(e => e.id), relacoes: val });
   }
   return out;
+}
+// Desfazer conflito: ficam validadas só as relações do código escolhido; as demais do mesmo título voltam a pendente.
+function resolverConflito(base, chaveT, codigoManter, responsavel, justificativa, competencia = '') {
+  if (!String(justificativa || '').trim()) throw new Error('Informe a justificativa para desfazer o conflito.');
+  const doTitulo = base.itens.filter(e => e.status === 'validada' && chaveTitulo(e.titulo) === chaveT);
+  if (!doTitulo.some(e => e.codigo === codigoManter)) throw new Error(`O código ${codigoManter} não está validado para este título.`);
+  const ids = doTitulo.filter(e => e.codigo !== codigoManter).map(e => e.id);
+  return alterarStatusEq(base, ids, 'pendente', responsavel, `Conflito desfeito: mantido o código ${codigoManter}. ${justificativa.trim()}`, competencia);
 }

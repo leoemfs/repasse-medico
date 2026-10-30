@@ -190,6 +190,7 @@ function montarCandidato(tipo, campos, ctx, motivo, extra = {}) {
     competencia: ctx.competencia || competenciaDaProducao(paraData(campos.data)),
     origem: { tipo: ctx.tipoAnalise, rodadaId: ctx.rodadaId || '', relatorio: ctx.relatorio ? `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome} · ${ctx.relatorio.cab.repasse}` : '' } };
   c.chave = chaveNC({ ...c.campos, categoria: c.categoria });
+  c.chavesLinha = extra.chavesLinha || [];
   return c;
 }
 function tipoCandidatoConferencia(x) {
@@ -204,17 +205,18 @@ function tipoCandidatoConferencia(x) {
 const competenciaDoRelatorio = rel => { const p = periodoDoRelatorio(rel.regs); return p ? competenciaDaProducao(p[1]) : ''; };
 function candidatoDaLinhaConferencia(x, ctx, cfg, tipo = null) {
   const t = tipo || tipoCandidatoConferencia(x) || 'manual';
-  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
+  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '), { chavesLinha: chavesDaLinha(x.r, x.l) });
 }
 function candidatosDaConferencia(res, ctx, cfg) {
   const out = [];
-  for (const x of res.linhas) { const t = tipoCandidatoConferencia(x); if (t) out.push(candidatoDaLinhaConferencia(x, ctx, cfg, t)); }
+  // Linha com decisão na competência (NC registrada ou considerada no repasse) não volta como candidata.
+  for (const x of res.linhas) { const t = !x.decisao && tipoCandidatoConferencia(x); if (t) out.push(candidatoDaLinhaConferencia(x, ctx, cfg, t)); }
   return out;
 }
 function candidatoDaLinhaCorrecao(o, ctx, cfg, tipo = null) {
   const campos = camposDaLinha(o.r, o.laudo, ctx, cfg);
   const ehPrestador = tipo === 'prestador-identificado' || o.estado === 'identificado';
-  const extra = ehPrestador ? { campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '' };
+  const extra = ehPrestador ? { chavesLinha: chavesDaLinha(o.r, o.laudo), campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '', chavesLinha: chavesDaLinha(o.r, o.laudo) };
   return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
 }
 // Só vira candidato o laudo de médico diferente do prestador do relatório.
@@ -225,7 +227,7 @@ function candidatosDaCorrecao(res, ctx, cfg) {
 // Candidato → dados de uma NC nova, com as escolhas do usuário por cima da sugestão.
 const dadosDoCandidato = (c, escolha) => ({ ...c.campos, categoria: escolha.categoria || c.categoria, natureza: escolha.natureza || c.natureza, competencia: escolha.competencia || c.competencia,
   responsavel: escolha.responsavel ?? c.campos.responsavel ?? '', detalhe: escolha.detalhe || '', obs: escolha.obs || '', impactaPagamento: escolha.impactaPagamento,
-  origem: { ...c.origem, tipoCandidato: c.tipo, motivo: c.motivo, chaveCandidato: c.chave } });
+  origem: { ...c.origem, tipoCandidato: c.tipo, motivo: c.motivo, chaveCandidato: c.chave, chavesLinha: c.chavesLinha || [] } });
 
 /* ---------- Faturista do atendimento (Power BI, quando a planilha trouxer a coluna) ---------- */
 function faturistaDoAtendimento(pbi, atendimento, conta) {
