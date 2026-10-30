@@ -7,7 +7,7 @@ RENDER.bases = () => {
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
   const branches = S.apolo ? [...contar(S.apolo.laudos, l => l.unidade)] : [];
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
-  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência do topo (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
+  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
   <div class="card"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>

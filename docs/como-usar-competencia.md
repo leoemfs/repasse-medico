@@ -4,7 +4,7 @@
 
 ## Seletor no topo
 
-- Fica no topo de todas as abas: use ‹ › para trocar de competência. A ferramenta começa no mês atual e lembra a última escolha.
+- Fica no topo das abas de trabalho (Início, Fluxo, Conferência, Correção, NCs e Rodadas): use ‹ › para trocar de competência. Bases, Equivalências e Configurações não têm seletor, porque valem para todas. A ferramenta começa no mês atual e lembra a última escolha.
 - **Ficam dentro da competência:**
   - as rodadas de conferência e de correção (a comparação «antes × depois» só olha rodadas da mesma competência);
   - as não conformidades e os candidatos a NC;

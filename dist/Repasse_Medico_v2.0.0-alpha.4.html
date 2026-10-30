@@ -199,6 +199,7 @@ button.mini{padding:4px 10px;font-size:12px}
 .fechamento{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.fechamento p{margin:4px 0 0}
 .nota-global{margin:0 0 10px}
 @media (max-width:760px){.topo-dir{width:100%}.comp-global{flex:1 1 100%;justify-content:space-between}.comp-rot{min-width:0}.comp-rot small{white-space:normal}}
+.comp-global[hidden]{display:none}
 
 </style>
 </head>
@@ -2400,9 +2401,11 @@ function exigirAberta(chave = S.comp, oque = 'alterar') {
 function desenharSeletorCompetencia() {
   const el = $('compGlobal'); if (!el) return;
   const fechada = compFechada(), global = PAGINAS_GLOBAIS.has(paginaAtual);
+  // Bases, equivalências e configurações valem para todas as competências: sem seletor.
+  el.hidden = global;
   el.innerHTML = `<button type="button" class="sec ic" id="compAnt" aria-label="Competência anterior" title="Competência anterior">‹</button>
     <div class="comp-rot"><b>Competência ${rotuloCompetencia(S.comp)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></b>
-    <small>${global ? 'esta aba vale para todas · alterações registradas aqui' : `produção ${rotuloMes(producaoEsperada(S.comp))}`}</small></div>
+    <small>produção ${rotuloMes(producaoEsperada(S.comp))}</small></div>
     <button type="button" class="sec ic" id="compProx" aria-label="Próxima competência" title="Próxima competência">›</button>`;
   $('compAnt').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, -1));
   $('compProx').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, 1));
@@ -3845,7 +3848,7 @@ RENDER.bases = () => {
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
   const branches = S.apolo ? [...contar(S.apolo.laudos, l => l.unidade)] : [];
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
-  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência do topo (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
+  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
   <div class="card"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>

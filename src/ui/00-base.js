@@ -162,9 +162,11 @@ function exigirAberta(chave = S.comp, oque = 'alterar') {
 function desenharSeletorCompetencia() {
   const el = $('compGlobal'); if (!el) return;
   const fechada = compFechada(), global = PAGINAS_GLOBAIS.has(paginaAtual);
+  // Bases, equivalências e configurações valem para todas as competências: sem seletor.
+  el.hidden = global;
   el.innerHTML = `<button type="button" class="sec ic" id="compAnt" aria-label="Competência anterior" title="Competência anterior">‹</button>
     <div class="comp-rot"><b>Competência ${rotuloCompetencia(S.comp)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></b>
-    <small>${global ? 'esta aba vale para todas · alterações registradas aqui' : `produção ${rotuloMes(producaoEsperada(S.comp))}`}</small></div>
+    <small>produção ${rotuloMes(producaoEsperada(S.comp))}</small></div>
     <button type="button" class="sec ic" id="compProx" aria-label="Próxima competência" title="Próxima competência">›</button>`;
   $('compAnt').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, -1));
   $('compProx').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, 1));

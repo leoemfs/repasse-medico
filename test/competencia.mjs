@@ -23,7 +23,11 @@ const seletor = () => p.textContent('#compGlobal');
 
 ok(/Competência 10\/2026\s*aberta/.test(await seletor()) && /produção 09\/2026/.test(await seletor()), `seletor no topo começa no mês atual: «${(await seletor()).replace(/\s+/g, ' ').trim()}»`);
 await ir('bases');
-ok(/vale para todas/.test(await seletor()), 'em Bases o seletor avisa que a aba vale para todas as competências');
+ok(!(await p.isVisible('#compGlobal')), 'Bases sem seletor de competência no topo');
+await p.goto(html + '#equivalencias'); await p.waitForTimeout(200);
+ok(!(await p.isVisible('#compGlobal')), 'Equivalências sem seletor de competência no topo');
+await p.goto(html + '#configuracoes'); await p.waitForTimeout(200);
+ok(!(await p.isVisible('#compGlobal')), 'Configurações sem seletor de competência no topo');
 
 // 1) Arquivos de produção 09/2026 na competência 10/2026: sem aviso.
 await ir('inicio');

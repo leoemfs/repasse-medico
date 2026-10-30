@@ -5,7 +5,7 @@ Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
 
 Pedido de 30/10/2026: «ter um controle por competência, assim todas alterações, correções ficam encapsuladas». Guia em `como-usar-competencia.md`.
-- Seletor único no topo; começa no mês atual e lembra a escolha. Fluxo mensal e NCs perderam o ‹ › próprio.
+- Seletor único no topo das abas de trabalho (não aparece em Bases, Equivalências e Configurações, a pedido do usuário); começa no mês atual e lembra a escolha. Fluxo mensal e NCs perderam o ‹ › próprio.
 - Por competência: rodadas (e a comparação antes × depois), NCs, candidatos a NC, fluxo, anotações.
 - Bases e equivalências: únicas para todas as competências (decisão do usuário). Cada alteração registra a competência e quem fez; a validação de equivalência guarda a competência no histórico.
 - Aviso quando MV, Apolo ou Power BI carregado não é da produção esperada (competência − 1). Não bloqueia.
