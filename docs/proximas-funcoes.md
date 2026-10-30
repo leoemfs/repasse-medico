@@ -127,7 +127,7 @@ Pedido de 30/10/2026.
   - lançamento faltante.
 - **Cuidado de privacidade a definir na prévia:** CPF nunca é lido. O que guardar por paciente (nome, atendimento) segue a mesma retenção das NCs; o catálogo sem dados de pacientes pode ficar permanente.
 
-## SOL-F10 — Pasta da competência na rede — EM LEVANTAMENTO
+## SOL-F10 — Pasta da competência na rede — A IMPLEMENTAR
 
 Organização atual do usuário (30/10/2026), uma pasta por competência («REPASSE MM-AAAA»), salva na rede:
 - **CORREÇÃO DE PRESTADOR:** relatório da unidade 1 com prestador genérico e os demais relatórios.
@@ -140,3 +140,27 @@ Organização atual do usuário (30/10/2026), uma pasta por competência («REPA
 - **Na raiz:** planilhas «REPASSE USG 15-10-2026», «REPASSE IMG 30-10-2026» e ajustes avulsos (ex.: «REAJUSTE REPASSE DR. ROBERTO - PAG. 30-10-2026 (CLASSE B…)»).
 
 Possibilidade técnica: no Chrome e no Edge, o HTML aberto do computador pode ler e gravar numa pasta escolhida pelo usuário (API de acesso a pastas). O navegador pede permissão, e nada sai para a internet.
+
+### O que implementar (proposta de 30/10/2026, pendente de prévia visual)
+1. **Salvar direto na pasta da competência.** O usuário aponta uma vez a pasta «REPASSE MM-AAAA» (a permissão é pedida pelo navegador a cada sessão). Cada exportação vai para a subpasta certa, com os nomes usados hoje:
+   - NCs → `NAO CONFORMIDADES/NAO CONFORMIDADES MM-AAAA.xlsx`;
+   - conferência → `PLANILHAS-CONFERENCIA/`;
+   - correção de prestador → `CORREÇÃO DE PRESTEDOR/`;
+   - extração do MV → `RELATORIOS-MV-CONFERENCIA/`;
+   - fechamento → `REPASSE USG DD-MM-AAAA.xlsx` e `REPASSE IMG DD-MM-AAAA.xlsx` na raiz, em arquivos separados como hoje, além da versão em 3 abas.
+2. **Arquivar os PDFs por médico.** Copia cada PDF do MV carregado para `REPASSE USG|IMG|PET|V3 - RELATORIOS PRESTADORES/<Nome do médico>/`, pelo prestador do cabeçalho e pelo tipo do repasse, junto com a prévia do prestador para anexar ao e-mail.
+3. **Carregar da pasta.** No Início, «Carregar da pasta da competência» lê o Apolo de `PLANILHAS-CONFERENCIA` e os PDFs de `RELATORIOS-MV-CONFERENCIA` de uma vez.
+4. **Pacote .zip** seguindo a mesma árvore de pastas, para quando não houver gravação direta (Firefox ou permissão negada).
+
+Requisitos:
+- Chrome ou Edge para gravar em pasta; nos demais navegadores, download normal.
+- Nunca apagar arquivos.
+- Mostrar antes o que será gravado e onde.
+- Registrar no histórico da competência o que foi salvo.
+
+Dúvidas em aberto:
+- ordem de prioridade (sugestão: 1 e 2);
+- navegador usado no trabalho;
+- arquivo com o mesmo nome já existente (substituir ou cópia com data);
+- reajustes avulsos (ex.: Dr. Roberto) como ajuste do fechamento;
+- PET, Sedação, 20%, 25% e Eco como blocos do fechamento.
