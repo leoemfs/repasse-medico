@@ -178,7 +178,7 @@ function desenharSeletorCompetencia() {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';

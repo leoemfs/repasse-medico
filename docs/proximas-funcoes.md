@@ -1,6 +1,6 @@
 # Próximas funções — requisitos registrados
 
-Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4).
+Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
 
@@ -84,14 +84,16 @@ Pedido de 30/10/2026: um laudo pode corresponder a mais de um código na conta, 
   - conferência que aceite **um laudo sustentando N linhas** da composição e aponte o código que falta ou que sobra.
 - Até lá, «desfazer conflito» (SOL-F8) resolve escolhendo um código.
 
-## SOL-F6 — Memória das decisões por linha na competência — EM LEVANTAMENTO
+## SOL-F6 — Memória das decisões por linha na competência — IMPLEMENTADA na v2.0.0-alpha.5
 
 Pedido de 30/10/2026.
 - **Fluxo:** a conferência mostra a prévia, você aponta a NC, retira o procedimento do relatório no MV e roda de novo. A ferramenta precisa lembrar que aquela falta é uma **NC já registrada**.
 - **Linha divergente aceita:** o procedimento não bate, mas por razão específica entra no repasse. Fica como **aceite manual da linha**, com justificativa, e conta como resolvido no fechamento.
 - **Escopo:** as decisões ficam na competência, sobrevivem a novas rodadas e aparecem no aceite e no fechamento.
 
-## SOL-F7 — Fechamento do repasse: planilhas e indicadores — EM LEVANTAMENTO
+## SOL-F7 — Fechamento do repasse: planilhas e indicadores — IMPLEMENTADA na v2.0.0-alpha.5 (guia em `como-usar-fechamento.md`)
+
+Regras de classe 2026 conforme `REGRAS_DE_CLASSE.xlsx`. O reajuste de 2027 (+2%) ainda não está aprovado e não foi aplicado. SUS é marcado no cadastro de convênios.
 
 Pedido de 30/10/2026, com exemplo `REPASSE_10-2026_CONTROLE.xlsx`. O fechamento gera uma exportação da competência em três abas, e os indicadores ficam separados.
 - **REPASSE USG** (pagamento dia 15):
@@ -105,7 +107,7 @@ Pedido de 30/10/2026, com exemplo `REPASSE_10-2026_CONTROLE.xlsx`. O fechamento 
 - **Situação por prestador:** Verificar · E-mail enviado/aguardando nota · Sem valores · Concluído.
 - **Controle demais prestadores:** a definir.
 
-## SOL-F8 — Desfazer conflitos de equivalência — EM LEVANTAMENTO
+## SOL-F8 — Desfazer conflitos de equivalência — IMPLEMENTADA na v2.0.0-alpha.5 (as outras validações voltam a pendente)
 
 No painel de conflitos de «Equivalências TUSS»: escolher o código correto do título e tirar a validação dos demais, com justificativa e histórico.
 

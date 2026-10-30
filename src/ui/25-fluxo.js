@@ -154,6 +154,7 @@ function corpoGrupo(comp, g, tarefas, mk) {
     const deps = (t.depende || []).map(d => nomeTarefaRef(comp, g.id, d)).filter(d => d && d.status !== 'ok' && d.status !== 'na');
     const rods = rodadasParaTarefa(S.rodadas, comp, t.vinculo);
     return `<tr data-t="${t.id}"><td class="t-nome">${t.marco ? '<span class="badge info">marco</span> ' : ''}${esc(t.nome)}
+        ${e.evidencias?.length ? `<small class="evid">📎 ${esc(e.evidencias.at(-1).desc)} em ${new Date(e.evidencias.at(-1).em).toLocaleDateString('pt-BR')}${e.evidencias.length > 1 ? ` (${e.evidencias.length}×)` : ''} — evidência, não conclui a etapa</small>` : ''}
         ${deps.length ? `<small class="dep">aguarda: ${deps.map(d => esc(d.nome)).join('; ')} (aviso, não bloqueia)</small>` : ''}
         ${t.vinculo ? (rods.length ? `<small><a href="#" data-rod="${t.id}">${rods.length} rodada(s) de ${t.vinculo === 'conferencia' ? 'conferência' : 'correção'} neste mês${e.rodada ? ' · vinculada ✓' : ' — vincular e confirmar'}</a></small>` : `<small class="muted">sem rodada de ${t.vinculo === 'conferencia' ? 'conferência' : 'correção'} neste mês</small>`) : ''}</td>
       <td><select data-c="status" class="sel-${e.status}" aria-label="Status">${opcoes(OPCOES_STATUS, e.status)}</select></td>

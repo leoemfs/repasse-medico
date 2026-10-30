@@ -7,7 +7,7 @@ Aplicação local, em um único HTML, para conferir o repasse médico: relatóri
 | Pasta | Conteúdo |
 | --- | --- |
 | `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração, equivalências, conferência, correção de prestador, rodadas e relatórios |
-| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, equivalências, bases, rodadas e configurações |
+| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, fechamento, equivalências, bases, rodadas e configurações |
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
@@ -28,6 +28,7 @@ node test/nc.mjs                # não conformidades com os arquivos de dados/ (
 node test/competencia.mjs       # competência no topo, encapsulamento, fechar/reabrir (data fixa em 30/10/2026)
 node test/decisoes.mjs          # desfazer conflito e memória das decisões por linha
 node test/regras.mjs            # regras de repasse em Bases e importação da planilha de controle
+node test/fechamento.mjs        # aba Fechamento: valores com aceite, situação, prévia do e-mail e exportação
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 
