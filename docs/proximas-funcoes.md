@@ -108,3 +108,19 @@ Pedido de 30/10/2026, com exemplo `REPASSE_10-2026_CONTROLE.xlsx`. O fechamento 
 ## SOL-F8 — Desfazer conflitos de equivalência — EM LEVANTAMENTO
 
 No painel de conflitos de «Equivalências TUSS»: escolher o código correto do título e tirar a validação dos demais, com justificativa e histórico.
+
+## SOL-F9 — Power BI como base de dados da competência — REGISTRADO (memorizar)
+
+Pedido de 30/10/2026.
+- **Regra de competência:** a planilha do Power BI carregada no Início segue a regra de competência. Os dados são do **mês anterior** (produção): competência 10/2026 = dados de 09/2026. Hoje a ferramenta só avisa quando o mês não bate (SOL-F4).
+- **Base de dados:** o que for apurado e puder contribuir vai para a base, e não fica só na sessão. Exemplos:
+  - catálogo de procedimentos e grupos;
+  - códigos de prestador por unidade;
+  - faturistas e as unidades em que fecham contas;
+  - convênios.
+- **Objetivo futuro:** uma camada de automação que case o Power BI com MV, Apolo e NCs (conciliação). Exemplos:
+  - conta aberta ou fechada;
+  - remessa;
+  - quem fechou a conta;
+  - lançamento faltante.
+- **Cuidado de privacidade a definir na prévia:** CPF nunca é lido. O que guardar por paciente (nome, atendimento) segue a mesma retenção das NCs; o catálogo sem dados de pacientes pode ficar permanente.
