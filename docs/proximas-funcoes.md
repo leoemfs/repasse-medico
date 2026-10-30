@@ -180,7 +180,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 | 5 | SOL-F10 Pasta da competência · SOL-F18 Base compartilhada para a equipe | médio/alto | planejado |
 | 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | planejado |
 | 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
-| 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | proposta enviada, aguardando aprovação |
+| 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | **implementado na v2.0.0-alpha.6** |
 
 ## SOL-F11 — Aceite na própria conferência — PLANEJADO
 - **Hoje:** o resultado está na Conferência e o aceite fica em Rodadas (troca de tela a cada relatório).
@@ -272,7 +272,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - **Proposta:** ao carregar o Power BI, uma ação única «Atualizar bases» com o resumo do que entra (faturistas e unidades, convênios e tipos, catálogo de procedimentos) e a comparação com a última importação.
 - **Aceite:** um passo em vez de três; nada marcado à mão (ex.: SUS) é sobrescrito.
 
-## SOL-F22 — Arquivos da sessão: limpar e separar conferência × correção — PROPOSTA (30/10/2026)
+## SOL-F22 — Arquivos da sessão: limpar e separar conferência × correção — IMPLEMENTADA na v2.0.0-alpha.6
 - **Hoje:**
   - Na conferência cruzada vale carregar todos os prestadores da mesma unidade. Na mesma sessão, a correção de prestador fica confusa com tantos PDFs no seletor.
   - A correção é sempre feita pelo **prestador genérico Gilberto Miyazaki Otta (código 2)**, lançado antes de se saber quem vai laudar.
@@ -286,7 +286,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - a troca de competência não deixa anexos antigos misturados sem aviso;
   - limpar não apaga rodadas, NCs nem decisões (só a memória da sessão).
 
-## SOL-F23 — Excel da conferência cruzada reorganizado — PROPOSTA (30/10/2026)
+## SOL-F23 — Excel da conferência cruzada reorganizado — IMPLEMENTADA na v2.0.0-alpha.6 (opção A: decisão tomada na ferramenta e mostrada no Excel; sem reimportação)
 - **Hoje:** a aba principal mistura técnica e conferência (colunas do MV, do laudo, faixa, equivalência), e fica confusa.
 - **Aba principal «Conferência»** (uma linha por registro, MV lado a lado com o Apolo):
   - **Situação e decisão:** Status (cor) · Decisão na competência (NC registrada / Considerado no repasse) · Indicar NC · Aceite (com justificativa).

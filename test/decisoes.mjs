@@ -1,13 +1,14 @@
 // Teste: desfazer conflito de equivalência e memória das decisões por linha na competência.
 import { createRequire } from 'module';
 import fs from 'fs';
+import { execFileSync } from 'child_process';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/', d = f => raiz + 'dados/' + f;
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
 fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch(), erros = [];
 const ok = (cond, msg) => { console.log((cond ? '✔ ' : '✘ ') + msg); if (!cond) process.exitCode = 1; };
-const p = await (await b.newContext({ viewport: { width: 1366, height: 900 } })).newPage();
+const p = await (await b.newContext({ viewport: { width: 1366, height: 900 }, acceptDownloads: true })).newPage();
 await p.clock.install({ time: new Date('2026-10-30T10:00:00') });
 p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
 // Base com um conflito: o mesmo título validado para dois códigos.
@@ -58,6 +59,16 @@ ok(dec.nc === 1 && dec.considerar === 1, `nova rodada reconhece as decisões (NC
 ok(dec.cand === nCand0 - 1, `a linha tratada não volta como candidata (${nCand0} → ${dec.cand})`);
 ok(dec.rod === 'considerar', 'a rodada guarda a decisão por linha');
 await p.screenshot({ path: out + 'decisoes_conferencia.png' });
+// Excel da conferência (SOL-F23): MV × Apolo lado a lado, decisão e abas técnicas à parte.
+const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#cfExcel')]); const xl = out + 'conferencia_f23.xlsx'; await dl.saveAs(xl);
+const xs = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
+wb=openpyxl.load_workbook(sys.argv[1]); c=wb['Conferência']; cab=[x.value for x in c[1]]
+linhas=list(c.iter_rows(min_row=2,values_only=True)); pend=wb['Pendências'].max_row-1
+print(json.dumps({'abas':wb.sheetnames,'cab':cab,'n':len(linhas),'cons':sum(1 for r in linhas if (r[1] or '').startswith('Considerado no repasse: doppler')),'nc':sum(1 for r in linhas if (r[1] or '').startswith('Tratado: NC')),'conf':sum(1 for r in linhas if r[0]=='Conferido'),'pend':pend,'unid':linhas[0][2]}))`, xl]).toString());
+ok(JSON.stringify(xs.abas) === JSON.stringify(['Conferência', 'Pendências', 'Resumo', 'Informações', 'Técnico', 'Por procedimento', 'Títulos sem validação', 'Candidatos', 'MV original']), `abas: ${xs.abas.join(', ')}`);
+ok(xs.cab.join('|') === 'Status|Decisão na competência|Unidade MV|Paciente MV|Cód. TUSS MV|Descrição do procedimento MV|Data MV|Convênio MV|Grupo de procedimento MV|Médico MV|Vl Repasse|Unidade Apolo|Paciente Apolo|Título do laudo (TITLE)|Descrição do estudo (STUDY)|Data Apolo|Convênio Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise', 'aba principal: status, decisão, MV e Apolo lado a lado, ressalvas e observações no fim');
+ok(xs.cons === 1 && xs.nc === 1 && /ULTRAMED APUCARANA/.test(xs.unid), `decisões na planilha (considerada ${xs.cons}, NC ${xs.nc}) e unidade MV da sessão`);
+ok(xs.pend === xs.n - xs.conf - 2, `Pendências = registros sem conferência e sem decisão (${xs.pend} de ${xs.n})`);
 // Aceite desconta as decisões.
 await p.goto(html + '#rodadas'); await p.waitForSelector('[data-ac]');
 await p.click('[data-ac]'); await p.waitForSelector('#dlg[open]');
