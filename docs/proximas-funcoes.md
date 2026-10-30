@@ -164,3 +164,109 @@ Dúvidas em aberto:
 - arquivo com o mesmo nome já existente (substituir ou cópia com data);
 - reajustes avulsos (ex.: Dr. Roberto) como ajuste do fechamento;
 - PET, Sedação, 20%, 25% e Eco como blocos do fechamento.
+
+---
+
+# Plano a partir da análise do fluxo (30/10/2026)
+
+Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono**; quem digita é uma tela, as outras só leem. Cada item segue o método: prévia visual → dúvidas → critérios de aceite → código com teste → guia → GitHub.
+
+| Ordem | Item | Esforço | Situação |
+|---|---|---|---|
+| 1 | SOL-F11 Aceite na conferência · SOL-F12 «Marcar como enviado» no Fechamento | baixo | planejado |
+| 2 | SOL-F13 Classificação do Fluxo lida do Fechamento · SOL-F14 Lista documental do Fluxo lida de Bases | baixo/médio | planejado |
+| 3 | SOL-F15 Cobertura de equivalências e validação em lote dos títulos mais frequentes | baixo | planejado |
+| 4 | SOL-F16 Status sugerido nas etapas do Fluxo · SOL-F17 Candidatos a NC guardados na competência | médio | planejado |
+| 5 | SOL-F10 Pasta da competência · SOL-F18 Base compartilhada para a equipe | médio/alto | planejado |
+| 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | planejado |
+| 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
+
+## SOL-F11 — Aceite na própria conferência — PLANEJADO
+- **Hoje:** o resultado está na Conferência e o aceite fica em Rodadas (troca de tela a cada relatório).
+- **Proposta:** botão «Registrar aceite» no resultado da conferência, com as mesmas regras (observação obrigatória com pendências, já descontadas as decisões). Rodadas continua como histórico.
+- **Aceite:**
+  - o aceite feito na conferência aparece em Rodadas e no Fechamento;
+  - competência fechada bloqueia o aceite.
+
+## SOL-F12 — «Marcar como enviado» no Fechamento — PLANEJADO
+- **Hoje:** a prévia é copiada no Fechamento, mas o «relatório enviado» é marcado no controle documental do Fluxo (~40 vaivéns por mês).
+- **Proposta:** depois de «Copiar prévia», o botão «Marcar como enviado» grava a data no controle documental do Fluxo. É o mesmo dado, sem cópia; o Fluxo continua sendo o dono.
+- **Aceite:**
+  - a situação muda para «E-mail enviado» nas duas telas;
+  - desfazer é possível;
+  - o Fluxo precisa estar iniciado na competência (senão, a tela avisa).
+
+## SOL-F13 — Classificação do Fluxo lida do Fechamento — PLANEJADO
+- **Hoje:** produção bruta e classe são digitadas no grupo «Classificação» do Fluxo, e o Fechamento já as calcula.
+- **Proposta:** o bloco do Fluxo mostra o calculado e só registra a conferência humana («conferido por… em…»). O ajuste manual fica permitido, com justificativa.
+- **Aceite:**
+  - sem digitação duplicada;
+  - divergência entre o ajuste manual e o calculado aparece como aviso.
+
+## SOL-F14 — Lista documental do Fluxo lida de Bases — PLANEJADO
+- **Hoje:** os prestadores do controle documental vêm de uma lista própria do modelo do Fluxo, separada das regras de Bases.
+- **Proposta:** de onde vem cada lista:
+
+  | Fluxo | Lista |
+  |---|---|
+  | USG | prestadores com faixa de USG |
+  | IMG | prestadores que recebem IMG |
+  | Curitiba | V3 / unidade 5 |
+  | PET, Sedação, 20%, 25% e Eco | lista própria (não têm regra em Bases) |
+
+- **Aceite:** um prestador cadastrado em Bases aparece no Fluxo do mês sem um segundo cadastro.
+
+## SOL-F15 — Cobertura de equivalências e validação em lote — PLANEJADO
+- **Hoje:** sem equivalência validada nada é conferido automaticamente (prestador 15: 67 de 67 pendentes).
+- **Proposta:**
+  - indicador de **cobertura**: % de linhas conferidas automaticamente por competência, no painel do Início e nos indicadores do Fechamento;
+  - lista «títulos que mais destravam» (título × código pendente ordenado pelo nº de linhas afetadas), com validação em lote;
+  - sugestão de uso: uma sessão de validação de 1 a 2 horas no início de cada competência.
+- **Aceite:** a cobertura sobe de uma competência para a outra e aparece no histórico.
+
+## SOL-F16 — Status sugerido nas etapas do Fluxo — PLANEJADO
+- **Hoje:** o status das etapas é digitado mesmo quando a ferramenta já sabe o que aconteceu.
+- **Proposta:** cada etapa ligada a um dado mostra a sugestão; um clique confirma. Nada conclui sozinho (decisão de 29/10/2026). Exemplos:
+  - «12 de 14 prestadores com aceite»;
+  - «NCs de USG: 4 abertas»;
+  - «planilha de fechamento gerada».
+- **Aceite:** a sugestão nunca altera o status sem confirmação; a confirmação fica no histórico da etapa.
+
+## SOL-F17 — Candidatos a NC guardados na competência — PLANEJADO
+- **Hoje:** os candidatos ficam só na memória e se perdem ao recarregar a página.
+- **Proposta:** guardar os candidatos (e os dispensados) na competência, com a mesma retenção de 60 dias das NCs para os dados de pacientes.
+- **Aceite:** depois de recarregar, a revisão continua de onde parou.
+
+## SOL-F18 — Base compartilhada para a equipe — PLANEJADO
+- **Hoje:** cada navegador tem a sua configuração, equivalências, NCs e fluxo. A equipe de dois troca backup à mão, com risco de retrabalho e divergência.
+- **Proposta:** na pasta de rede (junto com a SOL-F10), um arquivo por base (configuração, equivalências, NCs, fluxo, competências), com revisão e «quem alterou».
+  - Ao abrir, a ferramenta carrega a versão mais nova.
+  - Ao salvar, avisa se a outra pessoa alterou o mesmo item desde a última leitura (conflito) e mostra as duas versões.
+- **Aceite:** a validação feita por uma pessoa aparece para a outra; nenhuma gravação apaga a alteração da outra sem aviso.
+
+## SOL-F19 — Quadro Kanban por prestador — PLANEJADO
+- **Proposta:** visão em quadro no Fechamento (ou no Fluxo), com as colunas:
+  1. a conferir;
+  2. em correção;
+  3. aguardando terceiros;
+  4. com aceite;
+  5. enviado;
+  6. NF recebida;
+  7. concluído.
+- Também: limite configurável de prestadores «em correção» (WIP), com aviso quando passar.
+- **Definição de Pronto por prestador** = situação «Concluído»: aceite, divergências tratadas, prévia enviada, NF encaminhada.
+
+## SOL-F20 — Indicadores de fluxo para a retrospectiva mensal (PDCA) — PLANEJADO
+- **Indicadores:**
+  - lead time por prestador (geração no MV → aceite → envio → NF);
+  - nº de rodadas até o aceite;
+  - tempo de espera por terceiros;
+  - cobertura de equivalências;
+  - NCs por natureza e faturista (reincidência);
+  - dias de antecedência na entrega ao Financeiro.
+- **Proposta:** uma aba «Retrospectiva» na competência, com comparação entre meses e um campo de «o que melhorar no próximo mês» (vira item do backlog).
+
+## SOL-F21 — Atualizar bases com o Power BI — PLANEJADO (junto com SOL-F9)
+- **Hoje:** carregar no Início e depois importar faturistas e convênios em botões separados.
+- **Proposta:** ao carregar o Power BI, uma ação única «Atualizar bases» com o resumo do que entra (faturistas e unidades, convênios e tipos, catálogo de procedimentos) e a comparação com a última importação.
+- **Aceite:** um passo em vez de três; nada marcado à mão (ex.: SUS) é sobrescrito.
