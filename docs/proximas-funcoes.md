@@ -126,3 +126,17 @@ Pedido de 30/10/2026.
   - quem fechou a conta;
   - lançamento faltante.
 - **Cuidado de privacidade a definir na prévia:** CPF nunca é lido. O que guardar por paciente (nome, atendimento) segue a mesma retenção das NCs; o catálogo sem dados de pacientes pode ficar permanente.
+
+## SOL-F10 — Pasta da competência na rede — EM LEVANTAMENTO
+
+Organização atual do usuário (30/10/2026), uma pasta por competência («REPASSE MM-AAAA»), salva na rede:
+- **CORREÇÃO DE PRESTADOR:** relatório da unidade 1 com prestador genérico e os demais relatórios.
+- **NAO CONFORMIDADES:** todas as NCs da competência.
+- **NFs PAGAMENTO:** NFs recebidas, separadas em dia 15 e dia 30.
+- **PLANILHAS-CONFERENCIA:** planilha do Apolo da competência (produção do mês anterior).
+- **RELATORIOS-MV-CONFERENCIA:** repasses gerados e PDFs extraídos do MV.
+- **REPASSE 20% (Alpha Scann, Dr. Paulo) · REPASSE 25% (Mariana Manfio) · REPASSE EUDES GUERRA (ECO):** controle.
+- **REPASSE USG / IMG / PET / SEDAÇÃO / V3 - RELATORIOS PRESTADORES:** uma pasta por médico, com os relatórios daquele pagamento, para enviar ao prestador.
+- **Na raiz:** planilhas «REPASSE USG 15-10-2026», «REPASSE IMG 30-10-2026» e ajustes avulsos (ex.: «REAJUSTE REPASSE DR. ROBERTO - PAG. 30-10-2026 (CLASSE B…)»).
+
+Possibilidade técnica: no Chrome e no Edge, o HTML aberto do computador pode ler e gravar numa pasta escolhida pelo usuário (API de acesso a pastas). O navegador pede permissão, e nada sai para a internet.
