@@ -1,6 +1,6 @@
 # Próximas funções — requisitos registrados
 
-Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); **SOL-F3 em levantamento** (prévia visual antes de codificar).
+Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3).
 Registrado em 29/10/2026 a partir da conversa com o usuário. Referência visual atual: Microsoft To Do (listas por tipo de repasse).
 
 ## SOL-F1 — Aba «Fluxo mensal» — IMPLEMENTADA na v2.0.0-alpha.2
@@ -35,7 +35,18 @@ Hoje o usuário usa bloco de notas e anotações soltas no e-mail.
 - Área de anotações **junto do Fluxo ou separada** (decidir na prévia).
 - Proposta: notas livres com data, busca, e vínculo opcional a competência, tipo de repasse, item do fluxo, prestador ou não conformidade.
 
-## SOL-F3 — Aba «Não conformidades»
+## SOL-F3 — Aba «Não conformidades» — IMPLEMENTADA na v2.0.0-alpha.3
+
+Guia em `como-usar-nao-conformidades.md`. Decisões de 30/10/2026 (prévia aprovada):
+- Situações: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede.
+- Natureza: lista fixa + detalhe livre + observações. Na importação, o texto original vai para as observações.
+- Responsáveis: cadastro de faturistas em Bases (manual, planilha com escolha de coluna ou Power BI com a coluna de quem fechou a conta), usado nos indicadores.
+- Qualiex aceita qualquer formato de planilha: a exportação mantém as três abas da planilha manual + situação, observações e aba de indicadores.
+- Dados de pacientes: só no navegador; nome e ID/atendimento apagados 60 dias após o registro (parâmetro em Configurações). As exportações críticas o usuário guarda na rede.
+- MedicalShare: nome antigo no Apolo da unidade 17 (Palhano, faturada pela AlphaSonic Londrina), cadastrado como nome do Apolo da unidade 17.
+- Na conferência cruzada, o que pode ser NC aparece como candidato para o usuário apontar manualmente; nada vira NC sozinho.
+
+### Requisito original
 
 Aprovada pelo usuário como aba específica.
 - Na **conferência** (e na correção de prestador), o usuário **aponta** quais registros são não conformidade; o sistema já separa os candidatos (só no faturamento, só no laudo, prestador divergente etc.).

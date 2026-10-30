@@ -37,15 +37,23 @@ const UNIDADES_PADRAO = [
   { cod: '7', nome: 'ULTRAMED ARAPONGAS', apolo: ['Ultramed Arapongas Filial'], pbi: '7 - ULTRAMED ARAPONGAS FILIAL', empresa: 'SI2M' },
   { cod: '10', nome: 'ALPHASONIC APUCARANA', apolo: ['AlphaSonic Apucarana'], pbi: '10 - ALPHASONIC APUCARANA', empresa: 'SRA' },
   { cod: '11', nome: 'ULTRASONIC LONDRINA', apolo: [], pbi: '11 - ULTRASONIC LONDRI PR', empresa: '' },
-  { cod: '17', nome: 'ALPHASONIC LONDRINA (PALHANO)', apolo: ['AlphaSonic Palhano'], pbi: '17 - ALPHASONIC LONDRINA', empresa: '' }
+  { cod: '17', nome: 'ALPHASONIC LONDRINA (PALHANO)', apolo: ['AlphaSonic Palhano', 'MedicalShare'], pbi: '17 - ALPHASONIC LONDRINA', empresa: '' }
 ];
+
+// Responsáveis pelo fechamento da conta (faturistas). Os genéricos valem para qualquer unidade.
+const FATURISTAS_PADRAO = [
+  { nome: 'FATURISTA DA UNIDADE', unidades: '', generico: true, ativo: true, origem: 'padrão' },
+  { nome: 'PARTICULAR - EQUIPE UNIDADE', unidades: '', generico: true, ativo: true, origem: 'padrão' }
+];
+const RETENCAO_NC_PADRAO = 60;
 
 function configPadrao() {
   return {
     schema: SCHEMA_CONFIG, versaoSchema: 1, revisao: 1, atualizadoEm: agoraISO(),
-    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01 },
+    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO },
     unidades: clone(UNIDADES_PADRAO),
     prestadores: [],
+    faturistas: clone(FATURISTAS_PADRAO),
     classificacao: clone(CLASSIFICACAO_PADRAO)
   };
 }
@@ -59,6 +67,8 @@ function validarConfig(c) {
     if (!p || [p.tolConferencia, p.tolCorrecao, p.minTruncamento].some(v => !Number.isFinite(+v) || +v < 0)) erros.push('parâmetros ausentes ou inválidos');
     if (!Array.isArray(c.unidades) || c.unidades.some(u => !u.cod)) erros.push('tabela de unidades inválida');
     if (!Array.isArray(c.prestadores)) erros.push('tabela de prestadores inválida');
+    if (c.faturistas !== undefined && (!Array.isArray(c.faturistas) || c.faturistas.some(f => !f.nome))) erros.push('tabela de faturistas inválida');
+    if (p && p.retencaoNC !== undefined && !(+p.retencaoNC >= 1 && +p.retencaoNC <= 366)) erros.push('retenção de dados das NCs fora de 1 a 366 dias');
     if (!Array.isArray(c.classificacao)) erros.push('regras de classificação inválidas');
     else for (const r of c.classificacao) { try { new RegExp(r.padrao); } catch (e) { erros.push(`regra «${r.id}» com padrão inválido`); } if (!TIPOS_ITEM[r.tipo]) erros.push(`regra «${r.id}» com tipo desconhecido`); }
     const cods = contar(c.unidades || [], u => String(u.cod));
@@ -67,6 +77,27 @@ function validarConfig(c) {
     for (const [k, n] of nomesApolo) if (n > 1) erros.push(`nome do Apolo «${k}» ligado a mais de uma unidade`);
   }
   return erros;
+}
+
+// Configurações gravadas por versões anteriores ganham os campos novos sem perder o que o usuário editou.
+function migrarConfig(c) {
+  let mudou = false;
+  if (!Array.isArray(c.faturistas)) { c.faturistas = clone(FATURISTAS_PADRAO); mudou = true; }
+  if (c.parametros && c.parametros.retencaoNC === undefined) { c.parametros.retencaoNC = RETENCAO_NC_PADRAO; mudou = true; }
+  // MedicalShare: nome antigo no Apolo da unidade 17 (Palhano), faturada pela AlphaSonic Londrina.
+  const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
+  if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
+  return mudou;
+}
+// Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.
+function registrarFaturistas(cfg, nomes, origem) {
+  let n = 0;
+  for (const bruto of nomes) {
+    const nome = String(bruto || '').trim(); if (!nome) continue;
+    if (cfg.faturistas.some(f => norm(f.nome) === norm(nome))) continue;
+    cfg.faturistas.push({ nome, unidades: '', generico: false, ativo: true, origem, em: agoraISO() }); n++;
+  }
+  return n;
 }
 
 /* ---------- Classificação do tipo de item (RN-199) ---------- */

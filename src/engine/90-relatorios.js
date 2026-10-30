@@ -114,3 +114,45 @@ function xlsxCorrecao(res, ctx) {
     { nome: 'Todas as linhas', larguras: larg, linhas: [cabL, ...res.linhas.map(linhaL)], filtro: true }
   ]);
 }
+
+/* Não conformidades: as três abas da planilha manual da equipe (mesmas colunas) + situação e
+ * observações no fim, e uma aba de indicadores. Reimportável pela própria aba de NCs. */
+const COLUNAS_NC_EXPORT = {
+  particular: ['UNIDADE', 'NATUREZA DA NÃO CONFORMIDADE', 'NOME DO PACIENTE', 'ID ou atendimento', 'RESPONSAVEL PELO FAT. DA CONTA', 'DATA', 'TITULO DO LAUDO', 'CONVE.', 'MOD.', 'NOME DO MEDICO'],
+  convenio: ['UNIDADE', 'NATUREZA DA NÃO CONFORMIDADE', 'NOME DO PACIENTE', 'ID-ATENDIMENTO', 'RESPONSAVEL PELO FECHA. DA CONTA', 'DATA', 'TITULO DO LAUDO', 'CONVE.', 'MOD.', 'NOME DO MEDICO'],
+  prestador: ['UNIDADE', 'PRESTADOR INCORRETO', 'NOME DO PACIENTE', 'ID', 'TITULO DO ESTUDO', 'DATA', 'TITULO DO LAUDO', 'CONVE.', 'MOD.', 'PRESTADOR CORRIGIDO']
+};
+const ABAS_NC = { particular: 'PARTICULAR', convenio: 'CONVENIOS (FAT)', prestador: 'Correção de prestadores' };
+const COLUNAS_NC_EXTRA = ['SITUAÇÃO', 'IMPACTA PAGAMENTO', 'OBSERVAÇÕES', 'ENVIADA AO QUALIEX EM'];
+const COR_SITUACAO_NC = { aberta: 'FFC7CE', enviada: 'DDEBF7', tratativa: 'E4DFEC', regularizada: 'C6EFCE', 'nao-procede': 'EDEDED' };
+function xlsxNC(itens, chave, meta = {}) {
+  const pac = nc => nc.anonimizada ? '(apagado pela retenção)' : nc.paciente;
+  const dt = s => s ? paraData(s) : '';
+  const linhaNC = nc => {
+    const base = nc.categoria === 'prestador'
+      ? [nc.unidade, { v: nc.prestadorIncorreto, st: T }, pac(nc), { v: nc.anonimizada ? '' : nc.idAtendimento, st: T }, nc.tituloEstudo, dt(nc.data), nc.titulo, nc.convenio, nc.modalidade, nc.prestadorCorrigido || nc.medico]
+      : [nc.unidade, textoNatureza(nc), pac(nc), { v: nc.anonimizada ? '' : nc.idAtendimento, st: T }, nc.responsavel, dt(nc.data), nc.titulo, nc.convenio, nc.modalidade, nc.medico];
+    return [...base, { v: SITUACAO_NC[nc.situacao], st: { fill: COR_SITUACAO_NC[nc.situacao] } }, nc.impactaPagamento ? 'SIM' : 'NÃO', nc.obs, dt(nc.enviadaEm)];
+  };
+  const ordem = (a, b) => (a.unidade || '').localeCompare(b.unidade || '') || (a.data || '').localeCompare(b.data || '');
+  const abas = Object.keys(ABAS_NC).map(cat => ({
+    nome: ABAS_NC[cat], filtro: true, larguras: cat === 'prestador' ? [22, 12, 34, 12, 40, 11, 40, 30, 7, 30, 18, 10, 40, 12] : [22, 50, 34, 12, 28, 11, 40, 30, 7, 30, 18, 10, 40, 12],
+    linhas: [[...cabecalho(COLUNAS_NC_EXPORT[cat]), ...cabecalho(COLUNAS_NC_EXTRA, { ...CAB, fill: '5B5B5B' })], ...itens.filter(nc => nc.categoria === cat).sort(ordem).map(linhaNC)]
+  }));
+  const ind = indicadoresNC(itens), tot = Math.max(1, ind.total);
+  const bloco = (titulo, pares) => [[{ v: titulo, st: { b: true, fill: 'D9E1F2' } }, { v: 'NCs', st: { b: true, fill: 'D9E1F2', al: 'center' } }, { v: '%', st: { b: true, fill: 'D9E1F2', al: 'center' } }],
+    ...pares.map(([k, n]) => [k, n, { v: n / tot, st: { fmt: 'pct' } }]), []];
+  const linhasInd = [
+    [{ v: `Não conformidades — competência ${rotuloCompetencia(chave)} (produção ${producaoDaCompetencia(chave)})`, st: { b: true } }], [],
+    ...linhasMeta([['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || ''], ['Total de NCs', ind.total], ['Impactam o pagamento', `${ind.impactam} (R$ ${fmtBR(ind.valorImpacto)} nas que vieram do MV)`],
+      ...Object.entries(GRUPOS_PRAZO_NC).map(([k, g]) => [g.nome, `${ind.porPrazo[k].total} NCs · prazo de envio ${meta.prazos?.[k] ? fmtData(meta.prazos[k]) : '—'}`]),
+      ['Trazidas de competências anteriores', ind.trazidas], ['Privacidade', AVISO_LGPD]]), [],
+    ...bloco('Situação', Object.entries(ind.porSituacao).map(([k, n]) => [SITUACAO_NC[k], n])),
+    ...bloco('Categoria', Object.entries(ind.porCategoria).map(([k, n]) => [CATEGORIA_NC[k], n])),
+    ...bloco('Natureza', ind.porNatureza.map(([nome, n]) => [nome, n])),
+    ...bloco('Responsável pelo fechamento da conta', ind.porResponsavel),
+    ...bloco('Unidade', ind.porUnidade),
+    ...bloco('Médico', ind.porMedico)
+  ];
+  return criarXlsx([...abas, { nome: 'Indicadores', larguras: [52, 40, 10], linhas: linhasInd, filtro: false, congelar: false }]);
+}

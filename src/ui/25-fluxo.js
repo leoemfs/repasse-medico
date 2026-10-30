@@ -143,6 +143,10 @@ function desenharGrupos(comp) {
 function corpoGrupo(comp, g, tarefas, mk) {
   const eg = comp.grupos[g.id];
   let h = (g.regrasFixas || []).map(r => `<p class="regra-fixa">📌 ${esc(r)}</p>`).join('');
+  if (g.id === 'nc' && S.nc) {
+    const ind = indicadoresNC(S.nc.itens.filter(x => x.competencia === comp.chave));
+    h += `<p class="small">Não conformidades desta competência: <b>${ind.total}</b> · ${ind.porSituacao.aberta} abertas · ${ind.porSituacao.enviada + ind.porSituacao.tratativa} enviadas ao Qualiex · ${ind.porSituacao.regularizada} regularizadas — <a href="#nc" data-ir-nc="${comp.chave}">abrir a aba Não conformidades</a></p>`;
+  }
   h += `<div class="tw"><table class="tab-fx"><thead><tr><th>Etapa</th><th>Status</th><th>Prazo</th><th>Início</th><th>Concluída em</th><th>Responsável / dependência</th><th>Observação</th></tr></thead><tbody>${tarefas.map(t => {
     const e = eg.tarefas[t.id], p = prazoTarefa(comp, g.id, t, mk), dif = p ? diaSerial(p) - diaSerial(paraData(new Date())) : null, aberta = e.status !== 'ok' && e.status !== 'na';
     const deps = (t.depende || []).map(d => nomeTarefaRef(comp, g.id, d)).filter(d => d && d.status !== 'ok' && d.status !== 'na');
@@ -189,6 +193,7 @@ function blocoMatriz(comp, g) {
 
 function ligarGrupos(comp) {
   const cont = $('fxGrupos');
+  cont.querySelectorAll('[data-ir-nc]').forEach(a => a.onclick = () => { NCV.chave = a.dataset.irNc; });
   cont.querySelectorAll('section.grupo-fx').forEach(sec => {
     const gId = sec.dataset.g, eg = comp.grupos[gId], g = comp.modelo.grupos.find(x => x.id === gId);
     sec.querySelectorAll('tr[data-t]').forEach(tr => {

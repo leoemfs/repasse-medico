@@ -21,11 +21,14 @@ const S = {
   apolo: null, pbi: null,
   conf: null, corr: null,  // {res, ctx, rodada, comparacao}
   rodadas: [],
-  fluxo: null             // {schema, versaoSchema, modelo, competencias:{chave: competência}}
+  fluxo: null,            // {schema, versaoSchema, modelo, competencias:{chave: competência}}
+  nc: null,               // {schema, versaoSchema, itens:[NC]} — contém dados de pacientes (retenção)
+  ncCand: [],             // candidatos das análises desta sessão: [{chave, rotulo, itens}]
+  ncDispensados: new Set()
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior' };
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior' };
 function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 // Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
 function gravarLocal(k, v) {
@@ -124,7 +127,7 @@ function zonaArquivo(el, input, aoReceber) {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';

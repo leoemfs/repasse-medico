@@ -59,6 +59,8 @@ async function executarConferencia() {
   const ant = rodadaAnterior(S.rodadas, rodada);
   await guardarRodada(rodada);
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
+  ctx.fonteNC = `conf|${x.id}|${un}`;
+  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaConferencia(res, ctx, S.cfg));
   desenharConferencia();
   avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
 }
@@ -78,7 +80,9 @@ function desenharConferencia() {
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
     <div class="acoes"><input type="search" id="cfBusca" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}" style="max-width:420px"><button id="cfExcel">Exportar Excel</button><button id="cfLimpar" class="sec">Limpar filtros</button></div>
     <div id="cfTab" style="margin-top:10px"></div></div>
+    ${ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''}
     <div class="card"><h2>Equivalências desta rodada</h2><div id="cfEq"></div></div>`;
+  ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; desenharConferencia(); };
@@ -98,12 +102,13 @@ function desenharConferencia() {
       { t: 'Médico do laudo', v: x => x.l?.medico || '' }, { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' },
       { t: 'Marcadores', v: x => [...x.marcadores].map(m => MARCADORES[m]).join(' · ') }
     ],
-    detalhe: x => `<div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+    detalhe: x => `<div class="acoes" style="margin:0 0 8px"><button class="sec mini" data-nc-linha="${res.linhas.indexOf(x)}">Apontar como NC…</button></div><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
       ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map(cd => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]})${cd.l === x.l ? '</strong>' : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; t.atualizar(filtrar()); };
+  $('cfTab').addEventListener('click', e => { const b = e.target.closest('[data-nc-linha]'); if (b) abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]).then(ok => ok && desenharConferencia()); });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
 

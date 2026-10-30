@@ -23,6 +23,14 @@ RENDER.bases = () => {
     <div class="acoes"><button id="prAdd" class="sec">+ Prestador manual</button></div>
     ${S.apolo ? `<details style="margin-top:12px"><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Lista para conferência. Nenhum vínculo é criado automaticamente.</p><ul class="small">${semVinculo.map(([m, n]) => `<li>${esc(m)} — ${n} laudos</li>`).join('')}</ul></details>` : ''}</div>
 
+  <div class="card" id="cardFat"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
+    ${(() => { const nNC = S.nc ? contar(S.nc.itens, x => norm(x.responsavel)) : new Map(); return `<div class="tw"><table><thead><tr><th>Nome</th><th>Unidade(s)</th><th>Genérico</th><th>Ativo</th><th class="n">NCs</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.faturistas.map((f, i) => `<tr>
+      <td><input type="text" data-fat="${i}" data-c="nome" value="${esc(f.nome)}"></td><td><input type="text" data-fat="${i}" data-c="unidades" value="${esc(f.unidades || '')}" placeholder="ex.: 17, 5"></td>
+      <td><input type="checkbox" data-fat="${i}" data-c="generico"${f.generico ? ' checked' : ''} aria-label="Genérico"></td><td><input type="checkbox" data-fat="${i}" data-c="ativo"${f.ativo !== false ? ' checked' : ''} aria-label="Ativo"></td>
+      <td class="n">${nNC.get(norm(f.nome)) || ''}</td><td class="small muted">${esc(f.origem || '')}</td><td><button class="perigo" data-fatrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>`; })()}
+    <div class="acoes"><button id="fatAdd" class="sec">+ Faturista</button><button id="fatImp" class="sec">Importar de planilha (escolher coluna)</button><input type="file" id="fatArq" accept=".xlsx" hidden>
+      ${S.pbi?.temFaturista ? `<button id="fatPbi" class="sec">Importar do Power BI (${S.pbi.faturistas.length})</button>` : ''}</div></div>
+
   <div class="card"><h2>Classificação do tipo de item</h2><p class="lead">Aplicada antes de qualquer equivalência (RN-199). A primeira regra ativa que casar define o tipo; sem regra, o item fica «Desconhecido — pendente». Padrões são expressões regulares sobre o texto normalizado (maiúsculas, sem acento).</p>
     <div class="tw"><table><thead><tr><th>Ativa</th><th>Campo</th><th>Padrão</th><th>Tipo</th><th>Nota</th><th></th></tr></thead><tbody>${S.cfg.classificacao.map((r, i) => `<tr>
       <td><input type="checkbox" data-cl="${i}" data-c="ativa"${r.ativa ? ' checked' : ''}></td><td><select data-cl="${i}" data-c="campo">${opcoes([['grupo', 'Grupo de procedimento'], ['descricao', 'Descrição do procedimento'], ['codigo', 'Código']], r.campo)}</select></td>
@@ -34,7 +42,8 @@ RENDER.bases = () => {
     ${S.pbi ? `<dl class="kv"><dt>Arquivo</dt><dd>${esc(S.pbi.nome)}</dd><dt>Período</dt><dd>${S.pbi.periodo ? `${fmtData(S.pbi.periodo[0])} a ${fmtData(S.pbi.periodo[1])}` : '—'}</dd><dt>Linhas</dt><dd>${S.pbi.linhas.length.toLocaleString('pt-BR')}</dd></dl>
       <div class="grid3" style="margin-top:10px"><div><h3>Unidades</h3><ul class="small">${S.pbi.unidades.map(([u, n]) => `<li>${esc(u)} — ${n}</li>`).join('')}</ul></div>
       <div><h3>Grupos de procedimento</h3><ul class="small">${S.pbi.grupos.map(([g, n]) => `<li>${esc(g)} — ${n}</li>`).join('')}</ul></div>
-      <div><h3>Códigos de prestador (CD_PRESTADOR)</h3><p class="small muted">${S.pbi.prestadores.length} códigos distintos. O Power BI não traz o nome do médico.</p></div></div>
+      <div><h3>Códigos de prestador (CD_PRESTADOR)</h3><p class="small muted">${S.pbi.prestadores.length} códigos distintos. O Power BI não traz o nome do médico.</p>
+        <h3>Faturista</h3><p class="small muted">${S.pbi.temFaturista ? `${S.pbi.faturistas.length} nomes na coluna de quem fechou a conta: usados para sugerir o responsável das NCs pelo atendimento.` : 'Coluna de quem fechou a conta não encontrada (opcional; nomes aceitos: Faturista, Usuario Fechamento, Responsavel Fechamento…).'}</p></div></div>
       <details style="margin-top:8px"><summary>Procedimentos faturados (${S.pbi.procedimentos.length})</summary><div id="pbiProc"></div></details>` : '<p class="muted">Carregue a planilha do Power BI no Início para consultar.</p>'}</div>`;
 
   const pg = $('pag-bases');
@@ -55,6 +64,34 @@ RENDER.bases = () => {
     S.cfg.prestadores.push({ cod: r.campos.cod.trim(), nomeMV: r.campos.nome.trim(), aliases: [], naoRealizaRepasse: false, origem: `cadastro manual (${op})`, em: agoraISO() });
     salvarCfg('Prestador adicionado.'); RENDER.bases();
   };
+  pg.querySelectorAll('[data-fat]').forEach(inp => inp.onchange = () => {
+    const f = S.cfg.faturistas[+inp.dataset.fat], c = inp.dataset.c;
+    f[c] = inp.type === 'checkbox' ? inp.checked : inp.value.trim();
+    if (c === 'nome' && !f.nome) return avisar('O nome não pode ficar vazio.', 'warn');
+    salvarCfg('Faturista atualizado.');
+  });
+  pg.querySelectorAll('[data-fatrm]').forEach(b => b.onclick = async () => { const f = S.cfg.faturistas[+b.dataset.fatrm];
+    if (await confirmar('Remover faturista?', `«${esc(f.nome)}» sai da lista. As NCs já registradas mantêm o nome.`, 'Remover')) { S.cfg.faturistas.splice(+b.dataset.fatrm, 1); salvarCfg('Faturista removido.'); RENDER.bases(); } });
+  $('fatAdd').onclick = async () => {
+    const r = await dialogo('Novo faturista', `<label class="campo">Nome (como aparece no MV / na planilha)<input type="text" name="nome" placeholder="ex.: GISLAINE.CARVALHO"></label><label class="campo">Unidade(s)<input type="text" name="un" placeholder="opcional, ex.: 17"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
+    if (!registrarFaturistas(S.cfg, [r.campos.nome], `cadastro manual (${S.operador || '—'})`)) return avisar('Esse nome já está na lista.', 'warn');
+    S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg('Faturista adicionado.'); RENDER.bases();
+  };
+  $('fatImp').onclick = () => $('fatArq').click();
+  $('fatArq').onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    let rows; try { rows = await lerXlsx(await lerArquivo(f)); } catch (err) { return avisar(`Planilha não lida: ${err.message}`, 'err'); }
+    const cab = (rows[0] || []).map(h => String(h ?? '').trim());
+    if (!cab.some(Boolean)) return avisar('A primeira linha da planilha precisa ter os nomes das colunas.', 'warn');
+    const sugerida = cab.findIndex(h => /FATURISTA|RESPONSAVEL|USUARIO/.test(norm(h)));
+    const r = await dialogo('Importar faturistas', `<p class="small muted">${esc(f.name)} · ${rows.length - 1} linhas (só a primeira aba)</p><label class="campo">Coluna com o nome do faturista<select name="col">${opcoes(cab.map((h, i) => [i, h || `(coluna ${i + 1} sem nome)`]), sugerida >= 0 ? sugerida : 0)}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Importar']]);
+    if (r.botao !== 'ok') return;
+    const k = +r.campos.col, nomes = [...new Set(rows.slice(1).map(x => String(fixMojibake(x[k] ?? '')).trim()).filter(Boolean))];
+    if (nomes.length > 300 && !await confirmar('Muitos nomes', `A coluna tem ${nomes.length} nomes distintos. Tem certeza de que é a coluna de faturistas?`, 'Importar mesmo assim')) return;
+    const n = registrarFaturistas(S.cfg, nomes, `planilha ${f.name}`); salvarCfg(`${n} faturista(s) novo(s) de ${nomes.length} nome(s) na coluna.`); RENDER.bases();
+  };
+  if ($('fatPbi')) $('fatPbi').onclick = () => { const n = registrarFaturistas(S.cfg, S.pbi.faturistas.map(([x]) => x), `Power BI ${S.pbi.nome}`); salvarCfg(`${n} faturista(s) novo(s) do Power BI.`); RENDER.bases(); };
   pg.querySelectorAll('[data-cl]').forEach(inp => inp.onchange = () => { const r = S.cfg.classificacao[+inp.dataset.cl]; r[inp.dataset.c] = inp.type === 'checkbox' ? inp.checked : inp.value; });
   pg.querySelectorAll('[data-clrm]').forEach(b => b.onclick = () => { S.cfg.classificacao.splice(+b.dataset.clrm, 1); RENDER.bases(); });
   $('clAdd').onclick = () => { S.cfg.classificacao.push({ id: novoId('r'), campo: 'descricao', padrao: '', tipo: 'outro', nota: '', ativa: true }); RENDER.bases(); };

@@ -51,7 +51,9 @@ async function lerPowerBI(bytes, nome) {
   const X = mapearColunas(rows[0], {
     empresa: ['Nome Empresa'], convenio: ['Nome Convenio'], grupo: ['Grupo Procedimento'], atendimento: ['Cod. Atendimento'],
     conta: ['Cod. Conta'], paciente: ['Nome Paciente'], codigo: ['Cod. Procedimento'], desc: ['Desc. Procedimento'],
-    data: ['Data Atendimento'], quant: ['Quant. Lancamento'], valor: ['Valor Total Conta'], prestador: ['CD_PRESTADOR'], tipoConv: ['Tipo Convenio']
+    data: ['Data Atendimento'], quant: ['Quant. Lancamento'], valor: ['Valor Total Conta'], prestador: ['CD_PRESTADOR'], tipoConv: ['Tipo Convenio'],
+    // Opcional: quem fechou a conta. Só é usado para sugerir o responsável de uma NC.
+    faturista: ['Faturista', 'Usuario Fechamento', 'Usuario Fechamento Conta', 'Usuario Fech. Conta', 'Responsavel Fechamento', 'Responsavel Pelo Fechamento', 'NM_USUARIO_FECHAMENTO', 'CD_USUARIO_FECHAMENTO', 'Usuario Faturamento', 'Faturado Por']
   });
   const falta = ['empresa', 'atendimento', 'codigo', 'data'].filter(k => X[k] < 0);
   if (falta.length) throw new Error(`Não parece a planilha do Power BI. Faltam: ${falta.join(', ')}.`);
@@ -65,12 +67,14 @@ async function lerPowerBI(bytes, nome) {
       empresa: emp.trim(), unidadeCod: emp.match(/^\s*(\d+)/)[1], grupo: String(fixMojibake(g(r, 'grupo'))).trim(),
       atendimento: String(g(r, 'atendimento')).replace(/\.0+$/, ''), conta: String(g(r, 'conta')).replace(/\.0+$/, ''),
       codigo: cod, desc: String(fixMojibake(g(r, 'desc'))).trim(), data: paraData(g(r, 'data')),
-      prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim()
+      prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim(),
+      faturista: String(fixMojibake(g(r, 'faturista'))).trim()
     });
   }
   const datas = linhas.map(l => l.data).filter(Boolean).map(d => d.getTime());
   return {
-    nome, linhas, ignoradas,
+    nome, linhas, ignoradas, temFaturista: X.faturista >= 0,
+    faturistas: X.faturista >= 0 ? [...contar(linhas.filter(l => l.faturista), l => l.faturista)].sort((a, b) => b[1] - a[1]) : [],
     periodo: datas.length ? [new Date(Math.min(...datas)), new Date(Math.max(...datas))] : null,
     unidades: [...contar(linhas, l => l.empresa)].sort((a, b) => b[1] - a[1]),
     grupos: [...contar(linhas, l => l.grupo)].sort((a, b) => b[1] - a[1]),

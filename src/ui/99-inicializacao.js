@@ -5,11 +5,12 @@
   aplicarTema();
   S.cfg = lerLocal(CHAVES.cfg);
   if (!S.cfg || validarConfig(S.cfg).length) { S.cfg = configPadrao(); gravarLocal(CHAVES.cfg, S.cfg); }
+  else if (migrarConfig(S.cfg)) gravarLocal(CHAVES.cfg, S.cfg);
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   S.operador = lerLocal(CHAVES.operador) || '';
-  carregarFluxo();
-  iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo();
+  carregarFluxo(); carregarNC();
+  iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo(); atualizarNavNC();
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';
   await abrirDB(); S.rodadas = await dbTodas();

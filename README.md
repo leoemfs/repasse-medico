@@ -7,11 +7,11 @@ Aplicação local, em um único HTML, para conferir o repasse médico: relatóri
 | Pasta | Conteúdo |
 | --- | --- |
 | `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração, equivalências, conferência, correção de prestador, rodadas e relatórios |
-| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, equivalências, bases, rodadas e configurações |
+| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, equivalências, bases, rodadas e configurações |
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
-| `test/` | `motor.mjs` (motor no Chromium), `e2e.mjs` (ponta a ponta, por file://) `menu.mjs` (navegação), `fluxo.mjs` (fluxo mensal) e `calendario.mjs` (dias úteis) |
+| `test/` | `motor.mjs` (motor no Chromium), `e2e.mjs` (ponta a ponta, por file://) `menu.mjs` (navegação), `fluxo.mjs` (fluxo mensal), `nc.mjs` (não conformidades) e `calendario.mjs` (dias úteis) |
 | `docs/` | Especificações, requisitos em levantamento e guias de uso |
 | `dados/` | Arquivos reais para teste. **Fora do Git** (dados de pacientes) |
 
@@ -24,6 +24,7 @@ node test/motor.mjs             # motor com os arquivos de dados/
 node test/e2e.mjs               # interface completa com os arquivos de dados/
 node test/menu.mjs              # menu recolhível, Ctrl+B e barra do celular
 node test/fluxo.mjs             # fluxo mensal (com data fixa em 29/10/2026)
+node test/nc.mjs                # não conformidades com os arquivos de dados/ (data fixa em 30/10/2026)
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

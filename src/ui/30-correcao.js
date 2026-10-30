@@ -23,6 +23,8 @@ async function executarCorrecao() {
   const ant = rodadaAnterior(S.rodadas, rodada);
   await guardarRodada(rodada);
   S.corr = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtro: new Set(), busca: '' };
+  ctx.fonteNC = `corr|${x.id}|${un}`;
+  guardarCandidatosNC(ctx.fonteNC, `Correção ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${ctx.unidadeNome}`, `Corr. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaCorrecao(res, ctx, S.cfg));
   desenharCorrecao();
   avisar(`Identificação concluída: ${res.porEstado.identificado.n} de ${res.linhas.length} linhas com prestador identificado.`, 'ok');
 }
@@ -39,8 +41,10 @@ function desenharCorrecao() {
     <div class="marcadores">${Object.entries(res.porMotivo).map(([k, n]) => `<span class="marc">${esc(MOTIVOS_CORR[k])} · ${n}</span>`).join('')}</div>
     <div class="acoes"><input type="search" id="coBusca" placeholder="Buscar paciente, código ou médico…" value="${esc(S.corr.busca)}" style="max-width:420px"><button id="coExcel">Exportar planilha de trabalho</button></div>
     <div id="coTab" style="margin-top:10px"></div></div>
+    ${ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''}
     <div class="grid2"><div class="card"><h2>Médicos identificados</h2><div id="coMed"></div></div>
     <div class="card"><h2>Equivalências desta rodada</h2><div id="coEq"></div></div></div>`;
+  ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.corr.filtro; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharCorrecao(); });
   $('coExcel').onclick = () => baixarZip(xlsxCorrecao(res, ctx), `Correcao_prestador_${nomeSeguro(ctx.relatorio.cab.prestadorNome)}_${ctx.relatorio.cab.repasse}_${carimbo()}.xlsx`);
   const filtrar = () => {
@@ -54,11 +58,12 @@ function desenharCorrecao() {
       { t: 'Médico do laudo', v: o => o.estado === 'identificado' ? o.medico : '' }, { t: 'Cód. prestador', v: o => o.prestador?.cod || '' },
       { t: 'Motivo', v: o => MOTIVOS_CORR[o.motivo] || '' }, { t: 'Vl Repasse', n: true, v: o => fmtBR(o.r.vlRepasse) }
     ],
-    detalhe: o => `<div class="det"><div><h4>Detalhe objetivo</h4><p>${esc(o.detalhe)}</p>${o.alertas.length ? `<h4>Alertas</h4><ul>${o.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
+    detalhe: o => `<div class="acoes" style="margin:0 0 8px"><button class="sec mini" data-nc-linha="${res.linhas.indexOf(o)}">Apontar como NC…</button></div><div class="det"><div><h4>Detalhe objetivo</h4><p>${esc(o.detalhe)}</p>${o.alertas.length ? `<h4>Alertas</h4><ul>${o.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
       <div class="small muted">Tipo: ${esc(TIPOS_ITEM[o.tipo])} · grupo ${esc(o.r.grupoNome)} · conta ${esc(o.r.conta)} · atendimento ${esc(o.r.atendimento)} · ${esc(o.r.convenio)}</div></div>
       <div><h4>Laudos do paciente na data (sem nomes de médico quando não identificado)</h4>${o.evidencias.length ? `<ul>${o.evidencias.map(e => `<li>«${esc(e.titulo)}» · ${fmtData(e.data)} · nome ${NIVEL_NOME[e.nm]} · equivalência: ${esc(ROTULO_EQ[e.eq] || e.eq)}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum.</p>'}</div></div>`
   });
   $('coBusca').oninput = e => { S.corr.busca = e.target.value; t.atualizar(filtrar()); };
+  $('coTab').addEventListener('click', e => { const b = e.target.closest('[data-nc-linha]'); if (b) abrirRegistroNC([candidatoDaLinhaCorrecao(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]).then(ok => ok && desenharCorrecao()); });
   tabela($('coMed'), { porPagina: 50, linhas: res.porMedico, colunas: [{ t: 'Médico (Apolo)', v: m => m.medico }, { t: 'Cód. prestador', v: m => m.cod || 'sem cadastro' }, { t: 'Linhas', n: true, v: m => m.n }, { t: 'Vl Repasse', n: true, v: m => fmtBR(m.vlRepasse) }], vazio: 'Nenhum médico identificado.' });
   painelEqRodada($('coEq'), paresDaCorrecao(res), executarCorrecao);
 }
