@@ -18,6 +18,7 @@ await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 const S = expr => p.evaluate(expr);
 const ir = async pag => { await p.goto(html + '#' + pag); await p.waitForFunction(t => document.getElementById('titulo').textContent === t, { inicio: 'Início', conferencia: 'Conferência cruzada', rodadas: 'Rodadas', fluxo: 'Fluxo mensal', nc: 'Não conformidades', bases: 'Bases' }[pag]); await p.waitForTimeout(150); };
+const manterArquivos = async () => { await p.waitForTimeout(300); if (await p.$('#dlg[open]')) { await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open); } };
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(150); };
 const seletor = () => p.textContent('#compGlobal');
 
@@ -43,6 +44,8 @@ ok(await S(() => window.__RM.S.rodadas.map(r => r.chaveCompetencia).join()) === 
 
 // 3) Trocar para 09/2026: tudo muda junto.
 await p.click('#compAnt'); await p.waitForFunction(() => /09\/2026/.test(document.getElementById('compGlobal').textContent));
+ok(await p.isVisible('#dlg[open]') && /Limpar todos os arquivos/.test(await p.textContent('#dlgCorpo')), 'na troca para 09/2026 a ferramenta oferece limpar os arquivos de produção 09/2026');
+await manterArquivos();
 ok(/última conferência desta sessão é da competência 10\/2026/.test(await p.textContent('#pag-conferencia')) && !(await p.$('#cfTab table')), 'conferência de 10/2026 não aparece em 09/2026');
 ok(/espera produção 08\/2026/.test(await p.textContent('#pag-conferencia')), 'aviso: arquivos de produção 09/2026 numa competência que espera 08/2026');
 await ir('rodadas');
@@ -51,7 +54,7 @@ await p.check('#rdTodas'); await p.waitForTimeout(200);
 ok((await p.$$('#rdTab tbody tr.clicavel')).length === 1, '«mostrar todas as competências» traz a rodada de 10/2026');
 await ir('fluxo');
 ok(/Checklist da competência 09\/2026/.test(await p.textContent('#pag-fluxo')) && !(await p.$('#fxAnt')), 'Fluxo mensal segue o seletor do topo (sem ‹ › próprio)');
-await p.reload(); await p.waitForFunction(() => window.__RM);
+await p.reload(); await p.waitForFunction(() => window.__RM && /Competência/.test(document.getElementById('compGlobal')?.textContent || ''));
 ok(/Competência 09\/2026/.test(await seletor()), 'competência escolhida lembrada após recarregar');
 await p.click('#compProx'); await p.waitForFunction(() => /10\/2026/.test(document.getElementById('compGlobal').textContent));
 

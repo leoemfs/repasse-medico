@@ -50,7 +50,7 @@ const RETENCAO_NC_PADRAO = 60;
 function configPadrao() {
   return {
     schema: SCHEMA_CONFIG, versaoSchema: 1, revisao: 1, atualizadoEm: agoraISO(),
-    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO },
+    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO, prestadorGenerico: '2' },
     unidades: UNIDADES_PADRAO.map(u => ({ ...clone(u), cnpj: UNIDADES_REGRAS[u.cod]?.cnpj || '', pctUSG: UNIDADES_REGRAS[u.cod]?.pctUSG ? { ...UNIDADES_REGRAS[u.cod].pctUSG } : null })),
     prestadores: [],
     faturistas: clone(FATURISTAS_PADRAO),
@@ -85,6 +85,8 @@ function migrarConfig(c) {
   let mudou = false;
   if (!Array.isArray(c.faturistas)) { c.faturistas = clone(FATURISTAS_PADRAO); mudou = true; }
   if (c.parametros && c.parametros.retencaoNC === undefined) { c.parametros.retencaoNC = RETENCAO_NC_PADRAO; mudou = true; }
+  // Prestador genérico: lançado antes de se saber quem lauda; o relatório dele vai para a Correção de prestador.
+  if (c.parametros && c.parametros.prestadorGenerico === undefined) { c.parametros.prestadorGenerico = '2'; mudou = true; }
   // MedicalShare: nome antigo no Apolo da unidade 17 (Palhano), faturada pela AlphaSonic Londrina.
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }

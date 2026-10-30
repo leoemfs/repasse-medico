@@ -17,6 +17,7 @@ await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify(
 await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 const S = expr => p.evaluate(expr);
+const manterArquivos = async () => { await p.waitForTimeout(300); if (await p.$('#dlg[open]')) { await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open); } };
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(150); };
 
 ok(await S(() => window.__RM.S.cfg.unidades.find(u => u.cod === '17').apolo.includes('MedicalShare')), 'MedicalShare cadastrada como nome do Apolo da unidade 17 (Palhano)');
@@ -53,7 +54,7 @@ await p.screenshot({ path: out + 'nc_revisao.png', fullPage: true });
 // 4) Importar a planilha manual de 09/2026.
 await p.setInputFiles('#ncArq', d('nao_conformidades_09-2026.xlsx')); await p.waitForSelector('#dlg[open]');
 ok(await p.inputValue('#dlgCorpo input[name=competencia]') === '2026-09', 'competência 09/2026 lida do nome do arquivo');
-await okDlg(); await p.waitForFunction(() => window.__RM.S.nc.itens.some(x => x.competencia === '2026-09'));
+await p.click('#dlgBotoes button[value=ok]'); await manterArquivos(); await p.waitForFunction(() => window.__RM.S.nc.itens.some(x => x.competencia === '2026-09'));
 const imp = await S(() => { const it = window.__RM.S.nc.itens.filter(x => x.competencia === '2026-09'), c = k => it.filter(x => x.categoria === k).length, n = k => it.filter(x => x.natureza === k).length;
   return { total: it.length, part: c('particular'), conv: c('convenio'), prest: c('prestador'), guia: n('guia-negada'), outras: n('outras'), medical: it.filter(x => x.unidade === 'MedicalShare').map(x => x.unidadeCod).join(','),
     obs: it.find(x => x.obs.includes('Texto original: NÃO POSSUI ATENDIMENTO'))?.natureza, fat: window.__RM.S.cfg.faturistas.length }; });

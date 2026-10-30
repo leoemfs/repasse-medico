@@ -15,6 +15,7 @@ RENDER.configuracoes = () => {
       <label class="campo">Tolerância — correção de prestador (dias)<input type="number" id="pTolP" min="0" max="60" value="${p.tolCorrecao}"><span class="small muted">0 = mesma data (recomendado).</span></label>
       <label class="campo">Truncamento mínimo do nome (caracteres)<input type="number" id="pTrunc" min="10" max="60" value="${p.minTruncamento}"><span class="small muted">Prefixo no meio de palavra só conta a partir deste tamanho.</span></label>
       <label class="campo">Valor simbólico até (R$)<input type="number" id="pSimb" min="0" step="0.01" value="${p.valorSimbolico}"><span class="small muted">Só marca a linha; não muda a categoria.</span></label>
+      <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
     <div class="acoes"><button id="pSalvar">Salvar parâmetros</button></div></div>
   <div class="card"><h2>Regras financeiras</h2><p class="lead">Percentuais de USG por prestador e unidade, classes A/B/C/D, valores fixos por laudo, vigências e descontos estão especificados (RN-180, RN-183), mas <strong>não estão ativos nesta versão</strong>. Nenhum valor é calculado: a conferência é de existência e consistência.</p></div>
@@ -28,8 +29,8 @@ RENDER.configuracoes = () => {
   $('cfgOpSalvar').onclick = () => { S.operador = $('cfgOp').value.trim(); gravarLocal(CHAVES.operador, S.operador); mostrarOperador(); avisar('Operador salvo.', 'ok'); };
   $('cfgTema').onchange = e => { gravarLocal(CHAVES.tema, e.target.value); aplicarTema(); };
   $('pSalvar').onclick = () => {
-    const n = { tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value };
-    if (Object.values(n).some(v => !Number.isFinite(v) || v < 0) || n.retencaoNC < 1 || n.retencaoNC > 366) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
+    const n = { tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
+    if (Object.entries(n).some(([k, v]) => k !== 'prestadorGenerico' && (!Number.isFinite(v) || v < 0)) || n.retencaoNC < 1 || n.retencaoNC > 366) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
   };

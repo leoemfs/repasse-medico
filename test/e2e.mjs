@@ -38,7 +38,7 @@ console.log('  após validar:', await page.evaluate(() => JSON.stringify(Object.
 await passo('exportar Excel da conferência', async () => { const [dl] = await Promise.all([page.waitForEvent('download'), page.click('#cfExcel')]); await dl.saveAs(out + 'e2e_conferencia.xlsx'); });
 await passo('correção de prestador', async () => {
   await page.goto(page.url().split('#')[0] + '#correcao');
-  await page.selectOption('#coRel', { index: 1 }); await page.selectOption('#coUn', '2');
+  await page.selectOption('#coRel', { index: 0 }); await page.selectOption('#coUn', '2');
   await page.click('#coRodar'); await page.waitForSelector('#coTab table');
 });
 console.log('  correção:', await page.evaluate(() => JSON.stringify(Object.fromEntries(Object.entries(window.__RM.S.corr.res.porEstado).map(([k, v]) => [k, v.n])))));

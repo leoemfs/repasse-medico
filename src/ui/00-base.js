@@ -151,6 +151,7 @@ function mudarCompetencia(chave) {
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
   atualizarNavFluxo();
   irPara(paginaAtual, true);
+  if (typeof oferecerLimpezaNaTroca === 'function') oferecerLimpezaNaTroca();
 }
 const compFechada = (chave = S.comp) => competenciaFechada(S.compReg, chave);
 // Bloqueia alterações numa competência fechada; devolve verdadeiro se pode seguir.

@@ -29,6 +29,7 @@ node test/competencia.mjs       # competência no topo, encapsulamento, fechar/r
 node test/decisoes.mjs          # desfazer conflito e memória das decisões por linha
 node test/regras.mjs            # regras de repasse em Bases e importação da planilha de controle
 node test/fechamento.mjs        # aba Fechamento: valores com aceite, situação, prévia do e-mail e exportação
+node test/arquivos.mjs          # arquivos da sessão: genérico na correção, limpar, outra produção
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

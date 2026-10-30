@@ -22,6 +22,7 @@ await p.addInitScript(() => {
 await p.goto(html + '#equivalencias');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 const S = expr => p.evaluate(expr);
+const manterArquivos = async () => { await p.waitForTimeout(300); if (await p.$('#dlg[open]')) { await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open); } };
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(150); };
 
 // 1) Desfazer conflito.
@@ -69,7 +70,7 @@ await S(() => { window.__RM.S.nc.itens[0].situacao = 'nao-procede'; });
 await rodar();
 ok(await S(() => window.__RM.S.conf.res.porDecisao.nc) === 0, 'NC «Não procede» deixa de tratar a linha');
 // Outra competência: decisões não se misturam.
-await p.click('#compAnt'); await p.waitForTimeout(200); await rodar();
+await p.click('#compAnt'); await manterArquivos(); await rodar();
 ok(await S(() => window.__RM.S.conf.res.porDecisao.considerar) === 0, 'em 09/2026 a decisão de 10/2026 não vale');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

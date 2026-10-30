@@ -54,7 +54,7 @@ function desenharAcompanhamento() {
     c.innerHTML = cab + `<div class="card"><h2>Competência ${rotuloCompetencia(FX.chave)} ainda não iniciada</h2><p class="lead">O checklist do mês é criado a partir do modelo de fluxos (revisão ${S.fluxo.modelo.revisao}): grupos, etapas, prazos e listas de prestadores. Depois de criado, mudanças no modelo não alteram este mês.</p>
       <div class="acoes"><button id="fxCriar">Iniciar competência ${rotuloCompetencia(FX.chave)}</button><button class="sec" id="fxIrModelo">Revisar o modelo antes</button></div>
       ${existentes.length ? `<p class="small muted" style="margin-top:12px">Competências registradas: ${existentes.map(k => `<a href="#" data-k="${k}">${rotuloCompetencia(k)}</a>`).join(' · ')}</p>` : ''}</div>`;
-    $('fxCriar').onclick = () => { if (!exigirAberta(FX.chave, 'iniciar o checklist')) return; S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); };
+    $('fxCriar').onclick = () => { if (!exigirAberta(FX.chave, 'iniciar o checklist')) return; S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); oferecerLimpezaNaTroca(); };
     $('fxIrModelo').onclick = () => { FX.sub = 'modelo'; RENDER.fluxo(); };
     c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); mudarCompetencia(a.dataset.k); });
   } else {
