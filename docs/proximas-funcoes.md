@@ -180,6 +180,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 | 5 | SOL-F10 Pasta da competência · SOL-F18 Base compartilhada para a equipe | médio/alto | planejado |
 | 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | planejado |
 | 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
+| 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | proposta enviada, aguardando aprovação |
 
 ## SOL-F11 — Aceite na própria conferência — PLANEJADO
 - **Hoje:** o resultado está na Conferência e o aceite fica em Rodadas (troca de tela a cada relatório).
@@ -270,3 +271,49 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - **Hoje:** carregar no Início e depois importar faturistas e convênios em botões separados.
 - **Proposta:** ao carregar o Power BI, uma ação única «Atualizar bases» com o resumo do que entra (faturistas e unidades, convênios e tipos, catálogo de procedimentos) e a comparação com a última importação.
 - **Aceite:** um passo em vez de três; nada marcado à mão (ex.: SUS) é sobrescrito.
+
+## SOL-F22 — Arquivos da sessão: limpar e separar conferência × correção — PROPOSTA (30/10/2026)
+- **Hoje:**
+  - Na conferência cruzada vale carregar todos os prestadores da mesma unidade. Na mesma sessão, a correção de prestador fica confusa com tantos PDFs no seletor.
+  - A correção é sempre feita pelo **prestador genérico Gilberto Miyazaki Otta (código 2)**, lançado antes de se saber quem vai laudar.
+  - Ao passar para uma nova competência, os anexos da competência anterior continuam carregados e não batem com a data da competência nova.
+- **Proposta:**
+  1. «Limpar arquivos» no Início: tudo, só PDFs do MV ou só Apolo/Power BI, com confirmação. O ✕ por PDF continua.
+  2. Prestador genérico configurável (padrão: código 2). O PDF dele entra marcado como **Correção** e só aparece no seletor da Correção de prestador; os demais só aparecem na Conferência. Dá para trocar a finalidade de um PDF à mão.
+  3. Ao trocar a competência no topo (ou iniciar uma nova), se houver arquivos de outra produção, a ferramenta pergunta «Limpar os arquivos de produção MM/AAAA?». Ao carregar um arquivo de produção diferente da esperada, também avisa antes de incluir.
+- **Aceite:**
+  - a correção lista só o PDF do genérico;
+  - a troca de competência não deixa anexos antigos misturados sem aviso;
+  - limpar não apaga rodadas, NCs nem decisões (só a memória da sessão).
+
+## SOL-F23 — Excel da conferência cruzada reorganizado — PROPOSTA (30/10/2026)
+- **Hoje:** a aba principal mistura técnica e conferência (colunas do MV, do laudo, faixa, equivalência), e fica confusa.
+- **Aba principal «Conferência»** (uma linha por registro, MV lado a lado com o Apolo):
+  - **Situação e decisão:** Status (cor) · Decisão na competência (NC registrada / Considerado no repasse) · Indicar NC · Aceite (com justificativa).
+  - **MV (cabeçalho azul):**
+    - Unidade MV (a da sessão);
+    - Paciente MV;
+    - Cód. TUSS MV;
+    - Descrição do procedimento MV;
+    - Data MV;
+    - Convênio MV;
+    - Grupo de procedimento MV;
+    - Médico MV (prestador do relatório);
+    - Vl Repasse.
+  - **Apolo (cabeçalho verde):**
+    - Unidade Apolo;
+    - Paciente Apolo;
+    - Título do laudo (TITLE);
+    - Descrição do estudo (STUDY);
+    - Data Apolo;
+    - Convênio Apolo;
+    - Modalidade Apolo;
+    - Médico Apolo.
+  - **No fim:** Ressalvas (marcadores) · Observações e análise (motivos).
+- **Abas separadas:**
+  - **Pendências:** só o que não está conferido nem tem decisão, com as mesmas colunas.
+  - **Resumo:** contagens por status e marcador, valores.
+  - **Informações:** arquivos, parâmetros, versões, competência.
+  - **Técnico:** faixa do par, equivalência usada, validador, chave da linha, página, conta, atendimento, ID do laudo, linha da planilha, candidatos.
+  - **Por procedimento**, **Títulos sem validação** e **MV original**.
+- **Colunas de NC e aceite:** a decisão é tomada na ferramenta, que é a dona do dado (um clique por linha, com memória na competência); o Excel mostra a decisão já preenchida. Opcional: reimportar a planilha preenchida (colunas «Indicar NC» e «Aceite») para registrar as decisões em lote. A decidir com o usuário.
