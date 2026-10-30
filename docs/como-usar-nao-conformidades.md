@@ -42,7 +42,7 @@
 
 ## Faturistas
 
-Ficam em **Bases → Faturistas**: cadastro à mão, importação de uma planilha (você escolhe a coluna) ou do Power BI. Para o Power BI, a exportação precisa trazer a coluna de quem fechou a conta (ex.: «Faturista» ou «Usuario Fechamento»). Com essa coluna, o responsável de uma NC vinda da conferência é sugerido pelo atendimento.
+Ficam em **Bases → Faturistas**: cadastro à mão, importação de uma planilha (você escolhe a coluna) ou do Power BI. Para o Power BI, a exportação precisa trazer a coluna de quem fechou a conta («Nome do Usuario que Fechou a Conta», como na exportação completa). Com essa coluna, o responsável de uma NC vinda da conferência é sugerido pelo atendimento.
 
 ## Privacidade
 

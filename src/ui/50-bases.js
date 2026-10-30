@@ -43,7 +43,7 @@ RENDER.bases = () => {
       <div class="grid3" style="margin-top:10px"><div><h3>Unidades</h3><ul class="small">${S.pbi.unidades.map(([u, n]) => `<li>${esc(u)} — ${n}</li>`).join('')}</ul></div>
       <div><h3>Grupos de procedimento</h3><ul class="small">${S.pbi.grupos.map(([g, n]) => `<li>${esc(g)} — ${n}</li>`).join('')}</ul></div>
       <div><h3>Códigos de prestador (CD_PRESTADOR)</h3><p class="small muted">${S.pbi.prestadores.length} códigos distintos. O Power BI não traz o nome do médico.</p>
-        <h3>Faturista</h3><p class="small muted">${S.pbi.temFaturista ? `${S.pbi.faturistas.length} nomes na coluna de quem fechou a conta: usados para sugerir o responsável das NCs pelo atendimento.` : 'Coluna de quem fechou a conta não encontrada (opcional; nomes aceitos: Faturista, Usuario Fechamento, Responsavel Fechamento…).'}</p></div></div>
+        <h3>Faturista</h3><p class="small muted">${S.pbi.temFaturista ? `${S.pbi.faturistas.length} nomes na coluna de quem fechou a conta: usados para sugerir o responsável das NCs pelo atendimento.` : 'Coluna de quem fechou a conta não encontrada (opcional; nomes aceitos: «Nome do Usuario que Fechou a Conta», Faturista, Usuario Fechamento…).'}</p></div></div>
       <details style="margin-top:8px"><summary>Procedimentos faturados (${S.pbi.procedimentos.length})</summary><div id="pbiProc"></div></details>` : '<p class="muted">Carregue a planilha do Power BI no Início para consultar.</p>'}</div>`;
 
   const pg = $('pag-bases');
@@ -91,7 +91,13 @@ RENDER.bases = () => {
     if (nomes.length > 300 && !await confirmar('Muitos nomes', `A coluna tem ${nomes.length} nomes distintos. Tem certeza de que é a coluna de faturistas?`, 'Importar mesmo assim')) return;
     const n = registrarFaturistas(S.cfg, nomes, `planilha ${f.name}`); salvarCfg(`${n} faturista(s) novo(s) de ${nomes.length} nome(s) na coluna.`); RENDER.bases();
   };
-  if ($('fatPbi')) $('fatPbi').onclick = () => { const n = registrarFaturistas(S.cfg, S.pbi.faturistas.map(([x]) => x), `Power BI ${S.pbi.nome}`); salvarCfg(`${n} faturista(s) novo(s) do Power BI.`); RENDER.bases(); };
+  if ($('fatPbi')) $('fatPbi').onclick = () => {
+    const n = registrarFaturistas(S.cfg, S.pbi.faturistas.map(([x]) => x), `Power BI ${S.pbi.nome}`);
+    // Unidade(s) vazias recebem as unidades em que a pessoa fechou contas, da que mais fechou para a que menos fechou.
+    let u = 0;
+    for (const f of S.cfg.faturistas) { const m = S.pbi.unidadesDoFaturista[f.nome]; if (m && !f.unidades && !f.generico) { f.unidades = Object.entries(m).sort((a, b) => b[1] - a[1]).map(([c]) => c).join(', '); u++; } }
+    salvarCfg(`${n} faturista(s) novo(s) do Power BI${u ? ` · unidades preenchidas em ${u}` : ''}.`); RENDER.bases();
+  };
   pg.querySelectorAll('[data-cl]').forEach(inp => inp.onchange = () => { const r = S.cfg.classificacao[+inp.dataset.cl]; r[inp.dataset.c] = inp.type === 'checkbox' ? inp.checked : inp.value; });
   pg.querySelectorAll('[data-clrm]').forEach(b => b.onclick = () => { S.cfg.classificacao.splice(+b.dataset.clrm, 1); RENDER.bases(); });
   $('clAdd').onclick = () => { S.cfg.classificacao.push({ id: novoId('r'), campo: 'descricao', padrao: '', tipo: 'outro', nota: '', ativa: true }); RENDER.bases(); };

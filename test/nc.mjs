@@ -106,7 +106,7 @@ ok(/Não conformidades desta competência: 5/.test(await p.textContent('[data-g=
 
 // 10) Retenção: NC registrada há 70 dias perde nome e ID ao abrir; a de 55 dias gera aviso.
 await S(() => { const it = window.__RM.S.nc.itens, t = Date.now(); it[0].criadaEm = new Date(t - 70 * 864e5).toISOString(); it[1].criadaEm = new Date(t - 55 * 864e5).toISOString(); localStorage.setItem('rm2.nc', JSON.stringify(window.__RM.S.nc)); });
-await p.reload(); await p.waitForFunction(() => window.__RM);
+await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.nc.itens.length > 200);
 const ret = await S(() => { const it = window.__RM.S.nc.itens; return [it[0].paciente, it[0].idAtendimento, !!it[0].anonimizada, it[0].natureza, !!it[1].paciente]; });
 ok(ret[0] === '' && ret[1] === '' && ret[2] && ret[3] && ret[4], 'após 60 dias: nome e ID apagados; natureza mantida; a NC mais nova fica intacta');
 await p.goto(html + '#nc'); await p.waitForSelector('.nc-kpis');
@@ -116,6 +116,14 @@ ok(/terão nome e ID do paciente apagados em até 7 dias/.test(await p.textConte
 await p.goto(html + '#bases'); await p.waitForSelector('#cardFat');
 ok((await p.$$('#cardFat tbody tr')).length === 12, 'Bases → Faturistas lista 12 responsáveis (2 genéricos + 10 da planilha)');
 ok(/aberta/.test(await p.getAttribute('.nav a[data-pag="nc"]', 'aria-label')), `menu: «${await p.getAttribute('.nav a[data-pag="nc"]', 'aria-label')}»`);
+
+// 11b) Power BI completo: coluna de quem fechou a conta → faturistas com unidades e sugestão de responsável.
+await p.goto(html + '#inicio'); await p.setInputFiles('#inPBI', d('powerbi_completo_raw.xlsx')); await p.waitForFunction(() => !!window.__RM.S.pbi, null, { timeout: 120000 });
+const pbi = await S(() => ({ tem: window.__RM.S.pbi.temFaturista, n: window.__RM.S.pbi.faturistas.length }));
+ok(pbi.tem && pbi.n === 48, `Power BI completo: coluna «Nome do Usuario que Fechou a Conta» com ${pbi.n} faturistas`);
+await p.goto(html + '#bases'); await p.waitForSelector('#fatPbi'); await p.click('#fatPbi'); await p.waitForTimeout(300);
+const fat = await S(() => { const f = window.__RM.S.cfg.faturistas; return { n: f.length, marcos: f.find(x => x.nome === 'MARCOS.CAETANO')?.unidades, gen: f.find(x => x.generico).unidades }; });
+ok(fat.n === 50 && /\d/.test(fat.marcos) && fat.gen === '', `faturistas do Power BI importados com unidades (${fat.n} · MARCOS.CAETANO: ${fat.marcos})`);
 
 // 12) Celular.
 const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();

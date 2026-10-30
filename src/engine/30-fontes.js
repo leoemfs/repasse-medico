@@ -53,7 +53,7 @@ async function lerPowerBI(bytes, nome) {
     conta: ['Cod. Conta'], paciente: ['Nome Paciente'], codigo: ['Cod. Procedimento'], desc: ['Desc. Procedimento'],
     data: ['Data Atendimento'], quant: ['Quant. Lancamento'], valor: ['Valor Total Conta'], prestador: ['CD_PRESTADOR'], tipoConv: ['Tipo Convenio'],
     // Opcional: quem fechou a conta. Só é usado para sugerir o responsável de uma NC.
-    faturista: ['Faturista', 'Usuario Fechamento', 'Usuario Fechamento Conta', 'Usuario Fech. Conta', 'Responsavel Fechamento', 'Responsavel Pelo Fechamento', 'NM_USUARIO_FECHAMENTO', 'CD_USUARIO_FECHAMENTO', 'Usuario Faturamento', 'Faturado Por']
+    faturista: ['Nome do Usuario que Fechou a Conta', 'Usuario que Fechou a Conta', 'Faturista', 'Usuario Fechamento', 'Usuario Fechamento Conta', 'Usuario Fech. Conta', 'Responsavel Fechamento', 'Responsavel Pelo Fechamento', 'NM_USUARIO_FECHAMENTO', 'CD_USUARIO_FECHAMENTO', 'Usuario Faturamento', 'Faturado Por']
   });
   const falta = ['empresa', 'atendimento', 'codigo', 'data'].filter(k => X[k] < 0);
   if (falta.length) throw new Error(`Não parece a planilha do Power BI. Faltam: ${falta.join(', ')}.`);
@@ -75,6 +75,8 @@ async function lerPowerBI(bytes, nome) {
   return {
     nome, linhas, ignoradas, temFaturista: X.faturista >= 0,
     faturistas: X.faturista >= 0 ? [...contar(linhas.filter(l => l.faturista), l => l.faturista)].sort((a, b) => b[1] - a[1]) : [],
+    // Unidades em que cada faturista fechou contas (código da unidade → nº de lançamentos).
+    unidadesDoFaturista: X.faturista >= 0 ? linhas.reduce((m, l) => { if (l.faturista) { const u = m[l.faturista] || (m[l.faturista] = {}); u[l.unidadeCod] = (u[l.unidadeCod] || 0) + 1; } return m; }, {}) : {},
     periodo: datas.length ? [new Date(Math.min(...datas)), new Date(Math.max(...datas))] : null,
     unidades: [...contar(linhas, l => l.empresa)].sort((a, b) => b[1] - a[1]),
     grupos: [...contar(linhas, l => l.grupo)].sort((a, b) => b[1] - a[1]),
