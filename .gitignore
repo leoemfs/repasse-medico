@@ -3,5 +3,8 @@ dados/
 test/saida/
 *.xlsx
 *.pdf
-dist/
+# Build: só o HTML final entra no Git (o harness de teste não)
+dist/harness.html
 node_modules/
+# Cópia de transporte do repositório
+*.bundle
