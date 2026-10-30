@@ -72,3 +72,39 @@ Pendências de definição: tipos oficiais de NC usados no Qualiex, campos exigi
 1. Prévia visual do Fluxo (com anotações) e da aba Não conformidades.
 2. Não conformidades (aproveita a conferência que já existe).
 3. Fluxo + anotações.
+
+## SOL-F5 — Equivalências compostas e por convênio — EM LEVANTAMENTO (futuro)
+
+Pedido de 30/10/2026: um laudo pode corresponder a mais de um código na conta, e isso pode variar por convênio.
+- Exemplo: «USG de ombro com doppler» não corresponde ao articular sozinho. Na conta, precisa de um **articular + um doppler**; na **UNIMED, só o doppler**.
+- Hoje o motor trata «o mesmo título validado para dois códigos» como **conflito**, e a conferência pareia um laudo com uma linha só. A segunda linha (o doppler) fica «Só no faturamento».
+- O que precisa existir:
+  - **relação composta** (título → conjunto de códigos esperados);
+  - **variação por convênio** (ex.: UNIMED = só doppler);
+  - conferência que aceite **um laudo sustentando N linhas** da composição e aponte o código que falta ou que sobra.
+- Até lá, «desfazer conflito» (SOL-F8) resolve escolhendo um código.
+
+## SOL-F6 — Memória das decisões por linha na competência — EM LEVANTAMENTO
+
+Pedido de 30/10/2026.
+- **Fluxo:** a conferência mostra a prévia, você aponta a NC, retira o procedimento do relatório no MV e roda de novo. A ferramenta precisa lembrar que aquela falta é uma **NC já registrada**.
+- **Linha divergente aceita:** o procedimento não bate, mas por razão específica entra no repasse. Fica como **aceite manual da linha**, com justificativa, e conta como resolvido no fechamento.
+- **Escopo:** as decisões ficam na competência, sobrevivem a novas rodadas e aparecem no aceite e no fechamento.
+
+## SOL-F7 — Fechamento do repasse: planilhas e indicadores — EM LEVANTAMENTO
+
+Pedido de 30/10/2026, com exemplo `REPASSE_10-2026_CONTROLE.xlsx`. O fechamento gera uma exportação da competência em três abas, e os indicadores ficam separados.
+- **REPASSE USG** (pagamento dia 15):
+  - prestadores agrupados por faixa de percentual: geral 44/49/40/40/44/42% por unidade, +2%, residentes 35%, 40%, 49%, 50%, 55% e 70%;
+  - colunas por unidade (1, 2, 4, 7, 10, 17) + BOARD, PLANTÃO, TOTAL, DESCONTOS e TOTAL GERAL BRUTO, mais o CNPJ de cada unidade para a NF;
+  - o valor por unidade é o Vl Repasse do relatório do MV (ex.: Marcelo Miyazaki, unidade 1 = 4.926,59, igual ao PDF).
+- **REPASSE IMG** (último dia útil):
+  - colunas: valor da produção de USG, classe, médico e unidades (1, 2, 4, 5, 7, 10, 17), mais PLANTÃO, TOTAL, DESCONTOS e TOTAL GERAL;
+  - blocos à parte: médicos V3 que recebem pela SRA (Curitiba), NF complementar (PET-CT, Pluvicto, Curso Cetrus) e observações (pensão, adiantamento parcelado).
+- **PRODUÇÃO USG CLASSE:** produção bruta de USG por unidade, com o percentual da unidade, o total e a classe A/B/C/D («fixo classe» para alguns). A produção é o Vl Total dos relatórios de USG: por exemplo, 24.241,46 × 44% = 10.666,25 no repasse.
+- **Situação por prestador:** Verificar · E-mail enviado/aguardando nota · Sem valores · Concluído.
+- **Controle demais prestadores:** a definir.
+
+## SOL-F8 — Desfazer conflitos de equivalência — EM LEVANTAMENTO
+
+No painel de conflitos de «Equivalências TUSS»: escolher o código correto do título e tirar a validação dos demais, com justificativa e histórico.
