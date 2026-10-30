@@ -51,9 +51,10 @@ function configPadrao() {
   return {
     schema: SCHEMA_CONFIG, versaoSchema: 1, revisao: 1, atualizadoEm: agoraISO(),
     parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO },
-    unidades: clone(UNIDADES_PADRAO),
+    unidades: UNIDADES_PADRAO.map(u => ({ ...clone(u), cnpj: UNIDADES_REGRAS[u.cod]?.cnpj || '', pctUSG: UNIDADES_REGRAS[u.cod]?.pctUSG ? { ...UNIDADES_REGRAS[u.cod].pctUSG } : null })),
     prestadores: [],
     faturistas: clone(FATURISTAS_PADRAO),
+    faixasUSG: clone(FAIXAS_USG_PADRAO), classes: classesPadrao(), convenios: [], fechamento: { ...FECHAMENTO_PADRAO },
     classificacao: clone(CLASSIFICACAO_PADRAO)
   };
 }
@@ -87,6 +88,7 @@ function migrarConfig(c) {
   // MedicalShare: nome antigo no Apolo da unidade 17 (Palhano), faturada pela AlphaSonic Londrina.
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
+  if (migrarRegras(c)) mudou = true;
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.
@@ -122,7 +124,7 @@ function registrarPrestadorDoMV(cfg, cod, nome) {
   if (!cod || !nome) return false;
   let p = cfg.prestadores.find(x => String(x.cod) === String(cod));
   if (p) { if (!p.nomeMV) p.nomeMV = nome; return false; }
-  cfg.prestadores.push({ cod: String(cod), nomeMV: nome, aliases: [], naoRealizaRepasse: false, origem: 'cabeçalho do relatório MV', em: agoraISO() });
+  cfg.prestadores.push({ cod: String(cod), nomeMV: nome, aliases: [], naoRealizaRepasse: false, origem: 'cabeçalho do relatório MV', em: agoraISO(), regras: regrasPrestadorVazias() });
   return true;
 }
 // Índice: nome normalizado do Apolo → [{prestador, via}]. Duas entradas para o mesmo nome = conflito.

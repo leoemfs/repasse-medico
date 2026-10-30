@@ -27,6 +27,7 @@ node test/fluxo.mjs             # fluxo mensal (com data fixa em 29/10/2026)
 node test/nc.mjs                # não conformidades com os arquivos de dados/ (data fixa em 30/10/2026)
 node test/competencia.mjs       # competência no topo, encapsulamento, fechar/reabrir (data fixa em 30/10/2026)
 node test/decisoes.mjs          # desfazer conflito e memória das decisões por linha
+node test/regras.mjs            # regras de repasse em Bases e importação da planilha de controle
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

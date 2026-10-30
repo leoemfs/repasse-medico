@@ -203,6 +203,7 @@ button.mini{padding:4px 10px;font-size:12px}
 .conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
 .st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
 td .st.dec-nc,td .st.dec-considerar{margin-left:4px}
+.card[hidden]{display:none}
 
 </style>
 </head>
@@ -754,12 +755,13 @@ async function lerPowerBI(bytes, nome) {
       atendimento: String(g(r, 'atendimento')).replace(/\.0+$/, ''), conta: String(g(r, 'conta')).replace(/\.0+$/, ''),
       codigo: cod, desc: String(fixMojibake(g(r, 'desc'))).trim(), data: paraData(g(r, 'data')),
       prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim(),
-      faturista: String(fixMojibake(g(r, 'faturista'))).trim()
+      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase()
     });
   }
   const datas = linhas.map(l => l.data).filter(Boolean).map(d => d.getTime());
   return {
     nome, linhas, ignoradas, temFaturista: X.faturista >= 0,
+    convenios: [...linhas.reduce((m, l) => { if (l.convenio && !m.has(l.convenio)) m.set(l.convenio, l.tipoConvenio); return m; }, new Map())],
     faturistas: X.faturista >= 0 ? [...contar(linhas.filter(l => l.faturista), l => l.faturista)].sort((a, b) => b[1] - a[1]) : [],
     // Unidades em que cada faturista fechou contas (código da unidade → nº de lançamentos).
     unidadesDoFaturista: X.faturista >= 0 ? linhas.reduce((m, l) => { if (l.faturista) { const u = m[l.faturista] || (m[l.faturista] = {}); u[l.unidadeCod] = (u[l.unidadeCod] || 0) + 1; } return m; }, {}) : {},
@@ -843,9 +845,10 @@ function configPadrao() {
   return {
     schema: SCHEMA_CONFIG, versaoSchema: 1, revisao: 1, atualizadoEm: agoraISO(),
     parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO },
-    unidades: clone(UNIDADES_PADRAO),
+    unidades: UNIDADES_PADRAO.map(u => ({ ...clone(u), cnpj: UNIDADES_REGRAS[u.cod]?.cnpj || '', pctUSG: UNIDADES_REGRAS[u.cod]?.pctUSG ? { ...UNIDADES_REGRAS[u.cod].pctUSG } : null })),
     prestadores: [],
     faturistas: clone(FATURISTAS_PADRAO),
+    faixasUSG: clone(FAIXAS_USG_PADRAO), classes: classesPadrao(), convenios: [], fechamento: { ...FECHAMENTO_PADRAO },
     classificacao: clone(CLASSIFICACAO_PADRAO)
   };
 }
@@ -879,6 +882,7 @@ function migrarConfig(c) {
   // MedicalShare: nome antigo no Apolo da unidade 17 (Palhano), faturada pela AlphaSonic Londrina.
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
+  if (migrarRegras(c)) mudou = true;
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.
@@ -914,7 +918,7 @@ function registrarPrestadorDoMV(cfg, cod, nome) {
   if (!cod || !nome) return false;
   let p = cfg.prestadores.find(x => String(x.cod) === String(cod));
   if (p) { if (!p.nomeMV) p.nomeMV = nome; return false; }
-  cfg.prestadores.push({ cod: String(cod), nomeMV: nome, aliases: [], naoRealizaRepasse: false, origem: 'cabeçalho do relatório MV', em: agoraISO() });
+  cfg.prestadores.push({ cod: String(cod), nomeMV: nome, aliases: [], naoRealizaRepasse: false, origem: 'cabeçalho do relatório MV', em: agoraISO(), regras: regrasPrestadorVazias() });
   return true;
 }
 // Índice: nome normalizado do Apolo → [{prestador, via}]. Duas entradas para o mesmo nome = conflito.
@@ -938,6 +942,181 @@ function medicosDoPrestador(cfg, cod) {
   const p = cfg.prestadores.find(x => String(x.cod) === String(cod));
   if (!p) return [];
   return [norm(p.nomeMV), ...(p.aliases || []).filter(a => a.status === 'validado').map(a => norm(a.nome))].filter(Boolean);
+}
+
+/* ---- src/engine/45-regras.js ---- */
+/* ============================================================
+ * Regras de repasse (SOL-F7): percentuais de USG, classes por produção, valores de laudo
+ * do IMG, convênios (SUS · Convênio · Particular) e regras diferenciadas por prestador.
+ * Padrão para todos; diferenciado no cadastro do prestador. A ferramenta não recalcula
+ * o repasse: usa as regras para conferir e avisar.
+ * ============================================================ */
+const FAIXAS_USG_PADRAO = [
+  { id: 'geral', nome: 'Repasse médicos geral', base: 'unidade', acrescimo: 0 },
+  { id: 'mais2', nome: 'Repasse com acréscimo de 2%', base: 'unidade', acrescimo: 0.02 },
+  { id: 'residente', nome: 'Repasse residentes 35%', base: 'residente', acrescimo: 0 },
+  ...[40, 49, 50, 55, 70].map(n => ({ id: 'p' + n, nome: `Repasse ${n}%`, base: 'fixo', pct: n / 100 }))
+];
+// Percentual de USG por unidade (médicos / residentes) e CNPJ para a nota fiscal.
+const UNIDADES_REGRAS = {
+  1: { cnpj: '10.304.593/0001-33', pctUSG: { medico: 0.44, residente: 0.35 } },
+  2: { cnpj: '10.304.593/0004-86', pctUSG: { medico: 0.49, residente: 0.35 } },
+  4: { cnpj: '09.346.898/0002-00', pctUSG: { medico: 0.40, residente: 0.35 } },
+  5: { cnpj: '10.563.835/0001-03', pctUSG: null },
+  7: { cnpj: '02.978.370/0002-04', pctUSG: { medico: 0.40, residente: 0.35 } },
+  10: { cnpj: '10.304.593/0005-67', pctUSG: { medico: 0.44, residente: 0.35 } },
+  11: { cnpj: '', pctUSG: null },
+  17: { cnpj: '10.304.593/0007-29', pctUSG: { medico: 0.42, residente: 0.35 } }
+};
+const EXAMES_IMG = { RX: 'Raio-X', MAMO: 'Mamografia', DENSITO: 'Densitometria', TOMO: 'Tomografia', RESSO: 'Ressonância' };
+const COLUNAS_CLASSE = ['residente', 'D', 'C', 'B', 'A'];
+const v5 = (residente, D, C, B, A) => ({ residente, D, C, B, A });
+function classesPadrao() {
+  return {
+    vigencia: '2026',
+    // Produção bruta de USG (todas as unidades) ACIMA do valor → classe. Abaixo do último corte: D.
+    cortes: [{ classe: 'A', acima: 26524.38 }, { classe: 'B', acima: 19679.38 }, { classe: 'C', acima: 9411.88 }],
+    valores: {
+      convenio: { RX: v5(3, 4.1, 4.5, 4.9, 5.5), MAMO: v5(8, 15.3, 16.83, 18.36, 20.66), DENSITO: v5(5, 7.14, 7.14, 8.16, 9.18), TOMO: v5(18, 20.4, 24.48, 26.52, 29.58), RESSO: v5(22, 32.65, 35.7, 40.8, 44.88) },
+      sus: { RX: v5(3, 3.2, 3.5, 3.8, 4.3), MAMO: v5(8, 11, 12, 13.2, 14.85), DENSITO: v5(5, 6, 6.5, 7, 8), TOMO: v5(15, 20, 22, 24, 27), RESSO: v5(17, 26, 28, 31, 40) }
+    },
+    // Procedimentos equivalentes: valem N exames do tipo base, ou um valor fixo.
+    equivalentes: [
+      { nome: 'Angiotomografia', padrao: 'ANGIO ?TOMO|ANGIO ?TC|ANGIOTC', exame: 'TOMO', fator: 2 },
+      { nome: 'Angiorressonância', padrao: 'ANGIO ?R+ESSO|ANGIO ?RM|ANGIORM', exame: 'RESSO', fator: 1.5 },
+      { nome: 'Artrorressonância', padrao: 'ARTRO ?R+ESSO|ARTRO ?RM', exame: 'RESSO', fator: 2 },
+      { nome: 'Artrotomografia', padrao: 'ARTRO ?TOMO|ARTRO ?TC', exame: 'TOMO', fator: 2 },
+      { nome: 'Dacriotomografia', padrao: 'DACRIO', exame: 'TOMO', fator: 2 },
+      { nome: 'Infiltração tomografia', padrao: 'INFILTRA.*(TOMO|TC)', exame: 'TOMO', fator: 1.5 },
+      { nome: 'Infiltração ressonância', padrao: 'INFILTRA.*(R+ESSO|RM)', exame: 'RESSO', fator: 1.5 },
+      { nome: 'Perfusão', padrao: 'PERFUSAO', valor: 250 },
+      { nome: 'Fusão de imagem', padrao: 'FUSAO', valor: 250 }
+    ]
+  };
+}
+const FECHAMENTO_PADRAO = { cnpjBoard: '10.304.593/0007-29', cnpjPlantao: '10.304.593/0001-33', variacaoAlerta: 30, toleranciaPct: 0.5, toleranciaValor: 0.05 };
+const TIPOS_CONVENIO = { SUS: 'SUS', CONVENIO: 'Convênio', PARTICULAR: 'Particular' };
+
+// Acrescenta as regras a configurações antigas sem apagar o que o usuário editou.
+function migrarRegras(c) {
+  let mudou = false;
+  for (const u of c.unidades || []) {
+    const pad = UNIDADES_REGRAS[u.cod];
+    if (u.cnpj === undefined) { u.cnpj = pad?.cnpj || ''; mudou = true; }
+    if (u.pctUSG === undefined) { u.pctUSG = pad?.pctUSG ? { ...pad.pctUSG } : null; mudou = true; }
+  }
+  if (!Array.isArray(c.faixasUSG)) { c.faixasUSG = clone(FAIXAS_USG_PADRAO); mudou = true; }
+  if (!c.classes) { c.classes = classesPadrao(); mudou = true; }
+  if (!Array.isArray(c.convenios)) { c.convenios = []; mudou = true; }
+  if (!c.fechamento) { c.fechamento = { ...FECHAMENTO_PADRAO }; mudou = true; }
+  for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
+  return mudou;
+}
+const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
+
+/* ---------- USG ---------- */
+// Percentual esperado de USG do prestador numa unidade (null = sem regra).
+function pctUSGEsperado(cfg, p, unidadeCod) {
+  const r = p?.regras; if (!r) return null;
+  const dif = r.pctUSGUnidade?.[unidadeCod];
+  if (dif !== undefined && dif !== '' && dif !== null) return +dif;
+  const f = (cfg.faixasUSG || []).find(x => x.id === r.faixaUSG); if (!f) return null;
+  if (f.base === 'fixo') return +f.pct;
+  const u = unidadePorCod(cfg, unidadeCod); if (!u?.pctUSG) return null;
+  return f.base === 'residente' ? +u.pctUSG.residente : r2((+u.pctUSG.medico + (+f.acrescimo || 0)) * 10000) / 10000;
+}
+
+/* ---------- Classe por produção ---------- */
+function classePorProducao(classes, producao) {
+  for (const c of classes.cortes) if (producao > c.acima) return c.classe;
+  return 'D';
+}
+const classeDoPrestador = (classes, p, producao) => p?.regras?.classeFixa ? { classe: p.regras.classeFixa, fixa: true } : { classe: classePorProducao(classes, producao || 0), fixa: false };
+
+/* ---------- Convênios ---------- */
+const tipoConvenio = (cfg, nome) => (cfg.convenios || []).find(c => norm(c.nome) === norm(nome))?.tipo || '';
+function registrarConvenios(cfg, lista, origem) {
+  let novos = 0, tipados = 0;
+  for (const [nome, tipo] of lista) {
+    if (!String(nome || '').trim()) continue;
+    const c = cfg.convenios.find(x => norm(x.nome) === norm(nome));
+    const t = TIPOS_CONVENIO[String(tipo || '').toUpperCase()] ? String(tipo).toUpperCase() : '';
+    if (!c) { cfg.convenios.push({ nome: String(nome).trim(), tipo: t, origem }); novos++; }
+    else if (!c.tipo && t) { c.tipo = t; tipados++; }   // nunca troca um tipo já definido (ex.: SUS marcado à mão)
+  }
+  return { novos, tipados };
+}
+
+/* ---------- Valor esperado de um laudo do IMG ---------- */
+const GRUPO_EXAME = [[/RADIOLOG|RAIO/, 'RX'], [/MAMOGRAF/, 'MAMO'], [/DENSITOMETR/, 'DENSITO'], [/TOMOGRAF/, 'TOMO'], [/RESSONANC/, 'RESSO']];
+function exameDaLinha(classes, grupo, desc) {
+  const d = norm(desc);
+  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, equivalente: e.nome }; }
+  const g = norm(grupo);
+  const ex = (GRUPO_EXAME.find(([re]) => re.test(g)) || [])[1];
+  return ex ? { exame: ex, fator: 1, valorFixo: 0, equivalente: '' } : null;
+}
+// Devolve {esperado, explicacao} ou {motivo} quando não há regra (o aviso diz o que falta).
+function valorEsperadoIMG(cfg, p, classe, linha) {
+  const ex = exameDaLinha(cfg.classes, linha.grupo, linha.desc);
+  if (!ex) return { motivo: 'exame sem regra de valor' };
+  const q = +linha.quant || 1;
+  if (ex.valorFixo) return { esperado: r2(ex.valorFixo * q), explicacao: `${ex.equivalente}: R$ ${fmtBR(ex.valorFixo)} fixo` };
+  const tipoConv = tipoConvenio(cfg, linha.convenio);
+  if (!tipoConv) return { motivo: 'convênio sem tipo (SUS, Convênio ou Particular)' };
+  const tabela = tipoConv === 'SUS' ? 'sus' : 'convenio', col = p?.regras?.tabelaIMG === 'residente' || p?.regras?.tipo === 'residente' ? 'residente' : classe;
+  const exc = (p?.regras?.excecoesIMG || []).find(e => e.exame === ex.exame && (!e.tabela || e.tabela === tabela));
+  const unit = exc ? +exc.valor : +cfg.classes.valores[tabela]?.[ex.exame]?.[col];
+  if (!unit) return { motivo: `sem valor para ${EXAMES_IMG[ex.exame]} · ${col}` };
+  return { esperado: r2(unit * ex.fator * q), explicacao: `${EXAMES_IMG[ex.exame]} ${tipoConv === 'SUS' ? 'SUS' : 'convênio/particular'} · ${col === 'residente' ? 'residente' : 'classe ' + col}${exc ? ' (exceção do prestador)' : ''}${ex.fator !== 1 ? ` × ${ex.fator} (${ex.equivalente})` : ''}` };
+}
+
+/* ---------- Leitura da planilha de controle do repasse (cadastro inicial) ---------- */
+// abas: [{nome, rows}]. Devolve faixas de USG, BOARD, participação no IMG, classe fixa, V3, CNPJs e percentuais.
+function interpretarPlanilhaControle(abas) {
+  const prest = new Map(), cnpj = {}, pctMedico = {}, avisos = [];
+  const pegar = (cod, nome) => { const k = String(cod).replace(/\.0+$/, ''); if (!prest.has(k)) prest.set(k, { cod: k, nome: String(nome || '').trim(), faixaUSG: '', board: 0, participaIMG: false, v3: false, classeFixa: '' }); return prest.get(k); };
+  const codUnidade = t => (String(t || '').match(/^\s*(\d+)\s*-/) || [])[1] || '';
+  for (const { nome, rows } of abas) {
+    const n = norm(nome);
+    if (/REPASSE USG/.test(n)) {
+      let faixa = 'geral', colUn = {}, colBoard = -1;
+      for (const r of rows) {
+        const a = norm(r[0] ?? ''), t = String(r[0] ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();   // t mantém o «%»
+        if (/^REPASSE/.test(t) && !r[1]) faixa = /GERAL/.test(t) ? 'geral' : /ACRESCIMO/.test(t) ? 'mais2' : /RESIDENTE/.test(t) ? 'residente' : (t.match(/(\d+) ?%/) ? 'p' + t.match(/(\d+) ?%/)[1] : faixa);
+        if (a === 'EMPRESAS') { colUn = {}; r.forEach((v, i) => { const c = codUnidade(v); if (c) colUn[i] = c; if (norm(v ?? '') === 'BOARD') colBoard = i; }); continue; }
+        if (/^CNPJ/.test(a)) { for (const [i, c] of Object.entries(colUn)) if (r[i] && faixa === 'geral') cnpj[c] = cnpj[c] || String(r[i]).trim(); continue; }
+        if (/^PORCETAGEM|^PORCENTAGEM/.test(a)) { if (faixa === 'geral') for (const [i, c] of Object.entries(colUn)) if (typeof r[i] === 'number') pctMedico[c] = r[i]; continue; }
+        if (typeof r[0] === 'number' && r[1]) { const p = pegar(r[0], r[1]); p.faixaUSG = faixa; if (colBoard >= 0 && typeof r[colBoard] === 'number') p.board = r[colBoard]; }
+      }
+    } else if (/REPASSE IMG/.test(n)) {
+      let v3 = false;
+      for (const r of rows) {
+        if (/MEDICOS V3/.test(norm(r[2] ?? ''))) v3 = true;
+        if (/NF COMPLEMENTAR/.test(norm(r[2] ?? ''))) break;
+        if (typeof r[2] === 'number' && r[3]) {
+          const p = pegar(r[2], r[3]); p.participaIMG = true; if (v3) p.v3 = true;
+          if (/FIXO/.test(norm(r[0] ?? '')) && /^[ABCD]$/.test(String(r[1] || '').trim())) p.classeFixa = String(r[1]).trim();
+        }
+      }
+    }
+  }
+  if (!prest.size) avisos.push('Nenhum prestador encontrado: as abas esperadas são «REPASSE USG …» e «REPASSE IMG …».');
+  return { prestadores: [...prest.values()], cnpj, pctMedico, avisos };
+}
+// Aplica a leitura ao cadastro: cria prestadores que faltam e preenche as regras (sem apagar exceções).
+function aplicarPlanilhaControle(cfg, lida, origem) {
+  let novos = 0, atualizados = 0;
+  for (const x of lida.prestadores) {
+    let p = cfg.prestadores.find(y => String(y.cod) === x.cod);
+    if (!p) { p = { cod: x.cod, nomeMV: x.nome, aliases: [], naoRealizaRepasse: false, origem, em: agoraISO(), regras: regrasPrestadorVazias() }; cfg.prestadores.push(p); novos++; }
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}) };
+    Object.assign(p.regras, { faixaUSG: x.faixaUSG || p.regras.faixaUSG, board: x.board || p.regras.board, participaIMG: x.participaIMG || p.regras.participaIMG, v3: x.v3 || p.regras.v3, classeFixa: x.classeFixa || p.regras.classeFixa });
+    if (x.faixaUSG === 'residente') p.regras.tipo = 'residente';
+    atualizados++;
+  }
+  for (const [cod, c] of Object.entries(lida.cnpj)) { const u = unidadePorCod(cfg, cod); if (u && !u.cnpj) u.cnpj = c; }
+  return { novos, atualizados };
 }
 
 /* ---- src/engine/50-equivalencias.js ---- */
@@ -3960,29 +4139,37 @@ async function desfazerConflito(c) {
 /* ============================================================
  * Bases: unidades, prestadores (código MV ↔ médico do Apolo), regras de tipo de item e Power BI
  * ============================================================ */
+const BS = { sub: 'unidades', soSemTipo: false };
+const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['pbi', 'Power BI']];
 RENDER.bases = () => {
   const medApolo = S.apolo ? [...contar(S.apolo.laudos.filter(l => l.medico), l => l.medico)].sort((a, b) => a[0].localeCompare(b[0])) : [];
   const idxP = indicePrestadores(S.cfg);
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
   const branches = S.apolo ? [...contar(S.apolo.laudos, l => l.unidade)] : [];
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
+  const pctTxt = v => v === null || v === undefined || v === '' ? '' : String(r2(v * 10000) / 100);
   $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
-  <div class="card"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
+  <div class="subabas" role="tablist">${SUBS_BASES.map(([k, t]) => `<button role="tab" class="${BS.sub === k ? 'on' : ''}" aria-selected="${BS.sub === k}" data-bsub="${k}">${t}</button>`).join('')}</div>
+  <div class="card" data-sub="unidades"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
-    <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>
+    <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th>CNPJ para a NF</th><th>% USG médicos</th><th>% USG residentes</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>
       <td><input type="text" data-u="${i}" data-c="cod" value="${esc(u.cod)}" style="width:60px"></td><td><input type="text" data-u="${i}" data-c="nome" value="${esc(u.nome)}"></td>
       <td><input type="text" data-u="${i}" data-c="apolo" value="${esc((u.apolo || []).join(' | '))}"></td><td><input type="text" data-u="${i}" data-c="pbi" value="${esc(u.pbi)}"></td>
-      <td><input type="text" data-u="${i}" data-c="empresa" value="${esc(u.empresa)}" style="width:80px"></td><td><button class="perigo" data-urm="${i}">✕</button></td></tr>`).join('')}</tbody></table></div>
+      <td><input type="text" data-u="${i}" data-c="empresa" value="${esc(u.empresa)}" style="width:80px"></td><td><input type="text" data-u="${i}" data-c="cnpj" value="${esc(u.cnpj || '')}" style="width:150px"></td>
+      <td><input type="number" step="0.01" data-u="${i}" data-c="pctMed" value="${pctTxt(u.pctUSG?.medico)}" style="width:70px" aria-label="% USG médicos"></td><td><input type="number" step="0.01" data-u="${i}" data-c="pctRes" value="${pctTxt(u.pctUSG?.residente)}" style="width:70px" aria-label="% USG residentes"></td><td><button class="perigo" data-urm="${i}">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="unSalvar">Salvar unidades</button><button id="unAdd" class="sec">+ Unidade</button><button id="unPad" class="sec">Restaurar padrão</button></div></div>
+  ${cardFaixasUSG()}${cardParametrosFechamento()}
 
-  <div class="card"><h2>Prestadores</h2><p class="lead">O par código ↔ nome vem do cabeçalho de cada relatório do MV carregado. O médico do Apolo só é ligado a um código por nome idêntico (após normalizar caixa e acentos) ou por <strong>alias validado</strong> com responsável (RN-208).</p>
-    <div class="tw"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases do Apolo</th><th>Não realiza repasse</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.prestadores.length ? S.cfg.prestadores.map((p, i) => `<tr>
+  <div class="card" data-sub="prestadores"><h2>Prestadores</h2><p class="lead">O par código ↔ nome vem do cabeçalho de cada relatório do MV carregado. O médico do Apolo só é ligado a um código por nome idêntico (após normalizar caixa e acentos) ou por <strong>alias validado</strong> com responsável (RN-208).</p>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases do Apolo</th><th>Regras de repasse</th><th>Não realiza repasse</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.prestadores.length ? S.cfg.prestadores.map((p, i) => `<tr>
       <td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td><td>${(p.aliases || []).map((a, j) => `<span class="badge ${a.status === 'validado' ? 'ok' : 'warn'}" title="${esc(a.responsavel || '')}">${esc(a.nome)} <a href="#" data-arm="${i}:${j}" title="remover">✕</a></span>`).join(' ') || '<span class="muted small">—</span>'}</td>
-      <td><input type="checkbox" data-nr="${i}"${p.naoRealizaRepasse ? ' checked' : ''}></td><td class="small muted">${esc(p.origem || '')}</td><td><button class="sec" data-alias="${i}">+ Alias</button></td></tr>`).join('') : '<tr><td colspan="6" class="muted">Carregue um relatório do MV para registrar o prestador do cabeçalho, ou adicione manualmente.</td></tr>'}</tbody></table></div>
-    <div class="acoes"><button id="prAdd" class="sec">+ Prestador manual</button></div>
+      <td class="small">${resumoRegras(p)}</td><td><input type="checkbox" data-nr="${i}"${p.naoRealizaRepasse ? ' checked' : ''}></td><td class="small muted">${esc(p.origem || '')}</td><td style="white-space:nowrap"><button class="sec mini" data-regras="${i}">Regras…</button> <button class="sec mini" data-alias="${i}">+ Alias</button></td></tr>`).join('') : '<tr><td colspan="7" class="muted">Carregue um relatório do MV para registrar o prestador do cabeçalho, ou adicione manualmente.</td></tr>'}</tbody></table></div>
+    <div class="acoes"><button id="prAdd" class="sec">+ Prestador manual</button><button id="prCtrl" class="sec">Importar regras da planilha de controle (.xlsx)</button><input type="file" id="prCtrlArq" accept=".xlsx" hidden></div>
+    <p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
     ${S.apolo ? `<details style="margin-top:12px"><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Lista para conferência. Nenhum vínculo é criado automaticamente.</p><ul class="small">${semVinculo.map(([m, n]) => `<li>${esc(m)} — ${n} laudos</li>`).join('')}</ul></details>` : ''}</div>
 
-  <div class="card" id="cardFat"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
+  ${cardClasses()}${cardConvenios()}
+  <div class="card" id="cardFat" data-sub="faturistas"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
     ${(() => { const nNC = S.nc ? contar(S.nc.itens, x => norm(x.responsavel)) : new Map(); return `<div class="tw"><table><thead><tr><th>Nome</th><th>Unidade(s)</th><th>Genérico</th><th>Ativo</th><th class="n">NCs</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.faturistas.map((f, i) => `<tr>
       <td><input type="text" data-fat="${i}" data-c="nome" value="${esc(f.nome)}"></td><td><input type="text" data-fat="${i}" data-c="unidades" value="${esc(f.unidades || '')}" placeholder="ex.: 17, 5"></td>
       <td><input type="checkbox" data-fat="${i}" data-c="generico"${f.generico ? ' checked' : ''} aria-label="Genérico"></td><td><input type="checkbox" data-fat="${i}" data-c="ativo"${f.ativo !== false ? ' checked' : ''} aria-label="Ativo"></td>
@@ -3990,14 +4177,14 @@ RENDER.bases = () => {
     <div class="acoes"><button id="fatAdd" class="sec">+ Faturista</button><button id="fatImp" class="sec">Importar de planilha (escolher coluna)</button><input type="file" id="fatArq" accept=".xlsx" hidden>
       ${S.pbi?.temFaturista ? `<button id="fatPbi" class="sec">Importar do Power BI (${S.pbi.faturistas.length})</button>` : ''}</div></div>
 
-  <div class="card"><h2>Classificação do tipo de item</h2><p class="lead">Aplicada antes de qualquer equivalência (RN-199). A primeira regra ativa que casar define o tipo; sem regra, o item fica «Desconhecido — pendente». Padrões são expressões regulares sobre o texto normalizado (maiúsculas, sem acento).</p>
+  <div class="card" data-sub="itens"><h2>Classificação do tipo de item</h2><p class="lead">Aplicada antes de qualquer equivalência (RN-199). A primeira regra ativa que casar define o tipo; sem regra, o item fica «Desconhecido — pendente». Padrões são expressões regulares sobre o texto normalizado (maiúsculas, sem acento).</p>
     <div class="tw"><table><thead><tr><th>Ativa</th><th>Campo</th><th>Padrão</th><th>Tipo</th><th>Nota</th><th></th></tr></thead><tbody>${S.cfg.classificacao.map((r, i) => `<tr>
       <td><input type="checkbox" data-cl="${i}" data-c="ativa"${r.ativa ? ' checked' : ''}></td><td><select data-cl="${i}" data-c="campo">${opcoes([['grupo', 'Grupo de procedimento'], ['descricao', 'Descrição do procedimento'], ['codigo', 'Código']], r.campo)}</select></td>
       <td><input type="text" data-cl="${i}" data-c="padrao" value="${esc(r.padrao)}"></td><td><select data-cl="${i}" data-c="tipo">${opcoes(Object.entries(TIPOS_ITEM), r.tipo)}</select></td>
       <td><input type="text" data-cl="${i}" data-c="nota" value="${esc(r.nota || '')}"></td><td><button class="perigo" data-clrm="${i}">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="clSalvar">Salvar regras</button><button id="clAdd" class="sec">+ Regra</button><button id="clPad" class="sec">Restaurar padrão</button></div></div>
 
-  <div class="card"><h2>Power BI (consulta)</h2><p class="lead">Base auxiliar: cataloga o que existe no faturamento. Não participa da conferência nem da identificação de prestador.</p>
+  <div class="card" data-sub="pbi"><h2>Power BI (consulta)</h2><p class="lead">Base auxiliar: cataloga o que existe no faturamento. Não participa da conferência nem da identificação de prestador.</p>
     ${S.pbi ? `<dl class="kv"><dt>Arquivo</dt><dd>${esc(S.pbi.nome)}</dd><dt>Período</dt><dd>${S.pbi.periodo ? `${fmtData(S.pbi.periodo[0])} a ${fmtData(S.pbi.periodo[1])}` : '—'}</dd><dt>Linhas</dt><dd>${S.pbi.linhas.length.toLocaleString('pt-BR')}</dd></dl>
       <div class="grid3" style="margin-top:10px"><div><h3>Unidades</h3><ul class="small">${S.pbi.unidades.map(([u, n]) => `<li>${esc(u)} — ${n}</li>`).join('')}</ul></div>
       <div><h3>Grupos de procedimento</h3><ul class="small">${S.pbi.grupos.map(([g, n]) => `<li>${esc(g)} — ${n}</li>`).join('')}</ul></div>
@@ -4006,10 +4193,17 @@ RENDER.bases = () => {
       <details style="margin-top:8px"><summary>Procedimentos faturados (${S.pbi.procedimentos.length})</summary><div id="pbiProc"></div></details>` : '<p class="muted">Carregue a planilha do Power BI no Início para consultar.</p>'}</div>`;
 
   const pg = $('pag-bases');
-  pg.querySelectorAll('[data-u]').forEach(inp => inp.onchange = () => { const u = S.cfg.unidades[+inp.dataset.u]; u[inp.dataset.c] = inp.dataset.c === 'apolo' ? inp.value.split('|').map(s => s.trim()).filter(Boolean) : inp.value.trim(); });
+  pg.querySelectorAll('[data-sub]').forEach(c => { c.hidden = c.dataset.sub !== BS.sub; });
+  pg.querySelectorAll('[data-bsub]').forEach(b => b.onclick = () => { BS.sub = b.dataset.bsub; RENDER.bases(); });
+  pg.querySelectorAll('[data-u]').forEach(inp => inp.onchange = () => {
+    const u = S.cfg.unidades[+inp.dataset.u], c = inp.dataset.c;
+    if (c === 'pctMed' || c === 'pctRes') { const v = inp.value === '' ? null : +inp.value / 100; u.pctUSG = { medico: null, residente: null, ...(u.pctUSG || {}) }; u.pctUSG[c === 'pctMed' ? 'medico' : 'residente'] = v; return; }
+    u[c] = c === 'apolo' ? inp.value.split('|').map(s => s.trim()).filter(Boolean) : inp.value.trim();
+  });
+  ligarRegras(pg);
   pg.querySelectorAll('[data-urm]').forEach(b => b.onclick = () => { S.cfg.unidades.splice(+b.dataset.urm, 1); RENDER.bases(); });
   $('unAdd').onclick = () => { S.cfg.unidades.push({ cod: '', nome: '', apolo: [], pbi: '', empresa: '' }); RENDER.bases(); };
-  $('unPad').onclick = async () => { if (await confirmar('Restaurar unidades padrão?', 'A tabela de unidades volta ao padrão.')) { S.cfg.unidades = clone(UNIDADES_PADRAO); salvarCfg('Unidades restauradas.'); RENDER.bases(); } };
+  $('unPad').onclick = async () => { if (await confirmar('Restaurar unidades padrão?', 'A tabela de unidades volta ao padrão.')) { S.cfg.unidades = configPadrao().unidades; salvarCfg('Unidades restauradas.'); RENDER.bases(); } };
   $('unSalvar').onclick = () => { const e = validarConfig(S.cfg); if (e.length) return avisar('Não salvo: ' + e.join('; '), 'err'); salvarCfg('Unidades salvas.'); RENDER.bases(); };
   pg.querySelectorAll('[data-nr]').forEach(ch => ch.onchange = () => { S.cfg.prestadores[+ch.dataset.nr].naoRealizaRepasse = ch.checked; salvarCfg('Prestador atualizado.'); });
   pg.querySelectorAll('[data-arm]').forEach(a => a.onclick = async ev => { ev.preventDefault(); const [i, j] = a.dataset.arm.split(':').map(Number); const p = S.cfg.prestadores[i];
@@ -4078,6 +4272,185 @@ async function adicionarAlias(i, medApolo) {
   p.aliases = p.aliases || [];
   p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual', competencia: S.comp });
   salvarCfg(`Alias «${nome}» validado para o prestador ${p.cod}.`, 'aliases'); RENDER.bases();
+}
+
+/* ---- src/ui/55-regras.js ---- */
+/* ============================================================
+ * Bases → regras de repasse: faixas de USG, parâmetros do fechamento, classes e valores
+ * do IMG, convênios (SUS · Convênio · Particular) e regras de cada prestador
+ * ============================================================ */
+const nomeFaixa = id => (S.cfg.faixasUSG || []).find(f => f.id === id)?.nome || '';
+function resumoRegras(p) {
+  const r = p.regras || {}, partes = [];
+  if (r.faixaUSG) partes.push(`USG: ${esc(nomeFaixa(r.faixaUSG))}${Object.values(r.pctUSGUnidade || {}).some(v => v !== '' && v !== null) ? ' (diferenciado)' : ''}`);
+  if (r.board) partes.push(`BOARD R$ ${fmtBR(r.board)}`);
+  if (r.participaIMG) partes.push(`IMG${r.v3 ? ' (V3)' : ''}${r.classeFixa ? ` · classe fixa ${esc(r.classeFixa)}` : ''}${r.tabelaIMG === 'residente' || r.tipo === 'residente' ? ' · tabela de residente' : ''}`);
+  if ((r.excecoesIMG || []).length) partes.push(`exceções: ${r.excecoesIMG.map(e => `${EXAMES_IMG[e.exame] || e.exame} R$ ${fmtBR(e.valor)}`).join(', ')}`);
+  return partes.join(' · ') || '<span class="muted">sem regras</span>';
+}
+
+/* ---------- Cartões ---------- */
+function cardFaixasUSG() {
+  return `<div class="card" data-sub="unidades"><h2>Faixas de repasse de USG</h2>
+    <p class="lead">«Unidade» usa o percentual de médicos da unidade (mais o acréscimo); «Residente», o percentual de residentes da unidade; «Fixo», o mesmo percentual em todas. O prestador escolhe a faixa em «Prestadores e regras» e pode ter percentual diferenciado por unidade.</p>
+    <div class="tw"><table><thead><tr><th>Nome</th><th>Base</th><th>Acréscimo (p.p.)</th><th>% fixo</th><th class="n">Prestadores</th><th></th></tr></thead><tbody>${S.cfg.faixasUSG.map((f, i) => `<tr>
+      <td><input type="text" data-fx="${i}" data-c="nome" value="${esc(f.nome)}"></td>
+      <td><select data-fx="${i}" data-c="base">${opcoes([['unidade', 'Unidade (médicos)'], ['residente', 'Unidade (residentes)'], ['fixo', 'Fixo']], f.base)}</select></td>
+      <td><input type="number" step="0.01" data-fx="${i}" data-c="acrescimo" value="${f.acrescimo ? r2(f.acrescimo * 100) : ''}" style="width:80px"${f.base === 'fixo' ? ' disabled' : ''}></td>
+      <td><input type="number" step="0.01" data-fx="${i}" data-c="pct" value="${f.base === 'fixo' ? r2(f.pct * 100) : ''}" style="width:80px"${f.base === 'fixo' ? '' : ' disabled'}></td>
+      <td class="n">${S.cfg.prestadores.filter(p => p.regras?.faixaUSG === f.id).length || ''}</td><td><button class="perigo mini" data-fxrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="acoes"><button id="fxSalvar">Salvar faixas</button><button id="fxAdd" class="sec">+ Faixa</button></div></div>`;
+}
+function cardParametrosFechamento() {
+  const f = S.cfg.fechamento;
+  return `<div class="card" data-sub="unidades"><h2>Parâmetros do fechamento</h2>
+    <div class="grid4"><label class="campo">CNPJ da NF do BOARD<input type="text" id="pfBoard" value="${esc(f.cnpjBoard)}"></label>
+      <label class="campo">CNPJ da NF do PLANTÃO<input type="text" id="pfPlantao" value="${esc(f.cnpjPlantao)}"></label>
+      <label class="campo">Avisar variação acima de (%)<input type="number" id="pfVar" min="0" value="${f.variacaoAlerta}"><span class="small muted">contra a competência anterior</span></label>
+      <label class="campo">Tolerância do % de USG (p.p.)<input type="number" step="0.1" id="pfTolPct" min="0" value="${f.toleranciaPct}"><span class="small muted">e R$ ${fmtBR(f.toleranciaValor)} por laudo do IMG</span></label></div>
+    <div class="acoes"><button id="pfSalvar">Salvar parâmetros</button></div></div>`;
+}
+function cardClasses() {
+  const c = S.cfg.classes, tab = (k, titulo) => `<div><h3>${titulo}</h3><div class="tw"><table><thead><tr><th>Exame</th>${COLUNAS_CLASSE.map(x => `<th>${x === 'residente' ? 'Residentes' : 'Classe ' + x}</th>`).join('')}</tr></thead><tbody>${Object.keys(EXAMES_IMG).map(ex => `<tr><td>${EXAMES_IMG[ex]}</td>${COLUNAS_CLASSE.map(col => `<td><input type="number" step="0.01" data-val="${k}|${ex}|${col}" value="${c.valores[k][ex]?.[col] ?? ''}" style="width:72px"></td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`;
+  return `<div class="card" data-sub="classes"><h2>Classes por produção de USG e valores por laudo do IMG <span class="muted small">vigência ${esc(c.vigencia)}</span></h2>
+    <p class="lead">A classe sai da produção bruta de USG do prestador (Vl Total dos relatórios de USG, todas as unidades) na produção da competência. Classe fixa no cadastro do prestador vale por cima. A ferramenta usa a tabela só para conferir o valor de cada laudo do relatório do IMG e avisar quando não bate.</p>
+    <div class="grid4">${c.cortes.map((x, i) => `<label class="campo">Classe ${esc(x.classe)}: produção acima de (R$)<input type="number" step="0.01" data-corte="${i}" value="${x.acima}"></label>`).join('')}<div class="campo">Classe D<span class="small">até o último corte ou sem produção</span></div></div>
+    <div class="grid2" style="margin-top:8px">${tab('convenio', 'Convênios e particulares')}${tab('sus', 'SUS')}</div>
+    <h3 style="margin-top:12px">Procedimentos equivalentes</h3>
+    <div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th></th></tr></thead><tbody>${c.equivalentes.map((e, i) => `<tr>
+      <td><input type="text" data-eqv="${i}" data-c="nome" value="${esc(e.nome)}"></td><td><input type="text" data-eqv="${i}" data-c="padrao" value="${esc(e.padrao)}"></td>
+      <td><select data-eqv="${i}" data-c="exame"><option value="">—</option>${opcoes(Object.entries(EXAMES_IMG), e.exame || '')}</select></td>
+      <td><input type="number" step="0.5" data-eqv="${i}" data-c="fator" value="${e.fator || ''}" style="width:70px"></td><td><input type="number" step="0.01" data-eqv="${i}" data-c="valor" value="${e.valor || ''}" style="width:90px"></td>
+      <td><button class="perigo mini" data-eqvrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="acoes"><button id="clsSalvar">Salvar classes e valores</button><button id="clsEqvAdd" class="sec">+ Equivalente</button><button id="clsPad" class="sec">Restaurar tabela 2026</button></div></div>`;
+}
+function conveniosVistos() {
+  const m = new Map();
+  for (const x of S.relatorios) for (const r of x.rel.regs) if (r.convenio && !m.has(norm(r.convenio))) m.set(norm(r.convenio), r.convenio);
+  return [...m.values()].filter(n => !S.cfg.convenios.some(c => norm(c.nome) === norm(n)));
+}
+function cardConvenios() {
+  const semTipo = S.cfg.convenios.filter(c => !c.tipo).length, vistos = conveniosVistos();
+  return `<div class="card" data-sub="convenios"><h2>Convênios <span class="muted small">${S.cfg.convenios.length} cadastrados · ${semTipo} sem tipo</span></h2>
+    <p class="lead">O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
+    <div class="acoes">${S.pbi ? `<button id="cvPbi" class="sec">Importar do Power BI (${S.pbi.convenios.length})</button>` : '<span class="small muted">Carregue o Power BI no Início para importar a lista com os tipos.</span>'}
+      ${vistos.length ? `<button id="cvMV" class="sec">Incluir ${vistos.length} dos relatórios do MV carregados</button>` : ''}<button id="cvAdd" class="sec">+ Convênio</button>
+      <label class="small"><input type="checkbox" id="cvSoSem"${BS.soSemTipo ? ' checked' : ''}> só os sem tipo</label><input type="search" id="cvBusca" placeholder="Buscar convênio…" style="max-width:260px"></div>
+    <div id="cvTab" style="margin-top:8px"></div></div>`;
+}
+
+/* ---------- Ligações ---------- */
+function ligarRegras(pg) {
+  // Faixas de USG
+  pg.querySelectorAll('[data-fx]').forEach(inp => inp.onchange = () => {
+    const f = S.cfg.faixasUSG[+inp.dataset.fx], c = inp.dataset.c;
+    if (c === 'acrescimo' || c === 'pct') f[c] = inp.value === '' ? 0 : +inp.value / 100; else f[c] = inp.value.trim();
+    if (c === 'base') RENDER.bases();
+  });
+  pg.querySelectorAll('[data-fxrm]').forEach(b => b.onclick = async () => {
+    const f = S.cfg.faixasUSG[+b.dataset.fxrm], n = S.cfg.prestadores.filter(p => p.regras?.faixaUSG === f.id).length;
+    if (n) return avisar(`A faixa «${f.nome}» tem ${n} prestador(es). Troque a faixa deles antes de remover.`, 'warn');
+    S.cfg.faixasUSG.splice(+b.dataset.fxrm, 1); salvarCfg(`Faixa de USG «${f.nome}» removida.`, 'regras'); RENDER.bases();
+  });
+  $('fxAdd').onclick = () => { S.cfg.faixasUSG.push({ id: novoId('fx'), nome: 'Nova faixa', base: 'fixo', pct: 0.4, acrescimo: 0 }); RENDER.bases(); };
+  $('fxSalvar').onclick = () => { salvarCfg('Faixas de repasse de USG salvas.', 'regras'); RENDER.bases(); };
+  // Parâmetros do fechamento
+  $('pfSalvar').onclick = () => {
+    Object.assign(S.cfg.fechamento, { cnpjBoard: $('pfBoard').value.trim(), cnpjPlantao: $('pfPlantao').value.trim(), variacaoAlerta: +$('pfVar').value || 0, toleranciaPct: +$('pfTolPct').value || 0 });
+    salvarCfg('Parâmetros do fechamento salvos.', 'parametros');
+  };
+  // Prestadores
+  pg.querySelectorAll('[data-regras]').forEach(b => b.onclick = () => editarRegrasPrestador(S.cfg.prestadores[+b.dataset.regras]));
+  $('prCtrl').onclick = () => $('prCtrlArq').click();
+  $('prCtrlArq').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importarPlanilhaControle(f); };
+  // Classes e valores
+  pg.querySelectorAll('[data-corte]').forEach(inp => inp.onchange = () => { S.cfg.classes.cortes[+inp.dataset.corte].acima = +inp.value || 0; });
+  pg.querySelectorAll('[data-val]').forEach(inp => inp.onchange = () => { const [k, ex, col] = inp.dataset.val.split('|'); S.cfg.classes.valores[k][ex][col] = inp.value === '' ? null : +inp.value; });
+  pg.querySelectorAll('[data-eqv]').forEach(inp => inp.onchange = () => { const e = S.cfg.classes.equivalentes[+inp.dataset.eqv], c = inp.dataset.c; e[c] = ['fator', 'valor'].includes(c) ? (inp.value === '' ? 0 : +inp.value) : inp.value.trim(); });
+  pg.querySelectorAll('[data-eqvrm]').forEach(b => b.onclick = () => { S.cfg.classes.equivalentes.splice(+b.dataset.eqvrm, 1); RENDER.bases(); });
+  $('clsEqvAdd').onclick = () => { S.cfg.classes.equivalentes.push({ nome: 'Novo equivalente', padrao: '', exame: 'TOMO', fator: 1 }); RENDER.bases(); };
+  $('clsPad').onclick = async () => { if (await confirmar('Restaurar a tabela de 2026?', 'Cortes, valores e equivalentes voltam ao padrão da planilha de regras de classe.', 'Restaurar')) { S.cfg.classes = classesPadrao(); salvarCfg('Classes e valores do IMG restaurados (2026).', 'regras'); RENDER.bases(); } };
+  $('clsSalvar').onclick = () => {
+    const ruins = S.cfg.classes.equivalentes.filter(e => { try { new RegExp(e.padrao); return !e.padrao; } catch (x) { return true; } });
+    if (ruins.length) return avisar(`Padrão inválido em: ${ruins.map(e => e.nome).join(', ')}.`, 'err');
+    const c = S.cfg.classes.cortes.map(x => x.acima);
+    if (!(c[0] > c[1] && c[1] > c[2])) return avisar('Os cortes precisam ser decrescentes: A > B > C.', 'err');
+    salvarCfg('Classes e valores do IMG salvos.', 'regras');
+  };
+  // Convênios
+  if ($('cvTab')) desenharConvenios();
+  if ($('cvPbi')) $('cvPbi').onclick = () => { const r = registrarConvenios(S.cfg, S.pbi.convenios, `Power BI ${S.pbi.nome}`); salvarCfg(`${r.novos} convênio(s) novo(s) e ${r.tipados} com tipo preenchido, do Power BI.`, 'regras'); RENDER.bases(); };
+  if ($('cvMV')) $('cvMV').onclick = () => { const r = registrarConvenios(S.cfg, conveniosVistos().map(n => [n, '']), 'relatórios do MV'); salvarCfg(`${r.novos} convênio(s) dos relatórios do MV (sem tipo: marque SUS, Convênio ou Particular).`, 'regras'); BS.soSemTipo = true; RENDER.bases(); };
+  $('cvAdd').onclick = async () => {
+    const r = await dialogo('Novo convênio', `<label class="campo">Nome (como no MV)<input type="text" name="nome"></label><label class="campo">Tipo<select name="tipo">${opcoes(Object.entries(TIPOS_CONVENIO), 'SUS')}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
+    const x = registrarConvenios(S.cfg, [[r.campos.nome, r.campos.tipo]], `cadastro manual (${S.operador || '—'})`);
+    if (!x.novos) return avisar('Esse convênio já está cadastrado.', 'warn');
+    salvarCfg(`Convênio «${r.campos.nome.trim()}» cadastrado como ${TIPOS_CONVENIO[r.campos.tipo]}.`, 'regras'); RENDER.bases();
+  };
+  $('cvSoSem').onchange = e => { BS.soSemTipo = e.target.checked; desenharConvenios(); };
+  $('cvBusca').oninput = () => desenharConvenios();
+}
+function desenharConvenios() {
+  const q = norm($('cvBusca')?.value || '');
+  const lista = S.cfg.convenios.filter(c => (!BS.soSemTipo || !c.tipo) && (!q || norm(c.nome).includes(q))).sort((a, b) => (!!a.tipo - !!b.tipo) || a.nome.localeCompare(b.nome));
+  tabela($('cvTab'), {
+    linhas: lista, porPagina: 100, vazio: 'Nenhum convênio. Importe do Power BI ou dos relatórios do MV.',
+    colunas: [{ t: 'Convênio', v: c => c.nome }, { t: 'Tipo', html: c => `<select data-cv="${esc(c.nome)}" aria-label="Tipo"><option value="">— sem tipo —</option>${opcoes(Object.entries(TIPOS_CONVENIO), c.tipo)}</select>` }, { t: 'Origem', v: c => c.origem || '' }]
+  });
+  $('cvTab').onchange = e => {
+    const s = e.target.closest('[data-cv]'); if (!s) return;
+    const c = S.cfg.convenios.find(x => x.nome === s.dataset.cv); c.tipo = s.value;
+    salvarCfg(`Convênio «${c.nome}» marcado como ${TIPOS_CONVENIO[c.tipo] || 'sem tipo'}.`, 'regras');
+  };
+}
+
+/* ---------- Regras de um prestador ---------- */
+async function editarRegrasPrestador(p) {
+  const op = await exigirOperador(); if (!op) return;
+  const r = { ...regrasPrestadorVazias(), ...(p.regras || {}) };
+  const unUSG = S.cfg.unidades.filter(u => u.pctUSG);
+  const d = await dialogo(`Regras de repasse — ${p.cod} - ${p.nomeMV}`, `<div class="grid2">
+    <label class="campo">Tipo<select name="tipo">${opcoes([['medico', 'Médico'], ['residente', 'Residente']], r.tipo)}</select></label>
+    <label class="campo">Faixa de repasse de USG<select name="faixaUSG"><option value="">— não faz USG —</option>${opcoes(S.cfg.faixasUSG.map(f => [f.id, f.nome]), r.faixaUSG)}</select></label>
+    <label class="campo">BOARD fixo mensal (R$)<input type="number" step="0.01" name="board" value="${r.board || ''}"></label>
+    <label class="campo">Classe do IMG<select name="classeFixa">${opcoes([['', 'Calculada pela produção de USG'], ['A', 'Fixa A'], ['B', 'Fixa B'], ['C', 'Fixa C'], ['D', 'Fixa D']], r.classeFixa)}</select></label>
+    <label class="campo">Tabela de valores do IMG<select name="tabelaIMG">${opcoes([['padrao', 'Padrão (pela classe)'], ['residente', 'Residente']], r.tabelaIMG)}</select></label>
+    <div class="campo"><label class="small"><input type="checkbox" name="participaIMG"${r.participaIMG ? ' checked' : ''}> Recebe repasse de IMG</label><label class="small"><input type="checkbox" name="v3"${r.v3 ? ' checked' : ''}> Médico V3 que recebe pela SRA (Curitiba)</label></div></div>
+    <h4 style="margin:8px 0 4px">% de USG diferenciado por unidade <span class="muted small">(vazio = regra da faixa)</span></h4>
+    <div class="grid4">${unUSG.map(u => `<label class="campo">${esc(u.cod)} - ${esc(u.nome)}<input type="number" step="0.01" name="pct_${esc(u.cod)}" value="${r.pctUSGUnidade?.[u.cod] !== undefined && r.pctUSGUnidade[u.cod] !== '' ? r2(r.pctUSGUnidade[u.cod] * 100) : ''}" placeholder="${(() => { const v = pctUSGEsperado(S.cfg, { regras: { ...r, pctUSGUnidade: {} } }, u.cod); return v === null ? '—' : r2(v * 100); })()}"></label>`).join('')}</div>
+    <label class="campo">Exceções de valor no IMG <span class="small">uma por linha: EXAME=valor (exames: ${Object.keys(EXAMES_IMG).join(', ')}). Ex.: MAMO=18</span><textarea name="excecoes" rows="2">${esc((r.excecoesIMG || []).map(e => `${e.exame}=${e.valor}`).join('\n'))}</textarea></label>
+    <label class="campo">Observação<input type="text" name="obs" value="${esc(r.obs || '')}"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Salvar regras']]);
+  if (d.botao !== 'ok') return;
+  const c = d.campos, exc = [], erros = [];
+  for (const linha of String(c.excecoes || '').split('\n').map(s => s.trim()).filter(Boolean)) {
+    const m = linha.toUpperCase().match(/^([A-Z]+)\s*=\s*([\d.,]+)$/);
+    if (!m || !EXAMES_IMG[m[1]]) erros.push(linha); else exc.push({ exame: m[1], valor: numBR(m[2].includes(',') ? m[2] : m[2].replace('.', ',')) });
+  }
+  if (erros.length) return avisar(`Exceção não entendida: ${erros.join('; ')}. Use EXAME=valor, ex.: MAMO=18.`, 'err');
+  const pct = {}; for (const u of unUSG) { const v = c['pct_' + u.cod]; if (v !== '' && v !== undefined) pct[u.cod] = +v / 100; }
+  p.regras = { ...r, tipo: c.tipo, faixaUSG: c.faixaUSG, board: +c.board || 0, classeFixa: c.classeFixa, tabelaIMG: c.tabelaIMG, participaIMG: !!c.participaIMG, v3: !!c.v3, pctUSGUnidade: pct, excecoesIMG: exc, obs: c.obs.trim(), alteradoPor: op, alteradoEm: agoraISO() };
+  salvarCfg(`Regras de repasse de ${p.cod} - ${p.nomeMV} atualizadas.`, 'prestadores'); RENDER.bases();
+}
+
+async function importarPlanilhaControle(f) {
+  const op = await exigirOperador(); if (!op) return;
+  let lida;
+  try {
+    const bytes = await lerArquivo(f), zip = await JSZip.loadAsync(bytes), abas = [];
+    for (const a of await abasXlsx(zip)) abas.push({ nome: a.nome, rows: await lerXlsx(bytes, { aba: a.nome }) });
+    lida = interpretarPlanilhaControle(abas);
+  } catch (e) { return avisar(`Planilha não lida: ${e.message}`, 'err'); }
+  if (!lida.prestadores.length) return avisar(lida.avisos.join(' '), 'warn');
+  const porFaixa = [...contar(lida.prestadores.filter(x => x.faixaUSG), x => x.faixaUSG)].map(([k, n]) => `${nomeFaixa(k) || k}: ${n}`);
+  const r = await dialogo('Importar regras da planilha de controle', `<p class="small muted">${esc(f.name)}</p><ul class="small">
+    <li>${lida.prestadores.length} prestadores (${lida.prestadores.filter(x => !S.cfg.prestadores.some(p => String(p.cod) === x.cod)).length} novos no cadastro)</li>
+    <li>USG por faixa — ${esc(porFaixa.join(' · ') || 'nenhum')}</li><li>BOARD: ${lida.prestadores.filter(x => x.board).length} · IMG: ${lida.prestadores.filter(x => x.participaIMG).length} (classe fixa: ${lida.prestadores.filter(x => x.classeFixa).length}, V3: ${lida.prestadores.filter(x => x.v3).length})</li>
+    <li>CNPJs lidos: ${Object.keys(lida.cnpj).length} (só preenchem unidades sem CNPJ)</li></ul>
+    <p class="small muted">Faixa, BOARD, IMG, classe fixa e V3 da planilha substituem os do cadastro; exceções e % diferenciado por unidade são mantidos.</p>`, [['', 'Cancelar', 'sec'], ['ok', 'Importar']]);
+  if (r.botao !== 'ok') return;
+  const x = aplicarPlanilhaControle(S.cfg, lida, `planilha de controle ${f.name}`);
+  salvarCfg(`Regras de ${x.atualizados} prestador(es) importadas da planilha de controle (${x.novos} novos).`, 'prestadores'); RENDER.bases();
 }
 
 /* ---- src/ui/60-rodadas.js ---- */

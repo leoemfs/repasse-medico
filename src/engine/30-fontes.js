@@ -68,12 +68,13 @@ async function lerPowerBI(bytes, nome) {
       atendimento: String(g(r, 'atendimento')).replace(/\.0+$/, ''), conta: String(g(r, 'conta')).replace(/\.0+$/, ''),
       codigo: cod, desc: String(fixMojibake(g(r, 'desc'))).trim(), data: paraData(g(r, 'data')),
       prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim(),
-      faturista: String(fixMojibake(g(r, 'faturista'))).trim()
+      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase()
     });
   }
   const datas = linhas.map(l => l.data).filter(Boolean).map(d => d.getTime());
   return {
     nome, linhas, ignoradas, temFaturista: X.faturista >= 0,
+    convenios: [...linhas.reduce((m, l) => { if (l.convenio && !m.has(l.convenio)) m.set(l.convenio, l.tipoConvenio); return m; }, new Map())],
     faturistas: X.faturista >= 0 ? [...contar(linhas.filter(l => l.faturista), l => l.faturista)].sort((a, b) => b[1] - a[1]) : [],
     // Unidades em que cada faturista fechou contas (código da unidade → nº de lançamentos).
     unidadesDoFaturista: X.faturista >= 0 ? linhas.reduce((m, l) => { if (l.faturista) { const u = m[l.faturista] || (m[l.faturista] = {}); u[l.unidadeCod] = (u[l.unidadeCod] || 0) + 1; } return m; }, {}) : {},

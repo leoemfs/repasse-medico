@@ -56,7 +56,7 @@ ok(/Competência 09\/2026/.test(await seletor()), 'competência escolhida lembra
 await p.click('#compProx'); await p.waitForFunction(() => /10\/2026/.test(document.getElementById('compGlobal').textContent));
 
 // 4) Alteração nas bases registrada na competência.
-await ir('bases'); await p.click('#fatAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo input[name=nome]', 'TESTE.FATURISTA'); await okDlg();
+await ir('bases'); await p.click('[data-bsub="faturistas"]'); await p.click('#fatAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo input[name=nome]', 'TESTE.FATURISTA'); await okDlg();
 await ir('inicio');
 ok(/Faturistas[\s\S]*TESTE\.FATURISTA/.test(await p.textContent('.painel-comp .grid3 > div:last-child')), 'painel: faturista cadastrado aparece em «Bases alteradas nesta competência»');
 ok(await S(() => window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'faturistas' && a.por === 'Teste Competência')), 'alteração guarda tipo e quem fez');

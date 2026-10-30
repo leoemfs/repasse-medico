@@ -195,3 +195,4 @@ button.mini{padding:4px 10px;font-size:12px}
 .conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
 .st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
 td .st.dec-nc,td .st.dec-considerar{margin-left:4px}
+.card[hidden]{display:none}

@@ -113,7 +113,7 @@ await p.goto(html + '#nc'); await p.waitForSelector('.nc-kpis');
 ok(/terão nome e ID do paciente apagados em até 7 dias/.test(await p.textContent('#pag-nc')), 'aviso de dados que vencem em até 7 dias');
 
 // 11) Bases: faturistas; menu: selo de abertas.
-await p.goto(html + '#bases'); await p.waitForSelector('#cardFat');
+await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="faturistas"]'); await p.waitForSelector('#cardFat:not([hidden])');
 ok((await p.$$('#cardFat tbody tr')).length === 12, 'Bases → Faturistas lista 12 responsáveis (2 genéricos + 10 da planilha)');
 ok(/aberta/.test(await p.getAttribute('.nav a[data-pag="nc"]', 'aria-label')), `menu: «${await p.getAttribute('.nav a[data-pag="nc"]', 'aria-label')}»`);
 
@@ -121,7 +121,7 @@ ok(/aberta/.test(await p.getAttribute('.nav a[data-pag="nc"]', 'aria-label')), `
 await p.goto(html + '#inicio'); await p.setInputFiles('#inPBI', d('powerbi_completo_raw.xlsx')); await p.waitForFunction(() => !!window.__RM.S.pbi, null, { timeout: 120000 });
 const pbi = await S(() => ({ tem: window.__RM.S.pbi.temFaturista, n: window.__RM.S.pbi.faturistas.length }));
 ok(pbi.tem && pbi.n === 48, `Power BI completo: coluna «Nome do Usuario que Fechou a Conta» com ${pbi.n} faturistas`);
-await p.goto(html + '#bases'); await p.waitForSelector('#fatPbi'); await p.click('#fatPbi'); await p.waitForTimeout(300);
+await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="faturistas"]'); await p.click('#fatPbi'); await p.waitForTimeout(300);
 const fat = await S(() => { const f = window.__RM.S.cfg.faturistas; return { n: f.length, marcos: f.find(x => x.nome === 'MARCOS.CAETANO')?.unidades, gen: f.find(x => x.generico).unidades }; });
 ok(fat.n === 50 && /\d/.test(fat.marcos) && fat.gen === '', `faturistas do Power BI importados com unidades (${fat.n} · MARCOS.CAETANO: ${fat.marcos})`);
 
