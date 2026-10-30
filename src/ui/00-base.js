@@ -22,24 +22,33 @@ const S = {
   conf: null, corr: null,  // {res, ctx, rodada, comparacao}
   rodadas: [],
   fluxo: null,            // {schema, versaoSchema, modelo, competencias:{chave: competência}}
+  comp: '',               // competência escolhida no topo (AAAA-MM), vale para todas as abas
+  compReg: null,          // {schema, versaoSchema, itens:{chave:{status, historico, alteracoes}}}
   nc: null,               // {schema, versaoSchema, itens:[NC]} — contém dados de pacientes (retenção)
   ncCand: [],             // candidatos das análises desta sessão: [{chave, rotulo, itens}]
   ncDispensados: new Set()
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior' };
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias' };
 function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 // Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
 function gravarLocal(k, v) {
   try { const j = JSON.stringify(v); localStorage.setItem(k, j); return localStorage.getItem(k) === j; } catch (e) { return false; }
 }
-function salvarCfg(motivo = '') {
+// Alterações nas bases valem para todas as competências e ficam registradas na competência do topo.
+function registrarAlteracaoBase(motivo, tipo) {
+  if (!motivo || !S.compReg) return;
+  registrarAlteracao(S.compReg, S.comp, S.operador, tipo || tipoDaAlteracao(motivo), motivo); salvarCompReg();
+}
+function salvarCfg(motivo = '', tipo = '') {
+  registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
 }
 function salvarEq(motivo = '') {
+  registrarAlteracaoBase(motivo, 'equivalencias');
   if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador. Exporte o JSON para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
   atualizarNavPendencias();
@@ -126,11 +135,53 @@ function zonaArquivo(el, input, aoReceber) {
   input.onchange = () => { if (input.files.length) aoReceber([...input.files]); input.value = ''; };
 }
 
+/* ---------- Competência no topo (vale para todas as abas) ---------- */
+const PAGINAS_GLOBAIS = new Set(['equivalencias', 'bases', 'configuracoes']);
+let paginaAtual = 'inicio';
+function salvarCompReg() { if (!gravarLocal(CHAVES.compReg, S.compReg)) avisar('Não foi possível gravar o registro de competências neste navegador.', 'err'); }
+function carregarCompetencia() {
+  const r = lerLocal(CHAVES.compReg);
+  S.compReg = r && !validarRegistroCompetencias(r).length ? r : registroCompetenciasVazio();
+  const c = lerLocal(CHAVES.comp);
+  S.comp = /^\d{4}-\d{2}$/.test(c || '') ? c : chaveAtual();
+}
+function mudarCompetencia(chave) {
+  if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
+  S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
+  atualizarNavFluxo();
+  irPara(paginaAtual, true);
+}
+const compFechada = (chave = S.comp) => competenciaFechada(S.compReg, chave);
+// Bloqueia alterações numa competência fechada; devolve verdadeiro se pode seguir.
+function exigirAberta(chave = S.comp, oque = 'alterar') {
+  if (!compFechada(chave)) return true;
+  avisar(`A competência ${rotuloCompetencia(chave)} está fechada (somente leitura): não é possível ${oque}. Reabra no Início ou escolha outra competência no topo.`, 'warn');
+  return false;
+}
+function desenharSeletorCompetencia() {
+  const el = $('compGlobal'); if (!el) return;
+  const fechada = compFechada(), global = PAGINAS_GLOBAIS.has(paginaAtual);
+  el.innerHTML = `<button type="button" class="sec ic" id="compAnt" aria-label="Competência anterior" title="Competência anterior">‹</button>
+    <div class="comp-rot"><b>Competência ${rotuloCompetencia(S.comp)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></b>
+    <small>${global ? 'esta aba vale para todas · alterações registradas aqui' : `produção ${rotuloMes(producaoEsperada(S.comp))}`}</small></div>
+    <button type="button" class="sec ic" id="compProx" aria-label="Próxima competência" title="Próxima competência">›</button>`;
+  $('compAnt').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, -1));
+  $('compProx').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, 1));
+  const est = estadoCompetencia(S.compReg, S.comp), aviso = $('compAviso');
+  aviso.hidden = !fechada || global;
+  if (fechada && !global) {
+    aviso.innerHTML = `🔒 Competência ${rotuloCompetencia(S.comp)} fechada em ${new Date(est.fechadaEm).toLocaleDateString('pt-BR')} por ${esc(est.fechadaPor || '—')}: somente leitura. ${paginaAtual === 'inicio' ? 'Use «Reabrir…» no painel abaixo' : '<a href="#inicio">Reabrir no Início</a>'} ou escolha outra competência.`;
+  }
+}
+
 /* ---------- Navegação ---------- */
 const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';
+  paginaAtual = pag;
+  desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
   document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
   $('titulo').textContent = PAGINAS[pag];

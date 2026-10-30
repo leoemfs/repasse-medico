@@ -18,12 +18,13 @@ function salvarFluxo(msg = '') {
 }
 const chaveAtual = () => { const d = new Date(); return chaveCompetencia(d.getFullYear(), d.getMonth() + 1); };
 const compAtual = () => S.fluxo.competencias[FX.chave] || null;
-function moverCompetencia(delta) {
-  const [a, m] = FX.chave.split('-').map(Number), d = new Date(Date.UTC(a, m - 1 + delta, 1));
-  FX.chave = chaveCompetencia(d.getUTCFullYear(), d.getUTCMonth() + 1); RENDER.fluxo();
+// Competência fechada: a aba continua navegável (grupos, filtros, busca, exportação), mas nada se altera.
+function travarSeFechada(el) {
+  if (!el || !compFechada(FX.chave)) return;
+  el.querySelectorAll('input:not([type=search]), select, textarea, button:not([data-tg]):not([data-f]):not(#fxExp)').forEach(x => { x.disabled = true; });
 }
 function atualizarNavFluxo() {
-  const c = S.fluxo?.competencias[chaveAtual()], b = $('navFluxo'); if (!b) return;
+  const c = S.fluxo?.competencias[S.comp || chaveAtual()], b = $('navFluxo'); if (!b) return;
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
@@ -36,7 +37,7 @@ const nomeTarefaRef = (comp, gId, ref) => {
 };
 
 RENDER.fluxo = () => {
-  if (!FX.chave) FX.chave = chaveAtual();
+  FX.chave = S.comp || chaveAtual();
   const p = $('pag-fluxo');
   p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
   p.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { FX.sub = b.dataset.sub; RENDER.fluxo(); });
@@ -46,16 +47,16 @@ RENDER.fluxo = () => {
 /* ---------------- Acompanhamento ---------------- */
 function desenharAcompanhamento() {
   const c = $('fxCorpo'), comp = compAtual();
-  const cab = `<div class="fx-topo"><div class="comp-nav"><button class="sec ic" id="fxAnt" title="Competência anterior" aria-label="Competência anterior">‹</button><b>Competência ${rotuloCompetencia(FX.chave)}</b><button class="sec ic" id="fxProx" title="Próxima competência" aria-label="Próxima competência">›</button></div>
+  const cab = `<div class="fx-topo"><h2 class="fx-titulo">Checklist da competência ${rotuloCompetencia(FX.chave)}</h2>
     <div class="acoes" style="margin:0">${comp ? '<button class="sec" id="fxExp">Exportar situação (.xlsx)</button>' : ''}</div></div>`;
   if (!comp) {
     const existentes = Object.keys(S.fluxo.competencias).sort().reverse();
     c.innerHTML = cab + `<div class="card"><h2>Competência ${rotuloCompetencia(FX.chave)} ainda não iniciada</h2><p class="lead">O checklist do mês é criado a partir do modelo de fluxos (revisão ${S.fluxo.modelo.revisao}): grupos, etapas, prazos e listas de prestadores. Depois de criado, mudanças no modelo não alteram este mês.</p>
       <div class="acoes"><button id="fxCriar">Iniciar competência ${rotuloCompetencia(FX.chave)}</button><button class="sec" id="fxIrModelo">Revisar o modelo antes</button></div>
       ${existentes.length ? `<p class="small muted" style="margin-top:12px">Competências registradas: ${existentes.map(k => `<a href="#" data-k="${k}">${rotuloCompetencia(k)}</a>`).join(' · ')}</p>` : ''}</div>`;
-    $('fxCriar').onclick = () => { S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); };
+    $('fxCriar').onclick = () => { if (!exigirAberta(FX.chave, 'iniciar o checklist')) return; S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); };
     $('fxIrModelo').onclick = () => { FX.sub = 'modelo'; RENDER.fluxo(); };
-    c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); FX.chave = a.dataset.k; RENDER.fluxo(); });
+    c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); mudarCompetencia(a.dataset.k); });
   } else {
     const ind = indicadoresFluxo(comp), hoje = diaSerial(paraData(new Date()));
     const prox = [...ind.vencidas, ...ind.proximas].sort((a, b) => a.prazo - b.prazo).slice(0, 4);
@@ -85,7 +86,7 @@ function desenharAcompanhamento() {
     $('fxBusca').oninput = e => { FX.busca = e.target.value; desenharGrupos(comp); };
     desenharGrupos(comp); desenharEntrega(comp, ind); desenharNotas(comp);
   }
-  $('fxAnt').onclick = () => moverCompetencia(-1); $('fxProx').onclick = () => moverCompetencia(1);
+  travarSeFechada(c);
 }
 
 async function ajustarMarco(comp, id) {
@@ -138,6 +139,7 @@ function desenharGrupos(comp) {
   cont.innerHTML = blocos.join('') || '<div class="card"><p class="muted">Nenhuma etapa corresponde ao filtro.</p></div>';
   cont.querySelectorAll('[data-tg]').forEach(b => b.onclick = () => { const id = b.dataset.tg; FX.abertos.has(id) ? FX.abertos.delete(id) : FX.abertos.add(id); desenharGrupos(comp); });
   ligarGrupos(comp);
+  travarSeFechada(cont);
 }
 
 function corpoGrupo(comp, g, tarefas, mk) {
@@ -145,7 +147,7 @@ function corpoGrupo(comp, g, tarefas, mk) {
   let h = (g.regrasFixas || []).map(r => `<p class="regra-fixa">📌 ${esc(r)}</p>`).join('');
   if (g.id === 'nc' && S.nc) {
     const ind = indicadoresNC(S.nc.itens.filter(x => x.competencia === comp.chave));
-    h += `<p class="small">Não conformidades desta competência: <b>${ind.total}</b> · ${ind.porSituacao.aberta} abertas · ${ind.porSituacao.enviada + ind.porSituacao.tratativa} enviadas ao Qualiex · ${ind.porSituacao.regularizada} regularizadas — <a href="#nc" data-ir-nc="${comp.chave}">abrir a aba Não conformidades</a></p>`;
+    h += `<p class="small">Não conformidades desta competência: <b>${ind.total}</b> · ${ind.porSituacao.aberta} abertas · ${ind.porSituacao.enviada + ind.porSituacao.tratativa} enviadas ao Qualiex · ${ind.porSituacao.regularizada} regularizadas — <a href="#nc">abrir a aba Não conformidades</a></p>`;
   }
   h += `<div class="tw"><table class="tab-fx"><thead><tr><th>Etapa</th><th>Status</th><th>Prazo</th><th>Início</th><th>Concluída em</th><th>Responsável / dependência</th><th>Observação</th></tr></thead><tbody>${tarefas.map(t => {
     const e = eg.tarefas[t.id], p = prazoTarefa(comp, g.id, t, mk), dif = p ? diaSerial(p) - diaSerial(paraData(new Date())) : null, aberta = e.status !== 'ok' && e.status !== 'na';
@@ -193,7 +195,7 @@ function blocoMatriz(comp, g) {
 
 function ligarGrupos(comp) {
   const cont = $('fxGrupos');
-  cont.querySelectorAll('[data-ir-nc]').forEach(a => a.onclick = () => { NCV.chave = a.dataset.irNc; });
+
   cont.querySelectorAll('section.grupo-fx').forEach(sec => {
     const gId = sec.dataset.g, eg = comp.grupos[gId], g = comp.modelo.grupos.find(x => x.id === gId);
     sec.querySelectorAll('tr[data-t]').forEach(tr => {

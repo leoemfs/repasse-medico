@@ -31,14 +31,14 @@ function atualizarNavNC() {
 /* ---------- Candidatos da sessão (só na memória: somem ao recarregar a página) ---------- */
 function guardarCandidatosNC(chave, rotulo, curto, itens) {
   S.ncCand = (S.ncCand || []).filter(f => f.chave !== chave);
-  S.ncCand.push({ chave, rotulo, curto, itens });
+  S.ncCand.push({ chave, rotulo, curto, itens, competencia: S.comp });
 }
 function chavesRegistradasNC() { return new Set(S.nc.itens.flatMap(x => [chaveNC(x), x.origem?.chaveCandidato]).filter(Boolean)); }
 // Lista achatada com o estado de cada candidato: nova, registrada ou dispensada.
 function candidatosNC(filtro = {}) {
   const reg = chavesRegistradasNC(), disp = S.ncDispensados || new Set(), out = [];
   for (const f of S.ncCand || []) {
-    if (filtro.fonte && f.chave !== filtro.fonte) continue;
+    if (filtro.fonte ? f.chave !== filtro.fonte : f.competencia !== S.comp) continue;
     for (const c of f.itens) {
       if (filtro.tipo && c.tipo !== filtro.tipo) continue;
       out.push({ c, fonte: f, estado: reg.has(c.chave) ? 'registrada' : disp.has(c.chave) ? 'dispensada' : 'nova' });
@@ -77,17 +77,18 @@ function rotuloPrazo(d) {
 
 /* ---------- Página ---------- */
 RENDER.nc = () => {
-  if (!NCV.chave) NCV.chave = chaveAtual();
+  NCV.chave = S.comp;
+  const fechada = compFechada(NCV.chave);
   const p = $('pag-nc'), itens = S.nc.itens.filter(x => x.competencia === NCV.chave), ind = indicadoresNC(itens);
   const pr = prazosNC(NCV.chave), dias = retencaoNC(), vencendo = vencendoRetencaoNC(S.nc, dias);
-  const cands = candidatosNC(), novos = cands.filter(x => x.estado === 'nova');
+  const cands = candidatosNC(), temCand = (S.ncCand || []).some(f => f.competencia === NCV.chave), novos = cands.filter(x => x.estado === 'nova');
   const barras = (pares, max) => pares.length ? pares.map(([nome, n]) => `<div class="l"><span title="${esc(nome)}">${esc(nome)}</span><i style="width:${Math.max(2, Math.round(n / max * 100))}%"></i><b>${n}</b></div>`).join('') : '<p class="muted small">Sem NCs nesta competência.</p>';
   const topo = (pares, k) => pares.length > k ? [...pares.slice(0, k), [`outros ${pares.length - k}`, pares.slice(k).reduce((s, x) => s + x[1], 0)]] : pares;
   const nat = topo(ind.porNatureza.map(([n, q]) => [n, q]), 9), resp = topo(ind.porResponsavel, 6);
   const maxBar = Math.max(1, ...nat.map(x => x[1]), ...resp.map(x => x[1]));
   const tiposCand = [...contar(novos, x => x.c.tipo)];
-  p.innerHTML = `<div class="fx-topo"><div class="comp-nav"><button class="sec ic" id="ncAnt" aria-label="Competência anterior" title="Competência anterior">‹</button><b>Competência ${rotuloCompetencia(NCV.chave)}<small class="muted" style="display:block;font-weight:400;font-size:11.5px">produção ${producaoDaCompetencia(NCV.chave)}</small></b><button class="sec ic" id="ncProx" aria-label="Próxima competência" title="Próxima competência">›</button></div>
-    <div class="acoes" style="margin:0"><button class="sec" id="ncImp">Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova">+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
+  p.innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Não conformidades da competência ${rotuloCompetencia(NCV.chave)}</h2>
+    <div class="acoes" style="margin:0"><button class="sec" id="ncImp"${fechada ? ' disabled' : ''}>Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova"${fechada ? ' disabled' : ''}>+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
     ${vencendo.length ? `<div class="aviso-fixo warn">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias após o registro). Exporte antes se precisar guardar a planilha na rede.</div>` : ''}
     <div class="nc-kpis">
       <div class="nc-kpi"><b>${ind.total}</b><small>NCs na competência</small></div>
@@ -98,7 +99,7 @@ RENDER.nc = () => {
     <div class="nc-duas">
       <div class="card barras"><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}<h3 style="margin-top:14px">Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div>
       <div class="card nc-cand"><h3>Candidatos vindos das análises desta sessão</h3>
-        ${S.ncCand?.length ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
+        ${temCand ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
           : '<p class="small muted">Rode uma conferência cruzada ou uma correção de prestador: o que pode ser NC aparece aqui para você revisar. Os candidatos ficam só nesta sessão.</p>'}
         <h3 style="margin-top:14px">Prazos de envio (Fluxo mensal)</h3>
         ${Object.entries(pr.grupos).map(([k, g]) => { const r = rotuloPrazo(g.data), q = ind.porPrazo[k]; return `<div class="l"><div>${esc(g.nome)}<small>${q.total} NC(s) · ${q.abertas} aberta(s)${g.status ? ` · etapa no fluxo: ${esc(STATUS_TAREFA[g.status])}` : ''}</small></div><b class="${g.status === 'ok' ? 'txt-ok' : r.cls}">${g.status === 'ok' ? fmtCurta(g.data) + ' ✓' : r.txt}</b></div>`; }).join('')}
@@ -107,15 +108,13 @@ RENDER.nc = () => {
     <div class="card"><div class="nc-abas" role="tablist">${[['todas', 'Todas', ind.total], ...Object.entries(CATEGORIA_NC).map(([k, n]) => [k, n, ind.porCategoria[k]])].map(([k, n, q]) => `<button role="tab" class="${NCV.aba === k ? 'on' : ''}" aria-selected="${NCV.aba === k}" data-aba="${k}">${esc(n)}<em>${q}</em></button>`).join('')}</div>
       <div class="nc-filtros" id="ncFiltros"></div><div id="ncTab"></div>
       <div class="acoes nc-lote"><span class="small muted" id="ncSelInfo"></span><button class="sec mini" data-lote="tudo">Selecionar as filtradas</button><button class="sec mini" data-lote="limpar">Limpar seleção</button>
-        <button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button><button class="mini" data-lote="seguinte">Levar para a competência seguinte</button><button class="perigo mini" data-lote="excluir">Excluir</button></div></div>
+        ${fechada ? '' : '<button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button>'}<button class="mini" data-lote="seguinte">Levar para a competência seguinte</button>${fechada ? '' : '<button class="perigo mini" data-lote="excluir">Excluir</button>'}</div></div>
     <div class="card legenda"><h3>Como funciona</h3><ul>
       <li><b>Três categorias</b>, iguais às abas da planilha manual. A exportação sai nas mesmas abas e colunas, com situação, observações e uma aba de indicadores; ela pode ser importada de volta.</li>
       <li><b>Natureza padronizada + detalhe</b> («Procedimento não lançado na conta» + «RX patela») e observações livres. Na importação, o texto original fica nas observações.</li>
       <li><b>Situação</b>: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede. A pendência não resolvida pode ir para a competência seguinte, ligada à original.</li>
       <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores. <a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a>.</li></ul></div>`;
 
-  $('ncAnt').onclick = () => { NCV.chave = competenciaVizinha(NCV.chave, -1); NCV.sel.clear(); RENDER.nc(); };
-  $('ncProx').onclick = () => { NCV.chave = competenciaVizinha(NCV.chave, 1); NCV.sel.clear(); RENDER.nc(); };
   $('ncNova').onclick = () => editarNC(null);
   $('ncImp').onclick = () => $('ncArq').click();
   $('ncArq').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importarPlanilhaNC(f); };
@@ -226,9 +225,10 @@ const datalistFaturistas = () => `<datalist id="dlFat">${S.cfg.faturistas.filter
 const datalistUnidades = () => `<datalist id="dlUn">${[...new Set(S.cfg.unidades.flatMap(u => [...(u.apolo || []), u.nome]))].map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
 // Devolve verdadeiro se registrou algo.
 async function abrirRegistroNC(cands) {
+  if (!exigirAberta(S.comp, 'registrar NCs')) return false;
   const op = await exigirOperador(); if (!op) return false;
   const um = (f, vazio = '') => { const s = new Set(cands.map(f)); return s.size === 1 ? [...s][0] : vazio; };
-  const natSug = um(c => c.natureza), catSug = um(c => c.categoria), compSug = um(c => c.competencia) || NCV.chave || chaveAtual();
+  const natSug = um(c => c.natureza), catSug = um(c => c.categoria), compSug = um(c => c.competencia) || S.comp;
   const semSugestao = cands.filter(c => !c.natureza).length;
   const pbiSug = cands.map(c => faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta)).filter(Boolean).length;
   const r = await dialogo(`Registrar ${cands.length} NC(s)`, `<p class="small muted">${cands.length === 1 ? `${esc(cands[0].campos.paciente)} · ${esc(fmtData(paraData(cands[0].campos.data)))} · ${esc(cands[0].campos.titulo)}` : `${cands.length} linhas selecionadas. As escolhas abaixo valem para todas.`}</p>
@@ -243,6 +243,7 @@ async function abrirRegistroNC(cands) {
   const e = r.campos;
   if (!e.natureza && cands.some(c => !c.natureza)) { avisar(`Escolha a natureza: ${cands.filter(c => !c.natureza).length} linha(s) não têm sugestão.`, 'warn'); return false; }
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) { avisar('Competência inválida.', 'warn'); return false; }
+  if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
   const dados = cands.map(c => {
     const responsavel = e.responsavel.trim() || faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta) || (c.categoria === 'particular' && !e.categoria ? 'PARTICULAR - EQUIPE UNIDADE' : '');
     return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs: e.obs.trim(), impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
@@ -276,6 +277,7 @@ function formNC(d) {
     <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>${datalistFaturistas()}${datalistUnidades()}`;
 }
 async function editarNC(nc) {
+  if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   const d = nc ? { ...nc } : { competencia: NCV.chave, categoria: NCV.aba !== 'todas' ? NCV.aba : 'convenio', natureza: NCV.aba === 'prestador' ? 'prestador-incorreto' : 'nao-lancado', situacao: 'aberta', impactaPagamento: true };
   const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length})</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
@@ -283,6 +285,7 @@ async function editarNC(nc) {
   if (r.botao !== 'ok') return;
   const e = r.campos;
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) return avisar('Competência inválida.', 'warn');
+  if (!exigirAberta(e.competencia, 'gravar NCs')) return;
   const dados = { ...e, impactaPagamento: e.impacta === 'sim', unidadeCod: ncDaUnidade(S.cfg, e.unidade) };
   delete dados.impacta;
   if (d.anonimizada) { delete dados.paciente; delete dados.idAtendimento; }
@@ -301,6 +304,7 @@ async function acaoLoteNC(acao) {
   if (acao === 'limpar') { NCV.sel.clear(); return desenharTabelaNC(); }
   const sel = S.nc.itens.filter(x => NCV.sel.has(x.id));
   if (!sel.length) return avisar('Selecione ao menos uma NC na tabela.', 'warn');
+  if (acao === 'seguinte' ? !exigirAberta(competenciaVizinha(NCV.chave, 1), 'receber NCs') : !exigirAberta(NCV.chave, 'alterar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   let msg = '';
   if (acao === 'enviada') { const n = sel.filter(x => mudarSituacaoNC(x, 'enviada', op)).length; msg = `${n} NC(s) marcadas como enviadas ao Qualiex.`; }
@@ -324,6 +328,7 @@ async function acaoLoteNC(acao) {
 
 /* ---------- Importação e exportação ---------- */
 async function importarPlanilhaNC(f) {
+  if (!exigirAberta(S.comp, 'importar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   let lida;
   const compArquivo = competenciaDoNomeNC(f.name);
@@ -339,18 +344,18 @@ async function importarPlanilhaNC(f) {
   if (r.botao !== 'ok') return;
   const comp = r.campos.competencia;
   if (!/^\d{4}-\d{2}$/.test(comp)) return avisar('Competência inválida.', 'warn');
+  if (!exigirAberta(comp, 'importar NCs')) return;
   const { novas, repetidas } = registrarNCs(S.nc, lida.dados.map(d => ({ ...d, competencia: comp, origem: { ...d.origem, arquivo: f.name } })), op);
-  if (r.campos.cadResp) { const n = registrarFaturistas(S.cfg, novosResp.map(([n]) => n), `planilha de NCs ${f.name}`); if (n) salvarCfg(); }
-  NCV.chave = comp; NCV.sel.clear();
+  if (r.campos.cadResp) { const n = registrarFaturistas(S.cfg, novosResp.map(([n]) => n), `planilha de NCs ${f.name}`); if (n) salvarCfg(`${n} faturista(s) cadastrado(s) da planilha de NCs ${f.name}`, 'faturistas'); }
   salvarNC(`${novas.length} NC(s) importada(s) em ${rotuloCompetencia(comp)}${repetidas.length ? ` · ${repetidas.length} já existiam` : ''}.`);
-  RENDER.nc();
+  if (comp !== S.comp) mudarCompetencia(comp); else RENDER.nc();
 }
 async function exportarNC(itens, pr) {
   if (!itens.length) return avisar('Nenhuma NC nesta competência para exportar.', 'warn');
   const prazos = Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data]));
   await baixarZip(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`);
   const abertas = itens.filter(x => x.situacao === 'aberta');
-  if (abertas.length && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
+  if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;
     abertas.forEach(x => mudarSituacaoNC(x, 'enviada', op)); salvarNC(`${abertas.length} NC(s) marcadas como enviadas.`); RENDER.nc();
   }

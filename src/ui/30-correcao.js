@@ -4,19 +4,20 @@
 RENDER.correcao = () => {
   const p = $('pag-correcao');
   if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
-  p.innerHTML = `<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
+  p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
     ${seletoresAnalise('co', S.cfg.parametros.tolCorrecao)}
-    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes"></div>`;
+    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
   $('coExtra').innerHTML = '';
   $('coRodar').onclick = executarCorrecao;
-  if (S.corr) desenharCorrecao();
+  if (S.corr && S.corr.ctx.chaveCompetencia === S.comp) desenharCorrecao();
 };
 
 async function executarCorrecao() {
   const x = relSelecionado('co'), un = $('coUn').value, tol = +$('coTol').value;
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
+  if (!exigirAberta(S.comp, 'executar uma correção de prestador')) return;
   const res = corrigirPrestador(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol });
-  const ctx = { relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`,
+  const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`,
     parametros: { tol }, operador: S.operador, cfgRevisao: S.cfg.revisao, em: new Date().toLocaleString('pt-BR'),
     arquivos: [{ papel: 'MV', nome: x.nome, hash: x.hash }, { papel: 'Apolo', nome: S.apolo.nome, hash: S.apolo.hash }] };
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;

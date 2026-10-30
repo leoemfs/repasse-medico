@@ -9,7 +9,7 @@
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   S.operador = lerLocal(CHAVES.operador) || '';
-  carregarFluxo(); carregarNC();
+  carregarCompetencia(); carregarFluxo(); carregarNC();
   iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo(); atualizarNavNC();
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';

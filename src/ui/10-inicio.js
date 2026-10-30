@@ -3,7 +3,7 @@
  * ============================================================ */
 RENDER.inicio = () => {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
-  $('pag-inicio').innerHTML = `
+  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}
   <div class="card">
     <h2>Preparar o repasse</h2>
     <p class="lead">Carregue os arquivos uma vez; depois abra a análise. Nenhuma análise altera o MV: as correções são feitas lá, e a nova extração é conferida aqui em outra rodada.</p>
@@ -38,8 +38,93 @@ RENDER.inicio = () => {
   zonaArquivo($('dzEq'), $('inEq'), fs => importarEquivalenciasArquivo(fs[0], 'mesclar'));
   zonaArquivo($('dzPBI'), $('inPBI'), fs => carregarPBI(fs[0]));
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
+  ligarPainelCompetencia();
   desenharListaMV();
 };
+
+/* ---------- Painel da competência: arquivos, o que foi feito, bases alteradas e fechamento ---------- */
+function resumoCompetencia(chave) {
+  const rods = S.rodadas.filter(r => competenciaDaRodada(r) === chave);
+  const conf = rods.filter(r => r.tipo === 'conferencia'), corr = rods.filter(r => r.tipo === 'correcao');
+  const ncs = S.nc.itens.filter(x => x.competencia === chave), indNC = indicadoresNC(ncs);
+  const fx = S.fluxo.competencias[chave], indFx = fx ? indicadoresFluxo(fx) : null;
+  const eqVal = S.eq.itens.filter(e => (e.historico || []).some(h => h.competencia === chave && h.para === 'validada')).length;
+  const alt = estadoCompetencia(S.compReg, chave).alteracoes || [];
+  return { rods, conf, corr, semAceite: rods.filter(r => !r.aceite).length, ncs, indNC, fx, indFx, eqVal, alt };
+}
+function painelCompetencia() {
+  const ch = S.comp, R = resumoCompetencia(ch), est = estadoCompetencia(S.compReg, ch), fechada = est.status === 'fechada', esp = producaoEsperada(ch);
+  const arq = (nome, sub, dom) => `<div class="l"><div>${nome}<small>${sub}</small></div><span class="v ${!dom ? 'muted' : dom.mes === esp ? 'txt-ok' : 'txt-warn'}">${!dom ? '—' : dom.mes === esp ? 'ok' : 'outro mês'}</span></div>`;
+  const domMV = S.relatorios.map(x => producaoDoArquivo(x, () => x.rel.regs.map(r => r.data))).filter(Boolean);
+  const mvDom = domMV.length ? (domMV.every(d => d.mes === esp) ? { mes: esp } : domMV.find(d => d.mes !== esp)) : null;
+  const domAp = S.apolo ? producaoDoArquivo(S.apolo, () => S.apolo.laudos.map(l => l.data)) : null;
+  const domPb = S.pbi ? producaoDoArquivo(S.pbi, () => S.pbi.linhas.map(l => l.data)) : null;
+  const prestConf = new Set(R.conf.map(r => r.prestadorCod)).size, unCorr = [...new Set(R.corr.map(r => r.unidadeCod))].join(', ');
+  const porTipo = [...R.alt.reduce((m, a) => m.set(a.tipo, [...(m.get(a.tipo) || []), a]), new Map())];
+  const pct = R.indFx && R.indFx.total ? Math.round(R.indFx.ok / R.indFx.total * 100) : 0;
+  return `<div class="card painel-comp"><h2>Painel da competência ${rotuloCompetencia(ch)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></h2>
+    <div class="grid3">
+      <div><h3>Arquivos desta sessão</h3>
+        ${arq('Relatórios do MV', S.relatorios.length ? `${S.relatorios.length} PDF(s) · produção ${S.relatorios.length && mvDom ? rotuloMes(mvDom.mes) : '—'}` : 'nenhum carregado', mvDom)}
+        ${arq('Laudos do Apolo', S.apolo ? `produção ${rotuloMes(domAp?.mes)}` : 'não carregado', domAp)}
+        ${arq('Power BI', S.pbi ? `${S.pbi.linhas.length.toLocaleString('pt-BR')} lançamentos · ${rotuloMes(domPb?.mes)}` : 'não carregado', domPb)}
+        <p class="small muted">Esperado: produção ${rotuloMes(esp)}. Os arquivos ficam só na memória desta sessão.</p></div>
+      <div><h3>O que foi feito nesta competência</h3>
+        <div class="l"><div>Rodadas de conferência<small>${prestConf} prestador(es)</small></div><span class="v">${R.conf.length}</span></div>
+        <div class="l"><div>Rodadas de correção de prestador<small>${unCorr ? `unidade(s) ${esc(unCorr)}` : '—'}</small></div><span class="v">${R.corr.length}</span></div>
+        <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
+        <div class="l"><div>Fluxo mensal<small>${R.indFx ? `${R.indFx.ok} de ${R.indFx.total} etapas concluídas · ${R.indFx.vencidas.length} vencida(s)` : 'checklist não iniciado'}</small></div><span class="v">${R.indFx ? pct + '%' : '—'}</span></div>
+        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}</div>
+      <div><h3>Bases alteradas nesta competência</h3>
+        <div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
+        ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div>
+    </div>
+    <div class="fechamento"><div><strong>${fechada ? `Fechada em ${new Date(est.fechadaEm).toLocaleString('pt-BR')} por ${esc(est.fechadaPor || '—')}` : 'Fechar a competência'}</strong>
+      <p class="small muted">${fechada ? 'Somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. Pendências podem ser levadas para a competência seguinte.' : 'Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.'}</p>
+      ${est.historico?.length ? `<details class="small"><summary>Histórico (${est.historico.length})</summary><ul>${est.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${h.obs ? ` — ${esc(h.obs)}` : ''}</li>`).join('')}</ul></details>` : ''}</div>
+      <div class="acoes" style="margin:0"><button class="sec" id="compPacote">Exportar pacote da competência</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div></div>`;
+}
+function ligarPainelCompetencia() {
+  const ch = S.comp;
+  if ($('compFechar')) $('compFechar').onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const R = resumoCompetencia(ch), pend = [];
+    if (R.indNC.porSituacao.aberta) pend.push(`${R.indNC.porSituacao.aberta} NC(s) abertas, não enviadas ao Qualiex`);
+    if (R.indFx && R.indFx.total - R.indFx.ok - R.indFx.na > 0) pend.push(`${R.indFx.total - R.indFx.ok - R.indFx.na} etapa(s) do fluxo não concluídas`);
+    if (R.semAceite) pend.push(`${R.semAceite} rodada(s) sem aceite`);
+    const r = await dialogo(`Fechar a competência ${rotuloCompetencia(ch)}?`, `<p>Ela fica somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. As bases continuam editáveis (valem para todas as competências).</p>
+      ${pend.length ? `<p class="small" style="color:var(--warn)">Pendências (não impedem o fechamento):</p><ul class="small">${pend.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="small txt-ok">Sem pendências.</p>'}
+      <label class="campo">Observação (opcional)<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Fechar competência']]);
+    if (r.botao !== 'ok') return;
+    fecharCompetencia(S.compReg, ch, op, r.campos.obs.trim()); salvarCompReg();
+    avisar(`Competência ${rotuloCompetencia(ch)} fechada.`, 'ok'); irPara('inicio', true);
+  };
+  if ($('compReabrir')) $('compReabrir').onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const r = await dialogo(`Reabrir a competência ${rotuloCompetencia(ch)}?`, `<p class="small">A reabertura fica registrada no histórico da competência.</p><label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Reabrir']]);
+    if (r.botao !== 'ok') return;
+    if (!r.campos.just.trim()) return avisar('Informe a justificativa para reabrir.', 'warn');
+    reabrirCompetencia(S.compReg, ch, op, r.campos.just); salvarCompReg();
+    avisar(`Competência ${rotuloCompetencia(ch)} reaberta.`, 'ok'); irPara('inicio', true);
+  };
+  $('compPacote').onclick = () => exportarPacoteCompetencia(ch);
+}
+// Pacote para guardar na rede: NCs e fluxo em Excel, rodadas e resumo em JSON.
+async function exportarPacoteCompetencia(ch) {
+  const R = resumoCompetencia(ch), z = new JSZip(), mmaaaa = `${ch.slice(5)}-${ch.slice(0, 4)}`;
+  const bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  if (R.ncs.length) {
+    const pr = prazosNC(ch);
+    z.file(`NAO_CONFORMIDADES_${mmaaaa}.xlsx`, await bin(xlsxNC(R.ncs, ch, { operador: S.operador, prazos: Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data])) })));
+  }
+  if (R.fx) z.file(`Fluxo_mensal_${mmaaaa}.xlsx`, await bin(xlsxFluxo(R.fx)));
+  z.file(`rodadas_${mmaaaa}.json`, JSON.stringify({ schema: 'repasse-medico/rodadas', versaoSchema: 1, competencia: ch, exportadoEm: agoraISO(), rodadas: R.rods }, null, 1));
+  z.file('resumo_competencia.json', JSON.stringify({ competencia: ch, producao: producaoEsperada(ch), exportadoEm: agoraISO(), operador: S.operador, motor: MOTOR_VERSAO,
+    estado: estadoCompetencia(S.compReg, ch), rodadas: { conferencia: R.conf.length, correcao: R.corr.length, semAceite: R.semAceite }, naoConformidades: R.indNC,
+    fluxo: R.indFx ? { concluidas: R.indFx.ok, total: R.indFx.total, vencidas: R.indFx.vencidas.length } : null, equivalenciasValidadas: R.eqVal }, null, 1));
+  baixarBlob(await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), `Pacote_competencia_${mmaaaa}_${carimbo()}.zip`);
+  if (R.ncs.length) avisar('Pacote gerado. Ele inclui a planilha de NCs, que tem dados de pacientes: guarde na rede conforme a política da empresa.', 'info');
+}
 
 function resumoApolo(a) {
   const al = [];

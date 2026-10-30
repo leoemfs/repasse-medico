@@ -253,9 +253,7 @@ function indicadoresFluxo(comp, hoje = new Date()) {
 // Rodadas da ferramenta que podem evidenciar uma etapa (só sugestão: o usuário confirma).
 function rodadasParaTarefa(rodadas, comp, vinculo) {
   if (!vinculo) return [];
-  const [ano, mes] = comp.chave.split('-').map(Number);
-  const ini = Date.UTC(ano, mes - 1, 1), fim = Date.UTC(ano, mes, 1);
-  return rodadas.filter(r => r.tipo === vinculo && Date.parse(r.em) >= ini && Date.parse(r.em) < fim).sort((a, b) => b.em.localeCompare(a.em));
+  return rodadas.filter(r => r.tipo === vinculo && competenciaDaRodada(r) === comp.chave).sort((a, b) => b.em.localeCompare(a.em));
 }
 
 function validarFluxo(dados) {

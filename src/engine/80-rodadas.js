@@ -7,7 +7,7 @@ function registroRodada(res, ctx) {
   return {
     id: novoId('rod'), tipo: res.tipo, em: agoraISO(), operador: ctx.operador || '',
     arquivos: ctx.arquivos, unidadeCod: ctx.unidadeCod, prestadorCod: ctx.relatorio.cab.prestadorCod, prestadorNome: ctx.relatorio.cab.prestadorNome,
-    repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, descricao: ctx.relatorio.cab.descricao,
+    repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, chaveCompetencia: ctx.chaveCompetencia || '', descricao: ctx.relatorio.cab.descricao,
     parametros: ctx.parametros, versoes: { motor: MOTOR_VERSAO, equivalencias: res.eqRevisao, configuracao: ctx.cfgRevisao },
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse })),
@@ -15,9 +15,9 @@ function registroRodada(res, ctx) {
   };
 }
 
-// Rodada anterior comparável: mesmo tipo, unidade e prestador do cabeçalho.
+// Rodada anterior comparável: mesma competência, tipo, unidade e prestador do cabeçalho.
 function rodadaAnterior(rodadas, atual) {
-  return rodadas.filter(r => r.id !== atual.id && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
+  return rodadas.filter(r => r.id !== atual.id && competenciaDaRodada(r) === competenciaDaRodada(atual) && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
     .sort((a, b) => b.em.localeCompare(a.em))[0] || null;
 }
 

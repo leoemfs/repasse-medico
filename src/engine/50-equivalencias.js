@@ -95,13 +95,13 @@ function mesclarEquivalencias(base, novos, { catalogoTitulos = [], catalogoTUSS 
 }
 
 // Muda o status de relações, sempre com responsável e histórico (RN-184, RN-196).
-function alterarStatusEq(base, ids, novoStatus, responsavel, motivo = '') {
+function alterarStatusEq(base, ids, novoStatus, responsavel, motivo = '', competencia = '') {
   if (!responsavel) throw new Error('Informe o responsável (Configurações → Operador) antes de validar ou desativar equivalências.');
   if (!STATUS_EQ[novoStatus]) throw new Error('Status inválido.');
   const alvo = new Set(ids); let n = 0;
   for (const e of base.itens) {
     if (!alvo.has(e.id) || e.status === novoStatus) continue;
-    e.historico.push({ em: agoraISO(), por: responsavel, de: e.status, para: novoStatus, motivo });
+    e.historico.push({ em: agoraISO(), por: responsavel, de: e.status, para: novoStatus, motivo, competencia });
     e.status = novoStatus; n++;
     if (novoStatus === 'validada') { e.responsavel = responsavel; e.validadoEm = agoraISO(); }
   }

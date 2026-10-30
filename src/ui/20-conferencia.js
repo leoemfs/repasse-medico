@@ -20,12 +20,35 @@ function seletoresAnalise(prefixo, tolPadrao) {
 }
 function relSelecionado(prefixo) { return S.relatorios.find(r => r.id === $(prefixo + 'Rel').value); }
 
+/* ---------- Competência: produção dos arquivos e resultado de outra competência ---------- */
+// Mês dominante das datas de cada arquivo, calculado uma vez por arquivo carregado.
+function producaoDoArquivo(obj, datas) {
+  if (!obj) return null;
+  if (!obj.__producao) obj.__producao = mesDominante(datas());
+  return obj.__producao;
+}
+function avisosProducao() {
+  const esp = producaoEsperada(S.comp), out = [];
+  const checar = (nome, dom) => { if (dom && dom.mes !== esp) out.push(`${nome}: produção ${rotuloMes(dom.mes)}`); };
+  for (const x of S.relatorios) checar(`MV ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}`, producaoDoArquivo(x, () => x.rel.regs.map(r => r.data)));
+  if (S.apolo) checar('Laudos do Apolo', producaoDoArquivo(S.apolo, () => S.apolo.laudos.map(l => l.data)));
+  if (S.pbi) checar('Power BI', producaoDoArquivo(S.pbi, () => S.pbi.linhas.map(l => l.data)));
+  return out;
+}
+function cartaoAvisoProducao() {
+  const av = avisosProducao();
+  return av.length ? `<div class="aviso-fixo warn">A competência ${rotuloCompetencia(S.comp)} espera produção ${rotuloMes(producaoEsperada(S.comp))}, mas há arquivo de outro mês — ${av.map(esc).join(' · ')}. Confirme antes de analisar: as rodadas e NCs serão gravadas em ${rotuloCompetencia(S.comp)}.</div>` : '';
+}
+function cartaoOutraCompetencia(x, nome) {
+  return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
+}
+
 RENDER.conferencia = () => {
   const p = $('pag-conferencia');
   if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
-  p.innerHTML = `<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
+  p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
     <div class="acoes"><button id="cfRodar">Executar conferência</button><span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
-    <div id="cfRes"></div>`;
+    <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
     const ligados = rel ? medicosDoPrestador(S.cfg, rel.rel.cab.prestadorCod) : [];
@@ -39,7 +62,7 @@ RENDER.conferencia = () => {
   };
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
   $('cfRodar').onclick = executarConferencia;
-  if (S.conf) desenharConferencia();
+  if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
 function faltamArquivos() {
   return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
@@ -49,11 +72,12 @@ async function executarConferencia() {
   const x = relSelecionado('cf'), un = $('cfUn').value, tol = +$('cfTol').value, medSel = $('cfMed').value;
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
+  if (!exigirAberta(S.comp, 'executar uma conferência')) return;
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
   const res = conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos });
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
   const medicosNomes = medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '';
-  const ctx = { relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
+  const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
     arquivos: [{ papel: 'MV', nome: x.nome, hash: x.hash }, { papel: 'Apolo', nome: S.apolo.nome, hash: S.apolo.hash }] };
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;
   const ant = rodadaAnterior(S.rodadas, rodada);

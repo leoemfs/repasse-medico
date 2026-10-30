@@ -56,7 +56,7 @@ RENDER.equivalencias = () => {
     const amb = S.eq.itens.filter(e => FE.sel.has(e.id) && e.ambiguo).length;
     const r = await dialogo(`${rotulo} ${FE.sel.size} relação(ões)`, `<p>Responsável: <strong>${esc(op)}</strong>.</p>${status === 'validada' && amb ? `<p class="badge warn">${amb} relação(ões) ambíguas: confirme que o título identifica só este código.</p>` : ''}<label class="campo">Justificativa${status === 'validada' ? ' (recomendada)' : ''}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
     if (r.botao !== 'ok') return;
-    const n = alterarStatusEq(S.eq, [...FE.sel], status, op, r.campos.motivo);
+    const n = alterarStatusEq(S.eq, [...FE.sel], status, op, r.campos.motivo, S.comp);
     FE.sel.clear(); salvarEq(`${n} relação(ões) atualizadas.`); RENDER.equivalencias();
   };
   $('eqVal').onclick = () => mudar('validada', 'Validar');
@@ -86,6 +86,6 @@ async function novaRelacaoManual() {
   const m = mesclarEquivalencias(S.eq, [e]);
   if (!m.adicionadas) return avisar('Essa relação já existe na base.', 'warn');
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
-  if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual');
+  if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual', S.comp);
   salvarEq('Relação cadastrada.'); RENDER.equivalencias();
 }

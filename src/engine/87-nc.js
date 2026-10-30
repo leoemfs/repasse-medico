@@ -204,7 +204,7 @@ function tipoCandidatoConferencia(x) {
 const competenciaDoRelatorio = rel => { const p = periodoDoRelatorio(rel.regs); return p ? competenciaDaProducao(p[1]) : ''; };
 function candidatoDaLinhaConferencia(x, ctx, cfg, tipo = null) {
   const t = tipo || tipoCandidatoConferencia(x) || 'manual';
-  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
+  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
 }
 function candidatosDaConferencia(res, ctx, cfg) {
   const out = [];
@@ -215,7 +215,7 @@ function candidatoDaLinhaCorrecao(o, ctx, cfg, tipo = null) {
   const campos = camposDaLinha(o.r, o.laudo, ctx, cfg);
   const ehPrestador = tipo === 'prestador-identificado' || o.estado === 'identificado';
   const extra = ehPrestador ? { campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '' };
-  return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
+  return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
 }
 // Só vira candidato o laudo de médico diferente do prestador do relatório.
 function candidatosDaCorrecao(res, ctx, cfg) {

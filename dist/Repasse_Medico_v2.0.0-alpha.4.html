@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.0.0-alpha.3</title>
+<title>Repasse Médico v2.0.0-alpha.4</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -184,13 +184,28 @@ button.mini{padding:4px 10px;font-size:12px}
 @media (max-width:1000px){.nc-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-duas{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:760px){.nc-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.barras .l{grid-template-columns:minmax(0,1fr) 70px 30px}.nc-cand small{overflow-wrap:anywhere}}
 .nc-motivo{display:block;min-width:260px}
+/* ---------- Competência no topo ---------- */
+.comp-global{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:5px 8px}
+.comp-global .ic{width:30px;height:30px;padding:0;display:grid;place-items:center}
+.comp-rot{text-align:center;min-width:170px}.comp-rot b{display:block;font-size:14.5px;white-space:nowrap}.comp-rot small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.comp-st{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;vertical-align:middle;margin-left:2px}
+.comp-st.aberta{background:var(--okbg);color:var(--ok)}.comp-st.fechada{background:var(--errbg);color:var(--err)}
+.comp-aviso{background:var(--errbg);color:var(--err);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;font-weight:600}
+.fx-titulo{font-size:15px;margin:0}
+.painel-comp .l{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}.painel-comp h3+.l{border-top:0}
+.painel-comp .l small{display:block;color:var(--muted);font-size:12px}.painel-comp .v{font-weight:700;white-space:nowrap}
+.painel-comp h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.barra{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}.barra i{display:block;height:100%;background:var(--accent)}
+.fechamento{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.fechamento p{margin:4px 0 0}
+.nota-global{margin:0 0 10px}
+@media (max-width:760px){.topo-dir{width:100%}.comp-global{flex:1 1 100%;justify-content:space-between}.comp-rot{min-width:0}.comp-rot small{white-space:normal}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.3 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.4 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" aria-label="Navegação principal">
       <a href="#inicio" data-pag="inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
@@ -208,9 +223,10 @@ button.mini{padding:4px 10px;font-size:12px}
   <main class="main">
     <header class="topo">
       <div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
-      <div class="topo-dir"><span id="operadorTopo" class="chip"></span><span id="stInit" class="badge warn">Carregando componentes…</span></div>
+      <div class="topo-dir"><div id="compGlobal" class="comp-global"></div><span id="operadorTopo" class="chip"></span><span id="stInit" class="badge warn">Carregando componentes…</span></div>
     </header>
     <div id="aviso" class="aviso" role="status" hidden></div>
+    <div id="compAviso" class="comp-aviso" hidden></div>
     <section id="pag-inicio" class="pag"></section>
     <section id="pag-fluxo" class="pag" hidden></section>
     <section id="pag-conferencia" class="pag" hidden></section>
@@ -232,7 +248,7 @@ button.mini{padding:4px 10px;font-size:12px}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.0.0-alpha.3';
+const MOTOR_VERSAO = '2.0.0-alpha.4';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1018,13 +1034,13 @@ function mesclarEquivalencias(base, novos, { catalogoTitulos = [], catalogoTUSS 
 }
 
 // Muda o status de relações, sempre com responsável e histórico (RN-184, RN-196).
-function alterarStatusEq(base, ids, novoStatus, responsavel, motivo = '') {
+function alterarStatusEq(base, ids, novoStatus, responsavel, motivo = '', competencia = '') {
   if (!responsavel) throw new Error('Informe o responsável (Configurações → Operador) antes de validar ou desativar equivalências.');
   if (!STATUS_EQ[novoStatus]) throw new Error('Status inválido.');
   const alvo = new Set(ids); let n = 0;
   for (const e of base.itens) {
     if (!alvo.has(e.id) || e.status === novoStatus) continue;
-    e.historico.push({ em: agoraISO(), por: responsavel, de: e.status, para: novoStatus, motivo });
+    e.historico.push({ em: agoraISO(), por: responsavel, de: e.status, para: novoStatus, motivo, competencia });
     e.status = novoStatus; n++;
     if (novoStatus === 'validada') { e.responsavel = responsavel; e.validadoEm = agoraISO(); }
   }
@@ -1382,7 +1398,7 @@ function registroRodada(res, ctx) {
   return {
     id: novoId('rod'), tipo: res.tipo, em: agoraISO(), operador: ctx.operador || '',
     arquivos: ctx.arquivos, unidadeCod: ctx.unidadeCod, prestadorCod: ctx.relatorio.cab.prestadorCod, prestadorNome: ctx.relatorio.cab.prestadorNome,
-    repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, descricao: ctx.relatorio.cab.descricao,
+    repasse: ctx.relatorio.cab.repasse, competencia: ctx.relatorio.cab.competencia, chaveCompetencia: ctx.chaveCompetencia || '', descricao: ctx.relatorio.cab.descricao,
     parametros: ctx.parametros, versoes: { motor: MOTOR_VERSAO, equivalencias: res.eqRevisao, configuracao: ctx.cfgRevisao },
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse })),
@@ -1390,9 +1406,9 @@ function registroRodada(res, ctx) {
   };
 }
 
-// Rodada anterior comparável: mesmo tipo, unidade e prestador do cabeçalho.
+// Rodada anterior comparável: mesma competência, tipo, unidade e prestador do cabeçalho.
 function rodadaAnterior(rodadas, atual) {
-  return rodadas.filter(r => r.id !== atual.id && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
+  return rodadas.filter(r => r.id !== atual.id && competenciaDaRodada(r) === competenciaDaRodada(atual) && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
     .sort((a, b) => b.em.localeCompare(a.em))[0] || null;
 }
 
@@ -1412,6 +1428,65 @@ function compararRodadas(ant, atual) {
   for (const [k, a] of A) if (!B.has(k)) grupos.desapareceram.push(a);
   return grupos;
 }
+
+/* ---- src/engine/82-competencia.js ---- */
+/* ============================================================
+ * Competência: mês de trabalho (produção + 1) escolhido no topo e válido para todas as abas.
+ * - Ficam dentro dela: rodadas, NCs, fluxo mensal e anotações.
+ * - Bases e equivalências valem para todas; cada alteração registra a competência em que foi feita.
+ * - Fechada = somente leitura. Reabrir exige justificativa e fica no histórico.
+ * ============================================================ */
+const SCHEMA_COMP = 'repasse-medico/competencias';
+const registroCompetenciasVazio = () => ({ schema: SCHEMA_COMP, versaoSchema: 1, itens: {} });
+const validarRegistroCompetencias = r => !r || r.schema !== SCHEMA_COMP || typeof r.itens !== 'object' ? ['registro de competências inválido'] : [];
+const estadoCompetencia = (reg, chave) => reg.itens[chave] || { status: 'aberta', historico: [], alteracoes: [] };
+const itemCompetencia = (reg, chave) => reg.itens[chave] || (reg.itens[chave] = { status: 'aberta', historico: [], alteracoes: [] });
+const competenciaFechada = (reg, chave) => reg.itens[chave]?.status === 'fechada';
+
+function fecharCompetencia(reg, chave, por, obs = '') {
+  const c = itemCompetencia(reg, chave);
+  if (c.status === 'fechada') return false;
+  Object.assign(c, { status: 'fechada', fechadaEm: agoraISO(), fechadaPor: por });
+  c.historico.push({ em: c.fechadaEm, por, acao: 'fechada', obs });
+  return true;
+}
+function reabrirCompetencia(reg, chave, por, justificativa) {
+  if (!String(justificativa || '').trim()) throw new Error('Informe a justificativa para reabrir a competência.');
+  const c = itemCompetencia(reg, chave);
+  if (c.status !== 'fechada') return false;
+  c.status = 'aberta'; c.fechadaEm = ''; c.fechadaPor = '';
+  c.historico.push({ em: agoraISO(), por, acao: 'reaberta', obs: justificativa.trim() });
+  return true;
+}
+// Alterações nas bases (que valem para todas as competências) ficam registradas onde foram feitas.
+function registrarAlteracao(reg, chave, por, tipo, descricao) {
+  const c = itemCompetencia(reg, chave);
+  c.alteracoes.push({ em: agoraISO(), por, tipo, descricao });
+  if (c.alteracoes.length > 500) c.alteracoes.splice(0, c.alteracoes.length - 500);
+}
+const TIPOS_ALTERACAO = { equivalencias: 'Equivalências TUSS', aliases: 'Aliases de prestador', prestadores: 'Prestadores', faturistas: 'Faturistas', unidades: 'Unidades', regras: 'Regras de classificação', parametros: 'Parâmetros', configuracao: 'Configuração' };
+function tipoDaAlteracao(texto) {
+  const n = norm(texto);
+  return /FATURISTA/.test(n) ? 'faturistas' : /ALIAS/.test(n) ? 'aliases' : /PRESTADOR/.test(n) ? 'prestadores' : /UNIDADE/.test(n) ? 'unidades'
+    : /REGRA/.test(n) ? 'regras' : /PARAMETRO/.test(n) ? 'parametros' : /EQUIVALENCIA|RELAC/.test(n) ? 'equivalencias' : 'configuracao';
+}
+
+/* ---------- Produção esperada × arquivos carregados ---------- */
+const producaoEsperada = chave => competenciaVizinha(chave, -1);
+// Mês com mais datas (AAAA-MM) e a parcela dele no total.
+function mesDominante(datas) {
+  const v = datas.filter(Boolean); if (!v.length) return null;
+  const [mes, n] = [...contar(v, d => isoDia(d).slice(0, 7))].sort((a, b) => b[1] - a[1])[0];
+  return { mes, parcela: n / v.length };
+}
+function conferirProducao(datas, chave) {
+  const dom = mesDominante(datas), esperado = producaoEsperada(chave);
+  if (!dom) return { estado: 'sem-data', esperado, encontrado: '' };
+  return { estado: dom.mes === esperado ? 'ok' : 'outro', esperado, encontrado: dom.mes, parcela: dom.parcela };
+}
+const rotuloMes = m => m ? `${m.slice(5)}/${m.slice(0, 4)}` : '—';
+// Competência de uma rodada: a escolhida no topo quando ela foi executada (rodadas antigas: mês da execução).
+const competenciaDaRodada = r => r.chaveCompetencia || (r.em ? r.em.slice(0, 7) : '');
 
 /* ---- src/engine/85-fluxo.js ---- */
 /* ============================================================
@@ -1669,9 +1744,7 @@ function indicadoresFluxo(comp, hoje = new Date()) {
 // Rodadas da ferramenta que podem evidenciar uma etapa (só sugestão: o usuário confirma).
 function rodadasParaTarefa(rodadas, comp, vinculo) {
   if (!vinculo) return [];
-  const [ano, mes] = comp.chave.split('-').map(Number);
-  const ini = Date.UTC(ano, mes - 1, 1), fim = Date.UTC(ano, mes, 1);
-  return rodadas.filter(r => r.tipo === vinculo && Date.parse(r.em) >= ini && Date.parse(r.em) < fim).sort((a, b) => b.em.localeCompare(a.em));
+  return rodadas.filter(r => r.tipo === vinculo && competenciaDaRodada(r) === comp.chave).sort((a, b) => b.em.localeCompare(a.em));
 }
 
 function validarFluxo(dados) {
@@ -1889,7 +1962,7 @@ function tipoCandidatoConferencia(x) {
 const competenciaDoRelatorio = rel => { const p = periodoDoRelatorio(rel.regs); return p ? competenciaDaProducao(p[1]) : ''; };
 function candidatoDaLinhaConferencia(x, ctx, cfg, tipo = null) {
   const t = tipo || tipoCandidatoConferencia(x) || 'manual';
-  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
+  return montarCandidato(t, camposDaLinha(x.r, x.l, ctx, cfg), { ...ctx, tipoAnalise: 'conferencia', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, x.motivos.join(' · '));
 }
 function candidatosDaConferencia(res, ctx, cfg) {
   const out = [];
@@ -1900,7 +1973,7 @@ function candidatoDaLinhaCorrecao(o, ctx, cfg, tipo = null) {
   const campos = camposDaLinha(o.r, o.laudo, ctx, cfg);
   const ehPrestador = tipo === 'prestador-identificado' || o.estado === 'identificado';
   const extra = ehPrestador ? { campos: { prestadorIncorreto: o.r.prestadorCod, prestadorCorrigido: o.prestador ? `${o.medico} (${o.prestador.cod})` : o.medico, medico: o.medico } } : { natureza: '' };
-  return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
+  return montarCandidato(tipo || (ehPrestador ? 'prestador-identificado' : 'manual'), campos, { ...ctx, tipoAnalise: 'correcao', competencia: ctx.chaveCompetencia || competenciaDoRelatorio(ctx.relatorio) }, o.detalhe, extra);
 }
 // Só vira candidato o laudo de médico diferente do prestador do relatório.
 function candidatosDaCorrecao(res, ctx, cfg) {
@@ -2187,24 +2260,33 @@ const S = {
   conf: null, corr: null,  // {res, ctx, rodada, comparacao}
   rodadas: [],
   fluxo: null,            // {schema, versaoSchema, modelo, competencias:{chave: competência}}
+  comp: '',               // competência escolhida no topo (AAAA-MM), vale para todas as abas
+  compReg: null,          // {schema, versaoSchema, itens:{chave:{status, historico, alteracoes}}}
   nc: null,               // {schema, versaoSchema, itens:[NC]} — contém dados de pacientes (retenção)
   ncCand: [],             // candidatos das análises desta sessão: [{chave, rotulo, itens}]
   ncDispensados: new Set()
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior' };
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias' };
 function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
 // Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
 function gravarLocal(k, v) {
   try { const j = JSON.stringify(v); localStorage.setItem(k, j); return localStorage.getItem(k) === j; } catch (e) { return false; }
 }
-function salvarCfg(motivo = '') {
+// Alterações nas bases valem para todas as competências e ficam registradas na competência do topo.
+function registrarAlteracaoBase(motivo, tipo) {
+  if (!motivo || !S.compReg) return;
+  registrarAlteracao(S.compReg, S.comp, S.operador, tipo || tipoDaAlteracao(motivo), motivo); salvarCompReg();
+}
+function salvarCfg(motivo = '', tipo = '') {
+  registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
 }
 function salvarEq(motivo = '') {
+  registrarAlteracaoBase(motivo, 'equivalencias');
   if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador. Exporte o JSON para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
   atualizarNavPendencias();
@@ -2291,11 +2373,53 @@ function zonaArquivo(el, input, aoReceber) {
   input.onchange = () => { if (input.files.length) aoReceber([...input.files]); input.value = ''; };
 }
 
+/* ---------- Competência no topo (vale para todas as abas) ---------- */
+const PAGINAS_GLOBAIS = new Set(['equivalencias', 'bases', 'configuracoes']);
+let paginaAtual = 'inicio';
+function salvarCompReg() { if (!gravarLocal(CHAVES.compReg, S.compReg)) avisar('Não foi possível gravar o registro de competências neste navegador.', 'err'); }
+function carregarCompetencia() {
+  const r = lerLocal(CHAVES.compReg);
+  S.compReg = r && !validarRegistroCompetencias(r).length ? r : registroCompetenciasVazio();
+  const c = lerLocal(CHAVES.comp);
+  S.comp = /^\d{4}-\d{2}$/.test(c || '') ? c : chaveAtual();
+}
+function mudarCompetencia(chave) {
+  if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
+  S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
+  atualizarNavFluxo();
+  irPara(paginaAtual, true);
+}
+const compFechada = (chave = S.comp) => competenciaFechada(S.compReg, chave);
+// Bloqueia alterações numa competência fechada; devolve verdadeiro se pode seguir.
+function exigirAberta(chave = S.comp, oque = 'alterar') {
+  if (!compFechada(chave)) return true;
+  avisar(`A competência ${rotuloCompetencia(chave)} está fechada (somente leitura): não é possível ${oque}. Reabra no Início ou escolha outra competência no topo.`, 'warn');
+  return false;
+}
+function desenharSeletorCompetencia() {
+  const el = $('compGlobal'); if (!el) return;
+  const fechada = compFechada(), global = PAGINAS_GLOBAIS.has(paginaAtual);
+  el.innerHTML = `<button type="button" class="sec ic" id="compAnt" aria-label="Competência anterior" title="Competência anterior">‹</button>
+    <div class="comp-rot"><b>Competência ${rotuloCompetencia(S.comp)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></b>
+    <small>${global ? 'esta aba vale para todas · alterações registradas aqui' : `produção ${rotuloMes(producaoEsperada(S.comp))}`}</small></div>
+    <button type="button" class="sec ic" id="compProx" aria-label="Próxima competência" title="Próxima competência">›</button>`;
+  $('compAnt').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, -1));
+  $('compProx').onclick = () => mudarCompetencia(competenciaVizinha(S.comp, 1));
+  const est = estadoCompetencia(S.compReg, S.comp), aviso = $('compAviso');
+  aviso.hidden = !fechada || global;
+  if (fechada && !global) {
+    aviso.innerHTML = `🔒 Competência ${rotuloCompetencia(S.comp)} fechada em ${new Date(est.fechadaEm).toLocaleDateString('pt-BR')} por ${esc(est.fechadaPor || '—')}: somente leitura. ${paginaAtual === 'inicio' ? 'Use «Reabrir…» no painel abaixo' : '<a href="#inicio">Reabrir no Início</a>'} ou escolha outra competência.`;
+  }
+}
+
 /* ---------- Navegação ---------- */
 const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';
+  paginaAtual = pag;
+  desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
   document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
   $('titulo').textContent = PAGINAS[pag];
@@ -2350,7 +2474,7 @@ const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"$
  * ============================================================ */
 RENDER.inicio = () => {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
-  $('pag-inicio').innerHTML = `
+  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}
   <div class="card">
     <h2>Preparar o repasse</h2>
     <p class="lead">Carregue os arquivos uma vez; depois abra a análise. Nenhuma análise altera o MV: as correções são feitas lá, e a nova extração é conferida aqui em outra rodada.</p>
@@ -2385,8 +2509,93 @@ RENDER.inicio = () => {
   zonaArquivo($('dzEq'), $('inEq'), fs => importarEquivalenciasArquivo(fs[0], 'mesclar'));
   zonaArquivo($('dzPBI'), $('inPBI'), fs => carregarPBI(fs[0]));
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
+  ligarPainelCompetencia();
   desenharListaMV();
 };
+
+/* ---------- Painel da competência: arquivos, o que foi feito, bases alteradas e fechamento ---------- */
+function resumoCompetencia(chave) {
+  const rods = S.rodadas.filter(r => competenciaDaRodada(r) === chave);
+  const conf = rods.filter(r => r.tipo === 'conferencia'), corr = rods.filter(r => r.tipo === 'correcao');
+  const ncs = S.nc.itens.filter(x => x.competencia === chave), indNC = indicadoresNC(ncs);
+  const fx = S.fluxo.competencias[chave], indFx = fx ? indicadoresFluxo(fx) : null;
+  const eqVal = S.eq.itens.filter(e => (e.historico || []).some(h => h.competencia === chave && h.para === 'validada')).length;
+  const alt = estadoCompetencia(S.compReg, chave).alteracoes || [];
+  return { rods, conf, corr, semAceite: rods.filter(r => !r.aceite).length, ncs, indNC, fx, indFx, eqVal, alt };
+}
+function painelCompetencia() {
+  const ch = S.comp, R = resumoCompetencia(ch), est = estadoCompetencia(S.compReg, ch), fechada = est.status === 'fechada', esp = producaoEsperada(ch);
+  const arq = (nome, sub, dom) => `<div class="l"><div>${nome}<small>${sub}</small></div><span class="v ${!dom ? 'muted' : dom.mes === esp ? 'txt-ok' : 'txt-warn'}">${!dom ? '—' : dom.mes === esp ? 'ok' : 'outro mês'}</span></div>`;
+  const domMV = S.relatorios.map(x => producaoDoArquivo(x, () => x.rel.regs.map(r => r.data))).filter(Boolean);
+  const mvDom = domMV.length ? (domMV.every(d => d.mes === esp) ? { mes: esp } : domMV.find(d => d.mes !== esp)) : null;
+  const domAp = S.apolo ? producaoDoArquivo(S.apolo, () => S.apolo.laudos.map(l => l.data)) : null;
+  const domPb = S.pbi ? producaoDoArquivo(S.pbi, () => S.pbi.linhas.map(l => l.data)) : null;
+  const prestConf = new Set(R.conf.map(r => r.prestadorCod)).size, unCorr = [...new Set(R.corr.map(r => r.unidadeCod))].join(', ');
+  const porTipo = [...R.alt.reduce((m, a) => m.set(a.tipo, [...(m.get(a.tipo) || []), a]), new Map())];
+  const pct = R.indFx && R.indFx.total ? Math.round(R.indFx.ok / R.indFx.total * 100) : 0;
+  return `<div class="card painel-comp"><h2>Painel da competência ${rotuloCompetencia(ch)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></h2>
+    <div class="grid3">
+      <div><h3>Arquivos desta sessão</h3>
+        ${arq('Relatórios do MV', S.relatorios.length ? `${S.relatorios.length} PDF(s) · produção ${S.relatorios.length && mvDom ? rotuloMes(mvDom.mes) : '—'}` : 'nenhum carregado', mvDom)}
+        ${arq('Laudos do Apolo', S.apolo ? `produção ${rotuloMes(domAp?.mes)}` : 'não carregado', domAp)}
+        ${arq('Power BI', S.pbi ? `${S.pbi.linhas.length.toLocaleString('pt-BR')} lançamentos · ${rotuloMes(domPb?.mes)}` : 'não carregado', domPb)}
+        <p class="small muted">Esperado: produção ${rotuloMes(esp)}. Os arquivos ficam só na memória desta sessão.</p></div>
+      <div><h3>O que foi feito nesta competência</h3>
+        <div class="l"><div>Rodadas de conferência<small>${prestConf} prestador(es)</small></div><span class="v">${R.conf.length}</span></div>
+        <div class="l"><div>Rodadas de correção de prestador<small>${unCorr ? `unidade(s) ${esc(unCorr)}` : '—'}</small></div><span class="v">${R.corr.length}</span></div>
+        <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
+        <div class="l"><div>Fluxo mensal<small>${R.indFx ? `${R.indFx.ok} de ${R.indFx.total} etapas concluídas · ${R.indFx.vencidas.length} vencida(s)` : 'checklist não iniciado'}</small></div><span class="v">${R.indFx ? pct + '%' : '—'}</span></div>
+        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}</div>
+      <div><h3>Bases alteradas nesta competência</h3>
+        <div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
+        ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div>
+    </div>
+    <div class="fechamento"><div><strong>${fechada ? `Fechada em ${new Date(est.fechadaEm).toLocaleString('pt-BR')} por ${esc(est.fechadaPor || '—')}` : 'Fechar a competência'}</strong>
+      <p class="small muted">${fechada ? 'Somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. Pendências podem ser levadas para a competência seguinte.' : 'Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.'}</p>
+      ${est.historico?.length ? `<details class="small"><summary>Histórico (${est.historico.length})</summary><ul>${est.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${h.obs ? ` — ${esc(h.obs)}` : ''}</li>`).join('')}</ul></details>` : ''}</div>
+      <div class="acoes" style="margin:0"><button class="sec" id="compPacote">Exportar pacote da competência</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div></div>`;
+}
+function ligarPainelCompetencia() {
+  const ch = S.comp;
+  if ($('compFechar')) $('compFechar').onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const R = resumoCompetencia(ch), pend = [];
+    if (R.indNC.porSituacao.aberta) pend.push(`${R.indNC.porSituacao.aberta} NC(s) abertas, não enviadas ao Qualiex`);
+    if (R.indFx && R.indFx.total - R.indFx.ok - R.indFx.na > 0) pend.push(`${R.indFx.total - R.indFx.ok - R.indFx.na} etapa(s) do fluxo não concluídas`);
+    if (R.semAceite) pend.push(`${R.semAceite} rodada(s) sem aceite`);
+    const r = await dialogo(`Fechar a competência ${rotuloCompetencia(ch)}?`, `<p>Ela fica somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. As bases continuam editáveis (valem para todas as competências).</p>
+      ${pend.length ? `<p class="small" style="color:var(--warn)">Pendências (não impedem o fechamento):</p><ul class="small">${pend.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="small txt-ok">Sem pendências.</p>'}
+      <label class="campo">Observação (opcional)<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Fechar competência']]);
+    if (r.botao !== 'ok') return;
+    fecharCompetencia(S.compReg, ch, op, r.campos.obs.trim()); salvarCompReg();
+    avisar(`Competência ${rotuloCompetencia(ch)} fechada.`, 'ok'); irPara('inicio', true);
+  };
+  if ($('compReabrir')) $('compReabrir').onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const r = await dialogo(`Reabrir a competência ${rotuloCompetencia(ch)}?`, `<p class="small">A reabertura fica registrada no histórico da competência.</p><label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Reabrir']]);
+    if (r.botao !== 'ok') return;
+    if (!r.campos.just.trim()) return avisar('Informe a justificativa para reabrir.', 'warn');
+    reabrirCompetencia(S.compReg, ch, op, r.campos.just); salvarCompReg();
+    avisar(`Competência ${rotuloCompetencia(ch)} reaberta.`, 'ok'); irPara('inicio', true);
+  };
+  $('compPacote').onclick = () => exportarPacoteCompetencia(ch);
+}
+// Pacote para guardar na rede: NCs e fluxo em Excel, rodadas e resumo em JSON.
+async function exportarPacoteCompetencia(ch) {
+  const R = resumoCompetencia(ch), z = new JSZip(), mmaaaa = `${ch.slice(5)}-${ch.slice(0, 4)}`;
+  const bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  if (R.ncs.length) {
+    const pr = prazosNC(ch);
+    z.file(`NAO_CONFORMIDADES_${mmaaaa}.xlsx`, await bin(xlsxNC(R.ncs, ch, { operador: S.operador, prazos: Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data])) })));
+  }
+  if (R.fx) z.file(`Fluxo_mensal_${mmaaaa}.xlsx`, await bin(xlsxFluxo(R.fx)));
+  z.file(`rodadas_${mmaaaa}.json`, JSON.stringify({ schema: 'repasse-medico/rodadas', versaoSchema: 1, competencia: ch, exportadoEm: agoraISO(), rodadas: R.rods }, null, 1));
+  z.file('resumo_competencia.json', JSON.stringify({ competencia: ch, producao: producaoEsperada(ch), exportadoEm: agoraISO(), operador: S.operador, motor: MOTOR_VERSAO,
+    estado: estadoCompetencia(S.compReg, ch), rodadas: { conferencia: R.conf.length, correcao: R.corr.length, semAceite: R.semAceite }, naoConformidades: R.indNC,
+    fluxo: R.indFx ? { concluidas: R.indFx.ok, total: R.indFx.total, vencidas: R.indFx.vencidas.length } : null, equivalenciasValidadas: R.eqVal }, null, 1));
+  baixarBlob(await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), `Pacote_competencia_${mmaaaa}_${carimbo()}.zip`);
+  if (R.ncs.length) avisar('Pacote gerado. Ele inclui a planilha de NCs, que tem dados de pacientes: guarde na rede conforme a política da empresa.', 'info');
+}
 
 function resumoApolo(a) {
   const al = [];
@@ -2538,7 +2747,7 @@ function painelEqRodada(cont, pares, aoReprocessar) {
       if (!rel) { rel = novaRelacao({ codigo: x.codigo, descMV: x.descMV, titulo: x.titulo, origem: 'cadastrada na validação de uma rodada' }); S.eq.itens.push(rel); }
       ids.push(rel.id);
     }
-    const n = alterarStatusEq(S.eq, ids, 'validada', op, ok.campos.motivo || 'validada a partir dos resultados de uma rodada');
+    const n = alterarStatusEq(S.eq, ids, 'validada', op, ok.campos.motivo || 'validada a partir dos resultados de uma rodada', S.comp);
     salvarEq(`${n} equivalência(s) validada(s). Reprocesse para aplicar.`);
     aoReprocessar();
   };
@@ -2567,12 +2776,35 @@ function seletoresAnalise(prefixo, tolPadrao) {
 }
 function relSelecionado(prefixo) { return S.relatorios.find(r => r.id === $(prefixo + 'Rel').value); }
 
+/* ---------- Competência: produção dos arquivos e resultado de outra competência ---------- */
+// Mês dominante das datas de cada arquivo, calculado uma vez por arquivo carregado.
+function producaoDoArquivo(obj, datas) {
+  if (!obj) return null;
+  if (!obj.__producao) obj.__producao = mesDominante(datas());
+  return obj.__producao;
+}
+function avisosProducao() {
+  const esp = producaoEsperada(S.comp), out = [];
+  const checar = (nome, dom) => { if (dom && dom.mes !== esp) out.push(`${nome}: produção ${rotuloMes(dom.mes)}`); };
+  for (const x of S.relatorios) checar(`MV ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}`, producaoDoArquivo(x, () => x.rel.regs.map(r => r.data)));
+  if (S.apolo) checar('Laudos do Apolo', producaoDoArquivo(S.apolo, () => S.apolo.laudos.map(l => l.data)));
+  if (S.pbi) checar('Power BI', producaoDoArquivo(S.pbi, () => S.pbi.linhas.map(l => l.data)));
+  return out;
+}
+function cartaoAvisoProducao() {
+  const av = avisosProducao();
+  return av.length ? `<div class="aviso-fixo warn">A competência ${rotuloCompetencia(S.comp)} espera produção ${rotuloMes(producaoEsperada(S.comp))}, mas há arquivo de outro mês — ${av.map(esc).join(' · ')}. Confirme antes de analisar: as rodadas e NCs serão gravadas em ${rotuloCompetencia(S.comp)}.</div>` : '';
+}
+function cartaoOutraCompetencia(x, nome) {
+  return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
+}
+
 RENDER.conferencia = () => {
   const p = $('pag-conferencia');
   if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
-  p.innerHTML = `<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
+  p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
     <div class="acoes"><button id="cfRodar">Executar conferência</button><span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
-    <div id="cfRes"></div>`;
+    <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
     const ligados = rel ? medicosDoPrestador(S.cfg, rel.rel.cab.prestadorCod) : [];
@@ -2586,7 +2818,7 @@ RENDER.conferencia = () => {
   };
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
   $('cfRodar').onclick = executarConferencia;
-  if (S.conf) desenharConferencia();
+  if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
 function faltamArquivos() {
   return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
@@ -2596,11 +2828,12 @@ async function executarConferencia() {
   const x = relSelecionado('cf'), un = $('cfUn').value, tol = +$('cfTol').value, medSel = $('cfMed').value;
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
+  if (!exigirAberta(S.comp, 'executar uma conferência')) return;
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
   const res = conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos });
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
   const medicosNomes = medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '';
-  const ctx = { relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
+  const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
     arquivos: [{ papel: 'MV', nome: x.nome, hash: x.hash }, { papel: 'Apolo', nome: S.apolo.nome, hash: S.apolo.hash }] };
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;
   const ant = rodadaAnterior(S.rodadas, rodada);
@@ -2687,12 +2920,13 @@ function salvarFluxo(msg = '') {
 }
 const chaveAtual = () => { const d = new Date(); return chaveCompetencia(d.getFullYear(), d.getMonth() + 1); };
 const compAtual = () => S.fluxo.competencias[FX.chave] || null;
-function moverCompetencia(delta) {
-  const [a, m] = FX.chave.split('-').map(Number), d = new Date(Date.UTC(a, m - 1 + delta, 1));
-  FX.chave = chaveCompetencia(d.getUTCFullYear(), d.getUTCMonth() + 1); RENDER.fluxo();
+// Competência fechada: a aba continua navegável (grupos, filtros, busca, exportação), mas nada se altera.
+function travarSeFechada(el) {
+  if (!el || !compFechada(FX.chave)) return;
+  el.querySelectorAll('input:not([type=search]), select, textarea, button:not([data-tg]):not([data-f]):not(#fxExp)').forEach(x => { x.disabled = true; });
 }
 function atualizarNavFluxo() {
-  const c = S.fluxo?.competencias[chaveAtual()], b = $('navFluxo'); if (!b) return;
+  const c = S.fluxo?.competencias[S.comp || chaveAtual()], b = $('navFluxo'); if (!b) return;
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
@@ -2705,7 +2939,7 @@ const nomeTarefaRef = (comp, gId, ref) => {
 };
 
 RENDER.fluxo = () => {
-  if (!FX.chave) FX.chave = chaveAtual();
+  FX.chave = S.comp || chaveAtual();
   const p = $('pag-fluxo');
   p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
   p.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { FX.sub = b.dataset.sub; RENDER.fluxo(); });
@@ -2715,16 +2949,16 @@ RENDER.fluxo = () => {
 /* ---------------- Acompanhamento ---------------- */
 function desenharAcompanhamento() {
   const c = $('fxCorpo'), comp = compAtual();
-  const cab = `<div class="fx-topo"><div class="comp-nav"><button class="sec ic" id="fxAnt" title="Competência anterior" aria-label="Competência anterior">‹</button><b>Competência ${rotuloCompetencia(FX.chave)}</b><button class="sec ic" id="fxProx" title="Próxima competência" aria-label="Próxima competência">›</button></div>
+  const cab = `<div class="fx-topo"><h2 class="fx-titulo">Checklist da competência ${rotuloCompetencia(FX.chave)}</h2>
     <div class="acoes" style="margin:0">${comp ? '<button class="sec" id="fxExp">Exportar situação (.xlsx)</button>' : ''}</div></div>`;
   if (!comp) {
     const existentes = Object.keys(S.fluxo.competencias).sort().reverse();
     c.innerHTML = cab + `<div class="card"><h2>Competência ${rotuloCompetencia(FX.chave)} ainda não iniciada</h2><p class="lead">O checklist do mês é criado a partir do modelo de fluxos (revisão ${S.fluxo.modelo.revisao}): grupos, etapas, prazos e listas de prestadores. Depois de criado, mudanças no modelo não alteram este mês.</p>
       <div class="acoes"><button id="fxCriar">Iniciar competência ${rotuloCompetencia(FX.chave)}</button><button class="sec" id="fxIrModelo">Revisar o modelo antes</button></div>
       ${existentes.length ? `<p class="small muted" style="margin-top:12px">Competências registradas: ${existentes.map(k => `<a href="#" data-k="${k}">${rotuloCompetencia(k)}</a>`).join(' · ')}</p>` : ''}</div>`;
-    $('fxCriar').onclick = () => { S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); };
+    $('fxCriar').onclick = () => { if (!exigirAberta(FX.chave, 'iniciar o checklist')) return; S.fluxo.competencias[FX.chave] = novaCompetencia(S.fluxo.modelo, FX.chave, S.operador); salvarFluxo(`Competência ${rotuloCompetencia(FX.chave)} iniciada.`); RENDER.fluxo(); };
     $('fxIrModelo').onclick = () => { FX.sub = 'modelo'; RENDER.fluxo(); };
-    c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); FX.chave = a.dataset.k; RENDER.fluxo(); });
+    c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); mudarCompetencia(a.dataset.k); });
   } else {
     const ind = indicadoresFluxo(comp), hoje = diaSerial(paraData(new Date()));
     const prox = [...ind.vencidas, ...ind.proximas].sort((a, b) => a.prazo - b.prazo).slice(0, 4);
@@ -2754,7 +2988,7 @@ function desenharAcompanhamento() {
     $('fxBusca').oninput = e => { FX.busca = e.target.value; desenharGrupos(comp); };
     desenharGrupos(comp); desenharEntrega(comp, ind); desenharNotas(comp);
   }
-  $('fxAnt').onclick = () => moverCompetencia(-1); $('fxProx').onclick = () => moverCompetencia(1);
+  travarSeFechada(c);
 }
 
 async function ajustarMarco(comp, id) {
@@ -2807,6 +3041,7 @@ function desenharGrupos(comp) {
   cont.innerHTML = blocos.join('') || '<div class="card"><p class="muted">Nenhuma etapa corresponde ao filtro.</p></div>';
   cont.querySelectorAll('[data-tg]').forEach(b => b.onclick = () => { const id = b.dataset.tg; FX.abertos.has(id) ? FX.abertos.delete(id) : FX.abertos.add(id); desenharGrupos(comp); });
   ligarGrupos(comp);
+  travarSeFechada(cont);
 }
 
 function corpoGrupo(comp, g, tarefas, mk) {
@@ -2814,7 +3049,7 @@ function corpoGrupo(comp, g, tarefas, mk) {
   let h = (g.regrasFixas || []).map(r => `<p class="regra-fixa">📌 ${esc(r)}</p>`).join('');
   if (g.id === 'nc' && S.nc) {
     const ind = indicadoresNC(S.nc.itens.filter(x => x.competencia === comp.chave));
-    h += `<p class="small">Não conformidades desta competência: <b>${ind.total}</b> · ${ind.porSituacao.aberta} abertas · ${ind.porSituacao.enviada + ind.porSituacao.tratativa} enviadas ao Qualiex · ${ind.porSituacao.regularizada} regularizadas — <a href="#nc" data-ir-nc="${comp.chave}">abrir a aba Não conformidades</a></p>`;
+    h += `<p class="small">Não conformidades desta competência: <b>${ind.total}</b> · ${ind.porSituacao.aberta} abertas · ${ind.porSituacao.enviada + ind.porSituacao.tratativa} enviadas ao Qualiex · ${ind.porSituacao.regularizada} regularizadas — <a href="#nc">abrir a aba Não conformidades</a></p>`;
   }
   h += `<div class="tw"><table class="tab-fx"><thead><tr><th>Etapa</th><th>Status</th><th>Prazo</th><th>Início</th><th>Concluída em</th><th>Responsável / dependência</th><th>Observação</th></tr></thead><tbody>${tarefas.map(t => {
     const e = eg.tarefas[t.id], p = prazoTarefa(comp, g.id, t, mk), dif = p ? diaSerial(p) - diaSerial(paraData(new Date())) : null, aberta = e.status !== 'ok' && e.status !== 'na';
@@ -2862,7 +3097,7 @@ function blocoMatriz(comp, g) {
 
 function ligarGrupos(comp) {
   const cont = $('fxGrupos');
-  cont.querySelectorAll('[data-ir-nc]').forEach(a => a.onclick = () => { NCV.chave = a.dataset.irNc; });
+
   cont.querySelectorAll('section.grupo-fx').forEach(sec => {
     const gId = sec.dataset.g, eg = comp.grupos[gId], g = comp.modelo.grupos.find(x => x.id === gId);
     sec.querySelectorAll('tr[data-t]').forEach(tr => {
@@ -3078,19 +3313,20 @@ function desenharModeloFluxo() {
 RENDER.correcao = () => {
   const p = $('pag-correcao');
   if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
-  p.innerHTML = `<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
+  p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
     ${seletoresAnalise('co', S.cfg.parametros.tolCorrecao)}
-    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes"></div>`;
+    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
   $('coExtra').innerHTML = '';
   $('coRodar').onclick = executarCorrecao;
-  if (S.corr) desenharCorrecao();
+  if (S.corr && S.corr.ctx.chaveCompetencia === S.comp) desenharCorrecao();
 };
 
 async function executarCorrecao() {
   const x = relSelecionado('co'), un = $('coUn').value, tol = +$('coTol').value;
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
+  if (!exigirAberta(S.comp, 'executar uma correção de prestador')) return;
   const res = corrigirPrestador(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol });
-  const ctx = { relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`,
+  const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`,
     parametros: { tol }, operador: S.operador, cfgRevisao: S.cfg.revisao, em: new Date().toLocaleString('pt-BR'),
     arquivos: [{ papel: 'MV', nome: x.nome, hash: x.hash }, { papel: 'Apolo', nome: S.apolo.nome, hash: S.apolo.hash }] };
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;
@@ -3176,14 +3412,14 @@ function atualizarNavNC() {
 /* ---------- Candidatos da sessão (só na memória: somem ao recarregar a página) ---------- */
 function guardarCandidatosNC(chave, rotulo, curto, itens) {
   S.ncCand = (S.ncCand || []).filter(f => f.chave !== chave);
-  S.ncCand.push({ chave, rotulo, curto, itens });
+  S.ncCand.push({ chave, rotulo, curto, itens, competencia: S.comp });
 }
 function chavesRegistradasNC() { return new Set(S.nc.itens.flatMap(x => [chaveNC(x), x.origem?.chaveCandidato]).filter(Boolean)); }
 // Lista achatada com o estado de cada candidato: nova, registrada ou dispensada.
 function candidatosNC(filtro = {}) {
   const reg = chavesRegistradasNC(), disp = S.ncDispensados || new Set(), out = [];
   for (const f of S.ncCand || []) {
-    if (filtro.fonte && f.chave !== filtro.fonte) continue;
+    if (filtro.fonte ? f.chave !== filtro.fonte : f.competencia !== S.comp) continue;
     for (const c of f.itens) {
       if (filtro.tipo && c.tipo !== filtro.tipo) continue;
       out.push({ c, fonte: f, estado: reg.has(c.chave) ? 'registrada' : disp.has(c.chave) ? 'dispensada' : 'nova' });
@@ -3222,17 +3458,18 @@ function rotuloPrazo(d) {
 
 /* ---------- Página ---------- */
 RENDER.nc = () => {
-  if (!NCV.chave) NCV.chave = chaveAtual();
+  NCV.chave = S.comp;
+  const fechada = compFechada(NCV.chave);
   const p = $('pag-nc'), itens = S.nc.itens.filter(x => x.competencia === NCV.chave), ind = indicadoresNC(itens);
   const pr = prazosNC(NCV.chave), dias = retencaoNC(), vencendo = vencendoRetencaoNC(S.nc, dias);
-  const cands = candidatosNC(), novos = cands.filter(x => x.estado === 'nova');
+  const cands = candidatosNC(), temCand = (S.ncCand || []).some(f => f.competencia === NCV.chave), novos = cands.filter(x => x.estado === 'nova');
   const barras = (pares, max) => pares.length ? pares.map(([nome, n]) => `<div class="l"><span title="${esc(nome)}">${esc(nome)}</span><i style="width:${Math.max(2, Math.round(n / max * 100))}%"></i><b>${n}</b></div>`).join('') : '<p class="muted small">Sem NCs nesta competência.</p>';
   const topo = (pares, k) => pares.length > k ? [...pares.slice(0, k), [`outros ${pares.length - k}`, pares.slice(k).reduce((s, x) => s + x[1], 0)]] : pares;
   const nat = topo(ind.porNatureza.map(([n, q]) => [n, q]), 9), resp = topo(ind.porResponsavel, 6);
   const maxBar = Math.max(1, ...nat.map(x => x[1]), ...resp.map(x => x[1]));
   const tiposCand = [...contar(novos, x => x.c.tipo)];
-  p.innerHTML = `<div class="fx-topo"><div class="comp-nav"><button class="sec ic" id="ncAnt" aria-label="Competência anterior" title="Competência anterior">‹</button><b>Competência ${rotuloCompetencia(NCV.chave)}<small class="muted" style="display:block;font-weight:400;font-size:11.5px">produção ${producaoDaCompetencia(NCV.chave)}</small></b><button class="sec ic" id="ncProx" aria-label="Próxima competência" title="Próxima competência">›</button></div>
-    <div class="acoes" style="margin:0"><button class="sec" id="ncImp">Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova">+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
+  p.innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Não conformidades da competência ${rotuloCompetencia(NCV.chave)}</h2>
+    <div class="acoes" style="margin:0"><button class="sec" id="ncImp"${fechada ? ' disabled' : ''}>Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova"${fechada ? ' disabled' : ''}>+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
     ${vencendo.length ? `<div class="aviso-fixo warn">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias após o registro). Exporte antes se precisar guardar a planilha na rede.</div>` : ''}
     <div class="nc-kpis">
       <div class="nc-kpi"><b>${ind.total}</b><small>NCs na competência</small></div>
@@ -3243,7 +3480,7 @@ RENDER.nc = () => {
     <div class="nc-duas">
       <div class="card barras"><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}<h3 style="margin-top:14px">Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div>
       <div class="card nc-cand"><h3>Candidatos vindos das análises desta sessão</h3>
-        ${S.ncCand?.length ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
+        ${temCand ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
           : '<p class="small muted">Rode uma conferência cruzada ou uma correção de prestador: o que pode ser NC aparece aqui para você revisar. Os candidatos ficam só nesta sessão.</p>'}
         <h3 style="margin-top:14px">Prazos de envio (Fluxo mensal)</h3>
         ${Object.entries(pr.grupos).map(([k, g]) => { const r = rotuloPrazo(g.data), q = ind.porPrazo[k]; return `<div class="l"><div>${esc(g.nome)}<small>${q.total} NC(s) · ${q.abertas} aberta(s)${g.status ? ` · etapa no fluxo: ${esc(STATUS_TAREFA[g.status])}` : ''}</small></div><b class="${g.status === 'ok' ? 'txt-ok' : r.cls}">${g.status === 'ok' ? fmtCurta(g.data) + ' ✓' : r.txt}</b></div>`; }).join('')}
@@ -3252,15 +3489,13 @@ RENDER.nc = () => {
     <div class="card"><div class="nc-abas" role="tablist">${[['todas', 'Todas', ind.total], ...Object.entries(CATEGORIA_NC).map(([k, n]) => [k, n, ind.porCategoria[k]])].map(([k, n, q]) => `<button role="tab" class="${NCV.aba === k ? 'on' : ''}" aria-selected="${NCV.aba === k}" data-aba="${k}">${esc(n)}<em>${q}</em></button>`).join('')}</div>
       <div class="nc-filtros" id="ncFiltros"></div><div id="ncTab"></div>
       <div class="acoes nc-lote"><span class="small muted" id="ncSelInfo"></span><button class="sec mini" data-lote="tudo">Selecionar as filtradas</button><button class="sec mini" data-lote="limpar">Limpar seleção</button>
-        <button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button><button class="mini" data-lote="seguinte">Levar para a competência seguinte</button><button class="perigo mini" data-lote="excluir">Excluir</button></div></div>
+        ${fechada ? '' : '<button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button>'}<button class="mini" data-lote="seguinte">Levar para a competência seguinte</button>${fechada ? '' : '<button class="perigo mini" data-lote="excluir">Excluir</button>'}</div></div>
     <div class="card legenda"><h3>Como funciona</h3><ul>
       <li><b>Três categorias</b>, iguais às abas da planilha manual. A exportação sai nas mesmas abas e colunas, com situação, observações e uma aba de indicadores; ela pode ser importada de volta.</li>
       <li><b>Natureza padronizada + detalhe</b> («Procedimento não lançado na conta» + «RX patela») e observações livres. Na importação, o texto original fica nas observações.</li>
       <li><b>Situação</b>: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede. A pendência não resolvida pode ir para a competência seguinte, ligada à original.</li>
       <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores. <a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a>.</li></ul></div>`;
 
-  $('ncAnt').onclick = () => { NCV.chave = competenciaVizinha(NCV.chave, -1); NCV.sel.clear(); RENDER.nc(); };
-  $('ncProx').onclick = () => { NCV.chave = competenciaVizinha(NCV.chave, 1); NCV.sel.clear(); RENDER.nc(); };
   $('ncNova').onclick = () => editarNC(null);
   $('ncImp').onclick = () => $('ncArq').click();
   $('ncArq').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importarPlanilhaNC(f); };
@@ -3371,9 +3606,10 @@ const datalistFaturistas = () => `<datalist id="dlFat">${S.cfg.faturistas.filter
 const datalistUnidades = () => `<datalist id="dlUn">${[...new Set(S.cfg.unidades.flatMap(u => [...(u.apolo || []), u.nome]))].map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
 // Devolve verdadeiro se registrou algo.
 async function abrirRegistroNC(cands) {
+  if (!exigirAberta(S.comp, 'registrar NCs')) return false;
   const op = await exigirOperador(); if (!op) return false;
   const um = (f, vazio = '') => { const s = new Set(cands.map(f)); return s.size === 1 ? [...s][0] : vazio; };
-  const natSug = um(c => c.natureza), catSug = um(c => c.categoria), compSug = um(c => c.competencia) || NCV.chave || chaveAtual();
+  const natSug = um(c => c.natureza), catSug = um(c => c.categoria), compSug = um(c => c.competencia) || S.comp;
   const semSugestao = cands.filter(c => !c.natureza).length;
   const pbiSug = cands.map(c => faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta)).filter(Boolean).length;
   const r = await dialogo(`Registrar ${cands.length} NC(s)`, `<p class="small muted">${cands.length === 1 ? `${esc(cands[0].campos.paciente)} · ${esc(fmtData(paraData(cands[0].campos.data)))} · ${esc(cands[0].campos.titulo)}` : `${cands.length} linhas selecionadas. As escolhas abaixo valem para todas.`}</p>
@@ -3388,6 +3624,7 @@ async function abrirRegistroNC(cands) {
   const e = r.campos;
   if (!e.natureza && cands.some(c => !c.natureza)) { avisar(`Escolha a natureza: ${cands.filter(c => !c.natureza).length} linha(s) não têm sugestão.`, 'warn'); return false; }
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) { avisar('Competência inválida.', 'warn'); return false; }
+  if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
   const dados = cands.map(c => {
     const responsavel = e.responsavel.trim() || faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta) || (c.categoria === 'particular' && !e.categoria ? 'PARTICULAR - EQUIPE UNIDADE' : '');
     return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs: e.obs.trim(), impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
@@ -3421,6 +3658,7 @@ function formNC(d) {
     <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>${datalistFaturistas()}${datalistUnidades()}`;
 }
 async function editarNC(nc) {
+  if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   const d = nc ? { ...nc } : { competencia: NCV.chave, categoria: NCV.aba !== 'todas' ? NCV.aba : 'convenio', natureza: NCV.aba === 'prestador' ? 'prestador-incorreto' : 'nao-lancado', situacao: 'aberta', impactaPagamento: true };
   const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length})</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
@@ -3428,6 +3666,7 @@ async function editarNC(nc) {
   if (r.botao !== 'ok') return;
   const e = r.campos;
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) return avisar('Competência inválida.', 'warn');
+  if (!exigirAberta(e.competencia, 'gravar NCs')) return;
   const dados = { ...e, impactaPagamento: e.impacta === 'sim', unidadeCod: ncDaUnidade(S.cfg, e.unidade) };
   delete dados.impacta;
   if (d.anonimizada) { delete dados.paciente; delete dados.idAtendimento; }
@@ -3446,6 +3685,7 @@ async function acaoLoteNC(acao) {
   if (acao === 'limpar') { NCV.sel.clear(); return desenharTabelaNC(); }
   const sel = S.nc.itens.filter(x => NCV.sel.has(x.id));
   if (!sel.length) return avisar('Selecione ao menos uma NC na tabela.', 'warn');
+  if (acao === 'seguinte' ? !exigirAberta(competenciaVizinha(NCV.chave, 1), 'receber NCs') : !exigirAberta(NCV.chave, 'alterar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   let msg = '';
   if (acao === 'enviada') { const n = sel.filter(x => mudarSituacaoNC(x, 'enviada', op)).length; msg = `${n} NC(s) marcadas como enviadas ao Qualiex.`; }
@@ -3469,6 +3709,7 @@ async function acaoLoteNC(acao) {
 
 /* ---------- Importação e exportação ---------- */
 async function importarPlanilhaNC(f) {
+  if (!exigirAberta(S.comp, 'importar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   let lida;
   const compArquivo = competenciaDoNomeNC(f.name);
@@ -3484,18 +3725,18 @@ async function importarPlanilhaNC(f) {
   if (r.botao !== 'ok') return;
   const comp = r.campos.competencia;
   if (!/^\d{4}-\d{2}$/.test(comp)) return avisar('Competência inválida.', 'warn');
+  if (!exigirAberta(comp, 'importar NCs')) return;
   const { novas, repetidas } = registrarNCs(S.nc, lida.dados.map(d => ({ ...d, competencia: comp, origem: { ...d.origem, arquivo: f.name } })), op);
-  if (r.campos.cadResp) { const n = registrarFaturistas(S.cfg, novosResp.map(([n]) => n), `planilha de NCs ${f.name}`); if (n) salvarCfg(); }
-  NCV.chave = comp; NCV.sel.clear();
+  if (r.campos.cadResp) { const n = registrarFaturistas(S.cfg, novosResp.map(([n]) => n), `planilha de NCs ${f.name}`); if (n) salvarCfg(`${n} faturista(s) cadastrado(s) da planilha de NCs ${f.name}`, 'faturistas'); }
   salvarNC(`${novas.length} NC(s) importada(s) em ${rotuloCompetencia(comp)}${repetidas.length ? ` · ${repetidas.length} já existiam` : ''}.`);
-  RENDER.nc();
+  if (comp !== S.comp) mudarCompetencia(comp); else RENDER.nc();
 }
 async function exportarNC(itens, pr) {
   if (!itens.length) return avisar('Nenhuma NC nesta competência para exportar.', 'warn');
   const prazos = Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data]));
   await baixarZip(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`);
   const abertas = itens.filter(x => x.situacao === 'aberta');
-  if (abertas.length && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
+  if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;
     abertas.forEach(x => mudarSituacaoNC(x, 'enviada', op)); salvarNC(`${abertas.length} NC(s) marcadas como enviadas.`); RENDER.nc();
   }
@@ -3560,7 +3801,7 @@ RENDER.equivalencias = () => {
     const amb = S.eq.itens.filter(e => FE.sel.has(e.id) && e.ambiguo).length;
     const r = await dialogo(`${rotulo} ${FE.sel.size} relação(ões)`, `<p>Responsável: <strong>${esc(op)}</strong>.</p>${status === 'validada' && amb ? `<p class="badge warn">${amb} relação(ões) ambíguas: confirme que o título identifica só este código.</p>` : ''}<label class="campo">Justificativa${status === 'validada' ? ' (recomendada)' : ''}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
     if (r.botao !== 'ok') return;
-    const n = alterarStatusEq(S.eq, [...FE.sel], status, op, r.campos.motivo);
+    const n = alterarStatusEq(S.eq, [...FE.sel], status, op, r.campos.motivo, S.comp);
     FE.sel.clear(); salvarEq(`${n} relação(ões) atualizadas.`); RENDER.equivalencias();
   };
   $('eqVal').onclick = () => mudar('validada', 'Validar');
@@ -3590,7 +3831,7 @@ async function novaRelacaoManual() {
   const m = mesclarEquivalencias(S.eq, [e]);
   if (!m.adicionadas) return avisar('Essa relação já existe na base.', 'warn');
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
-  if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual');
+  if (r.campos.validar) alterarStatusEq(S.eq, [e.id], 'validada', op, r.campos.just || 'cadastro manual', S.comp);
   salvarEq('Relação cadastrada.'); RENDER.equivalencias();
 }
 
@@ -3604,7 +3845,7 @@ RENDER.bases = () => {
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
   const branches = S.apolo ? [...contar(S.apolo.laudos, l => l.unidade)] : [];
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
-  $('pag-bases').innerHTML = `
+  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência do topo (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
   <div class="card"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>
@@ -3673,7 +3914,7 @@ RENDER.bases = () => {
     const r = await dialogo('Novo faturista', `<label class="campo">Nome (como aparece no MV / na planilha)<input type="text" name="nome" placeholder="ex.: GISLAINE.CARVALHO"></label><label class="campo">Unidade(s)<input type="text" name="un" placeholder="opcional, ex.: 17"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
     if (!registrarFaturistas(S.cfg, [r.campos.nome], `cadastro manual (${S.operador || '—'})`)) return avisar('Esse nome já está na lista.', 'warn');
-    S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg('Faturista adicionado.'); RENDER.bases();
+    S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg(`Faturista «${r.campos.nome.trim()}» adicionado.`, 'faturistas'); RENDER.bases();
   };
   $('fatImp').onclick = () => $('fatArq').click();
   $('fatArq').onchange = async e => {
@@ -3714,25 +3955,26 @@ async function adicionarAlias(i, medApolo) {
   const outro = S.cfg.prestadores.find(x => x !== p && (norm(x.nomeMV) === norm(nome) || (x.aliases || []).some(a => norm(a.nome) === norm(nome))));
   if (outro && !await confirmar('Nome já ligado a outro prestador', `«${esc(nome)}» já identifica o prestador ${esc(outro.cod)}. Com dois vínculos, a identificação fica em conflito e não é aplicada.`, 'Adicionar mesmo assim')) return;
   p.aliases = p.aliases || [];
-  p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual' });
-  salvarCfg('Alias validado.'); RENDER.bases();
+  p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual', competencia: S.comp });
+  salvarCfg(`Alias «${nome}» validado para o prestador ${p.cod}.`, 'aliases'); RENDER.bases();
 }
 
 /* ---- src/ui/60-rodadas.js ---- */
 /* ============================================================
  * Rodadas: histórico de execuções, comparação e aceite humano (RN-186)
  * ============================================================ */
+const RD = { todas: false };
 RENDER.rodadas = async () => {
   S.rodadas = await dbTodas();
-  const lista = [...S.rodadas].sort((a, b) => b.em.localeCompare(a.em));
+  const lista = [...S.rodadas].filter(r => RD.todas || competenciaDaRodada(r) === S.comp).sort((a, b) => b.em.localeCompare(a.em));
   $('pag-rodadas').innerHTML = `<div class="card"><h2>Rodadas registradas</h2>
     <p class="lead">Cada execução guarda entradas (nome e impressão digital dos arquivos), parâmetros, versões do motor e das bases, contagens e o estado de cada linha (sem nomes de pacientes). O aceite final é sempre humano e fica registrado.</p>
     <p class="small muted">${DB.ok ? 'Guardadas neste navegador (IndexedDB).' : 'Armazenamento do navegador indisponível: as rodadas ficam só nesta sessão.'}</p>
-    <div class="acoes"><button id="rdExp" class="sec">Exportar histórico (.json)</button><button id="rdLimpar" class="perigo">Apagar histórico</button></div>
+    <div class="acoes"><label class="small"><input type="checkbox" id="rdTodas"${RD.todas ? ' checked' : ''}> mostrar todas as competências</label><button id="rdExp" class="sec">Exportar histórico (.json)</button><button id="rdLimpar" class="perigo">Apagar histórico</button></div>
     <div id="rdTab" style="margin-top:10px"></div></div>`;
   tabela($('rdTab'), {
-    linhas: lista, vazio: 'Nenhuma rodada ainda.', colunas: [
-      { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
+    linhas: lista, vazio: RD.todas ? 'Nenhuma rodada ainda.' : `Nenhuma rodada na competência ${rotuloCompetencia(S.comp)}.`, colunas: [
+      { t: 'Competência', v: r => rotuloCompetencia(competenciaDaRodada(r)) }, { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
       { t: 'Prestador', v: r => `${r.prestadorCod} - ${r.prestadorNome}` }, { t: 'Repasse', v: r => `${r.repasse} · ${r.descricao}` }, { t: 'Unidade', v: r => r.unidadeCod },
       { t: 'Resultado', v: r => Object.entries(r.contagens).filter(([, n]) => n).map(([k, n]) => `${(STATUS_CONF[k] || ESTADO_CORR[k])?.nome || k}: ${n}`).join(' · ') },
       { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span>` : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }
@@ -3742,12 +3984,14 @@ RENDER.rodadas = async () => {
       return `<div class="det"><div><h4>Entradas e versões</h4><ul class="small">${r.arquivos.map(a => `<li>${esc(a.papel)}: ${esc(a.nome)} <code>${esc(a.hash || '')}</code></li>`).join('')}
         <li>Motor ${esc(r.versoes.motor)} · equivalências rev. ${r.versoes.equivalencias} · configuração rev. ${r.versoes.configuracao}</li><li>Parâmetros: ${esc(JSON.stringify(r.parametros))}</li></ul>
         ${r.aceite ? `<h4>Aceite</h4><p class="small">${esc(r.aceite.por)} em ${new Date(r.aceite.em).toLocaleString('pt-BR')}: ${esc(r.aceite.obs || '')} (${r.aceite.pendencias} pendência(s) abertas no aceite)</p>` : ''}</div>
-        <div><h4>Comparação com a rodada anterior</h4>${g ? `<ul class="small"><li>Agora conferidos/identificados: ${g.agoraIdentificados.length}</li><li>Continuam pendentes: ${g.continuamPendentes.length}</li><li>Mudaram de categoria: ${g.mudaramEstado.length}</li><li>Mudaram de médico: ${g.mudaramMedico.length}</li><li>Novas linhas: ${g.novos.length}</li><li>Saíram da extração: ${g.desapareceram.length}</li><li>Sem mudança: ${g.semMudanca.length}</li></ul>` : '<p class="muted small">Sem rodada anterior comparável (mesmo tipo, unidade e prestador).</p>'}</div></div>`;
+        <div><h4>Comparação com a rodada anterior</h4>${g ? `<ul class="small"><li>Agora conferidos/identificados: ${g.agoraIdentificados.length}</li><li>Continuam pendentes: ${g.continuamPendentes.length}</li><li>Mudaram de categoria: ${g.mudaramEstado.length}</li><li>Mudaram de médico: ${g.mudaramMedico.length}</li><li>Novas linhas: ${g.novos.length}</li><li>Saíram da extração: ${g.desapareceram.length}</li><li>Sem mudança: ${g.semMudanca.length}</li></ul>` : '<p class="muted small">Sem rodada anterior comparável (mesma competência, tipo, unidade e prestador).</p>'}</div></div>`;
     }
   });
   $('rdTab').addEventListener('click', async e => {
     const b = e.target.closest('[data-ac]'); if (!b) return;
-    const r = S.rodadas.find(x => x.id === b.dataset.ac), op = await exigirOperador(); if (!op) return;
+    const r = S.rodadas.find(x => x.id === b.dataset.ac);
+    if (!exigirAberta(competenciaDaRodada(r), 'registrar aceite')) return;
+    const op = await exigirOperador(); if (!op) return;
     const pend = r.linhas.filter(l => !['conferido', 'identificado'].includes(l.estado)).length;
     const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
     if (d.botao !== 'ok') return;
@@ -3755,6 +3999,7 @@ RENDER.rodadas = async () => {
     r.aceite = { por: op, em: agoraISO(), obs: d.campos.obs.trim(), pendencias: pend };
     await guardarRodada(r); avisar('Aceite registrado.', 'ok'); RENDER.rodadas();
   });
+  $('rdTodas').onchange = e => { RD.todas = e.target.checked; RENDER.rodadas(); };
   $('rdExp').onclick = () => baixarJSON({ schema: 'repasse-medico/rodadas', versaoSchema: 1, exportadoEm: agoraISO(), rodadas: S.rodadas }, `rodadas_${carimbo()}.json`);
   $('rdLimpar').onclick = async () => { if (await confirmar('Apagar todo o histórico de rodadas?', 'Exporte antes se precisar guardar a rastreabilidade. Esta ação não pode ser desfeita.', 'Apagar')) { await dbApagar(null); S.rodadas = []; RENDER.rodadas(); } };
 };
@@ -3795,7 +4040,7 @@ RENDER.configuracoes = () => {
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
   };
-  $('bkExp').onclick = async () => baixarJSON({ schema: SCHEMA_BACKUP, versaoSchema: 1, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, nc: $('bkNC').checked ? S.nc : undefined, rodadas: $('bkRod').checked ? await dbTodas() : undefined }, `backup_repasse_medico_${carimbo()}.json`);
+  $('bkExp').onclick = async () => baixarJSON({ schema: SCHEMA_BACKUP, versaoSchema: 1, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, competencias: S.compReg, nc: $('bkNC').checked ? S.nc : undefined, rodadas: $('bkRod').checked ? await dbTodas() : undefined }, `backup_repasse_medico_${carimbo()}.json`);
   $('bkImp').onclick = () => $('bkArq').click();
   $('bkArq').onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
@@ -3808,6 +4053,7 @@ RENDER.configuracoes = () => {
       backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq);
       S.cfg = b.configuracao; S.eq = b.equivalencias; salvarCfg(); salvarEq();
       if (b.fluxo && !validarFluxo(b.fluxo).length) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = b.fluxo; salvarFluxo(); }
+      if (b.competencias && !validarRegistroCompetencias(b.competencias).length) { S.compReg = b.competencias; salvarCompReg(); }
       if (b.nc && !validarNC(b.nc).length) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = b.nc; aplicarRetencaoNC(S.nc, retencaoNC()); salvarNC(); }
       if (migrarConfig(S.cfg)) salvarCfg();
       if (Array.isArray(b.rodadas)) for (const r of b.rodadas) await guardarRodada(r);
@@ -3843,7 +4089,7 @@ function aplicarTema() {
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   S.operador = lerLocal(CHAVES.operador) || '';
-  carregarFluxo(); carregarNC();
+  carregarCompetencia(); carregarFluxo(); carregarNC();
   iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo(); atualizarNavNC();
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';

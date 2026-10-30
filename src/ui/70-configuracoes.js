@@ -33,7 +33,7 @@ RENDER.configuracoes = () => {
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
   };
-  $('bkExp').onclick = async () => baixarJSON({ schema: SCHEMA_BACKUP, versaoSchema: 1, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, nc: $('bkNC').checked ? S.nc : undefined, rodadas: $('bkRod').checked ? await dbTodas() : undefined }, `backup_repasse_medico_${carimbo()}.json`);
+  $('bkExp').onclick = async () => baixarJSON({ schema: SCHEMA_BACKUP, versaoSchema: 1, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, competencias: S.compReg, nc: $('bkNC').checked ? S.nc : undefined, rodadas: $('bkRod').checked ? await dbTodas() : undefined }, `backup_repasse_medico_${carimbo()}.json`);
   $('bkImp').onclick = () => $('bkArq').click();
   $('bkArq').onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
@@ -46,6 +46,7 @@ RENDER.configuracoes = () => {
       backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq);
       S.cfg = b.configuracao; S.eq = b.equivalencias; salvarCfg(); salvarEq();
       if (b.fluxo && !validarFluxo(b.fluxo).length) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = b.fluxo; salvarFluxo(); }
+      if (b.competencias && !validarRegistroCompetencias(b.competencias).length) { S.compReg = b.competencias; salvarCompReg(); }
       if (b.nc && !validarNC(b.nc).length) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = b.nc; aplicarRetencaoNC(S.nc, retencaoNC()); salvarNC(); }
       if (migrarConfig(S.cfg)) salvarCfg();
       if (Array.isArray(b.rodadas)) for (const r of b.rodadas) await guardarRodada(r);

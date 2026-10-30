@@ -7,7 +7,7 @@ RENDER.bases = () => {
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
   const branches = S.apolo ? [...contar(S.apolo.laudos, l => l.unidade)] : [];
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
-  $('pag-bases').innerHTML = `
+  $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência do topo (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
   <div class="card"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>
@@ -76,7 +76,7 @@ RENDER.bases = () => {
     const r = await dialogo('Novo faturista', `<label class="campo">Nome (como aparece no MV / na planilha)<input type="text" name="nome" placeholder="ex.: GISLAINE.CARVALHO"></label><label class="campo">Unidade(s)<input type="text" name="un" placeholder="opcional, ex.: 17"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
     if (!registrarFaturistas(S.cfg, [r.campos.nome], `cadastro manual (${S.operador || '—'})`)) return avisar('Esse nome já está na lista.', 'warn');
-    S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg('Faturista adicionado.'); RENDER.bases();
+    S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg(`Faturista «${r.campos.nome.trim()}» adicionado.`, 'faturistas'); RENDER.bases();
   };
   $('fatImp').onclick = () => $('fatArq').click();
   $('fatArq').onchange = async e => {
@@ -117,6 +117,6 @@ async function adicionarAlias(i, medApolo) {
   const outro = S.cfg.prestadores.find(x => x !== p && (norm(x.nomeMV) === norm(nome) || (x.aliases || []).some(a => norm(a.nome) === norm(nome))));
   if (outro && !await confirmar('Nome já ligado a outro prestador', `«${esc(nome)}» já identifica o prestador ${esc(outro.cod)}. Com dois vínculos, a identificação fica em conflito e não é aplicada.`, 'Adicionar mesmo assim')) return;
   p.aliases = p.aliases || [];
-  p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual' });
-  salvarCfg('Alias validado.'); RENDER.bases();
+  p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual', competencia: S.comp });
+  salvarCfg(`Alias «${nome}» validado para o prestador ${p.cod}.`, 'aliases'); RENDER.bases();
 }

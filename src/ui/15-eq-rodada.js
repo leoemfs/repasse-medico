@@ -60,7 +60,7 @@ function painelEqRodada(cont, pares, aoReprocessar) {
       if (!rel) { rel = novaRelacao({ codigo: x.codigo, descMV: x.descMV, titulo: x.titulo, origem: 'cadastrada na validação de uma rodada' }); S.eq.itens.push(rel); }
       ids.push(rel.id);
     }
-    const n = alterarStatusEq(S.eq, ids, 'validada', op, ok.campos.motivo || 'validada a partir dos resultados de uma rodada');
+    const n = alterarStatusEq(S.eq, ids, 'validada', op, ok.campos.motivo || 'validada a partir dos resultados de uma rodada', S.comp);
     salvarEq(`${n} equivalência(s) validada(s). Reprocesse para aplicar.`);
     aoReprocessar();
   };

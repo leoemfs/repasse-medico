@@ -98,7 +98,7 @@ ok(JSON.stringify(Object.keys(lido)) === JSON.stringify(['PARTICULAR', 'CONVENIO
 ok(lido.PARTICULAR[0] === 31 && lido['Correção de prestadores'][0] === 149 && lido['Correção de prestadores'][1][1] === 'PRESTADOR INCORRETO', 'colunas e quantidades iguais às da planilha manual');
 
 // 9) Prazos do Fluxo mensal e atalho no grupo de NCs.
-await p.click('#ncProx'); await p.waitForSelector('.nc-cand');
+await p.click('#compProx'); await p.waitForSelector('.nc-cand');
 const prazos = await p.$$eval('.nc-cand .l b', e => e.map(x => x.textContent));
 ok(prazos.some(t => t.startsWith('22/10')) && prazos.some(t => t.startsWith('30/10 · hoje')) && prazos.some(t => t.startsWith('29/10')), `prazos da competência 10/2026: ${prazos.join(' | ')}`);
 await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.click('#fxCriar'); await p.waitForSelector('[data-tg="nc"]'); await p.click('[data-tg="nc"]');
