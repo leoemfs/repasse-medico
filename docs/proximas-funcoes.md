@@ -317,3 +317,18 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - **Técnico:** faixa do par, equivalência usada, validador, chave da linha, página, conta, atendimento, ID do laudo, linha da planilha, candidatos.
   - **Por procedimento**, **Títulos sem validação** e **MV original**.
 - **Colunas de NC e aceite:** a decisão é tomada na ferramenta, que é a dona do dado (um clique por linha, com memória na competência); o Excel mostra a decisão já preenchida. Opcional: reimportar a planilha preenchida (colunas «Indicar NC» e «Aceite») para registrar as decisões em lote. A decidir com o usuário.
+
+## SOL-F24 — Excel da correção de prestador objetivo para corrigir no MV — IMPLEMENTADA na v2.0.0-alpha.7
+Pedido de 30/10/2026: «muito confuso, tenho que ficar ocultando colunas, o motivo fica no começo».
+- **Aba «Corrigir no MV»** (primeira): só as linhas com médico do laudo diferente do prestador do relatório, agrupadas por médico. Colunas:
+  - Status;
+  - Atendimento MV, Conta MV, Cód. TUSS MV, Descrição do procedimento MV, Paciente MV, Data MV, Convênio MV, Vl Repasse;
+  - Médico do laudo (Apolo), Cód. prestador, Paciente Apolo, Data Apolo, TITLE, STUDY;
+  - Observações (motivo e detalhe) e Alertas, no fim.
+- **Mesmas colunas em:** Todas as linhas, Não identificados, Conflitos e insuficientes.
+- **Abas à parte:**
+  - Resumo;
+  - Informações;
+  - Equivalências a analisar;
+  - Técnico (linha, chave, página, remessa, %, Vl Total, grupo, ID do laudo, laudos do paciente na data).
+- Não identificado continua sem médico (RN-206).

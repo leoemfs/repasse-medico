@@ -105,39 +105,58 @@ function xlsxConferencia(res, ctx) {
   ]);
 }
 
+/* Excel da correção de prestador: feito para corrigir no MV. A aba principal tem só o que
+ * precisa (status, atendimento/conta, procedimento e paciente do MV, médico e laudo do Apolo)
+ * e o motivo fica no fim; o técnico vai para abas à parte. Não identificado não recebe médico (RN-206). */
 function xlsxCorrecao(res, ctx) {
-  const cabL = [...cabecalho(['Estado', 'Motivo', 'Detalhe objetivo', 'Médico do laudo (Apolo)', 'Código do prestador', 'Origem do código', 'Alertas']), ...cabecalho(colunasMV), ...cabecalho(['Prestador do cabeçalho do MV', 'Laudo: ID', 'Laudo: TITLE', 'Laudo: data', 'Laudo: linha da planilha', 'Unidade da sessão', 'Rodada', 'Executado em'], { ...CAB, fill: '2E7D32' })];
-  const linhaL = o => {
-    const f = { fill: ESTADO_CORR[o.estado].cor };
-    return [{ v: ESTADO_CORR[o.estado].nome, st: { ...f, b: true } }, { v: MOTIVOS_CORR[o.motivo] || '', st: f }, { v: o.detalhe, st: { ...f, wrap: true } },
-      { v: o.estado === 'identificado' ? o.medico : '', st: { ...f, b: true } }, { v: o.prestador?.cod || '', st: { ...f, ...T } }, { v: o.viaPrestador, st: f }, { v: o.alertas.join(' | '), st: { ...f, wrap: true } },
-      ...celulasMV(o.r, o.tipo, f), { v: `${o.r.prestadorCod} - ${o.r.prestadorNome}`, st: f }, { v: o.laudo?.idLaudo || '', st: { ...f, ...T } }, { v: o.laudo?.titulo || '', st: f },
-      { v: o.laudo?.data || '', st: f }, { v: o.laudo?.linhaPlanilha || '', st: f }, { v: ctx.unidadeNome, st: f }, { v: ctx.rodadaId || '', st: { ...f, ...T } }, { v: ctx.em, st: f }];
+  const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
+  const cab = [...cabecalho(['Status'], SIT),
+    ...cabecalho(['Atendimento MV', 'Conta MV', 'Cód. TUSS MV', 'Descrição do procedimento MV', 'Paciente MV', 'Data MV', 'Convênio MV', 'Vl Repasse']),
+    ...cabecalho(['Médico do laudo (Apolo)', 'Cód. prestador', 'Paciente Apolo', 'Data Apolo', 'Título do laudo (TITLE)', 'Descrição do estudo (STUDY)'], AP),
+    ...cabecalho(['Observações', 'Alertas'], OBS)];
+  const linha = o => {
+    const r = o.r, l = o.estado === 'identificado' ? o.laudo : null, f = { fill: ESTADO_CORR[o.estado].cor };
+    return [{ v: ESTADO_CORR[o.estado].nome, st: { ...f, b: true } },
+      { v: r.atendimento, st: T }, { v: r.conta, st: T }, { v: r.codigo, st: T }, r.procDesc, r.paciente, r.data, r.convenio, { v: r.vlRepasse, st: { fmt: 'money' } },
+      { v: l ? o.medico : '', st: l ? { b: true } : {} }, { v: o.prestador?.cod || '', st: T }, l?.paciente || '', l?.data || '', l?.titulo || '', l?.descricao || '',
+      { v: [MOTIVOS_CORR[o.motivo], o.detalhe].filter(Boolean).join(' — '), st: { wrap: true } }, { v: o.alertas.join(' | '), st: { wrap: true } }];
   };
-  const larg = [24, 34, 70, 32, 10, 30, 50, 8, 30, 7, 12, 46, 26, 9, 10, 11, 30, 26, 11, 7, 11, 9, 11, 20, 30, 12, 46, 11, 10, 26, 22, 20];
-  const R = [cabecalho(['Estado', 'Registros', 'Vl Repasse', 'Vl Total'])];
+  const larg = [24, 13, 12, 12, 46, 32, 11, 28, 12, 32, 10, 32, 11, 40, 40, 80, 50];
+  // Para corrigir no MV: identificados com médico diferente do prestador do relatório, agrupados por médico.
+  const corrigir = res.linhas.filter(o => o.estado === 'identificado' && !(o.prestador && String(o.prestador.cod) === String(o.r.prestadorCod)))
+    .sort((a, b) => a.medico.localeCompare(b.medico) || String(a.r.atendimento).localeCompare(String(b.r.atendimento)) || a.r.seq - b.r.seq);
+  const R = [cabecalho(['Status', 'Registros', 'Vl Repasse', 'Vl Total'])];
   let n = 0;
   for (const [k, e] of Object.entries(ESTADO_CORR)) { const s = res.porEstado[k]; n += s.n; R.push([{ v: e.nome, st: { fill: e.cor, b: true } }, s.n, { v: s.vlRepasse, st: { fmt: 'money' } }, { v: s.vlTotal, st: { fmt: 'money' } }]); }
   R.push([{ v: 'TOTAL processado (linhas do MV)', st: { b: true, bt: true } }, { v: n, st: { b: true, bt: true } }]);
   R.push([{ v: n === ctx.relatorio.regs.length ? 'Reconciliado: soma dos estados = linhas do MV.' : 'ATENÇÃO: a soma dos estados difere das linhas do MV.', st: { b: true } }]);
+  R.push([{ v: 'Linhas para corrigir no MV (médico do laudo diferente do prestador do relatório)', st: { b: true } }, corrigir.length]);
   R.push([], cabecalho(['Motivo (não identificados, conflitos e insuficientes)', 'Registros']));
   for (const [k, v] of Object.entries(res.porMotivo)) R.push([MOTIVOS_CORR[k] || k, v]);
   R.push([], cabecalho(['Médico identificado (Apolo)', 'Código do prestador', 'Linhas', 'Vl Repasse']));
   for (const m of res.porMedico) R.push([m.medico, { v: m.cod || 'sem cadastro', st: T }, m.n, { v: m.vlRepasse, st: { fmt: 'money' } }]);
-  R.push([], ...linhasMeta([
-    ['Gerado em', ctx.em], ['Operador', ctx.operador || '(não informado)'], ['Relatório MV', ctx.relatorio.arquivo], ['Prestador do cabeçalho', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`],
-    ['Repasse', `${ctx.relatorio.cab.repasse} · ${ctx.relatorio.cab.descricao}`], ['Planilha de laudos', ctx.apoloNome], ['Unidade (escolhida na sessão)', ctx.unidadeNome],
-    ['Tolerância de data (dias)', ctx.parametros.tol], ['Equivalências validadas (revisão da base)', `${res.eqValidadas} · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
+  const I = [cabecalho(['Item', 'Valor']), ...linhasMeta([
+    ['Gerado em', ctx.em], ['Operador', ctx.operador || '(não informado)'], ['Competência', ctx.chaveCompetencia ? rotuloCompetencia(ctx.chaveCompetencia) : ''], ['Relatório MV', ctx.relatorio.arquivo],
+    ['Prestador do cabeçalho', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`], ['Repasse', `${ctx.relatorio.cab.repasse} · ${ctx.relatorio.cab.descricao}`],
+    ['Planilha de laudos', ctx.apoloNome], ['Unidade (escolhida na sessão)', ctx.unidadeNome], ['Tolerância de data (dias)', ctx.parametros.tol],
+    ['Equivalências validadas (revisão da base)', `${res.eqValidadas} · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
     ['Regra', 'Identificação só com nome idêntico ou truncado, data na tolerância e equivalência TUSS validada. Casos não identificados não recebem prestador sugerido (RN-206).'],
-    ['Uso', 'Planilha de trabalho: as correções são feitas no MV. Depois, importe a nova extração para conferir o que mudou.'], ['Privacidade', AVISO_LGPD]]));
+    ['Uso', 'Corrija no MV pela aba «Corrigir no MV» (agrupada por médico). Depois, extraia o relatório de novo e rode outra rodada para conferir o que mudou.'], ['Privacidade', AVISO_LGPD]])];
+  const cabTec = [...cabecalho(['Status', 'Linha MV', 'Chave da linha', 'Página', 'Remessa', 'Quant.', '% Repasse', 'Vl Total', 'Grupo de procedimento', 'Tipo de item', 'Prestador do relatório']),
+    ...cabecalho(['Laudo: ID', 'Laudo: linha da planilha', 'Origem do código do prestador', 'Laudos do paciente na data (equivalência)'], AP)];
+  const linhaTec = o => { const r = o.r; return [ESTADO_CORR[o.estado].nome, r.seq, { v: r.chave, st: T }, r.pagina, { v: r.remessa, st: T }, r.quant, { v: r2(r.pct * 10000) / 10000, st: { fmt: 'pct' } }, { v: r.vlTotal, st: { fmt: 'money' } },
+    r.grupoNome, TIPOS_ITEM[o.tipo] || o.tipo, `${r.prestadorCod} - ${r.prestadorNome}`, { v: o.laudo?.idLaudo || '', st: T }, o.laudo?.linhaPlanilha || '', o.viaPrestador,
+    { v: o.evidencias.map(e => `«${e.titulo}» ${fmtData(e.data)} (${e.eq})`).join(' | '), st: { wrap: true } }]; };
   const O = [cabecalho(['Código TUSS (MV)', 'Descrição MV', 'TITLE encontrado no Apolo', 'Estado da equivalência', 'Ocorrências']), ...res.ocorrencias.map(o => [{ v: o.codigo, st: T }, o.descMV, o.titulo, o.estadoEq, o.n])];
   return criarXlsx([
-    { nome: 'Resumo', larguras: [52, 22, 16, 16], linhas: R, filtro: false, congelar: false },
-    { nome: 'Identificados', larguras: larg, linhas: [cabL, ...res.linhas.filter(o => o.estado === 'identificado').map(linhaL)], filtro: true },
-    { nome: 'Não identificados', larguras: larg, linhas: [cabL, ...res.linhas.filter(o => o.estado === 'nao-identificado').map(linhaL)], filtro: true },
-    { nome: 'Conflitos e insuficientes', larguras: larg, linhas: [cabL, ...res.linhas.filter(o => o.estado === 'conflito' || o.estado === 'insuficiente').map(linhaL)], filtro: true },
+    { nome: 'Corrigir no MV', larguras: larg, linhas: [cab, ...corrigir.map(linha)], filtro: true },
+    { nome: 'Todas as linhas', larguras: larg, linhas: [cab, ...res.linhas.map(linha)], filtro: true },
+    { nome: 'Não identificados', larguras: larg, linhas: [cab, ...res.linhas.filter(o => o.estado === 'nao-identificado').map(linha)], filtro: true },
+    { nome: 'Conflitos e insuficientes', larguras: larg, linhas: [cab, ...res.linhas.filter(o => o.estado === 'conflito' || o.estado === 'insuficiente').map(linha)], filtro: true },
+    { nome: 'Resumo', larguras: [70, 22, 16, 16], linhas: R, filtro: false, congelar: false },
+    { nome: 'Informações', larguras: [40, 110], linhas: I, filtro: false, congelar: false },
     { nome: 'Equivalências a analisar', larguras: [12, 50, 60, 18, 12], linhas: O, filtro: true },
-    { nome: 'Todas as linhas', larguras: larg, linhas: [cabL, ...res.linhas.map(linhaL)], filtro: true }
+    { nome: 'Técnico', larguras: [24, 8, 30, 7, 10, 7, 9, 12, 28, 22, 34, 12, 10, 30, 80], linhas: [cabTec, ...res.linhas.map(linhaTec)], filtro: true }
   ]);
 }
 
