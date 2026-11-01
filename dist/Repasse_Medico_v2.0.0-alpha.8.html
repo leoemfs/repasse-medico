@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.0.0-alpha.7</title>
+<title>Repasse Médico v2.0.0-alpha.8</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -104,19 +104,35 @@ dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-bo
 .rodape{margin-top:28px;font-size:12px;color:var(--muted)}
 code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
 @media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
+/* Partes do menu que só existem no celular */
+.grupo-nav,.gaveta-cab,.gaveta-rod,.barra-cel,.veu-gaveta{display:none}
 @media (max-width:760px){
-  /* Celular: topo enxuto e barra de atalhos fixa no rodapé */
+  /* Celular: topo com ☰ ao lado do logo; gaveta com todas as abas; barra de 6 atalhos no rodapé */
   .shell,.shell.recolhido{display:block;background:var(--bg)}
-  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible}
-  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start}
-  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.hamb,.side-note{display:none!important}
-  .nav{position:fixed;left:0;right:0;bottom:0;flex-direction:row;gap:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
-  .nav a,.recolhido .nav a{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:7px 0;border-radius:10px;font-size:9.5px;overflow:hidden}
-  .nav a svg{width:22px;height:22px}
-  .nav .rot,.nav .dica,.recolhido .nav a:hover .dica{display:none}.nav .curto{display:block}
-  .pill,.recolhido .pill{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box;margin:0}
+  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible;z-index:7}
+  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start;gap:10px}
+  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.side-note{display:none!important}
+  .brand .hamb,.recolhido .brand .hamb{display:grid;order:-1;margin:0;width:36px;height:36px;border:1px solid #3b4d63;position:relative}
+  .hamb.com-ponto::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}
+  /* Gaveta: o próprio menu, deslizando da esquerda */
+  .nav,.recolhido .nav{position:fixed;top:0;bottom:0;left:0;width:min(82vw,310px);flex-direction:column;gap:2px;background:var(--side);padding:12px 10px calc(12px + env(safe-area-inset-bottom));z-index:30;overflow-y:auto;transform:translateX(-105%);transition:transform .22s ease;box-shadow:4px 0 18px rgba(0,0,0,.3)}
+  .gaveta-aberta .nav{transform:none}
+  .gaveta-aberta .sidebar{z-index:40}   /* o menu fica acima do véu (a barra do topo cria o contexto de empilhamento) */
+  .nav a,.recolhido .nav a{justify-content:flex-start;padding:10px 10px;font-size:14px}
+  .nav .rot,.recolhido .nav .rot{display:inline}.nav .curto,.nav .dica{display:none}
+  .pill,.recolhido .pill{position:static;width:auto;height:auto;padding:1px 7px;font-size:11px;border:0;margin-left:auto}
+  .grupo-nav{display:block;font-size:10px;letter-spacing:1.3px;color:#7f93ab;margin:12px 10px 4px;font-weight:800}
+  .gaveta-cab{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:2px 4px 10px 10px;border-bottom:1px solid #2a3a4e}
+  .gaveta-cab .hamb{display:grid;margin:0;font-size:18px}
+  .gaveta-rod{display:block;margin-top:auto;border-top:1px solid #2a3a4e;padding:10px 10px 0;font-size:11.5px;color:var(--side-t)}
+  .veu-gaveta{display:block;position:fixed;inset:0;background:rgba(10,18,28,.45);z-index:25}.veu-gaveta[hidden]{display:none}
+  /* Barra de atalhos */
+  .barra-cel{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
+  .barra-cel a{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:10px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:10px}
+  .barra-cel a.ativo{background:#2a5d8c;color:#fff}
+  .barra-cel svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .barra-cel .ponto{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}.barra-cel .ponto[hidden]{display:none}
   .main{padding:16px 16px calc(84px + env(safe-area-inset-bottom))}.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}
-}
 }
 /* ===== Fluxo mensal ===== */
 .txt-err{color:var(--err);font-weight:700}.txt-warn{color:var(--warn);font-weight:700}.txt-ok{color:var(--ok);font-weight:700}
@@ -226,22 +242,28 @@ small.evid{display:block;color:var(--info)}
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.7 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.8 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
-    <nav class="nav" aria-label="Navegação principal">
+    <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
+      <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
+      <h4 class="grupo-nav">TRABALHO DO MÊS</h4>
       <a href="#inicio" data-pag="inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
       <a href="#fluxo" data-pag="fluxo" aria-label="Fluxo mensal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg><span class="rot">Fluxo mensal</span><span class="curto" aria-hidden="true">Fluxo</span><b id="navFluxo" class="pill" hidden></b><span class="dica" aria-hidden="true">Fluxo mensal</span></a>
       <a href="#conferencia" data-pag="conferencia" aria-label="Conferência cruzada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13"/><path d="M14 4l4 4-4 4"/><path d="M20 16H7"/><path d="M10 12l-4 4 4 4"/></svg><span class="rot">Conferência cruzada</span><span class="curto" aria-hidden="true">Conferir</span><span class="dica" aria-hidden="true">Conferência cruzada</span></a>
       <a href="#correcao" data-pag="correcao" aria-label="Correção de prestador"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l2 2 4-4"/></svg><span class="rot">Correção de prestador</span><span class="curto" aria-hidden="true">Prestador</span><span class="dica" aria-hidden="true">Correção de prestador</span></a>
       <a href="#nc" data-pag="nc" aria-label="Não conformidades"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5L2.8 19.5h18.4z"/><path d="M12 10v4.5"/><path d="M12 17.2v.1"/></svg><span class="rot">Não conformidades</span><span class="curto" aria-hidden="true">NCs</span><b id="navNC" class="pill" hidden></b><span class="dica" aria-hidden="true">Não conformidades</span></a>
       <a href="#fechamento" data-pag="fechamento" aria-label="Fechamento"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/><path d="M8.5 16.5l1.8 1.8 3.7-3.7"/></svg><span class="rot">Fechamento</span><span class="curto" aria-hidden="true">Fechar</span><span class="dica" aria-hidden="true">Fechamento</span></a>
+      <a href="#rodadas" data-pag="rodadas" aria-label="Rodadas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg><span class="rot">Rodadas</span><span class="curto" aria-hidden="true">Rodadas</span><span class="dica" aria-hidden="true">Rodadas</span></a>
+      <h4 class="grupo-nav">BASES E AJUSTES</h4>
       <a href="#equivalencias" data-pag="equivalencias" aria-label="Equivalências TUSS"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><path d="M10 7h4a3 3 0 0 1 3 3v4"/><path d="M15 12l2 2 2-2"/></svg><span class="rot">Equivalências TUSS</span><span class="curto" aria-hidden="true">TUSS</span><b id="navPend" class="pill" hidden></b><span class="dica" aria-hidden="true">Equivalências TUSS</span></a>
       <a href="#bases" data-pag="bases" aria-label="Bases"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="rot">Bases</span><span class="curto" aria-hidden="true">Bases</span><span class="dica" aria-hidden="true">Bases</span></a>
-      <a href="#rodadas" data-pag="rodadas" aria-label="Rodadas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg><span class="rot">Rodadas</span><span class="curto" aria-hidden="true">Rodadas</span><span class="dica" aria-hidden="true">Rodadas</span></a>
       <a href="#configuracoes" data-pag="configuracoes" aria-label="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="rot">Configurações</span><span class="curto" aria-hidden="true">Ajustes</span><span class="dica" aria-hidden="true">Configurações</span></a>
+      <div class="gaveta-rod"><span id="operadorGaveta"></span><br>Modo local: nada é enviado à internet.</div>
     </nav>
     <div class="side-note"><strong>Modo local</strong><p>Os arquivos são lidos só neste navegador. Nada é enviado à internet.</p></div>
   </aside>
+  <div class="veu-gaveta" id="veuGaveta" hidden></div>
+  <nav class="barra-cel" id="barraCel" aria-label="Atalhos"></nav>
   <main class="main">
     <header class="topo">
       <div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
@@ -271,7 +293,7 @@ small.evid{display:block;color:var(--info)}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.0.0-alpha.7';
+const MOTOR_VERSAO = '2.0.0-alpha.8';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -2890,7 +2912,7 @@ async function exigirOperador() {
   if (r.botao === 'ok' && nome) { S.operador = nome; gravarLocal(CHAVES.operador, nome); mostrarOperador(); return nome; }
   return '';
 }
-function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; }
+function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; if ($('operadorGaveta')) $('operadorGaveta').textContent = $('operadorTopo').textContent; }
 async function baixarZip(zip, nome) {
   const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
   baixarBlob(blob, nome);
@@ -2964,7 +2986,8 @@ function irPara(pag) {
   paginaAtual = pag;
   desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
-  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
+  document.querySelectorAll('.nav a, .barra-cel a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
+  sincronizarPontos();
   $('titulo').textContent = PAGINAS[pag];
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
@@ -2975,6 +2998,7 @@ function atualizarNavPendencias() {
   // A dica e o nome lido pelo leitor de tela levam o número; recolhido/celular, o selo vira só um ponto.
   const a = b.closest('a'), nome = n ? `Equivalências TUSS · ${n} pendentes` : 'Equivalências TUSS';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+  sincronizarPontos();
 }
 
 /* ---------- Menu lateral recolhível (☰ e Ctrl+B); a escolha fica salva neste navegador ---------- */
@@ -2982,13 +3006,57 @@ function aplicarMenu(recolhido) {
   document.querySelector('.shell').classList.toggle('recolhido', recolhido);
   const b = $('btnMenu'); b.setAttribute('aria-expanded', String(!recolhido)); b.setAttribute('aria-label', recolhido ? 'Expandir menu' : 'Recolher menu');
 }
+/* Celular: ☰ ao lado do logo abre a gaveta com todas as abas; a barra de baixo tem 6 atalhos. */
+const BARRA_CEL = ['inicio', 'fluxo', 'conferencia', 'correcao', 'nc', 'fechamento'];
+const ehCelular = () => window.matchMedia('(max-width:760px)').matches;
+function abrirGaveta(abrir) {
+  document.querySelector('.shell').classList.toggle('gaveta-aberta', abrir);
+  $('veuGaveta').hidden = !abrir;
+  $('btnMenu').setAttribute('aria-expanded', String(abrir));
+  document.body.style.overflow = abrir ? 'hidden' : '';
+}
+function montarBarraCel() {
+  $('barraCel').innerHTML = BARRA_CEL.map(pag => {
+    const a = document.querySelector(`.nav a[data-pag="${pag}"]`);
+    return `<a href="#${pag}" data-pag="${pag}" aria-label="${esc(PAGINAS[pag])}">${a.querySelector('svg').outerHTML}<span>${esc(a.querySelector('.curto').textContent)}</span><i class="ponto" hidden></i></a>`;
+  }).join('');
+}
+// Pontos da barra e do ☰: mesma informação dos selos do menu (o menu é a fonte).
+function sincronizarPontos() {
+  const barra = $('barraCel'); if (!barra || !barra.children.length) return;
+  let foraDaBarra = false;
+  document.querySelectorAll('.nav a[data-pag]').forEach(a => {
+    const pill = a.querySelector('.pill'), tem = !!pill && !pill.hidden, pag = a.dataset.pag;
+    const ponto = barra.querySelector(`a[data-pag="${pag}"] .ponto`);
+    if (ponto) { ponto.hidden = !tem; barra.querySelector(`a[data-pag="${pag}"]`).setAttribute('aria-label', a.getAttribute('aria-label')); }
+    else if (tem) foraDaBarra = true;
+  });
+  $('btnMenu').classList.toggle('com-ponto', foraDaBarra);
+}
 function alternarMenu() {
+  if (ehCelular()) return abrirGaveta(!document.querySelector('.shell').classList.contains('gaveta-aberta'));
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
 function iniciarMenu() {
   aplicarMenu(lerLocal(CHAVES.menu) === true);
   $('btnMenu').onclick = alternarMenu;
+  montarBarraCel();
+  $('btFecharGaveta').onclick = () => abrirGaveta(false);
+  $('veuGaveta').onclick = () => abrirGaveta(false);
+  $('navPrincipal').addEventListener('click', e => { if (e.target.closest('a[data-pag]') && ehCelular()) abrirGaveta(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.shell').classList.contains('gaveta-aberta')) abrirGaveta(false); });
+  // Deslizar da borda esquerda abre; deslizar para a esquerda fecha.
+  let x0 = null, y0 = 0;
+  document.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (x0 === null || !ehCelular()) return;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0), aberta = document.querySelector('.shell').classList.contains('gaveta-aberta');
+    if (!aberta && x0 < 24 && dx > 60 && dy < 50) abrirGaveta(true);
+    else if (aberta && dx < -60 && dy < 50) abrirGaveta(false);
+    x0 = null;
+  }, { passive: true });
+  window.matchMedia('(max-width:760px)').addEventListener('change', () => abrirGaveta(false));
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
 
@@ -3559,7 +3627,7 @@ function atualizarNavFluxo() {
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
 }
 const nomeTarefaRef = (comp, gId, ref) => {
   const [g, t] = ref.includes('.') ? ref.split('.') : [gId, ref];
@@ -4037,7 +4105,7 @@ function atualizarNavNC() {
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Não conformidades · ${n} aberta(s), não enviadas` : 'Não conformidades';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
 }
 
 /* ---------- Candidatos da sessão (só na memória: somem ao recarregar a página) ---------- */

@@ -28,7 +28,7 @@ function atualizarNavFluxo() {
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
 }
 const nomeTarefaRef = (comp, gId, ref) => {
   const [g, t] = ref.includes('.') ? ref.split('.') : [gId, ref];

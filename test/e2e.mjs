@@ -8,6 +8,7 @@ const d = f => raiz + 'dados/' + f, out = raiz + 'test/saida/';
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 }, acceptDownloads: true });
 const page = await ctx.newPage();
+await page.clock.install({ time: new Date('2026-10-30T10:00:00') });   // competência 10/2026 = produção 09/2026 dos arquivos de teste
 const erros = [];
 page.on('pageerror', e => erros.push(e.message));
 page.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });

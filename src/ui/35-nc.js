@@ -25,7 +25,7 @@ function atualizarNavNC() {
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Não conformidades · ${n} aberta(s), não enviadas` : 'Não conformidades';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
 }
 
 /* ---------- Candidatos da sessão (só na memória: somem ao recarregar a página) ---------- */

@@ -87,6 +87,6 @@ m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#fluxo'); await m.waitForSelector('#fxCriar'); await m.click('#fxCriar'); await m.waitForSelector('.marco'); await m.click('[data-tg="usg"]');
 await m.screenshot({ path: out + 'fluxo_celular.png', fullPage: false });
 ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
-ok(await m.$eval('a[data-pag="fluxo"] .curto', e => e.textContent) === 'Fluxo', 'barra do celular: «Fluxo»');
+ok(await m.$eval('.barra-cel a[data-pag="fluxo"] span', e => e.textContent) === 'Fluxo', 'barra do celular: «Fluxo»');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

@@ -131,7 +131,7 @@ const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isM
 m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#nc'); await m.waitForSelector('.nc-kpis');
 ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
-ok(await m.evaluate(() => [...document.querySelectorAll('.nav .curto')].some(e => e.offsetParent && e.textContent === 'NCs')), 'barra do celular: «NCs»');
+ok(await m.evaluate(() => [...document.querySelectorAll('.barra-cel a span')].some(e => e.offsetParent && e.textContent === 'NCs')), 'barra do celular: «NCs»');
 await m.screenshot({ path: out + 'nc_celular.png', fullPage: false });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

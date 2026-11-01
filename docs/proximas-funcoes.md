@@ -332,3 +332,10 @@ Pedido de 30/10/2026: «muito confuso, tenho que ficar ocultando colunas, o moti
   - Equivalências a analisar;
   - Técnico (linha, chave, página, remessa, %, Vl Total, grupo, ID do laudo, laudos do paciente na data).
 - Não identificado continua sem médico (RN-206).
+
+## SOL-F25 — Menu no celular: gaveta lateral e barra com 6 atalhos — IMPLEMENTADA na v2.0.0-alpha.8
+Pedido e prévia aprovada em 01/11/2026.
+- **Topo:** ☰ ao lado (à esquerda) do logo. Toque ou deslize da borda esquerda abre a gaveta com as 10 abas, em dois grupos (Trabalho do mês; Bases e ajustes), com os contadores.
+- **Fechar a gaveta:** ✕, toque fora, deslizar para a esquerda, Esc ou escolher uma aba.
+- **Barra de baixo:** Início · Fluxo · Conferir · Prestador · NCs · Fechar, com ponto laranja de pendência. O ☰ ganha ponto laranja quando uma aba fora da barra tem pendência.
+- **No computador:** nada muda. Só a ordem do menu: Rodadas passou para o grupo de trabalho do mês, antes de Equivalências.

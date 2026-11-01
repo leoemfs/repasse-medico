@@ -96,19 +96,35 @@ dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-bo
 .rodape{margin-top:28px;font-size:12px;color:var(--muted)}
 code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
 @media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
+/* Partes do menu que só existem no celular */
+.grupo-nav,.gaveta-cab,.gaveta-rod,.barra-cel,.veu-gaveta{display:none}
 @media (max-width:760px){
-  /* Celular: topo enxuto e barra de atalhos fixa no rodapé */
+  /* Celular: topo com ☰ ao lado do logo; gaveta com todas as abas; barra de 6 atalhos no rodapé */
   .shell,.shell.recolhido{display:block;background:var(--bg)}
-  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible}
-  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start}
-  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.hamb,.side-note{display:none!important}
-  .nav{position:fixed;left:0;right:0;bottom:0;flex-direction:row;gap:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
-  .nav a,.recolhido .nav a{flex:1;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:7px 0;border-radius:10px;font-size:9.5px;overflow:hidden}
-  .nav a svg{width:22px;height:22px}
-  .nav .rot,.nav .dica,.recolhido .nav a:hover .dica{display:none}.nav .curto{display:block}
-  .pill,.recolhido .pill{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box;margin:0}
+  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible;z-index:7}
+  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start;gap:10px}
+  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.side-note{display:none!important}
+  .brand .hamb,.recolhido .brand .hamb{display:grid;order:-1;margin:0;width:36px;height:36px;border:1px solid #3b4d63;position:relative}
+  .hamb.com-ponto::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}
+  /* Gaveta: o próprio menu, deslizando da esquerda */
+  .nav,.recolhido .nav{position:fixed;top:0;bottom:0;left:0;width:min(82vw,310px);flex-direction:column;gap:2px;background:var(--side);padding:12px 10px calc(12px + env(safe-area-inset-bottom));z-index:30;overflow-y:auto;transform:translateX(-105%);transition:transform .22s ease;box-shadow:4px 0 18px rgba(0,0,0,.3)}
+  .gaveta-aberta .nav{transform:none}
+  .gaveta-aberta .sidebar{z-index:40}   /* o menu fica acima do véu (a barra do topo cria o contexto de empilhamento) */
+  .nav a,.recolhido .nav a{justify-content:flex-start;padding:10px 10px;font-size:14px}
+  .nav .rot,.recolhido .nav .rot{display:inline}.nav .curto,.nav .dica{display:none}
+  .pill,.recolhido .pill{position:static;width:auto;height:auto;padding:1px 7px;font-size:11px;border:0;margin-left:auto}
+  .grupo-nav{display:block;font-size:10px;letter-spacing:1.3px;color:#7f93ab;margin:12px 10px 4px;font-weight:800}
+  .gaveta-cab{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:2px 4px 10px 10px;border-bottom:1px solid #2a3a4e}
+  .gaveta-cab .hamb{display:grid;margin:0;font-size:18px}
+  .gaveta-rod{display:block;margin-top:auto;border-top:1px solid #2a3a4e;padding:10px 10px 0;font-size:11.5px;color:var(--side-t)}
+  .veu-gaveta{display:block;position:fixed;inset:0;background:rgba(10,18,28,.45);z-index:25}.veu-gaveta[hidden]{display:none}
+  /* Barra de atalhos */
+  .barra-cel{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
+  .barra-cel a{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:10px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:10px}
+  .barra-cel a.ativo{background:#2a5d8c;color:#fff}
+  .barra-cel svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .barra-cel .ponto{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}.barra-cel .ponto[hidden]{display:none}
   .main{padding:16px 16px calc(84px + env(safe-area-inset-bottom))}.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}
-}
 }
 /* ===== Fluxo mensal ===== */
 .txt-err{color:var(--err);font-weight:700}.txt-warn{color:var(--warn);font-weight:700}.txt-ok{color:var(--ok);font-weight:700}
