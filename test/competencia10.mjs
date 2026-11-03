@@ -120,7 +120,7 @@ for (const rel of relsC) {
   const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#coExcel')]); await dl.saveAs(out + 'comp10_' + dl.suggestedFilename());
 }
 marca('correcoes');
-ok(R.correcoes.length === 2 && R.correcoes.every(c => (c.porEstado.identificado || 0) > 0), `correção de prestador nas unidades 10 e 17 (identificados: ${R.correcoes.map(c => c.porEstado.identificado || 0).join(' e ')})`);
+ok(R.correcoes.length === 2 && R.correcoes.every(c => c.linhas > 0), `correção de prestador rodada nas unidades 10 e 17 (identificados: ${R.correcoes.map(c => c.porEstado.identificado || 0).join(' e ')}; sem equivalência validada, nenhum prestador é confirmado — RN-206)`);
 
 // 5) Fechamento: valores por prestador × unidade contra a planilha de controle.
 await p.goto(html + '#fechamento'); await p.waitForSelector('[data-fsub]');
@@ -166,6 +166,33 @@ await p.goto(html + '#fechamento'); await p.waitForSelector('#fhExp');
 const [dlF] = await Promise.all([p.waitForEvent('download'), p.click('#fhExp')]); await dlF.saveAs(out + 'comp10_fechamento.xlsx');
 ok(fs.statSync(out + 'comp10_fechamento.xlsx').size > 5000, `planilha da competência exportada (${dlF.suggestedFilename()})`);
 for (const sub of ['usg', 'img', 'curitiba']) { await p.click(`[data-fsub="${sub}"]`); await p.waitForTimeout(300); await p.screenshot({ path: out + `comp10_fechamento_${sub}.png` }); }
+// 9) Simulação (--simular): validar os 40 pares que mais destravam, como o usuário faria em «O que mais
+// destrava», e medir o efeito na cobertura e na correção de prestador. Não reflete validação real.
+if (process.argv.includes('--simular')) {
+  await p.goto(html + '#equivalencias'); await p.waitForSelector('[data-esub]'); await p.click('[data-esub="destrava"]'); await p.waitForSelector('#cardDestrava');
+  await S(() => { const ids = [...document.querySelectorAll('[data-dv]:not([disabled])')].slice(0, 40).map(x => x.dataset.dv); });
+  const alvo = await p.$$eval('[data-dv]:not([disabled])', l => l.slice(0, 40).map(x => x.dataset.dv));
+  for (const k of alvo) { await p.check(`[data-dv="${k.replace(/"/g, '\\"')}"]`).catch(() => {}); await p.waitForTimeout(30); }
+  const antes = R.cobertura.pct;
+  await p.click('#dvValidar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="motivo"]', 'SIMULAÇÃO do teste automatizado (não é validação real)'); await okDlg();
+  await p.waitForFunction(() => /rodadas de novo/.test(document.getElementById('aviso')?.textContent || ''), null, { timeout: 600000 });
+  const cob = await S(() => { const c = window.__RM.t.coberturaCompetencia(window.__RM.S.rodadas, window.__RM.S.comp); return { pct: c.pct, conferidas: c.conferidas, total: c.total, porPrestador: c.porPrestador.map(e => `${e.cod}: ${e.pct}%`) }; });
+  const corr = [];
+  for (const rel of relsC) {
+    const un = rel.nome.match(/_un(\d+)/)[1];
+    await p.goto(html + '#correcao'); await p.waitForSelector('#coRodar'); await p.selectOption('#coRel', rel.id); await p.selectOption('#coUn', un);
+    const n0 = await S(() => window.__RM.S.rodadas.length); await p.click('#coRodar'); await p.waitForFunction(n => window.__RM.S.rodadas.length > n, n0, { timeout: 300000 });
+    corr.push({ arquivo: rel.nome, ...(await S(() => ({ porEstado: Object.fromEntries(Object.entries(window.__RM.S.corr.res.porEstado).filter(([, v]) => v.n).map(([k, v]) => [k, v.n])), medicos: window.__RM.S.corr.res.porMedico.length }))) });
+  }
+  R.simulacao_v3 = await S(() => { const r = window.__RM.S.rodadas.filter(x => x.prestadorCod === '10490').sort((a, b) => b.em.localeCompare(a.em))[0];
+    const proc = r.linhas.filter(l => !l.tipoItem || l.tipoItem === 'procedimento'), c = {}; for (const l of proc) { const k = `${l.estado}|${l.eq || '-'}|${l.eqTrava ? 'trava' : ''}`; c[k] = (c[k] || 0) + 1; }
+    return { em: r.em, rodadas: window.__RM.S.rodadas.filter(x => x.prestadorCod === '10490').length, contagem: c }; });
+  info(`SIMULAÇÃO — V3 Ian: ${JSON.stringify(R.simulacao_v3)}`);
+  R.simulacao = { validados: alvo.length, coberturaAntes: antes, coberturaDepois: cob, correcoes: corr };
+  info(`SIMULAÇÃO — validar os ${alvo.length} pares do topo: cobertura ${antes}% → ${cob.pct}% (${cob.conferidas} de ${cob.total}); por prestador ${cob.porPrestador.join(', ')}`);
+  ok(cob.pct > antes && corr.every(c => (c.porEstado.identificado || 0) > 0), `simulação: com os pares validados, a cobertura sobe (${antes}% → ${cob.pct}%) e a correção identifica prestadores`);
+  for (const c of corr) info(`SIMULAÇÃO — ${c.arquivo}: ${JSON.stringify(c.porEstado)} · ${c.medicos} médico(s)`);
+}
 marca('fim');
 fs.writeFileSync(out + 'comp10_resultado.json', JSON.stringify(R, null, 1));
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + [...new Set(erros)].slice(0, 5).join(' | ') : ''));
