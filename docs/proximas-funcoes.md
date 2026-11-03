@@ -638,3 +638,15 @@ Pedido: «da F17 até a F16, F5, F9, pode executar na ordem que for melhor; depo
 - **F16 – Status sugerido:** cada etapa ligada a um dado mostra «💡 Sugestão: Concluída — 12 de 12 com aceite» e o botão «Confirmar». Nada muda sem o clique; a confirmação fica no histórico da etapa. Fontes: aceites do Fechamento (USG, IMG, Curitiba), envio e NF do controle documental, classificação conferida, rodadas de correção e NCs enviadas ao Qualiex. A sugestão só aparece quando avança o status atual.
 - **F5 – Regras compostas e por convênio** (Equivalências → «Regras compostas e por convênio»): título do laudo → vários códigos (ex.: articular + doppler), com variação por convênio (ex.: UNIMED = só doppler) e escopo por unidade. Só regra validada, com responsável, vale; editar uma validada volta a pendente. Na conferência: um laudo sustenta uma linha por código esperado (marcador «Regra composta»); código esperado que não está no MV → «Composição incompleta» (ressalva, diz qual falta); código lançado que não faz parte para aquele convênio → «Procedimento diverge», com o motivo. A mescla de base JSON leva as regras compostas.
 - **F9 – Conciliação com o Power BI:** com o Power BI carregado, cada «Só no laudo» da conferência é procurado no faturamento (mesmo paciente, data na tolerância, unidade, procedimento compatível) e classificado: sem lançamento · lançado para outro prestador · lançado para o médico do laudo (está no relatório dele) · conta aberta · conta fechada sem remessa · lançado (provavelmente depois da geração do repasse). Isso sugere a natureza da NC, o responsável (quem fechou a conta), a conta e o atendimento; o resumo aparece no resultado da conferência. Nomes de pacientes do Power BI ficam só na memória da sessão; CPF nunca é lido. A atualização da base pelo Power BI também guarda as unidades de cada código de prestador.
+
+## Exportar competência em pastas (03/11/2026, v2.1.0-alpha.1)
+Pedido: exportar a competência no padrão de pastas da rede. «Exportar competência (pasta)», no Fechamento e no painel do Início, gera `Comp_MM-AAAA.zip`:
+- `REPASSE_MM-AAAA_CONTROLE.xlsx` — planilha do Fechamento (a planilha sozinha continua em «Exportar planilha de controle»);
+- `Correção de prestador/correcao_prestador_unidade_[un].xlsx` e o PDF do prestador genérico de cada unidade;
+- `Não conformidades/nc_comp_MM-AAAA.xlsx` — todas as NCs de todas as unidades;
+- `Planilhas utilizadas para conferência/` — Power BI e laudos do Apolo, como foram carregados;
+- `Relatórios para conferência/[USG|IMG]/Unidade [un]/medico_[cód]_[nome]_repasse_[usg|img]_unidade_[un].pdf`;
+- `Conferência cruzada/[USG|IMG]/Unidade [un]/conferencia_medico_[cód]_unidade_[un]_comp_MM-AAAA_rodada_[id].xlsx`;
+- `Controle da ferramenta/` — fluxo, rodadas e resumo (o antigo «pacote da competência»);
+- `LEIA-ME.txt` — o que entrou e o que faltou.
+A modalidade (USG ou IMG) sai da descrição do repasse e dos grupos do relatório. A unidade e os parâmetros vêm da última rodada de cada PDF. As planilhas de análise são refeitas na exportação, com a base de equivalências atual. Os arquivos originais só existem na memória da sessão: precisam estar carregados no Início.

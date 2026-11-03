@@ -84,7 +84,7 @@ function painelCompetencia() {
     <div class="fechamento"><div><strong>${fechada ? `Fechada em ${new Date(est.fechadaEm).toLocaleString('pt-BR')} por ${esc(est.fechadaPor || '—')}` : 'Fechar a competência'}</strong>
       <p class="small muted">${fechada ? 'Somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. Pendências podem ser levadas para a competência seguinte.' : 'Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.'}</p>
       ${est.historico?.length ? `<details class="small"><summary>Histórico (${est.historico.length})</summary><ul>${est.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${h.obs ? ` — ${esc(h.obs)}` : ''}</li>`).join('')}</ul></details>` : ''}</div>
-      <div class="acoes" style="margin:0"><button class="sec" id="compPacote">Exportar pacote da competência</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div></div>`;
+      <div class="acoes" style="margin:0"><button class="sec" id="compPacote" title="Pasta Comp_MM-AAAA (.zip): correção de prestador, NCs, planilhas usadas, relatórios por modalidade e unidade, conferências e planilha de controle">Exportar competência (pasta)</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div></div>`;
 }
 function ligarPainelCompetencia() {
   const ch = S.comp;
@@ -109,25 +109,8 @@ function ligarPainelCompetencia() {
     reabrirCompetencia(S.compReg, ch, op, r.campos.just); salvarCompReg();
     avisar(`Competência ${rotuloCompetencia(ch)} reaberta.`, 'ok'); irPara('inicio', true);
   };
-  $('compPacote').onclick = () => exportarPacoteCompetencia(ch);
+  $('compPacote').onclick = () => exportarPastaCompetencia(ch);
 }
-// Pacote para guardar na rede: NCs e fluxo em Excel, rodadas e resumo em JSON.
-async function exportarPacoteCompetencia(ch) {
-  const R = resumoCompetencia(ch), z = new JSZip(), mmaaaa = `${ch.slice(5)}-${ch.slice(0, 4)}`;
-  const bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
-  if (R.ncs.length) {
-    const pr = prazosNC(ch);
-    z.file(`NAO_CONFORMIDADES_${mmaaaa}.xlsx`, await bin(xlsxNC(R.ncs, ch, { operador: S.operador, prazos: Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data])) })));
-  }
-  if (R.fx) z.file(`Fluxo_mensal_${mmaaaa}.xlsx`, await bin(xlsxFluxo(R.fx)));
-  z.file(`rodadas_${mmaaaa}.json`, JSON.stringify({ schema: 'repasse-medico/rodadas', versaoSchema: 1, competencia: ch, exportadoEm: agoraISO(), rodadas: R.rods }, null, 1));
-  z.file('resumo_competencia.json', JSON.stringify({ competencia: ch, producao: producaoEsperada(ch), exportadoEm: agoraISO(), operador: S.operador, motor: MOTOR_VERSAO,
-    estado: estadoCompetencia(S.compReg, ch), rodadas: { conferencia: R.conf.length, correcao: R.corr.length, semAceite: R.semAceite }, naoConformidades: R.indNC,
-    fluxo: R.indFx ? { concluidas: R.indFx.ok, total: R.indFx.total, vencidas: R.indFx.vencidas.length } : null, equivalenciasValidadas: R.eqVal }, null, 1));
-  baixarBlob(await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), `Pacote_competencia_${mmaaaa}_${carimbo()}.zip`);
-  if (R.ncs.length) avisar('Pacote gerado. Ele inclui a planilha de NCs, que tem dados de pacientes: guarde na rede conforme a política da empresa.', 'info');
-}
-
 function resumoApolo(a) {
   const al = [];
   if (a.semNome) al.push(`${a.semNome} sem nome`); if (a.semData) al.push(`${a.semData} sem data`); if (a.semMedico) al.push(`${a.semMedico} sem médico`); if (a.idsDuplos) al.push(`${a.idsDuplos} ID(s) com dois nomes`);
@@ -161,6 +144,7 @@ async function carregarPDFs(files) {
       const rel = interpretarMV(linhas, f.name);
       if (!rel.regs.length) { avisar(`${f.name}: nenhuma linha de atendimento reconhecida. ${rel.avisos[0] || ''}`, 'err'); continue; }
       const item = { id: novoId('mv'), nome: f.name, tamanho: f.size, hash, rel };
+      Object.defineProperty(item, 'bytes', { value: bytes, enumerable: false });   // só na memória: vai para a pasta da competência
       if (!await aceitarProducao(f.name, producaoDoArquivo(item, () => rel.regs.map(l => l.data)))) continue;
       item.finalidade = finalidadePadrao(rel);
       S.relatorios.push(item);
@@ -178,7 +162,7 @@ async function carregarApolo(f) {
     const bytes = await lerArquivo(f);
     const ap = await lerApolo(bytes, f.name, n => { const b = $('barApolo'); if (b) b.style.width = Math.min(95, n / 300) + '%'; });
     if (!await aceitarProducao(f.name, producaoDoArquivo(ap, () => ap.laudos.map(l => l.data)))) return RENDER.inicio();
-    S.apolo = ap; S.apolo.hash = hashBytes(bytes); S.apolo.tamanho = f.size;
+    S.apolo = ap; S.apolo.hash = hashBytes(bytes); S.apolo.tamanho = f.size; Object.defineProperty(S.apolo, 'bytes', { value: bytes, enumerable: false });
     const semUnidade = [...new Set(S.apolo.laudos.map(l => norm(l.unidade)))].filter(u => !S.cfg.unidades.some(x => (x.apolo || []).map(norm).includes(u)));
     avisar(`${f.name}: ${S.apolo.laudos.length} laudos lidos.${semUnidade.length ? ` ${semUnidade.length} unidade(s) do Apolo sem cadastro em Bases.` : ''}`, semUnidade.length ? 'warn' : 'ok');
   } catch (e) { S.apolo = null; avisar(`${f.name}: ${e.message}`, 'err'); }
@@ -189,7 +173,8 @@ async function carregarPBI(f) {
   if (!/\.xlsx$/i.test(f.name)) return avisar('Envie a planilha do Power BI em .xlsx.', 'err');
   $('stPBI').textContent = `Lendo ${f.name}…`;
   try {
-    const pb = await lerPowerBI(await lerArquivo(f), f.name);
+    const bytesPB = await lerArquivo(f), pb = await lerPowerBI(bytesPB, f.name);
+    Object.defineProperty(pb, 'bytes', { value: bytesPB, enumerable: false });
     if (!await aceitarProducao(f.name, producaoDoArquivo(pb, () => pb.linhas.map(l => l.data)))) return RENDER.inicio();
     S.pbi = pb; avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
   }

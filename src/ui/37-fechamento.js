@@ -34,13 +34,14 @@ RENDER.fechamento = async () => {
   const lista = FH.sub === 'img' ? f.img : FH.sub === 'curitiba' ? f.curitiba : f.usg;
   const cont = k => lista.filter(x => x.situacao === k).length;
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
-    <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button id="fhExp">Exportar competência</button></div></div>
+    <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
     <div id="fhCorpo"></div>`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
+  $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
   $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp) }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
@@ -266,13 +267,16 @@ async function copiarTexto(texto, titulo) {
 async function exportarFechamento(f, mk) {
   const mmaaaa = `${S.comp.slice(5)}-${S.comp.slice(0, 4)}`;
   await baixarZip(xlsxFechamento(f, S.cfg, { pagUSG: mk.pagUSG, pagIMG: mk.pagIMG, pagCuritiba: mk.pagCuritiba }), `REPASSE_${mmaaaa}_CONTROLE${f.previa ? '_PREVIA' : ''}_${carimbo()}.xlsx`);
+  registrarEvidenciaEnvio(f);
+}
+function registrarEvidenciaEnvio(f, aviso = true) {
   // Evidência nas etapas de envio do Fluxo mensal (não conclui nada sozinha).
   const comp = S.fluxo.competencias[S.comp];
   if (comp && !compFechada()) {
     for (const g of ['usg', 'img']) { const t = comp.grupos[g]?.tarefas?.envio; if (t) (t.evidencias = t.evidencias || []).push({ em: agoraISO(), por: S.operador, desc: `planilha de fechamento ${f.previa ? '(prévia) ' : ''}gerada` }); }
     salvarFluxo();
   }
-  avisar(`Planilha ${f.previa ? 'PRÉVIA ' : ''}da competência ${rotuloCompetencia(S.comp)} gerada${comp ? '; registrada como evidência no Fluxo mensal (etapas de envio)' : ''}.`, 'ok');
+  if (aviso) avisar(`Planilha ${f.previa ? 'PRÉVIA ' : ''}da competência ${rotuloCompetencia(S.comp)} gerada${comp ? '; registrada como evidência no Fluxo mensal (etapas de envio)' : ''}.`, 'ok');
 }
 
 /* ---------- Situação do prestador: menu de ações (SOL-F32) ----------

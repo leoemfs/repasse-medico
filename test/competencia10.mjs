@@ -165,6 +165,17 @@ ok(R.ncs.candidatos > 0, 'candidatos a NC gerados e guardados na competência');
 await p.goto(html + '#fechamento'); await p.waitForSelector('#fhExp');
 const [dlF] = await Promise.all([p.waitForEvent('download'), p.click('#fhExp')]); await dlF.saveAs(out + 'comp10_fechamento.xlsx');
 ok(fs.statSync(out + 'comp10_fechamento.xlsx').size > 5000, `planilha da competência exportada (${dlF.suggestedFilename()})`);
+// Pasta da competência (.zip) no padrão de rede.
+const [dlP] = await Promise.all([p.waitForEvent('download', { timeout: 600000 }), p.click('#fhPasta')]); await dlP.saveAs(out + 'comp10_pasta.zip');
+const estrutura = execFileSync('python3', ['-I', '-c', 'import zipfile,sys,json; print(json.dumps(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))', out + 'comp10_pasta.zip']).toString();
+R.pasta = JSON.parse(estrutura);
+for (const c of R.pasta) info('  ' + c);
+const tem = re => R.pasta.some(c => re.test(c));
+ok(dlP.suggestedFilename() === 'Comp_10-2026.zip' && tem(/^Comp_10-2026\/Correção de prestador\/correcao_prestador_unidade_10\.xlsx$/) && tem(/^Comp_10-2026\/Correção de prestador\/correcao_prestador_unidade_17\.xlsx$/)
+  && tem(/^Comp_10-2026\/Planilhas utilizadas para conferência\/POWERBI/) && tem(/^Comp_10-2026\/Planilhas utilizadas para conferência\/APOLO/)
+  && tem(/^Comp_10-2026\/Relatórios para conferência\/USG\/Unidade 17\/medico_3_RAFAEL_OGASAWARA_FERREIRA_repasse_usg_unidade_17\.pdf$/) && tem(/^Comp_10-2026\/Relatórios para conferência\/IMG\/Unidade 1\//)
+  && tem(/^Comp_10-2026\/Conferência cruzada\/USG\/Unidade 17\/conferencia_medico_7_unidade_17_comp_10-2026_rodada_/) && R.pasta.filter(c => /Conferência cruzada\/.*\.xlsx$/.test(c)).length === 13,
+  `pasta Comp_10-2026.zip no padrão (${R.pasta.length} arquivos; ${R.pasta.filter(c => /Conferência cruzada\/.*\.xlsx$/.test(c)).length} conferências)`);
 for (const sub of ['usg', 'img', 'curitiba']) { await p.click(`[data-fsub="${sub}"]`); await p.waitForTimeout(300); await p.screenshot({ path: out + `comp10_fechamento_${sub}.png` }); }
 // 9) Simulação (--simular): validar os 40 pares que mais destravam, como o usuário faria em «O que mais
 // destrava», e medir o efeito na cobertura e na correção de prestador. Não reflete validação real.
