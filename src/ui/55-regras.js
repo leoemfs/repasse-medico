@@ -7,7 +7,8 @@ function resumoRegras(p) {
   const r = p.regras || {}, partes = [];
   if (r.faixaUSG) partes.push(`USG: ${esc(nomeFaixa(r.faixaUSG))}${Object.values(r.pctUSGUnidade || {}).some(v => v !== '' && v !== null) ? ' (diferenciado)' : ''}`);
   if (r.board) partes.push(`BOARD R$ ${fmtBR(r.board)}`);
-  if (r.participaIMG) partes.push(`IMG${r.v3 ? ' (V3)' : ''}${r.classeFixa ? ` · classe fixa ${esc(r.classeFixa)}` : ''}${r.tabelaIMG === 'residente' || r.tipo === 'residente' ? ' · tabela de residente' : ''}`);
+  if (r.v3) partes.push(`V3${r.v3regra ? '' : ' (sem regra)'}`);
+  if (r.participaIMG && !r.v3) partes.push(`IMG${r.classeFixa ? ` · classe fixa ${esc(r.classeFixa)}` : ''}${r.tabelaIMG === 'residente' || r.tipo === 'residente' ? ' · tabela de residente' : ''}`);
   if ((r.excecoesIMG || []).length) partes.push(`exceções: ${r.excecoesIMG.map(e => `${EXAMES_IMG[e.exame] || e.exame} R$ ${fmtBR(e.valor)}`).join(', ')}`);
   return partes.join(' · ') || '<span class="muted">sem regras</span>';
 }
@@ -139,7 +140,7 @@ async function editarRegrasPrestador(p) {
     <label class="campo">BOARD fixo mensal (R$)<input type="number" step="0.01" name="board" value="${r.board || ''}"></label>
     <label class="campo">Classe do IMG<select name="classeFixa">${opcoes([['', 'Calculada pela produção de USG'], ['A', 'Fixa A'], ['B', 'Fixa B'], ['C', 'Fixa C'], ['D', 'Fixa D']], r.classeFixa)}</select></label>
     <label class="campo">Tabela de valores do IMG<select name="tabelaIMG">${opcoes([['padrao', 'Padrão (pela classe)'], ['residente', 'Residente']], r.tabelaIMG)}</select></label>
-    <div class="campo"><label class="small"><input type="checkbox" name="participaIMG"${r.participaIMG ? ' checked' : ''}> Recebe repasse de IMG</label><label class="small"><input type="checkbox" name="v3"${r.v3 ? ' checked' : ''}> Médico V3 que recebe pela SRA (Curitiba)</label></div></div>
+    <div class="campo"><label class="small"><input type="checkbox" name="participaIMG"${r.participaIMG ? ' checked' : ''}> Recebe repasse de IMG</label><label class="small"><input type="checkbox" name="v3"${r.v3 ? ' checked' : ''}> Médico V3 (Curitiba) <span class="muted">— regra em «Médicos V3»</span></label></div></div>
     <h4 style="margin:8px 0 4px">% de USG diferenciado por unidade <span class="muted small">(vazio = regra da faixa)</span></h4>
     <div class="grid4">${unUSG.map(u => `<label class="campo">${esc(u.cod)} - ${esc(u.nome)}<input type="number" step="0.01" name="pct_${esc(u.cod)}" value="${r.pctUSGUnidade?.[u.cod] !== undefined && r.pctUSGUnidade[u.cod] !== '' ? r2(r.pctUSGUnidade[u.cod] * 100) : ''}" placeholder="${(() => { const v = pctUSGEsperado(S.cfg, { regras: { ...r, pctUSGUnidade: {} } }, u.cod); return v === null ? '—' : r2(v * 100); })()}"></label>`).join('')}</div>
     <label class="campo">Exceções de valor no IMG <span class="small">uma por linha: EXAME=valor (exames: ${Object.keys(EXAMES_IMG).join(', ')}). Ex.: MAMO=18</span><textarea name="excecoes" rows="2">${esc((r.excecoesIMG || []).map(e => `${e.exame}=${e.valor}`).join('\n'))}</textarea></label>
@@ -174,4 +175,81 @@ async function importarPlanilhaControle(f) {
   if (r.botao !== 'ok') return;
   const x = aplicarPlanilhaControle(S.cfg, lida, `planilha de controle ${f.name}`);
   salvarCfg(`Regras de ${x.atualizados} prestador(es) importadas da planilha de controle (${x.novos} novos).`, 'prestadores'); RENDER.bases();
+}
+
+/* ---------- Médicos V3 (Curitiba) — SOL-F30 ----------
+ * Um espaço só para os médicos da V3, com a regra de cada um. Não usam classe A/B/C/D nem as faixas
+ * de USG do SRA. Doppler é sempre parte do grupo de USG. */
+function cardMedicosV3() {
+  const v3 = S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => p.regras?.v3);
+  return `<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">${v3.length} médico(s)</span></h2>
+    <p class="lead">Na V3 o repasse é calculado fora do MV. O Fechamento → Repasse Curitiba (V3) calcula o valor da NF pela regra de cada médico e gera o texto do e-mail. Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago (mesmo sem laudo); os demais ficam sinalizados para exclusão.</p>
+    <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Regra</th><th></th></tr></thead><tbody>
+    ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td><td class="small">${p.regras.v3regra ? esc(resumoRegraV3(p.regras.v3regra)) : '<span class="badge warn">sem regra cadastrada</span>'}</td>
+      <td style="white-space:nowrap"><button class="sec mini" data-v3regra="${i}">Regras…</button> <button class="perigo mini" data-v3rm="${i}" aria-label="Tirar da V3" title="Tirar da V3">✕</button></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Nenhum médico da V3. Use «+ Médico V3» ou importe a planilha de controle (bloco «MÉDICOS V3»).</td></tr>'}</tbody></table></div>
+    <div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div></div>`;
+}
+function ligarMedicosV3(pg) {
+  pg.querySelectorAll('[data-v3regra]').forEach(b => b.onclick = () => editarRegraV3(S.cfg.prestadores[+b.dataset.v3regra]));
+  pg.querySelectorAll('[data-v3rm]').forEach(b => b.onclick = async () => {
+    const p = S.cfg.prestadores[+b.dataset.v3rm];
+    if (!await confirmar(`Tirar ${esc(p.nomeMV)} da V3?`, 'O médico sai do Fechamento de Curitiba. A regra cadastrada fica guardada, caso volte.', 'Tirar da V3')) return;
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: false };
+    salvarCfg(`${p.cod} - ${p.nomeMV} deixou de ser médico V3.`, 'prestadores'); RENDER.bases();
+  });
+  if ($('v3Add')) $('v3Add').onclick = async () => {
+    const r = await dialogo('Incluir médico V3', campoBusca({ nome: 'prestador', rotulo: 'Prestador (busca no cadastro)', fonte: 'prestador', preencheCod: 'cod', obrigatorio: true }) + '<input type="hidden" name="cod">', [['', 'Cancelar', 'sec'], ['ok', 'Incluir e cadastrar a regra']]);
+    if (r.botao !== 'ok') return;
+    const cod = (r.campos.cod || r.campos.prestadorCod || '').trim(), p = S.cfg.prestadores.find(x => String(x.cod) === cod);
+    if (!p) return avisar('Escolha um prestador do cadastro (com código). Se ele não estiver lá, inclua em «+ Prestador manual».', 'warn');
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: true };
+    salvarCfg(`${p.cod} - ${p.nomeMV} marcado como médico V3.`, 'prestadores');
+    await editarRegraV3(p); RENDER.bases();
+  };
+}
+async function editarRegraV3(p) {
+  const op = await exigirOperador(); if (!op) return;
+  const atual = p.regras?.v3regra, g = JSON.parse(JSON.stringify(atual || regraV3Padrao()));
+  const outrosV3 = S.cfg.prestadores.filter(x => x !== p && x.regras?.v3 && x.regras.v3regra);
+  const faixas = [...g.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
+  const outros = [...g.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
+  const d = await dialogo(`Regras da V3 — ${p.cod} - ${p.nomeMV}`, `<span class="dlg-largo" hidden></span>
+    ${outrosV3.length ? `<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option>${opcoes(outrosV3.map(x => [String(x.cod), `${x.cod} - ${x.nomeMV}`]), '')}</select></label>` : ''}
+    ${atual ? '' : '<p class="small muted">Sem regra cadastrada: os campos vêm com a regra do Dr. Ian como ponto de partida. Ajuste e salve.</p>'}
+    <div class="grid4"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${g.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
+      <label class="campo">USG (inclui Doppler)<select name="usgForma">${opcoes(Object.entries(FORMAS_V3), g.usg.forma)}</select></label>
+      <label class="campo">% da USG<input type="number" step="0.01" min="0" name="usgPct" value="${g.usg.pct || ''}"><span class="small muted">para «% do líquido» ou «% do bruto»</span></label>
+      <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${g.usg.valor || ''}"></label></div>
+    <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(para «% do líquido por faixa»; volume = quantidade de exames de USG e Doppler no mês)</span></h4>
+    <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
+    <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), g.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, outros convênios) nunca são pagos na V3 e ficam sinalizados para exclusão.</span></label>
+    <h4 style="margin:8px 0 4px">Outros exames <span class="muted small">(texto que aparece no grupo ou na descrição do MV, ex.: DENSITOM)</span></h4>
+    <div class="tw"><table><thead><tr><th>Exame</th><th>Texto de busca</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
+      <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" value="${esc(o.padrao)}" style="width:110px"></td>
+      <td><select name="oForma${k}">${opcoes(FORMAS_OUTROS_V3.map(f => [f, FORMAS_V3[f]]), o.forma)}</select></td>
+      <td><input type="number" step="0.01" min="0" name="oPct${k}" value="${o.pct || ''}" style="width:70px"></td><td><input type="number" step="0.01" min="0" name="oVal${k}" value="${o.valor || ''}" style="width:90px"></td></tr>`).join('')}</tbody></table></div>
+    <p class="small muted">Exames da V3 que não forem USG/Doppler nem estiverem aqui ficam fora do cálculo, com aviso no Fechamento.</p>`,
+    [['', 'Cancelar', 'sec'], ...(atual ? [['limpar', 'Apagar regra', 'perigo']] : []), ['ok', 'Salvar regra']]);
+  if (d.botao === 'limpar') {
+    p.regras = { ...p.regras, v3regra: null, alteradoPor: op, alteradoEm: agoraISO() };
+    salvarCfg(`Regra da V3 de ${p.cod} - ${p.nomeMV} apagada.`, 'prestadores'); RENDER.bases(); return;
+  }
+  if (d.botao !== 'ok') return;
+  const c = d.campos;
+  let regra;
+  if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
+  else {
+    const num = v => v === '' || v === undefined ? '' : +v;
+    regra = {
+      impostos: +c.impostos || 0,
+      usg: { forma: c.usgForma, pct: +c.usgPct || 0, valor: +c.usgValor || 0,
+        faixas: [0, 1, 2, 3, 4].map(k => ({ de: num(c['fxDe' + k]), pct: num(c['fxPct' + k]) })).filter(f => f.pct !== '').map(f => ({ de: +f.de || 0, pct: +f.pct })).sort((a, b) => a.de - b.de) },
+      hm: c.hm,
+      outros: [0, 1, 2, 3].map(k => ({ nome: (c['oNome' + k] || '').trim(), padrao: String(c['oPad' + k] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(), forma: c['oForma' + k], pct: +c['oPct' + k] || 0, valor: +c['oVal' + k] || 0 })).filter(o => o.nome || o.padrao)
+    };
+  }
+  const erros = validarRegraV3(regra);
+  if (erros.length) return avisar('Regra não gravada: ' + erros.join('; ') + '.', 'err');
+  p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: true, v3regra: regra, alteradoPor: op, alteradoEm: agoraISO() };
+  salvarCfg(`Regra da V3 de ${p.cod} - ${p.nomeMV} ${atual ? 'atualizada' : 'cadastrada'}: ${resumoRegraV3(regra)}.`, 'prestadores'); RENDER.bases();
 }

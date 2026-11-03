@@ -73,7 +73,7 @@ function migrarRegras(c) {
   for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
   return mudou;
 }
-const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
+const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, v3regra: null, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
 
 /* ---------- USG ---------- */
 // Percentual esperado de USG do prestador numa unidade (null = sem regra).

@@ -91,6 +91,7 @@ function migrarConfig(c) {
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
+  if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.

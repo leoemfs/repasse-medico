@@ -425,7 +425,7 @@ Junta e guarda, de forma permanente e sem dados de pacientes, o que hoje está e
 2. Aplicar nas telas acima.
 3. Atualização pelo Power BI (junto com SOL-F21 e SOL-F9).
 
-## SOL-F30 — Fechamento: controle do repasse de Curitiba (V3) — A FAZER (com dúvidas)
+## SOL-F30 — Fechamento: controle do repasse de Curitiba (V3) — IMPLEMENTADA na v2.0.0-alpha.12 (ver «Implementação» abaixo)
 Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curitiba; hoje não controlo como os demais, fica só no e-mail».
 - **O que já existe:**
   - **Fluxo mensal:** grupo «Repasse de Curitiba» (fluxo próprio, sem separação USG/IMG, até o 20º dia útil, pagamento no último dia útil), com controle documental.
@@ -460,7 +460,7 @@ Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curi
 - **Competência:** sempre a do mês atual (a do topo), mesmo que se refira ao mês anterior.
 - **Tipos iniciais:** Laudos PET-CT, Aplicação Pluvicto, Curso Cetrus e Reajuste. São sugeridos **só no fechamento do IMG** (pagos no último dia útil). Nos outros fechamentos, a categoria é livre.
 
-## SOL-F31 (nova) — Descontos parcelados com alerta
+## SOL-F31 (nova) — Descontos parcelados com alerta — IMPLEMENTADA na v2.0.0-alpha.12
 - **Cadastro de desconto por prestador:** motivo (ex.: pensão alimentícia, adiantamento), valor da parcela, número de parcelas, parcela inicial e competência de início.
 - **No Fechamento:** a parcela do mês entra sozinha em DESCONTOS, com a observação «parcela 7/10».
 - **Alertas:**
@@ -548,7 +548,7 @@ Modelo: `exemplo_saida_repasse_usg_img_v3_e_produção.xlsx` (03/11/2026).
   - cabeçalho mesclado, como no modelo;
   - blocos de NF complementar (Curso Cetrus; PET-CT e Pluvicto) no layout do modelo;
   - os médicos V3 saem desta aba.
-- **REPASSE CURITIBA:** os médicos V3, no mesmo layout do IMG. As regras próprias da V3 entram com a SOL-F30.
+- **REPASSE CURITIBA:** os médicos V3, com o cálculo pela regra de cada um e a memória de cálculo (SOL-F30, alpha.12).
 - **PRODUÇÃO USG CLASSE:** cabeçalho CLASSE · MÉDICOS · UNIDADE n · TOTAL · Observação, com a linha de percentuais.
 - **Formatação:**
   - Arial 10, bordas finas, cabeçalho azul 1F4E78 com texto branco;
@@ -557,3 +557,26 @@ Modelo: `exemplo_saida_repasse_usg_img_v3_e_produção.xlsx` (03/11/2026).
   - zoom 85%, larguras do modelo.
 - **Cores e legenda:** a cor da situação fica no código e no nome; «Sem valores» fica sem cor, como no modelo. A legenda vai no fim de cada aba.
 - **Ainda não incluído:** a coluna de avisos não vai mais para a planilha; os avisos ficam na tela.
+
+
+## SOL-F30 e SOL-F31 — implementação (v2.0.0-alpha.12, 03/11/2026)
+Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume» e «sempre entenda o doppler como parte do grupo de USG».
+
+### SOL-F30 — V3 (Curitiba)
+- **Bases → Prestadores e regras → Médicos V3:** lista só dos médicos V3, com a regra de cada um, e «+ Médico V3» (busca no cadastro).
+  - **Regras…** por médico: impostos (padrão 9,15%); USG com Doppler (% do líquido por faixa de volume, % do líquido, % do bruto, valor por laudo ou não paga); até 5 faixas; HM de USG/Doppler Unimed (entra no faturamento da USG, igual a um laudo de USG ou não paga); até 4 «outros exames» (texto de busca no grupo/descrição do MV, ex.: DENSITOM) pagos por % do bruto, % do líquido ou valor por laudo.
+  - Regra nova começa com a do Dr. Ian (65/68/70% do líquido; densitometria 10% do bruto). Dá para «copiar a regra de» outro médico V3.
+- **Cálculo** (motor `47-v3.js`): volume = soma da quantidade dos procedimentos de USG e Doppler; base = USG bruto + HM Unimed (quando entra no faturamento); líquido = base − impostos; % pela faixa; outros exames somados. Arredonda só no final. O exemplo do Dr. Ian dá R$ 73.608,69.
+- **Fechamento → Repasse Curitiba (V3):** só médicos V3; colunas de exames, USG bruto, HM Unimed, outros, líquido, % e o total da NF na unidade 5. Outras unidades (laudos para o SRA) seguem o relatório do MV. Sem regra: valor do MV com aviso. Classe A/B/C/D não se aplica.
+  - **Memória de cálculo** com o texto do e-mail no formato de hoje, a origem de cada número, os HM a excluir e o que ficou fora do cálculo. «Copiar e-mail» copia o texto.
+  - Médicos V3 saíram do Repasse IMG e da Produção/classe.
+- **Conferência da unidade 5:** HM de USG/Doppler do convênio Unimed vira «Conferido» com o marcador **HM V3 devido** (pago mesmo sem laudo). Outro HM fica «HM — regra pendente» com o marcador **HM V3 a excluir** (não vira NC sozinho).
+- **Exportação:** aba REPASSE CURITIBA com o cálculo por médico, NF complementar, observações e a memória de cálculo de cada um.
+- **Doppler = USG** também no mapa de modalidade (laudo de US) e na separação USG/IMG das rodadas.
+
+### SOL-F31 — Descontos parcelados
+- **Bases → Prestadores e regras → Descontos parcelados:** prestador (busca), motivo, valor da parcela, nº de parcelas (vazio = recorrente), competência da 1ª parcela e em qual fechamento entra (USG, IMG ou Curitiba). Lista com «7 de 10», situação (ativo, recorrente, última parcela, quitado, adiado, encerrado) e histórico por competência. Editar, encerrar (mantém o histórico) ou excluir.
+- **Fechamento:** a parcela do mês entra sozinha em DESCONTOS, com a observação «Adiantamento · parcela 7/10» e o selo «auto». Valor digitado à mão vale por cima (selo «manual») e fica registrado nas alterações da competência; apagar o valor volta ao automático.
+- **Alertas** no cartão «Descontos parcelados do mês»: última parcela; prestador sem valores (a parcela não é descontada; botão «Levar para o próximo mês», que empurra as seguintes um mês, com «desfazer»); desconto maior que o repasse.
+- **Exportação:** a observação sai nas OBSERVAÇÕES («DESCONTO … R$ … ADIANTAMENTO · PARCELA 7/10»).
+- **Pendente de confirmação** (assumido como na prévia): densitometria somada depois do percentual, fora do imposto; «USG bruto» com todos os convênios; parcela sem valores só passa para o mês seguinte quando o usuário clica em «Levar para o próximo mês».

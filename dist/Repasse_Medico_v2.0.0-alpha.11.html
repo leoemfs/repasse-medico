@@ -257,6 +257,9 @@ button.fs{border:0;cursor:pointer;font:inherit;font-size:11px;font-weight:700}
 .menu-sit button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500}
 .menu-sit button:hover{background:var(--infobg)}.menu-sit small{color:var(--muted);font-size:11px;white-space:nowrap}
 .menu-sit hr{border:0;border-top:1px solid var(--line);margin:4px 0}.menu-sit .rodape{font-size:12px;color:var(--muted);padding:6px 10px}
+.memoria-v3{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;max-height:52vh;overflow:auto}
+dialog:has(.dlg-largo){max-width:900px}
+.alerta-desc{border-radius:8px;padding:7px 10px;margin:4px 0;font-size:13px;background:var(--bg);border:1px solid var(--line)}
 
 </style>
 </head>
@@ -843,7 +846,7 @@ async function lerPowerBI(bytes, nome) {
 /* ---------- Modalidade ---------- */
 // Grupo de procedimento do MV → modalidades do Apolo (MODALITY) que podem conter o laudo.
 const GRUPO_MODALIDADES = [
-  [/ULTRASSONOGRAFIA|ECOCARDIOGRAMA/, ['US']],
+  [/ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA/, ['US']],   // Doppler é sempre do grupo de USG
   [/TOMOGRAFIA/, ['CT']],
   [/RESSONANCIA/, ['MR']],
   [/RADIOLOGIA/, ['CR', 'DX']],
@@ -951,6 +954,7 @@ function migrarConfig(c) {
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
+  if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.
@@ -1088,7 +1092,7 @@ function migrarRegras(c) {
   for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
   return mudou;
 }
-const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
+const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, v3regra: null, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
 
 /* ---------- USG ---------- */
 // Percentual esperado de USG do prestador numa unidade (null = sem regra).
@@ -1295,6 +1299,143 @@ function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, 
   return r;
 }
 
+/* ---- src/engine/47-v3.js ---- */
+/* ============================================================
+ * V3 = Curitiba (unidade 5) — regras próprias por médico (SOL-F30)
+ * Na V3 o repasse é calculado fora do MV. A ferramenta calcula pela regra cadastrada do médico,
+ * mostra a memória de cálculo e gera o texto do e-mail no formato usado hoje.
+ * - Doppler é sempre parte do grupo de USG (conta no volume e no faturamento de USG).
+ * - HM: só se paga HM de USG/Doppler do convênio Unimed (mesmo sem laudo). Os demais HM não são
+ *   pagos e ficam sinalizados para exclusão (não viram NC sozinhos).
+ * - Arredonda só no final (assim o exemplo do Dr. Ian dá R$ 73.608,69).
+ * ============================================================ */
+const FORMAS_V3 = { 'faixa-liquido': '% do líquido por faixa de volume', 'pct-liquido': '% do líquido', 'pct-bruto': '% do bruto', 'por-laudo': 'valor por laudo', 'nao-paga': 'não paga' };
+const FORMAS_OUTROS_V3 = ['pct-bruto', 'pct-liquido', 'por-laudo', 'nao-paga'];
+const FORMAS_HM_V3 = { faturamento: 'entra no faturamento da USG', 'valor-laudo': 'igual a um laudo de USG', 'nao-paga': 'não paga' };
+const FAIXAS_V3_PADRAO = [{ de: 0, pct: 65 }, { de: 800, pct: 68 }, { de: 1000, pct: 70 }];
+const regraV3Padrao = () => ({
+  impostos: 9.15,
+  usg: { forma: 'faixa-liquido', faixas: FAIXAS_V3_PADRAO.map(f => ({ ...f })), pct: 0, valor: 0 },
+  hm: 'faturamento',
+  outros: [{ nome: 'Densitometria', padrao: 'DENSITOM', forma: 'pct-bruto', pct: 10, valor: 0 }]
+});
+
+const ehUnidadeV3 = (cfg, cod) => { const u = unidadePorCod(cfg, cod); return u?.empresa ? norm(u.empresa) === 'V3' : String(cod) === '5'; };
+const ehUSGouDoppler = (grupo, desc) => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(`${grupo || ''} ${desc || ''}`));
+const ehUnimed = convenio => /UNIMED/.test(norm(convenio || ''));
+const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm(l.grupo || '')) || /(^|\s)HM$/.test(norm(l.desc || '')));
+// HM de uma linha da unidade V3: devido (USG/Doppler Unimed) ou a excluir.
+const hmV3Devido = (grupo, desc, convenio) => ehUSGouDoppler(grupo, desc) && ehUnimed(convenio);
+
+function faixaV3(faixas, exames) {
+  const l = [...(faixas || [])].filter(f => f.pct !== '' && f.pct !== null && f.pct !== undefined).sort((a, b) => (+a.de || 0) - (+b.de || 0));
+  let r = null; for (const f of l) if (exames >= (+f.de || 0)) r = f;
+  if (!r) return null;
+  const prox = l[l.indexOf(r) + 1];
+  return { pct: +r.pct, de: +r.de || 0, ate: prox ? +prox.de - 1 : null };
+}
+const rotuloFaixaV3 = f => !f ? '' : f.ate === null ? `${f.de}+ exames` : f.de ? `${f.de}–${f.ate}` : `até ${f.ate}`;
+function resumoRegraV3(regra) {
+  if (!regra) return '';
+  const u = regra.usg || {}, p = [];
+  const usg = u.forma === 'faixa-liquido' ? `${(u.faixas || []).map(f => +f.pct).join(' / ')}% do líquido por volume`
+    : u.forma === 'pct-liquido' ? `${u.pct}% do líquido` : u.forma === 'pct-bruto' ? `${u.pct}% do bruto` : u.forma === 'por-laudo' ? `R$ ${fmtBR(u.valor)} por laudo` : 'não paga';
+  p.push(`USG${regra.hm === 'faturamento' ? ' + HM Unimed' : ''}: ${usg}`);
+  if (regra.hm === 'valor-laudo') p.push('HM Unimed = laudo de USG');
+  if (regra.hm === 'nao-paga') p.push('HM não paga');
+  for (const o of regra.outros || []) p.push(`${o.nome.toLowerCase()} ${o.forma === 'por-laudo' ? `R$ ${fmtBR(o.valor)} por laudo` : o.forma === 'nao-paga' ? 'não paga' : `${o.pct}% do ${o.forma === 'pct-bruto' ? 'bruto' : 'líquido'}`}`);
+  p.push(`impostos ${fmtBR(regra.impostos)}%`);
+  return p.join(' · ');
+}
+// Confere a regra antes de gravar. Devolve a lista de erros.
+function validarRegraV3(regra) {
+  const e = [], u = regra.usg || {};
+  if (!(+regra.impostos >= 0 && +regra.impostos < 100)) e.push('impostos entre 0 e 100%');
+  if (u.forma === 'faixa-liquido' && !(u.faixas || []).length) e.push('informe ao menos uma faixa de volume');
+  if (['pct-liquido', 'pct-bruto'].includes(u.forma) && !(+u.pct > 0)) e.push('informe o % da USG');
+  if (u.forma === 'por-laudo' && !(+u.valor > 0)) e.push('informe o valor por laudo da USG');
+  for (const o of regra.outros || []) {
+    if (!o.nome || !o.padrao) { e.push('cada exame extra precisa de nome e texto de busca'); continue; }
+    try { new RegExp(o.padrao); } catch (x) { e.push(`texto de busca inválido em «${o.nome}»`); }
+  }
+  return e;
+}
+
+/* Calcula o repasse da V3 de um médico a partir das linhas dos relatórios do MV da unidade V3.
+ * linhas: {grupo, desc, convenio, quant, vlTotal, vlRepasse, tipoItem}. */
+function calcularV3(regra, linhas) {
+  const imp = (+regra.impostos || 0) / 100, u = regra.usg || {};
+  const r = { exames: 0, brutoUSG: 0, hm: { qtd: 0, valor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: (regra.outros || []).map(o => ({ ...o, valorLaudo: +o.valor || 0, qtd: 0, bruto: 0, valor: 0 })), semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, valorMV: 0 };
+  for (const l of linhas) {
+    const q = +l.quant || 1, v = +l.vlTotal || 0;
+    r.valorMV += +l.vlRepasse || 0;
+    if (ehLinhaHM(l)) {
+      if (hmV3Devido(l.grupo, l.desc, l.convenio)) { r.hm.qtd += q; r.hm.valor += v; }
+      else { r.hmExcluir.qtd += q; r.hmExcluir.valor += v; const k = `${l.desc || l.grupo} · ${l.convenio || 'sem convênio'}`; r.hmExcluir.itens.set(k, (r.hmExcluir.itens.get(k) || 0) + q); }
+      continue;
+    }
+    if (l.tipoItem && l.tipoItem !== 'procedimento') { r.naoProcedimental.qtd += q; r.naoProcedimental.valor += v; continue; }
+    if (ehUSGouDoppler(l.grupo, l.desc)) { r.exames += q; r.brutoUSG += v; continue; }
+    const t = norm(`${l.grupo || ''} ${l.desc || ''}`), o = r.outros.find(x => { try { return new RegExp(x.padrao, 'i').test(t); } catch (e) { return false; } });
+    if (o) { o.qtd += q; o.bruto += v; continue; }
+    const k = l.grupo || l.desc || 'sem grupo', e = r.semRegra.get(k) || { qtd: 0, valor: 0 };
+    e.qtd += q; e.valor += v; r.semRegra.set(k, e);
+  }
+  const hmNaBase = regra.hm === 'faturamento' || (regra.hm === 'valor-laudo' && u.forma !== 'por-laudo');
+  r.hmNaBase = hmNaBase;
+  r.base = r.brutoUSG + (hmNaBase ? r.hm.valor : 0);
+  r.liquido = r.base * (1 - imp);
+  r.forma = u.forma;
+  let usg = 0;
+  if (u.forma === 'faixa-liquido') { r.faixa = faixaV3(u.faixas, r.exames); r.pct = r.faixa ? r.faixa.pct : 0; usg = r.liquido * r.pct / 100; }
+  else if (u.forma === 'pct-liquido') { r.pct = +u.pct || 0; usg = r.liquido * r.pct / 100; }
+  else if (u.forma === 'pct-bruto') { r.pct = +u.pct || 0; usg = r.base * r.pct / 100; }
+  else if (u.forma === 'por-laudo') { r.valorLaudo = +u.valor || 0; r.laudosPagos = r.exames + (regra.hm === 'valor-laudo' ? r.hm.qtd : 0); usg = r.laudosPagos * r.valorLaudo; }
+  r.valorUSGExato = usg;
+  for (const o of r.outros) o.valor = o.forma === 'pct-bruto' ? o.bruto * (+o.pct || 0) / 100 : o.forma === 'pct-liquido' ? o.bruto * (1 - imp) * (+o.pct || 0) / 100 : o.forma === 'por-laudo' ? o.qtd * o.valorLaudo : 0;
+  r.total = r2(usg + r.outros.reduce((s, o) => s + o.valor, 0));
+  r.valorUSG = r2(usg);
+  for (const k of ['brutoUSG', 'base', 'liquido', 'valorMV']) r[k] = r2(r[k]);
+  r.hm.valor = r2(r.hm.valor); r.hmExcluir.valor = r2(r.hmExcluir.valor);
+  for (const o of r.outros) { o.bruto = r2(o.bruto); o.valor = r2(o.valor); }
+  r.impostos = +regra.impostos || 0;
+  return r;
+}
+
+// Avisos do cálculo da V3 (aparecem no Fechamento).
+function avisosV3(c) {
+  const a = [];
+  if (c.hmExcluir.qtd) a.push(`${c.hmExcluir.qtd} HM a excluir (não pago na V3: R$ ${fmtBR(c.hmExcluir.valor)})`);
+  for (const [g, e] of c.semRegra) a.push(`${e.qtd} exame(s) de «${g}» sem regra na V3 (R$ ${fmtBR(e.valor)} bruto, fora do cálculo)`);
+  if (c.forma === 'faixa-liquido' && !c.faixa && c.exames) a.push('volume abaixo da primeira faixa da regra');
+  return a;
+}
+
+// Texto do e-mail no formato usado hoje (exemplo do Dr. Ian, 10/2026).
+function textoEmailV3(c) {
+  const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', '', `Foram realizados ${c.exames} exames de ultrassom.`, ''];
+  for (const o of c.outros) {
+    if (!o.qtd && !o.bruto) { L.push(`${o.nome}: R$ 0,00 (SEM PRODUÇÃO)`); continue; }
+    const como = o.forma === 'pct-bruto' ? `${fmtBR(o.pct)}% de ${R(o.bruto)}` : o.forma === 'pct-liquido' ? `${fmtBR(o.pct)}% de ${R(o.bruto)} menos os impostos` : o.forma === 'por-laudo' ? `${o.qtd} × ${R(o.valorLaudo)}` : 'não paga';
+    L.push(`${o.nome}: ${R(o.valor)} (${como})`);
+  }
+  if (c.hm.qtd || c.hmNaBase) L.push(`Honorários USG UNIMED: ${R(c.hm.valor)}`);
+  L.push(`USG: ${R(c.brutoUSG)}`, '');
+  const pctTxt = p => `${String(p).replace('.', ',')}%`;
+  if (c.forma === 'por-laudo') {
+    L.push(`Ultrassom: ${c.exames} exames${c.laudosPagos > c.exames ? ` + ${c.laudosPagos - c.exames} HM` : ''} × ${R(c.valorLaudo)} = ${R(c.valorUSG)}`);
+  } else if (c.forma === 'nao-paga') {
+    L.push('Ultrassom: não pago pela regra deste médico.');
+  } else {
+    const soma = c.hmNaBase ? `Ultrassom: ${R(c.brutoUSG)} mais HM ${R(c.hm.valor)} = ${R(c.base)}` : `Ultrassom: ${R(c.base)}`;
+    L.push(soma);
+    if (c.forma === 'pct-bruto') L.push(`* ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
+    else L.push(`menos os impostos (${pctTxt(fmtBR(c.impostos))}) = ${R(c.liquido)} * ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
+  }
+  L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
+  return L.join('\n');
+}
+
 /* ---- src/engine/50-equivalencias.js ---- */
 /* ============================================================
  * Base de equivalências TUSS (MV) ↔ título do laudo (Apolo)
@@ -1497,7 +1638,9 @@ const MARCADORES = {
   'valor-simbolico': 'Valor simbólico',
   'possivel-bilateral': 'Laudo já usado por linha do mesmo código',
   'modalidade-desconhecida': 'Modalidade do grupo não mapeada',
-  'laudo-sem-data': 'Laudo sem data válida'
+  'laudo-sem-data': 'Laudo sem data válida',
+  'hm-v3-devido': 'HM V3 devido',
+  'hm-v3-excluir': 'HM V3 a excluir'
 };
 
 // Período de produção coberto pelo relatório: do 1º dia do mês da menor data ao último dia do mês da maior.
@@ -1516,7 +1659,7 @@ function laudosDaUnidade(apolo, cfg, unidadeCod) {
 
 function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const tol = +opc.tol, minTrunc = +cfg.parametros.minTruncamento, simb = +cfg.parametros.valorSimbolico;
-  const idx = indiceEquivalencias(eqBase);
+  const idx = indiceEquivalencias(eqBase), unidadeV3 = !!opc.unidadeCod && opc.unidadeCod !== '*' && ehUnidadeV3(cfg, opc.unidadeCod);
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const porDia = new Map();
@@ -1569,6 +1712,17 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
+    // V3 (Curitiba): HM de USG/Doppler Unimed é devido mesmo sem laudo; os demais HM não são pagos (SOL-F30).
+    if (b.tipo === 'hm' && unidadeV3) {
+      if (hmV3Devido(r.grupoNome, r.procDesc, r.convenio)) {
+        marc.add('hm-v3-devido'); out.status = 'conferido';
+        motivos.push('HM V3 devido: HM de USG/Doppler do convênio Unimed entra no repasse da V3, mesmo sem laudo (regra da unidade).');
+      } else {
+        marc.add('hm-v3-excluir'); out.status = 'hm-pendente';
+        motivos.push(`HM V3 a excluir: na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», convênio «${r.convenio || '—'}»). Sinalizar para exclusão; não é NC por si só.`);
+      }
+      linhas.push(out); continue;
+    }
     if (b.tipo !== 'procedimento') {
       out.status = b.tipo === 'hm' ? 'hm-pendente' : b.tipo === 'desconhecido' ? 'classificacao-pendente' : 'nao-procedimental';
       motivos.push(b.tipo === 'hm' ? 'Item HM: preservado e fora do cruzamento de procedimentos até existir regra validada (RN-201).'
@@ -2173,6 +2327,88 @@ function validarFluxo(dados) {
   return e;
 }
 
+/* ---- src/engine/86-descontos.js ---- */
+/* ============================================================
+ * Descontos parcelados (SOL-F31)
+ * Cadastro por prestador (fica em Bases, vale para todas as competências):
+ *   {id, cod, nome, motivo, valorParcela, parcelas (0 = recorrente, ex.: pensão), inicio 'AAAA-MM'
+ *    (competência da 1ª parcela), tipo 'usg'|'img'|'curitiba' (em qual fechamento entra),
+ *    adiadas ['AAAA-MM'] (meses em que a parcela não foi descontada e passou para o seguinte),
+ *    encerradoEm 'AAAA-MM' (opcional), obs, por, em}
+ * No Fechamento, a parcela do mês entra sozinha em DESCONTOS com a observação «parcela 7/10».
+ * ============================================================ */
+const TIPOS_DESCONTO = { usg: 'USG', img: 'IMG (último dia útil)', curitiba: 'Curitiba (V3)' };
+const mesesEntre = (a, b) => { const [ya, ma] = a.split('-').map(Number), [yb, mb] = b.split('-').map(Number); return (yb - ya) * 12 + (mb - ma); };
+
+// Parcela de um desconto numa competência: null se não houver (antes do início, adiada, quitada, encerrada).
+function parcelaDoMes(d, chave) {
+  if (!d.inicio || chave < d.inicio) return null;
+  if (d.encerradoEm && chave >= d.encerradoEm) return null;
+  if ((d.adiadas || []).includes(chave)) return null;
+  const n = mesesEntre(d.inicio, chave) + 1 - (d.adiadas || []).filter(c => c < chave && c >= d.inicio).length;
+  const total = +d.parcelas || 0;
+  if (total && n > total) return null;
+  return { n, total, recorrente: !total, ultima: !!total && n === total, valor: r2(+d.valorParcela || 0) };
+}
+// Situação do desconto na competência (para a lista em Bases).
+function situacaoDesconto(d, chave) {
+  const p = parcelaDoMes(d, chave);
+  if (d.encerradoEm && chave >= d.encerradoEm) return { k: 'encerrado', nome: `encerrado em ${rotuloCompetencia(d.encerradoEm)}` };
+  if (chave < d.inicio) return { k: 'futuro', nome: `começa em ${rotuloCompetencia(d.inicio)}` };
+  if ((d.adiadas || []).includes(chave)) return { k: 'adiado', nome: 'adiado neste mês' };
+  if (!p) return { k: 'quitado', nome: `quitado em ${rotuloCompetencia(ultimaCompetenciaDesconto(d))}` };
+  if (p.recorrente) return { k: 'recorrente', nome: 'recorrente' };
+  return p.ultima ? { k: 'ultima', nome: 'última parcela' } : { k: 'ativo', nome: 'ativo' };
+}
+// Competência da última parcela (descontos com nº de parcelas).
+function ultimaCompetenciaDesconto(d) {
+  if (!+d.parcelas) return '';
+  let c = d.inicio, n = 0;
+  for (let i = 0; i < 600; i++) { if (!(d.adiadas || []).includes(c)) { n++; if (n === +d.parcelas) return c; } c = competenciaVizinha(c, 1); }
+  return '';
+}
+// Parcelas já descontadas até a competência (inclusive): o histórico por competência.
+function historicoDesconto(d, ate) {
+  const h = []; let c = d.inicio;
+  for (let i = 0; i < 600 && c <= ate; i++) {
+    const p = parcelaDoMes(d, c);
+    if ((d.adiadas || []).includes(c)) h.push({ chave: c, adiada: true });
+    else if (p) h.push({ chave: c, ...p }); else break;
+    c = competenciaVizinha(c, 1);
+  }
+  return h;
+}
+const textoParcela = p => p.recorrente ? '' : `parcela ${p.n}/${p.total}`;
+const obsDesconto = (d, p) => [d.motivo, textoParcela(p)].filter(Boolean).join(' · ');
+
+function validarDesconto(d) {
+  const e = [];
+  if (!String(d.cod || '').trim()) e.push('escolha o prestador do cadastro');
+  if (!String(d.motivo || '').trim()) e.push('informe o motivo');
+  if (!(+d.valorParcela > 0)) e.push('informe o valor da parcela');
+  if (!/^\d{4}-\d{2}$/.test(d.inicio || '')) e.push('informe a competência da 1ª parcela');
+  if (!TIPOS_DESCONTO[d.tipo]) e.push('escolha em qual fechamento entra');
+  if (d.parcelas !== '' && d.parcelas !== undefined && +d.parcelas < 0) e.push('número de parcelas inválido');
+  return e;
+}
+
+/* Aplica as parcelas do mês nas linhas do fechamento (chamado pelo montarFechamento).
+ * Desconto digitado à mão no mês vale por cima (fica marcado como manual). Devolve os alertas. */
+function aplicarDescontosParcelados(todos, descontos, chave) {
+  const alertas = [];
+  for (const d of descontos || []) {
+    const p = parcelaDoMes(d, chave); if (!p) continue;
+    const x = todos.find(y => y.cod === String(d.cod) && y.tipo === d.tipo);
+    const rotulo = `${d.nome || d.cod}: ${d.motivo}${p.recorrente ? '' : ` (${p.n}/${p.total})`}`;
+    if (!x) { alertas.push({ k: 'sem-linha', id: d.id, cod: String(d.cod), tipo: d.tipo, texto: `${rotulo} — o prestador não está no fechamento de ${TIPOS_DESCONTO[d.tipo]} deste mês. Levar para o próximo mês?`, adiar: true }); continue; }
+    x.parcelas = x.parcelas || [];
+    x.parcelas.push({ id: d.id, motivo: d.motivo, ...p, obs: obsDesconto(d, p) });
+    if (!x.temValores) { alertas.push({ k: 'sem-valores', id: d.id, cod: x.cod, tipo: x.tipo, texto: `${x.nome}: desconto ativo, mas sem valores neste mês. A ${p.recorrente ? 'parcela' : `parcela ${p.n}/${p.total}`} (R$ ${fmtBR(p.valor)}) não foi descontada. Levar para o próximo mês?`, adiar: true }); continue; }
+    if (p.ultima) alertas.push({ k: 'ultima', id: d.id, cod: x.cod, tipo: x.tipo, texto: `${x.nome}: última parcela do desconto «${d.motivo}» (${p.n}/${p.total}) neste mês.` });
+  }
+  return alertas;
+}
+
 /* ---- src/engine/87-nc.js ---- */
 /* ============================================================
  * Não conformidades (SOL-F3)
@@ -2553,7 +2789,7 @@ function tipoRepasseDaRodada(r) {
   const t = norm(`${r.descricao || ''} ${r.repasse || ''}`);
   if (/USG|ULTRASS/.test(t)) return 'usg';
   if (/\bIMG\b|IMAGEM|RAIO|TOMO|RESSON|MAMO|DENSIT/.test(t)) return 'img';
-  const us = r.linhas.filter(l => /ULTRASS/.test(norm(l.grupo || ''))).length;
+  const us = r.linhas.filter(l => /ULTRASS|DOPPLER/.test(norm(l.grupo || ''))).length;   // Doppler é sempre do grupo de USG
   return us > r.linhas.length / 2 ? 'usg' : 'img';
 }
 
@@ -2578,7 +2814,10 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   fech = fech || fechamentoVazio();
   const tol = cfg.fechamento || FECHAMENTO_PADRAO, prestPorCod = new Map(cfg.prestadores.map(p => [String(p.cod), p]));
   const grupos = rodadasDoFechamento(rodadas, chave), linhasPrest = new Map();
+  // Médicos da V3 (Curitiba) têm fechamento próprio: tudo deles vai para «curitiba» (SOL-F30).
+  const ehV3 = cod => !!prestPorCod.get(String(cod))?.regras?.v3;
   const pegar = (tipo, cod, nome) => {
+    if (ehV3(cod)) tipo = 'curitiba';
     const k = `${tipo}|${cod}`;
     if (!linhasPrest.has(k)) { const p = prestPorCod.get(String(cod)); linhasPrest.set(k, { tipo, cod: String(cod), nome: p?.nomeMV || nome || '', p, unidades: {}, producao: {}, avisos: [], semAceite: [], decisoes: 0, pendencias: 0 }); }
     return linhasPrest.get(k);
@@ -2586,9 +2825,10 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   // Valores por unidade a partir das rodadas.
   for (const g of grupos) {
     const x = pegar(g.tipo, g.prestadorCod, g.prestadorNome), r = g.aceita || g.ultima;
-    x.unidades[g.unidadeCod] = somaLinhas(r, 'vlRepasse');
-    if (g.tipo === 'usg') x.producao[g.unidadeCod] = somaLinhas(r, 'vlTotal');
-    if (!g.aceita || g.ultima.em > g.aceita.em) x.semAceite.push(g.unidadeCod);
+    // Na V3 o relatório de USG e o de IMG da mesma unidade somam.
+    x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(r, 'vlRepasse'));
+    if (g.tipo === 'usg' && x.tipo !== 'curitiba') x.producao[g.unidadeCod] = somaLinhas(r, 'vlTotal');
+    if ((!g.aceita || g.ultima.em > g.aceita.em) && !x.semAceite.includes(g.unidadeCod)) x.semAceite.push(g.unidadeCod);
     x.decisoes += r.linhas.filter(l => l.decisao).length;
     if (decisoes) x.pendencias += pendenciasDaRodada(r, decisoes).length;
     x._rodadas = [...(x._rodadas || []), { r, unidade: g.unidadeCod }];
@@ -2596,32 +2836,57 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   // Roster: quem tem regra cadastrada aparece mesmo sem relatório (situação «Sem valores»).
   for (const p of cfg.prestadores) {
     if (p.regras?.faixaUSG) pegar('usg', p.cod, p.nomeMV);
-    if (p.regras?.participaIMG) pegar('img', p.cod, p.nomeMV);
+    if (p.regras?.participaIMG || p.regras?.v3) pegar('img', p.cod, p.nomeMV);
   }
   const todos = [...linhasPrest.values()];
   // Produção de USG e classe (todas as unidades).
   const producaoUSG = new Map(todos.filter(x => x.tipo === 'usg').map(x => [x.cod, r2(Object.values(x.producao).reduce((s, v) => s + v, 0))]));
   const doc = (grupo, cod) => fluxoComp?.grupos?.[grupo]?.documental?.[cod] || null;
+  // Descontos parcelados (SOL-F31): a parcela do mês vai para a linha do prestador.
+  for (const x of todos) x.temValores = Object.keys(x.unidades).length > 0;
+  const alertasDescontos = aplicarDescontosParcelados(todos, cfg.descontos, chave);
   for (const x of todos) {
-    const aj = fech.ajustes[x.tipo]?.[x.cod] || {};
+    // V3: a unidade de Curitiba é calculada pela regra do médico; as outras unidades seguem o MV.
+    if (x.tipo === 'curitiba') {
+      const regra = x.p?.regras?.v3regra, unV3 = Object.keys(x.unidades).filter(u => ehUnidadeV3(cfg, u));
+      if (regra && unV3.length) {
+        const linhas = (x._rodadas || []).filter(y => ehUnidadeV3(cfg, y.unidade)).flatMap(y => y.r.linhas);
+        x.v3 = calcularV3(regra, linhas);
+        unV3.forEach((u, i) => { x.unidades[u] = i ? 0 : x.v3.total; });
+        x.avisos.push(...avisosV3(x.v3));
+      } else if (!regra) x.avisos.push(unV3.length ? 'sem regra da V3 cadastrada: valor do relatório do MV' : 'sem regra da V3 cadastrada (Bases → Prestadores → Médicos V3)');
+    }
+    // Legado: até a SOL-F30 os ajustes e marcas dos médicos V3 ficavam em «img».
+    const legado = (o, k) => o?.[k]?.[x.cod] || (x.tipo === 'curitiba' ? o?.img?.[x.cod] : null);
+    const aj = x.tipo === 'curitiba' ? { ...(fech.ajustes.img?.[x.cod] || {}), ...(fech.ajustes.curitiba?.[x.cod] || {}) } : (fech.ajustes[x.tipo]?.[x.cod] || {});
     x.board = x.tipo === 'usg' ? (+x.p?.regras?.board || 0) : 0;
-    x.plantao = +aj.plantao || 0; x.descontos = +aj.descontos || 0; x.obs = aj.obs || '';
+    x.plantao = +aj.plantao || 0;
+    // Desconto: as parcelas do mês entram sozinhas; o valor digitado no mês vale por cima (manual).
+    const parc = x.temValores ? (x.parcelas || []) : [];
+    x.descontosAuto = r2(parc.reduce((s, p) => s + p.valor, 0));
+    const manualDesc = aj.descontos !== undefined && aj.descontos !== '';
+    x.descontos = manualDesc ? (+aj.descontos || 0) : x.descontosAuto;
+    x.descontosManual = manualDesc && parc.length > 0 && x.descontos !== x.descontosAuto;
+    x.obs = aj.obs || parc.map(p => p.obs).join('; ');
     x.total = r2(Object.values(x.unidades).reduce((s, v) => s + v, 0) + x.board + x.plantao);
     x.totalGeral = r2(x.total - x.descontos);
-    x.temValores = Object.keys(x.unidades).length > 0;
+    if (parc.length) x.avisos.push(`desconto parcelado: ${parc.map(p => p.obs).join('; ')}${x.descontosManual ? ` (valor alterado à mão: R$ ${fmtBR(x.descontos)} no lugar de R$ ${fmtBR(x.descontosAuto)})` : ''}`);
+    if (x.temValores && x.totalGeral < 0) { x.avisos.push(`desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)})`); alertasDescontos.push({ k: 'maior', cod: x.cod, tipo: x.tipo, texto: `${x.nome}: desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)}).` }); }
     // Situação
-    const d = [doc(x.tipo, x.cod), x.tipo === 'img' ? doc('curitiba', x.cod) : null].filter(Boolean);
+    const d = [doc(x.tipo, x.cod)].filter(Boolean);
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
     // Marca manual «Verificar» (SOL-F32) fica por cima do cálculo até ser retirada.
-    const manual = fech.manual?.[x.tipo]?.[x.cod];
+    const manual = legado(fech.manual, x.tipo);
     if (manual) { x.situacaoCalculada = x.situacao; x.situacao = 'verificar'; x.manual = manual; x.avisos.push(`marcado para verificar: ${manual.motivo}`); }
     if (x.semAceite.length) x.avisos.push(`sem aceite na(s) unidade(s) ${x.semAceite.join(', ')}`);
     if (x.pendencias) x.avisos.push(`${x.pendencias} pendência(s) na conferência`);
     // Classe (IMG) e produção
     x.producaoUSG = producaoUSG.get(x.cod) || 0;
-    const cl = classeDoPrestador(cfg.classes, x.p, x.producaoUSG); x.classe = cl.classe; x.classeFixa = cl.fixa;
+    // Classe A/B/C/D não se aplica aos médicos da V3.
+    if (x.tipo === 'curitiba') { x.classe = ''; x.classeFixa = false; }
+    else { const cl = classeDoPrestador(cfg.classes, x.p, x.producaoUSG); x.classe = cl.classe; x.classeFixa = cl.fixa; }
     // Conferências de regra
-    for (const { r, unidade } of x._rodadas || []) {
+    for (const { r, unidade } of x.tipo === 'curitiba' ? [] : x._rodadas || []) {
       if (x.tipo === 'usg') {
         const esp = pctUSGEsperado(cfg, x.p, unidade);
         if (esp === null) { if (!x.avisos.some(a => a.startsWith('sem faixa'))) x.avisos.push('sem faixa de USG no cadastro'); continue; }
@@ -2647,20 +2912,20 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
       if (Math.abs(x.variacao) > (+tol.variacaoAlerta || 0)) x.avisos.push(`variação de ${x.variacao > 0 ? '+' : ''}${fmtBR(x.variacao)}% × competência anterior`);
     }
   }
-  const usg = todos.filter(x => x.tipo === 'usg'), img = todos.filter(x => x.tipo === 'img');
+  const usg = todos.filter(x => x.tipo === 'usg'), img = todos.filter(x => x.tipo === 'img'), curitiba = todos.filter(x => x.tipo === 'curitiba').sort((a, b) => a.nome.localeCompare(b.nome));
   const faixaDe = x => x.p?.regras?.faixaUSG || '';
   const ordemFaixa = id => { const i = (cfg.faixasUSG || []).findIndex(f => f.id === id); return i < 0 ? 99 : i; };
   usg.sort((a, b) => ordemFaixa(faixaDe(a)) - ordemFaixa(faixaDe(b)) || a.nome.localeCompare(b.nome));
-  img.sort((a, b) => (!!a.p?.regras?.v3 - !!b.p?.regras?.v3) || a.nome.localeCompare(b.nome));
+  img.sort((a, b) => a.nome.localeCompare(b.nome));
   const semAceite = todos.filter(x => x.situacao === 'verificar').length;
-  return { chave, prestadores: todos, usg, img, semAceite, previa: semAceite > 0 || !todos.some(x => x.temValores), fech, nfs: nfsDoFechamento(fech) };
+  return { chave, prestadores: todos, usg, img, curitiba, semAceite, alertasDescontos, previa: semAceite > 0 || !todos.some(x => x.temValores), fech, nfs: nfsDoFechamento(fech) };
 }
 
 function indicadoresFechamento(f, cfg, ncs = []) {
   const somaPor = (lista, chaveFn) => { const m = new Map(); for (const x of lista) for (const [k, v] of chaveFn(x)) m.set(k, r2((m.get(k) || 0) + v)); return [...m]; };
   const porUnidade = t => somaPor(f[t], x => Object.entries(x.unidades)).sort((a, b) => +a[0] - +b[0]).map(([u, v]) => [`${u} - ${unidadePorCod(cfg, u)?.nome || ''}`, v]);
   return {
-    totais: { usg: r2(f.usg.reduce((s, x) => s + x.totalGeral, 0)), img: r2(f.img.reduce((s, x) => s + x.totalGeral, 0)) },
+    totais: { usg: r2(f.usg.reduce((s, x) => s + x.totalGeral, 0)), img: r2(f.img.reduce((s, x) => s + x.totalGeral, 0)), curitiba: r2((f.curitiba || []).reduce((s, x) => s + x.totalGeral, 0)) },
     usgPorUnidade: porUnidade('usg'), imgPorUnidade: porUnidade('img'),
     usgPorFaixa: somaPor(f.usg, x => [[(cfg.faixasUSG.find(y => y.id === x.p?.regras?.faixaUSG)?.nome) || 'Sem faixa', x.totalGeral]]),
     imgPorClasse: somaPor(f.img, x => [[`Classe ${x.classe}${x.classeFixa ? ' (fixa)' : ''}`, x.totalGeral]]).sort(),
@@ -2675,8 +2940,23 @@ function indicadoresFechamento(f, cfg, ncs = []) {
 // Texto da prévia de um prestador, para colar no e-mail (uma NF por CNPJ).
 function textoPreviaPrestador(x, cfg, chave, dataPagamento, nfs = []) {
   const un = u => unidadePorCod(cfg, u), L = [];
-  L.push(`Prévia do repasse de ${x.tipo === 'usg' ? 'USG' : 'IMG'} — competência ${rotuloCompetencia(chave)} (produção ${rotuloMes(producaoEsperada(chave))})`);
-  L.push(`Prestador: ${x.cod} - ${x.nome}${x.tipo === 'img' ? ` · classe ${x.classe}${x.classeFixa ? ' (fixa)' : ''}` : ''}`, '');
+  // V3: o e-mail de hoje (memória de cálculo) e, se houver, as outras unidades e ajustes.
+  if (x.tipo === 'curitiba' && x.v3) {
+    L.push(textoEmailV3(x.v3));
+    const outras = Object.entries(x.unidades).filter(([u]) => !ehUnidadeV3(cfg, u));
+    if (outras.length || x.plantao || x.descontos) {
+      L.push('', 'Outros valores do mês:');
+      for (const [u, v] of outras) L.push(`${u}- ${un(u)?.nome || ''}${un(u)?.cnpj ? ` (CNPJ ${un(u).cnpj})` : ''}: R$ ${fmtBR(v)}`);
+      if (x.plantao) L.push(`PLANTÃO (CNPJ ${cfg.fechamento.cnpjPlantao}): R$ ${fmtBR(x.plantao)}`);
+      if (x.descontos) L.push(`Descontos: − R$ ${fmtBR(x.descontos)}${x.obs ? ` (${x.obs})` : ''}`);
+      L.push(`Total geral bruto: R$ ${fmtBR(x.totalGeral)}`);
+    }
+    const minhas = nfs.filter(n => String(n.cod) === String(x.cod));
+    if (minhas.length) { L.push('', 'NF complementar:'); for (const n of minhas) L.push(`${n.categoria}: R$ ${fmtBR(valorNF(n))}`); }
+    return L.join('\n');
+  }
+  L.push(`Prévia do repasse de ${x.tipo === 'usg' ? 'USG' : x.tipo === 'curitiba' ? 'Curitiba (V3)' : 'IMG'} — competência ${rotuloCompetencia(chave)} (produção ${rotuloMes(producaoEsperada(chave))})`);
+  L.push(`Prestador: ${x.cod} - ${x.nome}${x.tipo === 'img' && x.classe ? ` · classe ${x.classe}${x.classeFixa ? ' (fixa)' : ''}` : ''}`, '');
   for (const [u, v] of Object.entries(x.unidades).sort((a, b) => +a[0] - +b[0])) L.push(`${u}- ${un(u)?.nome || ''}${un(u)?.cnpj ? ` (CNPJ ${un(u).cnpj})` : ''}: R$ ${fmtBR(v)}`);
   if (x.board) L.push(`BOARD (CNPJ ${cfg.fechamento.cnpjBoard}): R$ ${fmtBR(x.board)}`);
   if (x.plantao) L.push(`PLANTÃO (CNPJ ${cfg.fechamento.cnpjPlantao}): R$ ${fmtBR(x.plantao)}`);
@@ -2794,15 +3074,33 @@ function xlsxFechamento(f, cfg, meta = {}) {
   observacoes(I, 3, [...imgPrincipal.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.img ? [f.fech.obs.img] : [])]);
   legenda(I, 3);
 
-  /* ---- REPASSE CURITIBA (V3): médicos da V3. As regras próprias da V3 entram na SOL-F30. ---- */
-  const v3 = f.img.filter(x => x.p?.regras?.v3);
-  const unV3 = cfg.unidades.filter(u => u.cnpj && (u.cod === '5' || v3.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => +a.cod - +b.cod);
-  const MC = [], AC = {}, tC = tabelaIMG(v3, unV3, MC, AC);
-  const C = [...topo(`REPASSE CURITIBA (V3) — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagCuritiba ? fmtData(meta.pagCuritiba) : ''}`, tC.ultima, MC), ...tC.L];
-  blocosNF(C, MC, AC, f.nfs.filter(n => n.tipo === 'curitiba'), 2);
-  if (!v3.length) C.push([], [{ v: 'Nenhum médico da V3 cadastrado (Bases → Prestadores e regras → «Médico V3»).', st: { va: 'center' } }]);
-  C.push([], [{ v: 'Regras próprias da V3 (faixas por volume, impostos, HM Unimed de USG e Doppler) em implementação: SOL-F30. Valores conforme os relatórios do MV.', st: { fc: '7F7F7F' } }]);
-  legenda(C, 3);
+  /* ---- REPASSE CURITIBA (V3): só os médicos da V3, com o cálculo da regra de cada um (SOL-F30) ---- */
+  const v3 = f.curitiba || [];
+  const unV3 = cfg.unidades.filter(u => u.cnpj && (ehUnidadeV3(cfg, u.cod) || v3.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => (ehUnidadeV3(cfg, b.cod) - ehUnidadeV3(cfg, a.cod)) || +a.cod - +b.cod);
+  const c0 = 8, cPlC = c0 + unV3.length, cToC = cPlC + 1, cDeC = cPlC + 2, cGeC = cPlC + 3, MC = [], AC = {};
+  const C = [...topo(`REPASSE CURITIBA (V3) — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagCuritiba ? fmtData(meta.pagCuritiba) : ''}`, cGeC, MC)];
+  C.push([...['CÓD.', 'MÉDICO V3', 'EXAMES USG (COM DOPPLER)', 'USG BRUTO', 'HM USG UNIMED', 'OUTROS EXAMES (V3)', 'LÍQUIDO (− IMPOSTOS)', '% REPASSE'].map(v => ({ v, st: E.cab })), ...unV3.map(u => ({ v: unNome(u), st: E.cab })), ...['PLANTÃO', 'TOTAL', 'DESCONTOS', 'TOTAL GERAL BRUTO'].map(v => ({ v, st: E.cab }))]);
+  AC[3] = 38.25; MC.push(...[0, 1, 2, 3, 4, 5, 6, 7, cToC, cDeC, cGeC].map(c => `${col(c)}3:${col(c)}4`));
+  C.push([...Array(c0).fill({ v: '', st: E.cab }), ...unV3.map(u => ({ v: u.cnpj || '', st: E.cnpj })), { v: cfg.fechamento.cnpjPlantao, st: E.cnpj }, ...Array(3).fill({ v: '', st: E.cab })]);
+  for (const x of v3) {
+    const n = C.length + 1, c = x.v3;
+    C.push([{ v: +x.cod || x.cod, st: sit(x, E.centro) }, { v: x.nome, st: sit(x, E.texto) },
+      { v: c ? c.exames : '', st: E.centro }, { v: c ? c.brutoUSG : '', st: E.valor }, { v: c ? c.hm.valor : '', st: E.valor }, { v: c ? r2(c.outros.reduce((s2, o) => s2 + o.valor, 0)) : '', st: E.valor },
+      { v: c && c.forma !== 'por-laudo' ? c.liquido : '', st: E.valor }, { v: c && c.pct ? c.pct / 100 : '', st: { ...E.pct, fill: undefined } },
+      ...unV3.map(u => ({ v: x.unidades[u.cod] ?? '', st: E.valor })), { v: x.plantao || '', st: E.valor },
+      { v: x.total, f: `SUM(${col(c0)}${n}:${col(cPlC)}${n})`, st: E.valorB }, { v: x.descontos, st: E.valorB }, { v: x.totalGeral, f: `${col(cToC)}${n}-${col(cDeC)}${n}`, st: E.valorB }]);
+  }
+  if (!v3.length) C.push([], [{ v: 'Nenhum médico da V3 cadastrado (Bases → Prestadores → Médicos V3).', st: { va: 'center' } }]);
+  blocosNF(C, MC, AC, f.nfs.filter(n => n.tipo === 'curitiba'), 0);
+  observacoes(C, 1, [...v3.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.curitiba ? [f.fech.obs.curitiba] : []),
+    ...v3.filter(x => !x.v3).map(x => `${x.nome.toUpperCase()}: SEM REGRA DA V3 CADASTRADA — VALORES DO RELATÓRIO DO MV`)]);
+  // Memória de cálculo de cada médico: o mesmo texto do e-mail.
+  for (const x of v3.filter(y => y.v3)) {
+    C.push([], [{ v: '' }, { v: `MEMÓRIA DE CÁLCULO — ${x.cod} - ${x.nome}`.toUpperCase(), st: { b: true, fc: '1F4E78' } }]);
+    for (const t of textoEmailV3(x.v3).split('\n')) C.push([{ v: '' }, t]);
+    for (const a of avisosV3(x.v3)) C.push([{ v: '' }, { v: `Aviso: ${a}`, st: { fc: 'C00000' } }]);
+  }
+  legenda(C, 1);
 
   /* ---- PRODUÇÃO USG CLASSE ---- */
   const unProd = cfg.unidades.filter(u => u.pctUSG);
@@ -2820,14 +3118,14 @@ function xlsxFechamento(f, cfg, meta = {}) {
   return criarXlsx([
     { nome: `REPASSE USG ${dt(meta.pagUSG)}`.trim(), larguras: [6, 50.3, ...unUSG.map(() => 18.1), 18.6, 18.1, 16.4, 16.4, 18.1], linhas: U, mesclar: MU, alturas: AU, zoom: 85, filtro: false, congelar: false },
     { nome: `REPASSE IMG ${dt(meta.pagIMG)}`.trim(), larguras: [18, 8.4, 10, 48.3, ...Array(tI.ultima - 6).fill(21.3), 15, 12, 16], linhas: I, mesclar: MI, alturas: AI, zoom: 85, filtro: false, congelar: false },
-    { nome: `REPASSE CURITIBA ${dt(meta.pagCuritiba)}`.trim(), larguras: [18, 8.4, 10, 48.3, ...Array(Math.max(0, tC.ultima - 6)).fill(21.3), 15, 12, 16], linhas: C, mesclar: MC, alturas: AC, zoom: 85, filtro: false, congelar: false },
+    { nome: `REPASSE CURITIBA ${dt(meta.pagCuritiba)}`.trim(), larguras: [8, 42, 13, 16, 16, 16, 18, 11, ...unV3.map(() => 21.3), 15, 16, 14, 18], linhas: C, mesclar: MC, alturas: AC, zoom: 85, filtro: false, congelar: false },
     { nome: `PRODUÇÃO USG CLASSE ${f.chave.slice(5)}-${f.chave.slice(0, 4)}`, larguras: [8.4, 10, 49.6, ...unProd.map(() => 14), 15, 26], linhas: P, mesclar: MP, alturas: AP, zoom: 85, filtro: false, congelar: false }
   ]);
 }
 function xlsxIndicadoresFechamento(f, ind, meta = {}) {
   const bloco = (titulo, pares, fmt = 'money') => [[{ v: titulo, st: { b: true, fill: 'D9E1F2' } }, { v: '', st: { fill: 'D9E1F2' } }], ...pares.map(([k, v]) => [k, { v, st: { fmt } }]), []];
   const linhas = [[{ v: `Indicadores do fechamento — competência ${rotuloCompetencia(f.chave)}${f.previa ? ' (PRÉVIA)' : ''}`, st: { b: true } }], [],
-    ...linhasMeta([['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || ''], ['Total USG', `R$ ${fmtBR(ind.totais.usg)}`], ['Total IMG', `R$ ${fmtBR(ind.totais.img)}`],
+    ...linhasMeta([['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || ''], ['Total USG', `R$ ${fmtBR(ind.totais.usg)}`], ['Total IMG', `R$ ${fmtBR(ind.totais.img)}`], ['Total Curitiba (V3)', `R$ ${fmtBR(ind.totais.curitiba)}`],
       ['NCs da competência', `${ind.ncs.total} · ${ind.ncs.impactam} impactam o pagamento (R$ ${fmtBR(ind.ncs.valor)} nas vindas do MV)`], ['Linhas com decisão (NC ou considerada)', ind.decisoes]]), [],
     ...bloco('USG por unidade', ind.usgPorUnidade), ...bloco('USG por faixa', ind.usgPorFaixa), ...bloco('IMG por unidade', ind.imgPorUnidade), ...bloco('IMG por classe', ind.imgPorClasse),
     ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
@@ -4814,7 +5112,7 @@ function fechamentoAtual() {
 RENDER.fechamento = async () => {
   S.rodadas = await dbTodas();
   const f = fechamentoAtual(), mk = marcosFech(S.comp), fechada = compFechada();
-  const lista = FH.sub === 'img' ? f.img.filter(x => !x.p?.regras?.v3) : FH.sub === 'curitiba' ? f.img.filter(x => x.p?.regras?.v3) : f.usg;
+  const lista = FH.sub === 'img' ? f.img : FH.sub === 'curitiba' ? f.curitiba : f.usg;
   const cont = k => lista.filter(x => x.situacao === k).length;
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button id="fhExp">Exportar competência (3 abas)</button></div></div>
@@ -4826,12 +5124,13 @@ RENDER.fechamento = async () => {
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
-  if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharIMG(corpo, f, mk, 'curitiba'); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
+  if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
 };
 
 const celValor = v => v === undefined ? '' : fmtBR(v);
-const inputAjuste = (tipo, x, campo, largura = 80) => `<input type="${campo === 'obs' ? 'text' : 'number'}" step="0.01" data-aj="${tipo}|${x.cod}|${campo}" value="${esc(campo === 'obs' ? x.obs : (x[campo] || ''))}" style="width:${largura}px" aria-label="${campo}">`;
+const inputAjuste = (tipo, x, campo, largura = 80) => `<input type="${campo === 'obs' ? 'text' : 'number'}" step="0.01" data-aj="${tipo}|${x.cod}|${campo}" value="${esc(campo === 'obs' ? x.obs : (x[campo] || ''))}" style="width:${largura}px" aria-label="${campo}">`
+  + (campo === 'descontos' && x.temValores && (x.parcelas || []).length ? ` <span class="badge ${x.descontosManual ? 'warn' : 'info'}" title="${esc(x.parcelas.map(p => p.obs).join('; '))}${x.descontosManual ? ` · automático seria R$ ${fmtBR(x.descontosAuto)}; apague o valor para voltar` : ''}">${x.descontosManual ? 'manual' : 'auto'}</span>` : '');
 const avisosHtml = x => x.avisos.length ? `<span class="fh-aviso" title="${esc(x.avisos.join('\n'))}">${esc(x.avisos.join(' · '))}</span>` : '';
 
 function desenharUSG(corpo, f, mk) {
@@ -4847,26 +5146,72 @@ function desenharUSG(corpo, f, mk) {
           <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="usg|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`).join(''); }).join('')}
     <tr class="fh-total"><td></td><td>TOTAL USG</td><td></td>${un.map(u => `<td class="n">${fmtBR(f.usg.reduce((s, x) => s + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.board, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.plantao, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.total, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(f.usg.reduce((s, x) => s + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr>
     </tbody></table></div>${f.usg.length ? '' : '<p class="muted">Nenhum prestador de USG: cadastre as faixas em Bases → Prestadores e regras (ou importe a planilha de controle) e rode as conferências dos relatórios de USG.</p>'}
-    ${cartaoNF(f, 'usg')}
+    ${cartaoDescontosFech(f, 'usg')}${cartaoNF(f, 'usg')}
     <label class="campo">Observações da planilha de USG<textarea id="fhObsUSG" rows="2">${esc(f.fech.obs.usg || '')}</textarea></label>
     <p class="small muted">Valores por unidade = Vl Repasse do relatório da última rodada de conferência com aceite (sem aceite: última rodada, como prévia). BOARD vem do cadastro do prestador; PLANTÃO, DESCONTOS e observações são deste mês. Pagamento ${fmtData(mk.pagUSG)}.</p>`;
   ligarFech(corpo, f, mk);
 }
 // IMG (médicos do SRA) e Curitiba (médicos V3): mesma tabela; Curitiba só com os médicos da V3.
+const listaFech = (f, modo) => modo === 'usg' ? f.usg : modo === 'curitiba' ? f.curitiba : f.img;
 function desenharIMG(corpo, f, mk, modo) {
-  const v3 = modo === 'curitiba', lista = f.img.filter(x => !!x.p?.regras?.v3 === v3);
+  const v3 = modo === 'curitiba', lista = listaFech(f, modo);
   const un = S.cfg.unidades.filter(u => u.cnpj && (v3 ? (u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)) : (u.pctUSG || u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)))).sort((a, b) => +a.cod - +b.cod);
   const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, modo)}</td>
-    ${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}<td class="n">${inputAjuste('img', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('img', x, 'descontos')}</td><td>${inputAjuste('img', x, 'obs', 160)}</td>
+    ${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}<td class="n">${inputAjuste(x.tipo, x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste(x.tipo, x, 'descontos')}</td><td>${inputAjuste(x.tipo, x, 'obs', 160)}</td>
     <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="${modo}|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`;
   const cab = `<thead><tr><th class="n">Produção USG</th><th>Classe</th><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th>${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>`;
   corpo.innerHTML = `${v3 ? '<p class="small muted">Só os médicos da V3 (Curitiba). As regras próprias da V3 — faixas por volume, impostos e HM Unimed de USG e Doppler — entram com a SOL-F30; por enquanto os valores vêm dos relatórios do MV.</p>' : ''}
     <div class="tw fh-tab"><table>${cab}<tbody><tr class="fh-cnpj"><td colspan="5">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="6"></td></tr>${lista.map(linha).join('')}</tbody></table></div>
     ${lista.length ? '' : `<p class="muted">${v3 ? 'Nenhum médico da V3: marque «Médico V3» nas regras do prestador (Bases → Prestadores e regras).' : 'Nenhum prestador de IMG: marque «Recebe repasse de IMG» em Bases → Prestadores e regras (ou importe a planilha de controle).'}</p>`}
-    ${cartaoNF(f, modo)}
+    ${cartaoDescontosFech(f, modo)}${cartaoNF(f, modo)}
     <label class="campo">Observações da planilha de ${v3 ? 'Curitiba' : 'IMG'}<textarea id="${v3 ? 'fhObsCur' : 'fhObsIMG'}" rows="2">${esc(f.fech.obs[v3 ? 'curitiba' : 'img'] || '')}</textarea></label>
     <p class="small muted">${v3 ? '' : 'Classe pela produção bruta de USG do prestador nesta competência (ou fixa no cadastro). Os avisos conferem o valor de cada laudo do relatório contra a tabela da classe; nada é recalculado. '}Pagamento ${fmtData(v3 ? mk.pagCuritiba : mk.pagIMG)}.</p>`;
   ligarFech(corpo, f, mk);
+}
+
+/* ---------- Repasse Curitiba (V3) — SOL-F30 ----------
+ * Valor da unidade V3 calculado pela regra do médico (Bases → Prestadores → Médicos V3);
+ * outras unidades (laudos para o SRA) seguem o relatório do MV. */
+function desenharCuritiba(corpo, f, mk) {
+  const lista = f.curitiba;
+  const un = S.cfg.unidades.filter(u => u.cnpj && (ehUnidadeV3(S.cfg, u.cod) || lista.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => (ehUnidadeV3(S.cfg, b.cod) - ehUnidadeV3(S.cfg, a.cod)) || +a.cod - +b.cod);
+  const v = (x, fn) => x.v3 ? fn(x.v3) : '<span class="muted small">—</span>';
+  const linha = x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'curitiba')}</td>
+    <td class="n">${v(x, c => c.exames.toLocaleString('pt-BR'))}</td><td class="n">${v(x, c => fmtBR(c.brutoUSG))}</td><td class="n">${v(x, c => c.hmNaBase || c.hm.valor ? fmtBR(c.hm.valor) : '<span class="muted small">não entra</span>')}</td>
+    <td class="n">${v(x, c => fmtBR(c.outros.reduce((s2, o) => s2 + o.valor, 0)))}</td><td class="n">${v(x, c => c.forma === 'por-laudo' ? '<span class="small">por laudo</span>' : fmtBR(c.liquido))}</td>
+    <td class="n">${v(x, c => c.pct ? `<b>${fmtBR(c.pct).replace(',00', '')}%</b>${c.faixa ? `<small class="nc-det">${esc(rotuloFaixaV3(c.faixa))}</small>` : ''}` : c.forma === 'por-laudo' ? `<small>R$ ${fmtBR(c.valorLaudo)}</small>` : '')}</td>
+    ${un.map(u => `<td class="n">${ehUnidadeV3(S.cfg, u.cod) && x.v3 ? `<b>${celValor(x.unidades[u.cod])}</b>` : celValor(x.unidades[u.cod])}</td>`).join('')}
+    <td class="n">${inputAjuste('curitiba', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('curitiba', x, 'descontos')}</td><td>${inputAjuste('curitiba', x, 'obs', 160)}</td>
+    <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td>
+    <td style="white-space:nowrap">${x.v3 ? `<button class="sec mini" data-memoria="${esc(x.cod)}">Memória de cálculo</button> ` : ''}${x.temValores ? `<button class="sec mini" data-copiar="curitiba|${esc(x.cod)}">${x.v3 ? 'Copiar e-mail' : 'Copiar prévia'}</button>` : ''}</td></tr>`;
+  corpo.innerHTML = `<p class="small muted">Só os médicos da V3 (Curitiba). A unidade ${un.filter(u => ehUnidadeV3(S.cfg, u.cod)).map(u => esc(u.cod)).join(', ') || '5'} é calculada pela regra de cada médico (Bases → Prestadores → Médicos V3): Doppler conta como USG, HM só de USG/Doppler Unimed. Sem regra, vale o valor do relatório do MV. Classe A/B/C/D não se aplica.</p>
+    <div class="tw fh-tab"><table><thead><tr><th>Cód.</th><th class="fh-nome">Médico V3</th><th>Situação</th><th class="n">Exames USG</th><th class="n">USG (bruto)</th><th class="n">HM Unimed</th><th class="n">Outros</th><th class="n">Líquido</th><th class="n">%</th>
+      ${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}${ehUnidadeV3(S.cfg, u.cod) ? ' · total da NF' : ''}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>
+      <tbody><tr class="fh-cnpj"><td colspan="9">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="7"></td></tr>${lista.map(linha).join('')}
+      <tr class="fh-total"><td></td><td>TOTAL CURITIBA</td><td colspan="7"></td>${un.map(u => `<td class="n">${fmtBR(lista.reduce((s2, x) => s2 + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.plantao, 0))}</td><td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.total, 0))}</td><td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(lista.reduce((s2, x) => s2 + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr></tbody></table></div>
+    ${lista.length ? '' : '<p class="muted">Nenhum médico da V3: inclua em Bases → Prestadores → Médicos V3 (ou importe a planilha de controle).</p>'}
+    ${cartaoDescontosFech(f, 'curitiba')}${cartaoNF(f, 'curitiba')}
+    <label class="campo">Observações da planilha de Curitiba<textarea id="fhObsCur" rows="2">${esc(f.fech.obs.curitiba || '')}</textarea></label>
+    <p class="small muted">Pagamento ${fmtData(mk.pagCuritiba)}.</p>`;
+  ligarFech(corpo, f, mk);
+  corpo.querySelectorAll('[data-memoria]').forEach(b => b.onclick = () => memoriaV3(lista.find(y => y.cod === b.dataset.memoria)));
+}
+async function memoriaV3(x) {
+  const c = x.v3, texto = textoEmailV3(c);
+  const exc = [...c.hmExcluir.itens].sort((a, b) => b[1] - a[1]);
+  const r = await dialogo(`Memória de cálculo — ${x.cod} - ${x.nome}`, `<span class="dlg-largo" hidden></span><div class="grid2"><div><h4 style="margin:0 0 4px">Texto do e-mail</h4><pre class="memoria-v3">${esc(texto)}</pre></div>
+    <div><h4 style="margin:0 0 4px">De onde vem cada número</h4><ul class="small">
+      <li><b>Exames USG:</b> soma da quantidade dos procedimentos de USG e Doppler do médico na V3 (${c.exames}).</li>
+      <li><b>USG (bruto):</b> soma do Vl Total dessas linhas (R$ ${fmtBR(c.brutoUSG)}).</li>
+      <li><b>HM Unimed:</b> ${c.hm.qtd} HM de USG/Doppler do convênio Unimed (R$ ${fmtBR(c.hm.valor)})${c.hmNaBase ? ', somados ao faturamento da USG' : c.forma === 'por-laudo' && x.p?.regras?.v3regra?.hm === 'valor-laudo' ? ', pagos como laudo de USG' : ', não pagos pela regra'}.</li>
+      ${c.forma === 'faixa-liquido' ? `<li><b>Faixa:</b> ${c.exames} exames → ${c.faixa ? `${fmtBR(c.pct).replace(',00', '')}% (${esc(rotuloFaixaV3(c.faixa))})` : 'abaixo da primeira faixa'}.</li>` : ''}
+      ${c.outros.map(o => `<li><b>${esc(o.nome)}:</b> ${o.qtd} exame(s), R$ ${fmtBR(o.bruto)} bruto → R$ ${fmtBR(o.valor)}.</li>`).join('')}
+      <li>Calculado sem arredondar no meio; arredonda só no final.</li>
+      <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li></ul>
+      ${exc.length ? `<h4 style="margin:8px 0 4px">HM a excluir (${c.hmExcluir.qtd} · R$ ${fmtBR(c.hmExcluir.valor)})</h4><ul class="small">${exc.slice(0, 12).map(([k, n]) => `<li>${esc(k)} — ${n}</li>`).join('')}${exc.length > 12 ? `<li>… e mais ${exc.length - 12}</li>` : ''}</ul>` : ''}
+      ${c.semRegra.size ? `<h4 style="margin:8px 0 4px">Fora do cálculo (sem regra)</h4><ul class="small">${[...c.semRegra].map(([k, e]) => `<li>${esc(k)} — ${e.qtd} · R$ ${fmtBR(e.valor)}</li>`).join('')}</ul>` : ''}</div></div>`,
+    [['', 'Fechar', 'sec'], ['copiar', 'Copiar texto do e-mail']]);
+  if (r.botao === 'copiar') copiarTexto(texto, `Texto do e-mail de ${x.nome}`);
 }
 
 /* ---------- NF complementar (SOL-F28) ---------- */
@@ -4936,7 +5281,7 @@ function desenharProducao(corpo, f) {
 function desenharIndicadoresFech(corpo, f) {
   const ind = indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp));
   const tab = (titulo, pares, fmt = v => 'R$ ' + fmtBR(v)) => `<div class="card"><h3>${titulo}</h3>${pares.length ? `<table class="fh-ind">${pares.map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${fmt(v)}</td></tr>`).join('')}</table>` : '<p class="muted small">—</p>'}</div>`;
-  corpo.innerHTML = `<div class="nc-kpis"><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.usg)}</b><small>total USG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.img)}</b><small>total IMG</small></div>
+  corpo.innerHTML = `<div class="nc-kpis"><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.usg)}</b><small>total USG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.img)}</b><small>total IMG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.curitiba)}</b><small>total Curitiba (V3)</small></div>
     <div class="nc-kpi warn"><b>${ind.variacoes.length}</b><small>variações acima de ${S.cfg.fechamento.variacaoAlerta}%</small></div><div class="nc-kpi err"><b>${ind.ncs.impactam}</b><small>NCs que impactam o pagamento</small></div><div class="nc-kpi"><b>${ind.decisoes}</b><small>linhas com decisão</small></div></div>
     <div class="grid3">${tab('USG por unidade', ind.usgPorUnidade)}${tab('USG por faixa', ind.usgPorFaixa)}${tab('Prestadores por situação', ind.porSituacao, v => v)}
       ${tab('IMG por unidade', ind.imgPorUnidade)}${tab('IMG por classe', ind.imgPorClasse)}${tab('Variação × competência anterior', ind.variacoes, v => (v > 0 ? '+' : '') + fmtBR(v) + '%')}</div>`;
@@ -4945,13 +5290,23 @@ function desenharIndicadoresFech(corpo, f) {
 function ligarFech(corpo, f, mk) {
   corpo.querySelectorAll('[data-aj]').forEach(inp => inp.onchange = () => {
     const [tipo, cod, campo] = inp.dataset.aj.split('|');
-    if (salvarFech(fe => { fe.ajustes[tipo] = fe.ajustes[tipo] || {}; const a = fe.ajustes[tipo][cod] = fe.ajustes[tipo][cod] || {}; a[campo] = campo === 'obs' ? inp.value.trim() : (inp.value === '' ? 0 : +inp.value); })) RENDER.fechamento();
+    const x = [...f.usg, ...f.img, ...f.curitiba].find(y => y.tipo === tipo && y.cod === cod);
+    const temParcela = campo === 'descontos' && (x?.parcelas || []).length;
+    if (salvarFech(fe => { fe.ajustes[tipo] = fe.ajustes[tipo] || {}; const a = fe.ajustes[tipo][cod] = fe.ajustes[tipo][cod] || {};
+      // Desconto com parcela automática: apagar o valor volta ao automático.
+      if (temParcela && inp.value === '') delete a.descontos;
+      else a[campo] = campo === 'obs' ? inp.value.trim() : (inp.value === '' ? 0 : +inp.value); })) {
+      if (temParcela) registrarAlteracao(S.compReg, S.comp, S.operador || '', 'fechamento', inp.value === '' ? `${x.nome}: desconto voltou ao automático (R$ ${fmtBR(x.descontosAuto)}).` : `${x.nome}: desconto alterado à mão para R$ ${fmtBR(+inp.value)} (automático: R$ ${fmtBR(x.descontosAuto)}; ${x.parcelas.map(p => p.obs).join('; ')}).`);
+      if (temParcela) salvarCompReg();
+      RENDER.fechamento();
+    }
   });
   corpo.querySelectorAll('[data-copiar]').forEach(b => b.onclick = () => {
-    const [modo, cod] = b.dataset.copiar.split('|'), x = (modo === 'usg' ? f.usg : f.img).find(y => y.cod === cod);
+    const [modo, cod] = b.dataset.copiar.split('|'), x = listaFech(f, modo).find(y => y.cod === cod);
     copiarTexto(textoPreviaPrestador(x, S.cfg, S.comp, modo === 'usg' ? mk.pagUSG : modo === 'curitiba' ? mk.pagCuritiba : mk.pagIMG, f.nfs.filter(n => n.tipo === modo)), `Prévia de ${x.nome}`);
   });
   corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
+  ligarDescontos(corpo, () => RENDER.fechamento());
   corpo.querySelectorAll('[data-nf-nova]').forEach(b => b.onclick = () => editarNF(b.dataset.nfNova));
   corpo.querySelectorAll('[data-nf-ed]').forEach(b => b.onclick = () => { const n = f.nfs.find(x => x.id === b.dataset.nfEd); if (n) editarNF(n.tipo, n.id); });
   corpo.querySelectorAll('[data-nf-rm]').forEach(b => b.onclick = async () => {
@@ -4988,7 +5343,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuSi
 window.addEventListener('scroll', fecharMenuSituacao, true);
 function abrirMenuSituacao(btn, f) {
   fecharMenuSituacao();
-  const [modo, cod] = btn.dataset.sit.split('|'), lista = modo === 'usg' ? f.usg : f.img, x = lista.find(y => y.cod === cod); if (!x) return;
+  const [modo, cod] = btn.dataset.sit.split('|'), x = listaFech(f, modo).find(y => y.cod === cod); if (!x) return;
   const comp = S.fluxo.competencias[S.comp], doc = comp?.grupos?.[GRUPO_DOC[modo]]?.documental?.[cod] || {};
   const m = document.createElement('div'); m.id = 'menuSit'; m.className = 'menu-sit'; m.setAttribute('role', 'menu');
   m.innerHTML = `<div class="cab">Situação de «${esc(x.nome)}»</div>
@@ -5004,7 +5359,7 @@ function abrirMenuSituacao(btn, f) {
 async function acaoSituacao(ac, modo, x) {
   if (!exigirAberta(S.comp, 'mudar a situação')) return;
   const op = await exigirOperador(); if (!op) return;
-  const tipo = x.tipo;   // as marcas manuais usam a tabela do prestador (usg ou img; V3 fica em img)
+  const tipo = x.tipo;   // as marcas manuais usam a tabela do prestador (usg, img ou curitiba)
   if (ac === 'verificar') {
     const r = await dialogo(`Marcar «${x.nome}» para verificar`, `<p class="small muted">A marca fica por cima da situação calculada até você tirar. Aparece na tela e na planilha (cor «Verificar»).</p><label class="campo">Motivo (obrigatório)<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Marcar']]);
     if (r.botao !== 'ok') return;
@@ -5012,7 +5367,7 @@ async function acaoSituacao(ac, modo, x) {
     salvarFech(fe => { fe.manual = fe.manual || {}; fe.manual[tipo] = { ...(fe.manual[tipo] || {}), [x.cod]: { motivo: r.campos.motivo.trim(), por: op, em: agoraISO() } }; });
     avisar(`${x.nome} marcado para verificar.`, 'ok');
   } else if (ac === 'tirar') {
-    salvarFech(fe => { if (fe.manual?.[tipo]) delete fe.manual[tipo][x.cod]; });
+    salvarFech(fe => { if (fe.manual?.[tipo]) delete fe.manual[tipo][x.cod]; if (tipo === 'curitiba' && fe.manual?.img) delete fe.manual.img[x.cod]; });
     avisar(`Marca «Verificar» retirada de ${x.nome}.`, 'ok');
   } else {
     const comp = S.fluxo.competencias[S.comp], g = comp?.grupos?.[GRUPO_DOC[modo]];
@@ -5168,7 +5523,7 @@ RENDER.bases = () => {
     <p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
     ${S.apolo ? `<details style="margin-top:12px"><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Lista para conferência. Nenhum vínculo é criado automaticamente.</p><ul class="small">${semVinculo.map(([m, n]) => `<li>${esc(m)} — ${n} laudos</li>`).join('')}</ul></details>` : ''}</div>
 
-  ${cardClasses()}${cardConvenios()}
+  ${cardMedicosV3()}${cardDescontos()}${cardClasses()}${cardConvenios()}
   <div class="card" id="cardFat" data-sub="faturistas"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
     ${(() => { const nNC = S.nc ? contar(S.nc.itens, x => norm(x.responsavel)) : new Map(); return `<div class="tw"><table><thead><tr><th>Nome</th><th>Unidade(s)</th><th>Genérico</th><th>Ativo</th><th class="n">NCs</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.faturistas.map((f, i) => `<tr>
       <td><input type="text" data-fat="${i}" data-c="nome" value="${esc(f.nome)}"></td><td><input type="text" data-fat="${i}" data-c="unidades" value="${esc(f.unidades || '')}" placeholder="ex.: 17, 5"></td>
@@ -5200,7 +5555,7 @@ RENDER.bases = () => {
     if (c === 'pctMed' || c === 'pctRes') { const v = inp.value === '' ? null : +inp.value / 100; u.pctUSG = { medico: null, residente: null, ...(u.pctUSG || {}) }; u.pctUSG[c === 'pctMed' ? 'medico' : 'residente'] = v; return; }
     u[c] = c === 'apolo' ? inp.value.split('|').map(s => s.trim()).filter(Boolean) : inp.value.trim();
   });
-  ligarRegras(pg);
+  ligarRegras(pg); ligarMedicosV3(pg); ligarDescontos(pg, () => RENDER.bases());
   pg.querySelectorAll('[data-urm]').forEach(b => b.onclick = () => { S.cfg.unidades.splice(+b.dataset.urm, 1); RENDER.bases(); });
   $('unAdd').onclick = () => { S.cfg.unidades.push({ cod: '', nome: '', apolo: [], pbi: '', empresa: '' }); RENDER.bases(); };
   $('unPad').onclick = async () => { if (await confirmar('Restaurar unidades padrão?', 'A tabela de unidades volta ao padrão.')) { S.cfg.unidades = configPadrao().unidades; salvarCfg('Unidades restauradas.'); RENDER.bases(); } };
@@ -5284,7 +5639,8 @@ function resumoRegras(p) {
   const r = p.regras || {}, partes = [];
   if (r.faixaUSG) partes.push(`USG: ${esc(nomeFaixa(r.faixaUSG))}${Object.values(r.pctUSGUnidade || {}).some(v => v !== '' && v !== null) ? ' (diferenciado)' : ''}`);
   if (r.board) partes.push(`BOARD R$ ${fmtBR(r.board)}`);
-  if (r.participaIMG) partes.push(`IMG${r.v3 ? ' (V3)' : ''}${r.classeFixa ? ` · classe fixa ${esc(r.classeFixa)}` : ''}${r.tabelaIMG === 'residente' || r.tipo === 'residente' ? ' · tabela de residente' : ''}`);
+  if (r.v3) partes.push(`V3${r.v3regra ? '' : ' (sem regra)'}`);
+  if (r.participaIMG && !r.v3) partes.push(`IMG${r.classeFixa ? ` · classe fixa ${esc(r.classeFixa)}` : ''}${r.tabelaIMG === 'residente' || r.tipo === 'residente' ? ' · tabela de residente' : ''}`);
   if ((r.excecoesIMG || []).length) partes.push(`exceções: ${r.excecoesIMG.map(e => `${EXAMES_IMG[e.exame] || e.exame} R$ ${fmtBR(e.valor)}`).join(', ')}`);
   return partes.join(' · ') || '<span class="muted">sem regras</span>';
 }
@@ -5416,7 +5772,7 @@ async function editarRegrasPrestador(p) {
     <label class="campo">BOARD fixo mensal (R$)<input type="number" step="0.01" name="board" value="${r.board || ''}"></label>
     <label class="campo">Classe do IMG<select name="classeFixa">${opcoes([['', 'Calculada pela produção de USG'], ['A', 'Fixa A'], ['B', 'Fixa B'], ['C', 'Fixa C'], ['D', 'Fixa D']], r.classeFixa)}</select></label>
     <label class="campo">Tabela de valores do IMG<select name="tabelaIMG">${opcoes([['padrao', 'Padrão (pela classe)'], ['residente', 'Residente']], r.tabelaIMG)}</select></label>
-    <div class="campo"><label class="small"><input type="checkbox" name="participaIMG"${r.participaIMG ? ' checked' : ''}> Recebe repasse de IMG</label><label class="small"><input type="checkbox" name="v3"${r.v3 ? ' checked' : ''}> Médico V3 que recebe pela SRA (Curitiba)</label></div></div>
+    <div class="campo"><label class="small"><input type="checkbox" name="participaIMG"${r.participaIMG ? ' checked' : ''}> Recebe repasse de IMG</label><label class="small"><input type="checkbox" name="v3"${r.v3 ? ' checked' : ''}> Médico V3 (Curitiba) <span class="muted">— regra em «Médicos V3»</span></label></div></div>
     <h4 style="margin:8px 0 4px">% de USG diferenciado por unidade <span class="muted small">(vazio = regra da faixa)</span></h4>
     <div class="grid4">${unUSG.map(u => `<label class="campo">${esc(u.cod)} - ${esc(u.nome)}<input type="number" step="0.01" name="pct_${esc(u.cod)}" value="${r.pctUSGUnidade?.[u.cod] !== undefined && r.pctUSGUnidade[u.cod] !== '' ? r2(r.pctUSGUnidade[u.cod] * 100) : ''}" placeholder="${(() => { const v = pctUSGEsperado(S.cfg, { regras: { ...r, pctUSGUnidade: {} } }, u.cod); return v === null ? '—' : r2(v * 100); })()}"></label>`).join('')}</div>
     <label class="campo">Exceções de valor no IMG <span class="small">uma por linha: EXAME=valor (exames: ${Object.keys(EXAMES_IMG).join(', ')}). Ex.: MAMO=18</span><textarea name="excecoes" rows="2">${esc((r.excecoesIMG || []).map(e => `${e.exame}=${e.valor}`).join('\n'))}</textarea></label>
@@ -5451,6 +5807,166 @@ async function importarPlanilhaControle(f) {
   if (r.botao !== 'ok') return;
   const x = aplicarPlanilhaControle(S.cfg, lida, `planilha de controle ${f.name}`);
   salvarCfg(`Regras de ${x.atualizados} prestador(es) importadas da planilha de controle (${x.novos} novos).`, 'prestadores'); RENDER.bases();
+}
+
+/* ---------- Médicos V3 (Curitiba) — SOL-F30 ----------
+ * Um espaço só para os médicos da V3, com a regra de cada um. Não usam classe A/B/C/D nem as faixas
+ * de USG do SRA. Doppler é sempre parte do grupo de USG. */
+function cardMedicosV3() {
+  const v3 = S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => p.regras?.v3);
+  return `<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">${v3.length} médico(s)</span></h2>
+    <p class="lead">Na V3 o repasse é calculado fora do MV. O Fechamento → Repasse Curitiba (V3) calcula o valor da NF pela regra de cada médico e gera o texto do e-mail. Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago (mesmo sem laudo); os demais ficam sinalizados para exclusão.</p>
+    <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Regra</th><th></th></tr></thead><tbody>
+    ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td><td class="small">${p.regras.v3regra ? esc(resumoRegraV3(p.regras.v3regra)) : '<span class="badge warn">sem regra cadastrada</span>'}</td>
+      <td style="white-space:nowrap"><button class="sec mini" data-v3regra="${i}">Regras…</button> <button class="perigo mini" data-v3rm="${i}" aria-label="Tirar da V3" title="Tirar da V3">✕</button></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Nenhum médico da V3. Use «+ Médico V3» ou importe a planilha de controle (bloco «MÉDICOS V3»).</td></tr>'}</tbody></table></div>
+    <div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div></div>`;
+}
+function ligarMedicosV3(pg) {
+  pg.querySelectorAll('[data-v3regra]').forEach(b => b.onclick = () => editarRegraV3(S.cfg.prestadores[+b.dataset.v3regra]));
+  pg.querySelectorAll('[data-v3rm]').forEach(b => b.onclick = async () => {
+    const p = S.cfg.prestadores[+b.dataset.v3rm];
+    if (!await confirmar(`Tirar ${esc(p.nomeMV)} da V3?`, 'O médico sai do Fechamento de Curitiba. A regra cadastrada fica guardada, caso volte.', 'Tirar da V3')) return;
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: false };
+    salvarCfg(`${p.cod} - ${p.nomeMV} deixou de ser médico V3.`, 'prestadores'); RENDER.bases();
+  });
+  if ($('v3Add')) $('v3Add').onclick = async () => {
+    const r = await dialogo('Incluir médico V3', campoBusca({ nome: 'prestador', rotulo: 'Prestador (busca no cadastro)', fonte: 'prestador', preencheCod: 'cod', obrigatorio: true }) + '<input type="hidden" name="cod">', [['', 'Cancelar', 'sec'], ['ok', 'Incluir e cadastrar a regra']]);
+    if (r.botao !== 'ok') return;
+    const cod = (r.campos.cod || r.campos.prestadorCod || '').trim(), p = S.cfg.prestadores.find(x => String(x.cod) === cod);
+    if (!p) return avisar('Escolha um prestador do cadastro (com código). Se ele não estiver lá, inclua em «+ Prestador manual».', 'warn');
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: true };
+    salvarCfg(`${p.cod} - ${p.nomeMV} marcado como médico V3.`, 'prestadores');
+    await editarRegraV3(p); RENDER.bases();
+  };
+}
+async function editarRegraV3(p) {
+  const op = await exigirOperador(); if (!op) return;
+  const atual = p.regras?.v3regra, g = JSON.parse(JSON.stringify(atual || regraV3Padrao()));
+  const outrosV3 = S.cfg.prestadores.filter(x => x !== p && x.regras?.v3 && x.regras.v3regra);
+  const faixas = [...g.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
+  const outros = [...g.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
+  const d = await dialogo(`Regras da V3 — ${p.cod} - ${p.nomeMV}`, `<span class="dlg-largo" hidden></span>
+    ${outrosV3.length ? `<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option>${opcoes(outrosV3.map(x => [String(x.cod), `${x.cod} - ${x.nomeMV}`]), '')}</select></label>` : ''}
+    ${atual ? '' : '<p class="small muted">Sem regra cadastrada: os campos vêm com a regra do Dr. Ian como ponto de partida. Ajuste e salve.</p>'}
+    <div class="grid4"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${g.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
+      <label class="campo">USG (inclui Doppler)<select name="usgForma">${opcoes(Object.entries(FORMAS_V3), g.usg.forma)}</select></label>
+      <label class="campo">% da USG<input type="number" step="0.01" min="0" name="usgPct" value="${g.usg.pct || ''}"><span class="small muted">para «% do líquido» ou «% do bruto»</span></label>
+      <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${g.usg.valor || ''}"></label></div>
+    <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(para «% do líquido por faixa»; volume = quantidade de exames de USG e Doppler no mês)</span></h4>
+    <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
+    <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), g.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, outros convênios) nunca são pagos na V3 e ficam sinalizados para exclusão.</span></label>
+    <h4 style="margin:8px 0 4px">Outros exames <span class="muted small">(texto que aparece no grupo ou na descrição do MV, ex.: DENSITOM)</span></h4>
+    <div class="tw"><table><thead><tr><th>Exame</th><th>Texto de busca</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
+      <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" value="${esc(o.padrao)}" style="width:110px"></td>
+      <td><select name="oForma${k}">${opcoes(FORMAS_OUTROS_V3.map(f => [f, FORMAS_V3[f]]), o.forma)}</select></td>
+      <td><input type="number" step="0.01" min="0" name="oPct${k}" value="${o.pct || ''}" style="width:70px"></td><td><input type="number" step="0.01" min="0" name="oVal${k}" value="${o.valor || ''}" style="width:90px"></td></tr>`).join('')}</tbody></table></div>
+    <p class="small muted">Exames da V3 que não forem USG/Doppler nem estiverem aqui ficam fora do cálculo, com aviso no Fechamento.</p>`,
+    [['', 'Cancelar', 'sec'], ...(atual ? [['limpar', 'Apagar regra', 'perigo']] : []), ['ok', 'Salvar regra']]);
+  if (d.botao === 'limpar') {
+    p.regras = { ...p.regras, v3regra: null, alteradoPor: op, alteradoEm: agoraISO() };
+    salvarCfg(`Regra da V3 de ${p.cod} - ${p.nomeMV} apagada.`, 'prestadores'); RENDER.bases(); return;
+  }
+  if (d.botao !== 'ok') return;
+  const c = d.campos;
+  let regra;
+  if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
+  else {
+    const num = v => v === '' || v === undefined ? '' : +v;
+    regra = {
+      impostos: +c.impostos || 0,
+      usg: { forma: c.usgForma, pct: +c.usgPct || 0, valor: +c.usgValor || 0,
+        faixas: [0, 1, 2, 3, 4].map(k => ({ de: num(c['fxDe' + k]), pct: num(c['fxPct' + k]) })).filter(f => f.pct !== '').map(f => ({ de: +f.de || 0, pct: +f.pct })).sort((a, b) => a.de - b.de) },
+      hm: c.hm,
+      outros: [0, 1, 2, 3].map(k => ({ nome: (c['oNome' + k] || '').trim(), padrao: String(c['oPad' + k] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(), forma: c['oForma' + k], pct: +c['oPct' + k] || 0, valor: +c['oVal' + k] || 0 })).filter(o => o.nome || o.padrao)
+    };
+  }
+  const erros = validarRegraV3(regra);
+  if (erros.length) return avisar('Regra não gravada: ' + erros.join('; ') + '.', 'err');
+  p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: true, v3regra: regra, alteradoPor: op, alteradoEm: agoraISO() };
+  salvarCfg(`Regra da V3 de ${p.cod} - ${p.nomeMV} ${atual ? 'atualizada' : 'cadastrada'}: ${resumoRegraV3(regra)}.`, 'prestadores'); RENDER.bases();
+}
+
+/* ---- src/ui/56-descontos.js ---- */
+/* ============================================================
+ * Descontos parcelados (SOL-F31): cadastro em Bases → Prestadores e alertas no Fechamento
+ * ============================================================ */
+const COR_SIT_DESC = { ativo: 'ok', recorrente: 'info', ultima: 'warn', quitado: 'ok', futuro: 'info', adiado: 'warn', encerrado: '' };
+function cardDescontos() {
+  const l = [...(S.cfg.descontos || [])].sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+  return `<div class="card" data-sub="prestadores" id="cardDesc"><h2>Descontos parcelados <span class="muted small">${l.length} cadastrado(s) · situação em ${rotuloCompetencia(S.comp)}</span></h2>
+    <p class="lead">Adiantamentos, pensão alimentícia e outros descontos combinados. A parcela de cada mês entra sozinha em DESCONTOS no Fechamento, com a observação «parcela 7/10». Dá para mudar à mão no mês, e a mudança fica registrada.</p>
+    <div class="tw"><table><thead><tr><th>Prestador</th><th>Motivo</th><th class="n">Parcela (R$)</th><th>Parcelas</th><th>Aplica em</th><th>Situação</th><th>Histórico</th><th></th></tr></thead><tbody>
+    ${l.map(d => { const sit = situacaoDesconto(d, S.comp), p = parcelaDoMes(d, S.comp), h = historicoDesconto(d, S.comp);
+      return `<tr><td>${esc(d.cod)} - ${esc(d.nome || '')}</td><td>${esc(d.motivo)}${d.obs ? `<small class="nc-det">${esc(d.obs)}</small>` : ''}</td><td class="n">${fmtBR(d.valorParcela)}</td>
+        <td>${+d.parcelas ? `${p ? `${p.n} de ${d.parcelas}` : `${d.parcelas} parcela(s)`}<small class="nc-det">início ${rotuloCompetencia(d.inicio)}</small>` : `recorrente<small class="nc-det">desde ${rotuloCompetencia(d.inicio)}</small>`}</td>
+        <td>${esc(TIPOS_DESCONTO[d.tipo] || d.tipo)}</td><td><span class="badge ${COR_SIT_DESC[sit.k] || ''}">${esc(sit.nome)}</span></td>
+        <td>${h.length ? `<details><summary class="small">${h.filter(x => !x.adiada).length} parcela(s) até ${rotuloCompetencia(S.comp)}</summary><ul class="small">${h.map(x => `<li>${rotuloCompetencia(x.chave)}: ${x.adiada ? 'adiada' : `${x.recorrente ? '' : `${x.n}/${x.total} · `}R$ ${fmtBR(x.valor)}`}</li>`).join('')}</ul></details>` : '<span class="muted small">—</span>'}</td>
+        <td style="white-space:nowrap"><button class="sec mini" data-desc-ed="${esc(d.id)}" aria-label="Editar">✎</button> <button class="perigo mini" data-desc-rm="${esc(d.id)}" aria-label="Excluir">✕</button></td></tr>`; }).join('') || '<tr><td colspan="8" class="muted">Nenhum desconto cadastrado.</td></tr>'}</tbody></table></div>
+    <div class="acoes"><button class="sec" data-desc-novo="">+ Desconto</button></div></div>`;
+}
+function ligarDescontos(raiz, depois) {
+  raiz.querySelectorAll('[data-desc-novo]').forEach(b => b.onclick = () => editarDesconto(null, b.dataset.descNovo || '').then(depois));
+  raiz.querySelectorAll('[data-desc-ed]').forEach(b => b.onclick = () => editarDesconto(b.dataset.descEd).then(depois));
+  raiz.querySelectorAll('[data-desc-rm]').forEach(b => b.onclick = async () => {
+    const d = S.cfg.descontos.find(x => x.id === b.dataset.descRm); if (!d) return;
+    if (!await confirmar('Excluir desconto?', `${esc(d.nome)} · ${esc(d.motivo)} · R$ ${fmtBR(d.valorParcela)}. Para parar de descontar e manter o histórico, use ✎ → «Encerrar».`, 'Excluir')) return;
+    S.cfg.descontos = S.cfg.descontos.filter(x => x !== d);
+    salvarCfg(`Desconto de ${d.cod} - ${d.nome} (${d.motivo}) excluído.`, 'prestadores'); depois();
+  });
+  raiz.querySelectorAll('[data-desc-adiar]').forEach(b => b.onclick = async () => {
+    if (!exigirAberta(S.comp, 'adiar a parcela')) return;
+    const d = S.cfg.descontos.find(x => x.id === b.dataset.descAdiar); if (!d) return;
+    d.adiadas = [...new Set([...(d.adiadas || []), S.comp])].sort();
+    salvarCfg(`Desconto de ${d.cod} - ${d.nome} (${d.motivo}): parcela de ${rotuloCompetencia(S.comp)} levada para o próximo mês.`, 'prestadores');
+    avisar('Parcela levada para o próximo mês: as seguintes andam um mês.', 'ok'); depois();
+  });
+  raiz.querySelectorAll('[data-desc-volta]').forEach(b => b.onclick = () => {
+    const d = S.cfg.descontos.find(x => x.id === b.dataset.descVolta); if (!d) return;
+    d.adiadas = (d.adiadas || []).filter(c => c !== S.comp);
+    salvarCfg(`Desconto de ${d.cod} - ${d.nome} (${d.motivo}): parcela de ${rotuloCompetencia(S.comp)} voltou a ser descontada.`, 'prestadores'); depois();
+  });
+}
+async function editarDesconto(id, tipoPadrao = '') {
+  const op = await exigirOperador(); if (!op) return;
+  S.cfg.descontos = S.cfg.descontos || [];
+  const atual = id ? S.cfg.descontos.find(x => x.id === id) : null;
+  const d = atual || { cod: '', nome: '', motivo: '', valorParcela: '', parcelas: '', inicio: S.comp, tipo: tipoPadrao || 'img', obs: '' };
+  const mesInput = k => k ? k : '';
+  const r = await dialogo(`${atual ? 'Editar' : 'Novo'} desconto parcelado`, `<div class="grid2">
+      ${campoBusca({ nome: 'prestador', rotulo: 'Prestador (busca no cadastro)', fonte: 'prestador', valor: d.nome, cod: d.cod, preencheCod: 'cod', obrigatorio: true })}
+      <label class="campo">Código<input type="text" name="cod" value="${esc(d.cod)}" style="max-width:120px"></label>
+      <label class="campo">Motivo *<input type="text" name="motivo" list="dlMotivoDesc" value="${esc(d.motivo)}" placeholder="ex.: Adiantamento"></label>
+      <label class="campo">Valor da parcela (R$) *<input type="number" step="0.01" min="0" name="valorParcela" value="${esc(d.valorParcela)}"></label>
+      <label class="campo">Número de parcelas<input type="number" step="1" min="0" name="parcelas" value="${+d.parcelas || ''}"><span class="small muted">vazio = recorrente (ex.: pensão)</span></label>
+      <label class="campo">Primeira parcela na competência *<input type="month" name="inicio" value="${esc(mesInput(d.inicio))}"></label>
+      <label class="campo">Aplica em *<select name="tipo">${opcoes(Object.entries(TIPOS_DESCONTO), d.tipo)}</select></label>
+      <label class="campo">Observação<input type="text" name="obs" value="${esc(d.obs || '')}"></label></div>
+    <datalist id="dlMotivoDesc">${['Adiantamento', 'Pensão alimentícia', 'Ajuste de repasse', ...new Set(S.cfg.descontos.map(x => x.motivo))].filter((v, i, a) => a.indexOf(v) === i).map(m => `<option value="${esc(m)}"></option>`).join('')}</datalist>
+    ${atual ? `<p class="small muted">Situação em ${rotuloCompetencia(S.comp)}: ${esc(situacaoDesconto(atual, S.comp).nome)}.${(atual.adiadas || []).length ? ` Adiadas: ${atual.adiadas.map(rotuloCompetencia).join(', ')}.` : ''}</p>` : ''}`,
+    [['', 'Cancelar', 'sec'], ...(atual && !atual.encerradoEm ? [['encerrar', `Encerrar em ${rotuloCompetencia(S.comp)}`, 'perigo']] : []), ...(atual?.encerradoEm ? [['reabrir', 'Reativar', 'sec']] : []), ['ok', atual ? 'Salvar' : 'Incluir']]);
+  if (r.botao === 'encerrar') { atual.encerradoEm = S.comp; salvarCfg(`Desconto de ${atual.cod} - ${atual.nome} (${atual.motivo}) encerrado em ${rotuloCompetencia(S.comp)}.`, 'prestadores'); return; }
+  if (r.botao === 'reabrir') { delete atual.encerradoEm; salvarCfg(`Desconto de ${atual.cod} - ${atual.nome} (${atual.motivo}) reativado.`, 'prestadores'); return; }
+  if (r.botao !== 'ok') return;
+  const c = r.campos, p = S.cfg.prestadores.find(x => String(x.cod) === c.cod.trim());
+  const dados = { cod: c.cod.trim(), nome: p?.nomeMV || c.prestador.trim(), motivo: c.motivo.trim(), valorParcela: +c.valorParcela || 0, parcelas: c.parcelas === '' ? 0 : +c.parcelas, inicio: c.inicio, tipo: c.tipo, obs: c.obs.trim() };
+  const erros = validarDesconto(dados);
+  if (!p && dados.cod) erros.push('o código não está no cadastro de prestadores');
+  if (erros.length) return avisar('Desconto não gravado: ' + erros.join('; ') + '.', 'warn');
+  if (atual) Object.assign(atual, dados, { alteradoPor: op, alteradoEm: agoraISO() });
+  else S.cfg.descontos.push({ id: novoId('desc'), ...dados, adiadas: [], por: op, em: agoraISO() });
+  salvarCfg(`Desconto ${atual ? 'alterado' : 'cadastrado'}: ${dados.cod} - ${dados.nome} · ${dados.motivo} · R$ ${fmtBR(dados.valorParcela)} ${dados.parcelas ? `× ${dados.parcelas}` : '(recorrente)'} desde ${rotuloCompetencia(dados.inicio)} · ${TIPOS_DESCONTO[dados.tipo]}.`, 'prestadores');
+  avisar(`Desconto ${atual ? 'atualizado' : 'cadastrado'}.`, 'ok');
+}
+// Fechamento: parcelas do mês e alertas do tipo (USG, IMG ou Curitiba).
+function cartaoDescontosFech(f, tipo) {
+  const lista = listaFech(f, tipo).filter(x => (x.parcelas || []).length), alertas = (f.alertasDescontos || []).filter(a => a.tipo === tipo);
+  const adiadas = (S.cfg.descontos || []).filter(d => d.tipo === tipo && (d.adiadas || []).includes(S.comp));
+  const cls = { ultima: 'warn', 'sem-valores': 'err', 'sem-linha': 'err', maior: 'err' };
+  return `<div class="card desc-cartao"><h3>Descontos parcelados do mês — ${NOME_TIPO_FECH[tipo]}</h3>
+    ${lista.length ? `<div class="tw"><table><thead><tr><th>Cód.</th><th>Prestador</th><th>Parcelas do mês</th><th class="n">Automático</th><th class="n">Em DESCONTOS</th></tr></thead><tbody>${lista.map(x => `<tr><td>${esc(x.cod)}</td><td>${esc(x.nome)}</td><td class="small">${x.parcelas.map(p => `${esc(p.obs)} · R$ ${fmtBR(p.valor)}`).join('<br>')}</td><td class="n">${x.temValores ? fmtBR(x.descontosAuto) : '<span class="small muted">sem valores</span>'}</td><td class="n"><b>${fmtBR(x.descontos)}</b>${x.descontosManual ? ' <span class="badge warn">manual</span>' : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma parcela neste mês.</p>'}
+    ${alertas.length ? `<h4 style="margin:10px 0 4px">Alertas</h4>${alertas.map(a => `<div class="alerta-desc ${cls[a.k] || ''}">${esc(a.texto)}${a.adiar ? ` <button class="sec mini" data-desc-adiar="${esc(a.id)}">Levar para o próximo mês</button>` : ''}</div>`).join('')}` : ''}
+    ${adiadas.length ? `<p class="small muted">Adiadas neste mês: ${adiadas.map(d => `${esc(d.nome)} · ${esc(d.motivo)} <button class="sec mini" data-desc-volta="${esc(d.id)}">desfazer</button>`).join(' · ')}</p>` : ''}
+    <div class="acoes"><button class="sec" data-desc-novo="${tipo}">+ Desconto</button><span class="small muted">Cadastro completo em Bases → Prestadores e regras → Descontos parcelados.</span></div></div>`;
 }
 
 /* ---- src/ui/60-rodadas.js ---- */
@@ -5598,7 +6114,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto } };   // usado pelos testes automatizados
 })();
 
 </script>

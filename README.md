@@ -32,6 +32,8 @@ node test/fechamento.mjs        # aba Fechamento: valores com aceite, situação
 node test/arquivos.mjs          # arquivos da sessão: genérico na correção, limpar, outra produção
 node test/correcao_excel.mjs    # Excel da correção de prestador (aba «Corrigir no MV»)
 node test/busca.mjs             # campo de busca no cadastro (NCs)
+node test/v3.mjs                # regras da V3 (Curitiba): cálculo, e-mail, fechamento, exportação e HM na conferência
+node test/descontos.mjs         # descontos parcelados: parcela automática, alertas, adiar e exportação
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

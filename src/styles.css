@@ -249,3 +249,6 @@ button.fs{border:0;cursor:pointer;font:inherit;font-size:11px;font-weight:700}
 .menu-sit button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500}
 .menu-sit button:hover{background:var(--infobg)}.menu-sit small{color:var(--muted);font-size:11px;white-space:nowrap}
 .menu-sit hr{border:0;border-top:1px solid var(--line);margin:4px 0}.menu-sit .rodape{font-size:12px;color:var(--muted);padding:6px 10px}
+.memoria-v3{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;max-height:52vh;overflow:auto}
+dialog:has(.dlg-largo){max-width:900px}
+.alerta-desc{border-radius:8px;padding:7px 10px;margin:4px 0;font-size:13px;background:var(--bg);border:1px solid var(--line)}

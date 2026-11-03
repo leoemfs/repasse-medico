@@ -51,6 +51,20 @@
 
 A classe de quem não tem classe fixa depende da produção de USG: rode e aceite todos os relatórios de USG da competência antes de fechar o IMG.
 
+## Novidades da v2.0.0-alpha.12
+### Repasse Curitiba (V3)
+1. Em **Bases → Prestadores e regras → Médicos V3**, confira quem é V3 e clique em **Regras…** para cadastrar a regra de cada médico. Use «Copiar a regra de» quando for igual à de outro médico (ex.: Dr. Augusto = Dr. Ian).
+2. Rode a conferência dos relatórios da unidade 5 como nas outras unidades e dê o aceite. Os HM aparecem com «HM V3 devido» (USG/Doppler Unimed) ou «HM V3 a excluir».
+3. Em **Fechamento → Repasse Curitiba (V3)**, o total da NF de cada médico sai calculado pela regra. Clique em **Memória de cálculo** para ver a conta, ou em **Copiar e-mail** para colar o texto no e-mail.
+
+O Doppler sempre conta como USG: entra no volume de exames e no faturamento de USG.
+
+### Descontos parcelados
+1. Em **Bases → Prestadores e regras → Descontos parcelados**, clique em **+ Desconto**. Informe prestador, motivo, valor da parcela, número de parcelas (vazio para recorrente, como pensão), a competência da primeira parcela e em qual fechamento entra.
+2. No Fechamento, a parcela do mês já aparece em DESCONTOS com o selo «auto» e a observação «parcela 7/10».
+3. Para mudar só neste mês, digite o valor (fica «manual» e registrado). Apague o valor para voltar ao automático.
+4. Leia os alertas no cartão «Descontos parcelados do mês». Quando o prestador estiver sem valores, use **Levar para o próximo mês**.
+
 ## Novidades da v2.0.0-alpha.11
 
 - **Situação com ação manual:** clique no selo da situação. As opções são:

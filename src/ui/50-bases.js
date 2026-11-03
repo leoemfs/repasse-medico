@@ -30,7 +30,7 @@ RENDER.bases = () => {
     <p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
     ${S.apolo ? `<details style="margin-top:12px"><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Lista para conferência. Nenhum vínculo é criado automaticamente.</p><ul class="small">${semVinculo.map(([m, n]) => `<li>${esc(m)} — ${n} laudos</li>`).join('')}</ul></details>` : ''}</div>
 
-  ${cardClasses()}${cardConvenios()}
+  ${cardMedicosV3()}${cardDescontos()}${cardClasses()}${cardConvenios()}
   <div class="card" id="cardFat" data-sub="faturistas"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
     ${(() => { const nNC = S.nc ? contar(S.nc.itens, x => norm(x.responsavel)) : new Map(); return `<div class="tw"><table><thead><tr><th>Nome</th><th>Unidade(s)</th><th>Genérico</th><th>Ativo</th><th class="n">NCs</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.faturistas.map((f, i) => `<tr>
       <td><input type="text" data-fat="${i}" data-c="nome" value="${esc(f.nome)}"></td><td><input type="text" data-fat="${i}" data-c="unidades" value="${esc(f.unidades || '')}" placeholder="ex.: 17, 5"></td>
@@ -62,7 +62,7 @@ RENDER.bases = () => {
     if (c === 'pctMed' || c === 'pctRes') { const v = inp.value === '' ? null : +inp.value / 100; u.pctUSG = { medico: null, residente: null, ...(u.pctUSG || {}) }; u.pctUSG[c === 'pctMed' ? 'medico' : 'residente'] = v; return; }
     u[c] = c === 'apolo' ? inp.value.split('|').map(s => s.trim()).filter(Boolean) : inp.value.trim();
   });
-  ligarRegras(pg);
+  ligarRegras(pg); ligarMedicosV3(pg); ligarDescontos(pg, () => RENDER.bases());
   pg.querySelectorAll('[data-urm]').forEach(b => b.onclick = () => { S.cfg.unidades.splice(+b.dataset.urm, 1); RENDER.bases(); });
   $('unAdd').onclick = () => { S.cfg.unidades.push({ cod: '', nome: '', apolo: [], pbi: '', empresa: '' }); RENDER.bases(); };
   $('unPad').onclick = async () => { if (await confirmar('Restaurar unidades padrão?', 'A tabela de unidades volta ao padrão.')) { S.cfg.unidades = configPadrao().unidades; salvarCfg('Unidades restauradas.'); RENDER.bases(); } };

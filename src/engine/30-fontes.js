@@ -90,7 +90,7 @@ async function lerPowerBI(bytes, nome) {
 /* ---------- Modalidade ---------- */
 // Grupo de procedimento do MV → modalidades do Apolo (MODALITY) que podem conter o laudo.
 const GRUPO_MODALIDADES = [
-  [/ULTRASSONOGRAFIA|ECOCARDIOGRAMA/, ['US']],
+  [/ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA/, ['US']],   // Doppler é sempre do grupo de USG
   [/TOMOGRAFIA/, ['CT']],
   [/RESSONANCIA/, ['MR']],
   [/RADIOLOGIA/, ['CR', 'DX']],

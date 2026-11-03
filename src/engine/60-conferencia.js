@@ -30,7 +30,9 @@ const MARCADORES = {
   'valor-simbolico': 'Valor simbólico',
   'possivel-bilateral': 'Laudo já usado por linha do mesmo código',
   'modalidade-desconhecida': 'Modalidade do grupo não mapeada',
-  'laudo-sem-data': 'Laudo sem data válida'
+  'laudo-sem-data': 'Laudo sem data válida',
+  'hm-v3-devido': 'HM V3 devido',
+  'hm-v3-excluir': 'HM V3 a excluir'
 };
 
 // Período de produção coberto pelo relatório: do 1º dia do mês da menor data ao último dia do mês da maior.
@@ -49,7 +51,7 @@ function laudosDaUnidade(apolo, cfg, unidadeCod) {
 
 function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const tol = +opc.tol, minTrunc = +cfg.parametros.minTruncamento, simb = +cfg.parametros.valorSimbolico;
-  const idx = indiceEquivalencias(eqBase);
+  const idx = indiceEquivalencias(eqBase), unidadeV3 = !!opc.unidadeCod && opc.unidadeCod !== '*' && ehUnidadeV3(cfg, opc.unidadeCod);
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const porDia = new Map();
@@ -102,6 +104,17 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
+    // V3 (Curitiba): HM de USG/Doppler Unimed é devido mesmo sem laudo; os demais HM não são pagos (SOL-F30).
+    if (b.tipo === 'hm' && unidadeV3) {
+      if (hmV3Devido(r.grupoNome, r.procDesc, r.convenio)) {
+        marc.add('hm-v3-devido'); out.status = 'conferido';
+        motivos.push('HM V3 devido: HM de USG/Doppler do convênio Unimed entra no repasse da V3, mesmo sem laudo (regra da unidade).');
+      } else {
+        marc.add('hm-v3-excluir'); out.status = 'hm-pendente';
+        motivos.push(`HM V3 a excluir: na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», convênio «${r.convenio || '—'}»). Sinalizar para exclusão; não é NC por si só.`);
+      }
+      linhas.push(out); continue;
+    }
     if (b.tipo !== 'procedimento') {
       out.status = b.tipo === 'hm' ? 'hm-pendente' : b.tipo === 'desconhecido' ? 'classificacao-pendente' : 'nao-procedimental';
       motivos.push(b.tipo === 'hm' ? 'Item HM: preservado e fora do cruzamento de procedimentos até existir regra validada (RN-201).'
