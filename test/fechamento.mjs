@@ -93,8 +93,9 @@ const x = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,
 wb=openpyxl.load_workbook(sys.argv[1]); u=wb.worksheets[0]
 linha=[r for r in u.iter_rows(values_only=True) if r[0]==15][0]
 form=[c.value for c in u[[c.row for c in u['A'] if c.value==15][0]] if isinstance(c.value,str) and c.value.startswith('=')]
-print(json.dumps({'abas':wb.sheetnames,'linha':[v for v in linha if v is not None],'form':form,'leg':any(r[0]=='Concluído' for r in u.iter_rows(values_only=True))}))`, arq]).toString());
-ok(JSON.stringify(x.abas) === JSON.stringify(['REPASSE USG 15-10-2026', 'REPASSE IMG 30-10-2026', 'PRODUÇÃO USG CLASSE']), `abas: ${x.abas.join(', ')}`);
+print(json.dumps({'abas':wb.sheetnames,'linha':[v for v in linha if v is not None],'form':form,'leg':any(r[1]=='Concluído' for r in u.iter_rows(values_only=True)),'mesc':[str(m) for m in u.merged_cells.ranges],'fmt':u.cell(row=[c.row for c in u['A'] if c.value==15][0],column=3).number_format,'zoom':u.sheet_view.zoomScale}))`, arq]).toString());
+ok(JSON.stringify(x.abas) === JSON.stringify(['REPASSE USG 15-10-2026', 'REPASSE IMG 30-10-2026', 'REPASSE CURITIBA 30-10-2026', 'PRODUÇÃO USG CLASSE 10-2026']), `abas: ${x.abas.join(', ')}`);
+ok(x.mesc.includes('A1:M1') && x.mesc.includes('A3:M3') && x.mesc.includes('A4:B4') && x.mesc.includes('K4:K6') && x.mesc.includes('I5:I6') && x.fmt.includes('R$') && x.zoom === 85, `layout do modelo: mesclagens, formato contábil R$ e zoom 85% (${x.mesc.slice(0, 6).join(' ')})`);
 ok(x.linha.includes(4926.59) && x.linha.includes(725) && x.form.length === 2 && x.leg, `linha do prestador 15 com valor, plantão e fórmulas de total (${JSON.stringify(x.linha.slice(0, 6))})`);
 const [dl2] = await Promise.all([p.waitForEvent('download'), p.click('#fhInd')]);
 ok(/^Indicadores_fechamento_10-2026/.test(dl2.suggestedFilename()), 'indicadores exportados à parte');

@@ -149,73 +149,134 @@ function textoPreviaPrestador(x, cfg, chave, dataPagamento) {
   return L.join('\n');
 }
 
-/* ---------- Exportação: três abas no layout da planilha de controle ---------- */
+/* ---------- Exportação no layout da planilha de controle (modelo enviado em 03/11/2026) ----------
+ * Abas: REPASSE USG (blocos por faixa) · REPASSE IMG · REPASSE CURITIBA · PRODUÇÃO USG CLASSE.
+ * Arial 10, bordas finas, cabeçalho azul 1F4E78, CNPJ em azul-claro, percentuais em azul médio,
+ * valores em formato contábil R$, totais com fórmula, zoom 85%. */
+const EST_FECH = {
+  cab: { b: true, fc: 'FFFFFF', fill: '1F4E78', al: 'center', va: 'center', wrap: true, bd: 'tudo' },
+  titulo: { fc: '1F4E78', al: 'center', va: 'center', wrap: true, bd: 'tudo' },
+  cnpjRot: { b: true, fill: 'DCEAF7', al: 'center', va: 'center', wrap: true, bd: 'tudo' },
+  cnpj: { fill: 'DCEAF7', al: 'center', va: 'center', wrap: true, bd: 'tudo' },
+  pct: { fill: 'A6CAEC', al: 'center', va: 'center', fmt: 'pct2', bd: 'tudo' },
+  centro: { al: 'center', va: 'center', bd: 'tudo' },
+  centroB: { b: true, al: 'center', va: 'center', bd: 'tudo' },
+  texto: { al: 'left', va: 'center', bd: 'tudo' },
+  valor: { fmt: 'acct', va: 'center', bd: 'tudo' },
+  valorB: { b: true, fmt: 'acct', al: 'center', va: 'center', bd: 'tudo' },
+  num: { fmt: 'num2', al: 'center', va: 'center', bd: 'tudo' },
+  numB: { b: true, fmt: 'num2', al: 'center', va: 'center', bd: 'tudo' },
+  aviso: { b: true, fc: 'C00000', al: 'left', va: 'center', wrap: true },
+  rotulo: { b: true, al: 'center', va: 'center', wrap: true, bd: 'tudo' }
+};
 function xlsxFechamento(f, cfg, meta = {}) {
-  const N = { b: true }, money = { fmt: 'money' }, tit = { b: true, fc: '1F4E78' };
-  const stNome = x => { const s = SITUACAO_FECH[x.situacao]; return { b: true, fill: s.cor, fc: s.fc }; };
-  const col = i => colLetra(i);
-  const prev = f.previa ? [[{ v: `PRÉVIA — ${f.semAceite} prestador(es) sem aceite. Valores sujeitos a alteração.`, st: { b: true, fc: 'C00000' } }], []] : [];
-  const legenda = () => [[], [{ v: 'LEGENDA', st: N }], ...Object.values(SITUACAO_FECH).map(s => [{ v: s.nome, st: { fill: s.cor, fc: s.fc, b: true } }])];
-  // USG
-  const unUSG = cfg.unidades.filter(u => u.pctUSG && f.usg.some(x => x.unidades[u.cod] !== undefined) || (u.pctUSG && u.cnpj));
-  const U = [...prev];
-  const faixas = [...new Set(f.usg.map(x => x.p?.regras?.faixaUSG || ''))];
+  const E = EST_FECH, col = colLetra, dt = d => d ? fmtData(d).replace(/\//g, '-') : '';
+  const sit = (x, base) => { const s = SITUACAO_FECH[x.situacao]; return x.situacao === 'sem' && !meta.corSemValores ? { ...base, fc: '000000' } : { ...base, fill: s.cor, fc: s.fc }; };
+  const unNome = u => `${u.cod}- ${u.nome}`;
+  const topo = (titulo, ultima, M) => { M.push(`A1:${col(ultima)}1`); return [[{ v: f.previa ? `PRÉVIA — ${f.semAceite} prestador(es) sem aceite. Valores sujeitos a alteração.` : titulo, st: f.previa ? E.aviso : { ...E.aviso, fc: '1F4E78' } }], []]; };
+  const legenda = (L, c) => { L.push([], []); const pad = Array(c).fill(''); L.push([...pad, { v: 'LEGENDA', st: E.rotulo }]); for (const s of Object.values(SITUACAO_FECH)) L.push([...pad, { v: s.nome, st: { ...E.rotulo, fill: s.cor, fc: s.fc } }]); };
+  const observacoes = (L, c, linhas) => { if (!linhas.length) return; const pad = Array(c).fill(''); L.push([], [...pad, { v: 'OBSERVAÇÕES:', st: { b: true } }], ...linhas.map(t => [...pad, t])); };
+
+  /* ---- REPASSE USG: um bloco por faixa ---- */
+  const unUSG = cfg.unidades.filter(u => u.pctUSG && (u.cnpj || f.usg.some(x => x.unidades[u.cod] !== undefined)));
+  const nU = unUSG.length, cB = 2 + nU, cP = cB + 1, cT = cB + 2, cD = cB + 3, cG = cB + 4;
+  const MU = [], AU = {}, U = topo(`REPASSE USG — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagUSG ? fmtData(meta.pagUSG) : ''}`, cG, MU);
+  const faixas = [...new Set(f.usg.map(x => x.p?.regras?.faixaUSG || ''))].sort((a, b) => cfg.faixasUSG.findIndex(y => y.id === a) - cfg.faixasUSG.findIndex(y => y.id === b));
   for (const fx of faixas) {
     const faixa = cfg.faixasUSG.find(y => y.id === fx), lista = f.usg.filter(x => (x.p?.regras?.faixaUSG || '') === fx);
-    U.push([{ v: (faixa?.nome || 'SEM FAIXA CADASTRADA').toUpperCase(), st: tit }]);
-    U.push([{ v: 'EMPRESAS', st: CAB }, { v: '', st: CAB }, ...unUSG.map(u => ({ v: `${u.cod}- ${u.nome}`, st: CAB })), ...['BOARD', 'PLANTÃO', 'TOTAL', 'DESCONTOS', 'TOTAL GERAL BRUTO'].map(v => ({ v, st: CAB }))]);
-    U.push([{ v: 'CNPJ PARA EMISSÃO DA NOTA FISCAL', st: N }, '', ...unUSG.map(u => u.cnpj), cfg.fechamento.cnpjBoard, cfg.fechamento.cnpjPlantao]);
-    U.push([{ v: 'PORCENTAGEM', st: N }, '', ...unUSG.map(u => { const p = lista[0] ? pctUSGEsperado(cfg, { regras: { ...(lista[0].p?.regras || {}), pctUSGUnidade: {} } }, u.cod) : null; return p === null ? '' : { v: p, st: { fmt: 'pct' } }; })]);
+    const r = U.length + 1;
+    U.push([{ v: (faixa?.nome || 'Sem faixa cadastrada').toUpperCase(), st: E.titulo }, ...Array(cG).fill({ v: '', st: E.titulo })]); MU.push(`A${r}:${col(cG)}${r}`);
+    U.push([{ v: 'EMPRESAS', st: E.cab }, { v: '', st: E.cab }, ...unUSG.map(u => ({ v: unNome(u), st: E.cab })), ...['BOARD', 'PLANTÃO', 'TOTAL', 'DESCONTOS', 'TOTAL GERAL BRUTO'].map(v => ({ v, st: E.cab }))]);
+    AU[r + 1] = 38.25;
+    MU.push(`A${r + 1}:B${r + 1}`, ...[cT, cD, cG].map(c => `${col(c)}${r + 1}:${col(c)}${r + 3}`));
+    U.push([{ v: 'CNPJ PARA EMISSÃO DA NOTA FISCAL', st: E.cnpjRot }, { v: '', st: E.cnpjRot }, ...unUSG.map(u => ({ v: u.cnpj || '', st: E.cnpj })), { v: cfg.fechamento.cnpjBoard, st: E.cnpj }, { v: cfg.fechamento.cnpjPlantao, st: E.cnpj }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
+    MU.push(`A${r + 2}:B${r + 2}`, `${col(cB)}${r + 2}:${col(cB)}${r + 3}`, `${col(cP)}${r + 2}:${col(cP)}${r + 3}`);
+    const pctDe = u => pctUSGEsperado(cfg, { regras: { faixaUSG: fx, pctUSGUnidade: {} } }, u.cod);
+    U.push([{ v: 'PORCENTAGEM', st: E.cnpjRot }, { v: '', st: E.cnpjRot }, ...unUSG.map(u => { const p = faixa ? pctDe(u) : null; return { v: p === null ? '' : p, st: E.pct }; }), { v: '', st: E.cnpj }, { v: '', st: E.cnpj }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
+    MU.push(`A${r + 3}:B${r + 3}`);
     for (const x of lista) {
-      const n = U.length + 1, ini = col(2), fim = col(2 + unUSG.length + 1);
-      U.push([{ v: +x.cod || x.cod, st: stNome(x) }, { v: x.nome, st: stNome(x) }, ...unUSG.map(u => x.unidades[u.cod] !== undefined ? { v: x.unidades[u.cod], st: money } : ''),
-        x.board ? { v: x.board, st: money } : '', x.plantao ? { v: x.plantao, st: money } : '',
-        { v: x.total, f: `SUM(${ini}${n}:${fim}${n})`, st: money }, { v: x.descontos, st: money }, { v: x.totalGeral, f: `${col(2 + unUSG.length + 2)}${n}-${col(2 + unUSG.length + 3)}${n}`, st: { ...money, b: true } },
-        x.avisos.length ? { v: x.avisos.join(' · '), st: { fc: '9C5700' } } : '']);
+      const n = U.length + 1;
+      U.push([{ v: +x.cod || x.cod, st: sit(x, E.centro) }, { v: x.nome, st: sit(x, E.texto) }, ...unUSG.map(u => ({ v: x.unidades[u.cod] ?? '', st: E.valor })),
+        { v: x.board || '', st: E.valor }, { v: x.plantao || '', st: E.valor }, { v: x.total, f: `SUM(${col(2)}${n}:${col(cP)}${n})`, st: E.valor },
+        { v: x.descontos, st: E.valor }, { v: x.totalGeral, f: `${col(cT)}${n}-${col(cD)}${n}`, st: E.valor }]);
     }
     U.push([]);
   }
-  if (f.fech.obs.usg) U.push([{ v: 'OBSERVAÇÕES:', st: N }], [f.fech.obs.usg]);
-  U.push(...legenda());
-  // IMG
-  const unIMG = cfg.unidades.filter(u => u.cnpj && (f.img.some(x => x.unidades[u.cod] !== undefined) || u.pctUSG || u.cod === '5'));
-  const cabIMG = ['VALOR PRODUÇÃO DE USG', 'CLASSE', 'MÉDICOS', '', ...unIMG.map(u => `${u.cod}- ${u.nome}`), 'PLANTÃO', 'TOTAL PRODUZIDO', 'DESCONTOS', 'TOTAL GERAL BRUTO'];
-  const I = [...prev, cabecalho(cabIMG), ['', '', '', '', ...unIMG.map(u => u.cnpj), cfg.fechamento.cnpjPlantao]];
-  const linhaIMG = x => {
-    const n = I.length + 1, a = x.classeFixa ? 'FIXO CLASSE' : x.producaoUSG ? { v: x.producaoUSG, st: money } : 'SEM PROD. USG';
-    return [a, x.classe, { v: +x.cod || x.cod, st: stNome(x) }, { v: x.nome, st: stNome(x) }, ...unIMG.map(u => x.unidades[u.cod] !== undefined ? { v: x.unidades[u.cod], st: money } : ''),
-      x.plantao ? { v: x.plantao, st: money } : '', { v: x.total, f: `SUM(${col(4)}${n}:${col(4 + unIMG.length)}${n})`, st: money }, { v: x.descontos, st: money },
-      { v: x.totalGeral, f: `${col(5 + unIMG.length)}${n}-${col(6 + unIMG.length)}${n}`, st: { ...money, b: true } }, x.avisos.length ? { v: x.avisos.join(' · '), st: { fc: '9C5700' } } : ''];
+  observacoes(U, 1, [...f.usg.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.usg ? [f.fech.obs.usg] : [])]);
+  legenda(U, 1);
+
+  /* ---- REPASSE IMG (sem os médicos da V3, que vão para a aba de Curitiba) ---- */
+  const tabelaIMG = (lista, unidades, MI, AI) => {
+    const nI = unidades.length, cPl = 4 + nI, cTo = cPl + 1, cDe = cPl + 2, cGe = cPl + 3, L = [];
+    const r = 3;
+    L.push([{ v: 'VALOR PRODUÇÃO DE USG', st: E.cab }, { v: 'CLASSE', st: E.cab }, { v: 'EMPRESAS', st: E.cab }, { v: '', st: E.cab }, ...unidades.map(u => ({ v: unNome(u), st: E.cab })), ...['PLANTÃO', 'TOTAL PRODUZIDO', 'DESCONTOS', 'TOTAL GERAL BRUTO'].map(v => ({ v, st: E.cab }))]);
+    AI[r] = 38.25;
+    MI.push(`A${r}:A${r + 2}`, `B${r}:B${r + 2}`, `C${r}:D${r}`, ...[cTo, cDe, cGe].map(c => `${col(c)}${r}:${col(c)}${r + 2}`));
+    L.push([{ v: '', st: E.cab }, { v: '', st: E.cab }, { v: 'CNPJ PARA EMISSÃO DA NOTA FISCAL', st: E.cnpjRot }, { v: '', st: E.cnpjRot }, ...unidades.map(u => ({ v: u.cnpj || '', st: E.cnpj })), { v: cfg.fechamento.cnpjPlantao, st: E.cnpj }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
+    MI.push(`C${r + 1}:D${r + 1}`, ...[...unidades.map((u, k) => 4 + k), cPl].map(c => `${col(c)}${r + 1}:${col(c)}${r + 2}`));
+    L.push([{ v: '', st: E.cab }, { v: '', st: E.cab }, { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, ...unidades.map(() => ({ v: '', st: E.cnpj })), { v: '', st: E.cnpj }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
+    MI.push(`C${r + 2}:D${r + 2}`);
+    for (const x of lista) {
+      const n = r + L.length;
+      const a = x.classeFixa ? { v: 'FIXO CLASSE', st: E.centroB } : x.producaoUSG ? { v: x.producaoUSG, st: E.valorB } : { v: 'SEM PROD. USG', st: E.centroB };
+      L.push([a, { v: x.classe, st: E.centroB }, { v: +x.cod || x.cod, st: sit(x, E.centro) }, { v: x.nome, st: sit(x, E.texto) }, ...unidades.map(u => ({ v: x.unidades[u.cod] ?? '', st: E.valor })),
+        { v: x.plantao || '', st: E.valor }, { v: x.total, f: `SUM(${col(4)}${n}:${col(cPl)}${n})`, st: E.valorB }, { v: x.descontos, st: E.valorB }, { v: x.totalGeral, f: `${col(cTo)}${n}-${col(cDe)}${n}`, st: E.valorB }]);
+    }
+    return { L, ultima: cGe };
   };
-  for (const x of f.img.filter(y => !y.p?.regras?.v3)) I.push(linhaIMG(x));
-  const v3 = f.img.filter(y => y.p?.regras?.v3);
-  if (v3.length) { I.push([], [{ v: 'MÉDICOS V3 QUE RECEBEM PELA SRA (LAUDOS)', st: tit }]); for (const x of v3) I.push(linhaIMG(x)); }
-  const comp = f.fech.blocos.complementar || [], cet = f.fech.blocos.cetrus || [];
-  if (comp.length) {
-    I.push([], [{ v: `NF COMPLEMENTAR REPASSE LAUDOS PET-CT E PLUVICTO 17- ${unidadePorCod(cfg, '17')?.nome || ''} ${unidadePorCod(cfg, '17')?.cnpj || ''}`, st: tit }], cabecalho(['', '', 'MÉDICOS', '', 'LAUDOS PET-CT', 'APLICAÇÃO PLUVICTO', 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR']));
-    for (const c of comp) { const n = I.length + 1; I.push(['', '', +c.cod || c.cod, c.nome, { v: +c.petct || 0, st: money }, { v: +c.pluvicto || 0, st: money }, { v: r2((+c.petct || 0) + (+c.pluvicto || 0)), f: `SUM(E${n}:F${n})`, st: money }]); }
-  }
+  const imgPrincipal = f.img.filter(x => !x.p?.regras?.v3);
+  const unIMG = cfg.unidades.filter(u => u.cnpj && (u.pctUSG || u.cod === '5' || imgPrincipal.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => +a.cod - +b.cod);
+  const MI = [], AI = {}, tI = tabelaIMG(imgPrincipal, unIMG, MI, AI);
+  const I = [...topo(`REPASSE IMG — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagIMG ? fmtData(meta.pagIMG) : ''}`, tI.ultima, MI), ...tI.L];
+  // NFs complementares (Curso Cetrus; PET-CT e Pluvicto) no layout da planilha.
+  const u17 = unidadePorCod(cfg, '17');
+  const cet = f.fech.blocos.cetrus || [], comp = f.fech.blocos.complementar || [];
   if (cet.length) {
-    I.push([], [{ v: `NF COMPLEMENTAR REPASSE CURSO CETRUS 17- ${unidadePorCod(cfg, '17')?.nome || ''} ${unidadePorCod(cfg, '17')?.cnpj || ''}`, st: tit }], cabecalho(['', '', 'MÉDICOS', '', `R$ ${fmtBR(f.fech.valorPeriodoCetrus)} POR PERÍODO`, 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR']));
-    for (const c of cet) { const n = I.length + 1; I.push(['', '', +c.cod || c.cod, c.nome, +c.periodos || 0, { v: r2((+c.periodos || 0) * f.fech.valorPeriodoCetrus), f: `E${n}*${f.fech.valorPeriodoCetrus}`, st: money }]); }
+    I.push([]); let r = I.length + 1;
+    I.push(['', '', { v: `NF COMPLEMENTAR REPASSE CURSO CETRUS 17- ${u17?.nome || ''} ${u17?.cnpj || ''}`, st: E.titulo }, { v: '', st: E.titulo }, { v: '', st: E.titulo }, { v: '', st: E.titulo }]); MI.push(`C${r}:F${r}`);
+    r = I.length + 1;
+    I.push(['', '', { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, { v: `R$ ${fmtBR(f.fech.valorPeriodoCetrus)} POR PERÍODO`, st: E.cab }, { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], ['', '', { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
+    MI.push(`C${r}:D${r + 1}`, `E${r}:E${r + 1}`, `F${r}:F${r + 1}`);
+    for (const c of cet) { const n = I.length + 1; I.push(['', '', { v: +c.cod || c.cod, st: E.centro }, { v: c.nome, st: E.texto }, { v: +c.periodos || 0, st: E.centro }, { v: r2((+c.periodos || 0) * f.fech.valorPeriodoCetrus), f: `E${n}*${f.fech.valorPeriodoCetrus}`, st: E.valorB }]); }
   }
-  const obsDesc = f.img.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`);
-  if (f.fech.obs.img || obsDesc.length) I.push([], [{ v: 'OBSERVAÇÕES:', st: N }], ...obsDesc.map(t => [t]), ...(f.fech.obs.img ? [[f.fech.obs.img]] : []));
-  I.push(...legenda());
-  // PRODUÇÃO USG CLASSE
+  if (comp.length) {
+    I.push([]); let r = I.length + 1;
+    I.push(['', '', { v: `NF COMPLEMENTAR REPASSE LAUDOS PET-CT E PLUVICTO 17- ${u17?.nome || ''} ${u17?.cnpj || ''}`, st: E.titulo }, ...Array(4).fill({ v: '', st: E.titulo })]); MI.push(`C${r}:G${r}`);
+    r = I.length + 1;
+    I.push(['', '', { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, { v: 'LAUDOS PET-CT', st: E.cab }, { v: 'APLICAÇÃO PLUVICTO', st: E.cab }, { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], ['', '', ...Array(5).fill({ v: '', st: E.cab })]);
+    MI.push(`C${r}:D${r + 1}`, `E${r}:E${r + 1}`, `F${r}:F${r + 1}`, `G${r}:G${r + 1}`); AI[r] = 26.25; AI[r + 1] = 26.25;
+    for (const c of comp) { const n = I.length + 1; I.push(['', '', { v: +c.cod || c.cod, st: E.centro }, { v: c.nome, st: E.texto }, { v: +c.petct || '', st: E.valor }, { v: +c.pluvicto || '', st: E.valor }, { v: r2((+c.petct || 0) + (+c.pluvicto || 0)), f: `SUM(E${n}:F${n})`, st: E.valorB }]); }
+  }
+  observacoes(I, 3, [...imgPrincipal.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.img ? [f.fech.obs.img] : [])]);
+  legenda(I, 3);
+
+  /* ---- REPASSE CURITIBA (V3): médicos da V3. As regras próprias da V3 entram na SOL-F30. ---- */
+  const v3 = f.img.filter(x => x.p?.regras?.v3);
+  const unV3 = cfg.unidades.filter(u => u.cnpj && (u.cod === '5' || v3.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => +a.cod - +b.cod);
+  const MC = [], AC = {}, tC = tabelaIMG(v3, unV3, MC, AC);
+  const C = [...topo(`REPASSE CURITIBA (V3) — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagCuritiba ? fmtData(meta.pagCuritiba) : ''}`, tC.ultima, MC), ...tC.L];
+  if (!v3.length) C.push([], [{ v: 'Nenhum médico da V3 cadastrado (Bases → Prestadores e regras → «Médico V3»).', st: { va: 'center' } }]);
+  C.push([], [{ v: 'Regras próprias da V3 (faixas por volume, impostos, HM Unimed de USG e Doppler) em implementação: SOL-F30. Valores conforme os relatórios do MV.', st: { fc: '7F7F7F' } }]);
+  legenda(C, 3);
+
+  /* ---- PRODUÇÃO USG CLASSE ---- */
   const unProd = cfg.unidades.filter(u => u.pctUSG);
-  const P = [...prev, [{ v: `Competência ${rotuloCompetencia(f.chave)} · produção ${rotuloMes(producaoEsperada(f.chave))}`, st: N }],
-    cabecalho(['CLASSE', 'MÉDICOS', '', ...unProd.map(u => `UNIDADE ${u.cod}`), 'TOTAL', '']), ['', '', '', ...unProd.map(u => ({ v: u.pctUSG.medico, st: { fmt: 'pct' } }))]];
-  for (const x of f.img) {
+  const cTot = 3 + unProd.length, cObs = cTot + 1, MP = [], AP = {};
+  const P = [...topo(`PRODUÇÃO USG CLASSE — COMPETÊNCIA ${rotuloCompetencia(f.chave)}`, cObs, MP)];
+  P.push([{ v: `Competência ${rotuloCompetencia(f.chave)} · produção ${rotuloMes(producaoEsperada(f.chave))}`, st: { al: 'center', va: 'center' } }]); MP.push(`A3:${col(cObs)}3`);
+  P.push([{ v: 'CLASSE', st: E.cab }, { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, ...unProd.map(u => ({ v: `UNIDADE ${u.cod}`, st: E.cab })), { v: 'TOTAL', st: E.cab }, { v: 'Observação', st: E.cab }]);
+  P.push([{ v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }, ...unProd.map(u => ({ v: u.pctUSG.medico, st: E.pct })), { v: '', st: E.cab }, { v: '', st: E.cab }]);
+  MP.push('A4:A5', 'B4:C5', `${col(cTot)}4:${col(cTot)}5`, `${col(cObs)}4:${col(cObs)}5`);
+  for (const x of imgPrincipal) {
     const n = P.length + 1, prod = f.usg.find(y => y.cod === x.cod)?.producao || {};
-    P.push([x.classe, +x.cod || x.cod, x.nome, ...unProd.map(u => prod[u.cod] !== undefined ? { v: prod[u.cod], st: money } : ''), { v: x.producaoUSG, f: `SUM(D${n}:${col(2 + unProd.length)}${n})`, st: { ...money, b: true } },
-      x.classeFixa ? `FIXO CLASSE ${x.classe}` : !x.producaoUSG ? 'SEM PROD. USG/CLASSE D' : '']);
+    P.push([{ v: x.classe, st: E.centroB }, { v: +x.cod || x.cod, st: E.centro }, { v: x.nome, st: E.texto }, ...unProd.map(u => ({ v: prod[u.cod] ?? '', st: E.num })),
+      { v: x.producaoUSG, f: `SUM(D${n}:${col(cTot - 1)}${n})`, st: E.numB }, { v: x.classeFixa ? `FIXO CLASSE ${x.classe}` : !x.producaoUSG ? 'SEM PROD. USG/CLASSE D' : '', st: E.centroB }]);
   }
-  const dt = d => d ? fmtData(d).replace(/\//g, '-') : '';
   return criarXlsx([
-    { nome: `REPASSE USG ${dt(meta.pagUSG)}`.trim(), larguras: [10, 38, ...unUSG.map(() => 16), 12, 12, 14, 12, 16, 60], linhas: U, filtro: false, congelar: false },
-    { nome: `REPASSE IMG ${dt(meta.pagIMG)}`.trim(), larguras: [18, 8, 10, 38, ...unIMG.map(() => 15), 12, 15, 12, 16, 60], linhas: I, filtro: false, congelar: false },
-    { nome: 'PRODUÇÃO USG CLASSE', larguras: [8, 10, 38, ...unProd.map(() => 14), 15, 26], linhas: P, filtro: false, congelar: false }
+    { nome: `REPASSE USG ${dt(meta.pagUSG)}`.trim(), larguras: [6, 50.3, ...unUSG.map(() => 18.1), 18.6, 18.1, 16.4, 16.4, 18.1], linhas: U, mesclar: MU, alturas: AU, zoom: 85, filtro: false, congelar: false },
+    { nome: `REPASSE IMG ${dt(meta.pagIMG)}`.trim(), larguras: [18, 8.4, 10, 48.3, ...Array(tI.ultima - 6).fill(21.3), 15, 12, 16], linhas: I, mesclar: MI, alturas: AI, zoom: 85, filtro: false, congelar: false },
+    { nome: `REPASSE CURITIBA ${dt(meta.pagCuritiba)}`.trim(), larguras: [18, 8.4, 10, 48.3, ...Array(Math.max(0, tC.ultima - 6)).fill(21.3), 15, 12, 16], linhas: C, mesclar: MC, alturas: AC, zoom: 85, filtro: false, congelar: false },
+    { nome: `PRODUÇÃO USG CLASSE ${f.chave.slice(5)}-${f.chave.slice(0, 4)}`, larguras: [8.4, 10, 49.6, ...unProd.map(() => 14), 15, 26], linhas: P, mesclar: MP, alturas: AP, zoom: 85, filtro: false, congelar: false }
   ]);
 }
 function xlsxIndicadoresFechamento(f, ind, meta = {}) {

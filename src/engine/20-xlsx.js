@@ -103,24 +103,27 @@ function mapearColunas(cabecalho, campos) {
 const limpaXml = s => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
 const escXml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-/* Gera .xlsx. sheets: [{nome, larguras, linhas:[[célula]], filtro, congelar, semFiltroUltimas}]
- * célula: valor simples | {v, f, st:{b,fc,fill,fmt:'date'|'money'|'pct'|'int'|'text',al,wrap,bt}}
+/* Gera .xlsx. sheets: [{nome, larguras, linhas:[[célula]], filtro, congelar, semFiltroUltimas, mesclar:['A1:M1'], alturas:{linha: pt}, zoom}]
+ * célula: valor simples | {v, f, st:{b,fc,fill,fmt:'date'|'money'|'acct'|'pct'|'pct2'|'num2'|'int'|'text',al,va,wrap,bt,bd:'tudo'}}
  * Textos são gravados como string em linha: códigos TUSS e zeros à esquerda não viram número. */
 function criarXlsx(sheets) {
   const fonts = [], fills = ['<fill><patternFill patternType="none"/></fill>', '<fill><patternFill patternType="gray125"/></fill>'];
   const borders = ['<border><left/><right/><top/><bottom/><diagonal/></border>'];
   const xfs = [], reg = {};
   const idx = (arr, x) => { let i = arr.indexOf(x); if (i < 0) { arr.push(x); i = arr.length - 1; } return i; };
-  const FMT = { date: 164, money: 4, pct: 10, int: 1, text: 49 };
+  const FMT = { date: 164, money: 4, pct: 10, pct2: 10, num2: 4, int: 1, text: 49, acct: 165 };
   const estilo = st => {
     st = st || {};
     const key = JSON.stringify(st);
     if (reg[key] !== undefined) return reg[key];
     const f = idx(fonts, `<font>${st.b ? '<b/>' : ''}<sz val="10"/>${st.fc ? `<color rgb="FF${st.fc}"/>` : ''}<name val="Arial"/></font>`);
     const fl = st.fill ? idx(fills, `<fill><patternFill patternType="solid"><fgColor rgb="FF${st.fill}"/><bgColor indexed="64"/></patternFill></fill>`) : 0;
-    const bd = st.bt ? idx(borders, '<border><left/><right/><top style="medium"><color auto="1"/></top><bottom/><diagonal/></border>') : 0;
+    const fino = l => `<${l} style="thin"><color auto="1"/></${l}>`;
+    const bd = st.bd === 'tudo' ? idx(borders, `<border>${fino('left')}${fino('right')}${fino('top')}${fino('bottom')}<diagonal/></border>`)
+      : st.bt ? idx(borders, '<border><left/><right/><top style="medium"><color auto="1"/></top><bottom/><diagonal/></border>') : 0;
     const nf = FMT[st.fmt] || 0;
-    const al = (st.al || st.wrap) ? `<alignment${st.al ? ` horizontal="${st.al}"` : ''} vertical="${st.wrap ? 'top' : 'center'}"${st.wrap ? ' wrapText="1"' : ''}/>` : '';
+    const va = st.va || (st.wrap ? 'top' : 'center');
+    const al = (st.al || st.wrap || st.va) ? `<alignment${st.al ? ` horizontal="${st.al}"` : ''} vertical="${va}"${st.wrap ? ' wrapText="1"' : ''}/>` : '';
     xfs.push(`<xf numFmtId="${nf}" fontId="${f}" fillId="${fl}" borderId="${bd}" xfId="0" applyFont="1"${fl ? ' applyFill="1"' : ''}${bd ? ' applyBorder="1"' : ''}${nf ? ' applyNumberFormat="1"' : ''}${al ? ' applyAlignment="1">' + al + '</xf>' : '/>'}`);
     reg[key] = xfs.length - 1;
     return reg[key];
@@ -145,18 +148,20 @@ function criarXlsx(sheets) {
         else if (typeof v === 'boolean') cs += `<c r="${ref}" s="${s}" t="inlineStr"><is><t>${v ? 'SIM' : 'NÃO'}</t></is></c>`;
         else cs += `<c r="${ref}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${escXml(limpaXml(v))}</t></is></c>`;
       });
-      rows += `<row r="${n}">${cs}</row>`;
+      const h = sh.alturas?.[n];
+      rows += `<row r="${n}"${h ? ` ht="${h}" customHeight="1"` : ''}>${cs}</row>`;
     });
     const nCols = Math.max(1, ...sh.linhas.map(l => (l || []).length));
     const ult = Math.max(1, sh.linhas.length - (sh.semFiltroUltimas || 0));
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">` +
-      `<sheetViews><sheetView workbookViewId="0">${sh.congelar === false ? '' : '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>'}</sheetView></sheetViews>` +
+      `<sheetViews><sheetView${sh.zoom ? ` zoomScale="${sh.zoom}" zoomScaleNormal="${sh.zoom}"` : ''} workbookViewId="0">${sh.congelar === false ? '' : '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>'}</sheetView></sheetViews>` +
       `<sheetFormatPr defaultRowHeight="15"/>${(sh.larguras || []).length ? `<cols>${sh.larguras.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols>` : ''}` +
-      `<sheetData>${rows}</sheetData>${sh.filtro && sh.linhas.length > 1 ? `<autoFilter ref="A1:${colLetra(nCols - 1)}${ult}"/>` : ''}</worksheet>`;
+      `<sheetData>${rows}</sheetData>${sh.filtro && sh.linhas.length > 1 ? `<autoFilter ref="A1:${colLetra(nCols - 1)}${ult}"/>` : ''}` +
+      `${(sh.mesclar || []).length ? `<mergeCells count="${sh.mesclar.length}">${sh.mesclar.map(m => `<mergeCell ref="${m}"/>`).join('')}</mergeCells>` : ''}</worksheet>`;
   });
   const nomes = sheets.map(s => escXml(s.nome.slice(0, 31)));
   const dn = sheets.map((s, i) => s.filtro && s.linhas.length > 1 ? `<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${nomes[i]}'!$A$1:$${colLetra(Math.max(1, ...s.linhas.map(l => (l || []).length)) - 1)}$${Math.max(1, s.linhas.length - (s.semFiltroUltimas || 0))}</definedName>` : '').join('');
-  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/></numFmts><fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="${borders.length}">${borders.join('')}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="2"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/><numFmt numFmtId="165" formatCode="${escXml('_-"R$"\\ * #,##0.00_-;\\-"R$"\\ * #,##0.00_-;_-"R$"\\ * "-"??_-;_-@_-')}"/></numFmts><fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="${borders.length}">${borders.join('')}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
   const zip = new JSZip();
   zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`);
   zip.file('_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`);

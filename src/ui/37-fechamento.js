@@ -122,7 +122,7 @@ async function copiarTexto(texto, titulo) {
 }
 async function exportarFechamento(f, mk) {
   const mmaaaa = `${S.comp.slice(5)}-${S.comp.slice(0, 4)}`;
-  await baixarZip(xlsxFechamento(f, S.cfg, { pagUSG: mk.pagUSG, pagIMG: mk.pagIMG }), `REPASSE_${mmaaaa}_CONTROLE${f.previa ? '_PREVIA' : ''}_${carimbo()}.xlsx`);
+  await baixarZip(xlsxFechamento(f, S.cfg, { pagUSG: mk.pagUSG, pagIMG: mk.pagIMG, pagCuritiba: mk.pagCuritiba }), `REPASSE_${mmaaaa}_CONTROLE${f.previa ? '_PREVIA' : ''}_${carimbo()}.xlsx`);
   // Evidência nas etapas de envio do Fluxo mensal (não conclui nada sozinha).
   const comp = S.fluxo.competencias[S.comp];
   if (comp && !compFechada()) {

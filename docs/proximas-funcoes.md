@@ -533,3 +533,27 @@ Pergunta de 03/11/2026: «no fechamento, em status não consigo selecionar nada;
   - «Marcar e-mail enviado» (SOL-F12): grava a data no controle documental do Fluxo, que é o dono do dado;
   - «NF recebida» e «NF encaminhada ao Financeiro»: também gravam no controle documental do Fluxo.
 - A marca manual fica na competência, com quem fez e quando, e conta nos indicadores e na exportação (cor «Verificar»).
+
+## SOL-F33 — Exportação do Fechamento no layout do modelo do usuário — IMPLEMENTADA na v2.0.0-alpha.10
+Modelo: `exemplo_saida_repasse_usg_img_v3_e_produção.xlsx` (03/11/2026).
+- **Abas:**
+  - REPASSE USG dd-mm-aaaa;
+  - REPASSE IMG dd-mm-aaaa;
+  - **REPASSE CURITIBA dd-mm-aaaa** (nova);
+  - PRODUÇÃO USG CLASSE mm-aaaa.
+- **REPASSE USG:** um bloco por faixa (médicos geral, com acréscimo de 2%, residentes, 40%, 49%, 50%, 55%, 70%).
+  - Cada bloco tem o título mesclado, o cabeçalho EMPRESAS · unidades · BOARD · PLANTÃO · TOTAL · DESCONTOS · TOTAL GERAL BRUTO (os três últimos mesclados em três linhas), a linha CNPJ (BOARD e PLANTÃO mesclados) e a linha PORCENTAGEM com o percentual da faixa em cada unidade.
+- **REPASSE IMG:**
+  - colunas: produção de USG, classe, médico e unidades 1, 2, 4, 5, 7, 10 e 17;
+  - cabeçalho mesclado, como no modelo;
+  - blocos de NF complementar (Curso Cetrus; PET-CT e Pluvicto) no layout do modelo;
+  - os médicos V3 saem desta aba.
+- **REPASSE CURITIBA:** os médicos V3, no mesmo layout do IMG. As regras próprias da V3 entram com a SOL-F30.
+- **PRODUÇÃO USG CLASSE:** cabeçalho CLASSE · MÉDICOS · UNIDADE n · TOTAL · Observação, com a linha de percentuais.
+- **Formatação:**
+  - Arial 10, bordas finas, cabeçalho azul 1F4E78 com texto branco;
+  - CNPJ em azul-claro (DCEAF7), percentuais em azul (A6CAEC);
+  - valores em formato contábil R$, totais com fórmula;
+  - zoom 85%, larguras do modelo.
+- **Cores e legenda:** a cor da situação fica no código e no nome; «Sem valores» fica sem cor, como no modelo. A legenda vai no fim de cada aba.
+- **Ainda não incluído:** a coluna de avisos não vai mais para a planilha; os avisos ficam na tela.

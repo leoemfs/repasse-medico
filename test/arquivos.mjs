@@ -35,7 +35,7 @@ ok(await S(() => window.__RM.S.relatorios.length === 0 && !!window.__RM.S.apolo)
 
 // 3) Carregar arquivo de outra produção: pergunta antes de incluir.
 await S(() => { localStorage.setItem('rm2.competencia', JSON.stringify('2026-11')); });
-await p.reload(); await p.waitForFunction(() => window.__RM && /11\/2026/.test(document.getElementById('compGlobal').textContent));
+await p.reload(); await p.waitForFunction(() => window.__RM && /11\/2026/.test(document.getElementById('compGlobal')?.textContent || ''), null, { polling: 200, timeout: 30000 });
 await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.waitForSelector('#dlg[open]');
 ok(/produção <b>09\/2026<\/b>|produção 09\/2026/.test(await p.innerHTML('#dlgCorpo')) && /espera produção 10\/2026/.test(await p.textContent('#dlgCorpo')), 'PDF de produção 09/2026 na competência 11/2026: a ferramenta pergunta');
 await botao('');
