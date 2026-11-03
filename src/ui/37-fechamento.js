@@ -2,7 +2,10 @@
  * Fechamento do repasse da competência: USG, IMG, produção e classe, indicadores e exportação
  * ============================================================ */
 const FH = { sub: 'usg' };
-const chipSitFech = k => `<span class="fs fs-${k}">${esc(SITUACAO_FECH[k].nome)}</span>`;
+// Selo da situação: estático nos indicadores; com x, vira botão que abre o menu de ações (SOL-F32).
+const chipSitFech = (k, x = null, modo = '') => x
+  ? `<button type="button" class="fs fs-${k} fs-menu" data-sit="${esc(modo || x.tipo)}|${esc(x.cod)}" title="Mudar a situação">${esc(SITUACAO_FECH[k].nome)}${x.manual ? ' ✎' : ''} ▾</button>${x.manual ? `<small class="fs-manual">manual: «${esc(x.manual.motivo)}» · ${esc(x.manual.por || '—')} ${new Date(x.manual.em).toLocaleDateString('pt-BR')}</small>` : ''}`
+  : `<span class="fs fs-${k}">${esc(SITUACAO_FECH[k].nome)}</span>`;
 function fechDaCompetencia(chave = S.comp) {
   const c = estadoCompetencia(S.compReg, chave);
   return { ...fechamentoVazio(), ...(c.fechamento || {}) };
@@ -56,7 +59,7 @@ function desenharUSG(corpo, f, mk) {
     ${faixas.map(fx => { const fa = S.cfg.faixasUSG.find(y => y.id === fx), l = f.usg.filter(x => (x.p?.regras?.faixaUSG || '') === fx);
       // Percentual da faixa embaixo de cada unidade, alinhado com a coluna.
       return `<tr class="fh-faixa"><td colspan="3">${esc(fa?.nome || 'Sem faixa cadastrada (Bases → Prestadores e regras)')}</td>${un.map(u => { const p = fa ? pctUSGEsperado(S.cfg, { regras: { faixaUSG: fx, pctUSGUnidade: {} } }, u.cod) : null; return `<td class="n fh-pct">${p === null ? '' : r2(p * 100) + '%'}</td>`; }).join('')}<td colspan="8"></td></tr>` +
-        l.map(x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao)}</td>${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}
+        l.map(x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'usg')}</td>${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}
           <td class="n">${x.board ? fmtBR(x.board) : ''}</td><td class="n">${inputAjuste('usg', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('usg', x, 'descontos')}</td><td>${inputAjuste('usg', x, 'obs', 160)}</td>
           <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="usg|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`).join(''); }).join('')}
     <tr class="fh-total"><td></td><td>TOTAL USG</td><td></td>${un.map(u => `<td class="n">${fmtBR(f.usg.reduce((s, x) => s + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.board, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.plantao, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.total, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(f.usg.reduce((s, x) => s + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr>
@@ -70,7 +73,7 @@ function desenharUSG(corpo, f, mk) {
 function desenharIMG(corpo, f, mk, modo) {
   const v3 = modo === 'curitiba', lista = f.img.filter(x => !!x.p?.regras?.v3 === v3);
   const un = S.cfg.unidades.filter(u => u.cnpj && (v3 ? (u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)) : (u.pctUSG || u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)))).sort((a, b) => +a.cod - +b.cod);
-  const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao)}</td>
+  const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, modo)}</td>
     ${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}<td class="n">${inputAjuste('img', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('img', x, 'descontos')}</td><td>${inputAjuste('img', x, 'obs', 160)}</td>
     <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="${modo}|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`;
   const cab = `<thead><tr><th class="n">Produção USG</th><th>Classe</th><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th>${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>`;
@@ -165,6 +168,7 @@ function ligarFech(corpo, f, mk) {
     const [modo, cod] = b.dataset.copiar.split('|'), x = (modo === 'usg' ? f.usg : f.img).find(y => y.cod === cod);
     copiarTexto(textoPreviaPrestador(x, S.cfg, S.comp, modo === 'usg' ? mk.pagUSG : modo === 'curitiba' ? mk.pagCuritiba : mk.pagIMG, f.nfs.filter(n => n.tipo === modo)), `Prévia de ${x.nome}`);
   });
+  corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
   corpo.querySelectorAll('[data-nf-nova]').forEach(b => b.onclick = () => editarNF(b.dataset.nfNova));
   corpo.querySelectorAll('[data-nf-ed]').forEach(b => b.onclick = () => { const n = f.nfs.find(x => x.id === b.dataset.nfEd); if (n) editarNF(n.tipo, n.id); });
   corpo.querySelectorAll('[data-nf-rm]').forEach(b => b.onclick = async () => {
@@ -188,4 +192,52 @@ async function exportarFechamento(f, mk) {
     salvarFluxo();
   }
   avisar(`Planilha ${f.previa ? 'PRÉVIA ' : ''}da competência ${rotuloCompetencia(S.comp)} gerada${comp ? '; registrada como evidência no Fluxo mensal (etapas de envio)' : ''}.`, 'ok');
+}
+
+/* ---------- Situação do prestador: menu de ações (SOL-F32) ----------
+ * «Verificar» manual fica no fechamento da competência; envio e NF gravam no controle documental do
+ * Fluxo mensal (o dono desses dados), e a situação calculada passa a refletir isso. */
+const GRUPO_DOC = { usg: 'usg', img: 'img', curitiba: 'curitiba' };
+const ACOES_DOC = [['relatorio', 'E-mail enviado (relatório e prévia)'], ['nfRecebida', 'NF recebida'], ['nfFinanceiro', 'NF encaminhada ao Financeiro']];
+function fecharMenuSituacao() { const m = $('menuSit'); if (m) m.remove(); }
+document.addEventListener('click', e => { if (!e.target.closest('#menuSit')) fecharMenuSituacao(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuSituacao(); });
+window.addEventListener('scroll', fecharMenuSituacao, true);
+function abrirMenuSituacao(btn, f) {
+  fecharMenuSituacao();
+  const [modo, cod] = btn.dataset.sit.split('|'), lista = modo === 'usg' ? f.usg : f.img, x = lista.find(y => y.cod === cod); if (!x) return;
+  const comp = S.fluxo.competencias[S.comp], doc = comp?.grupos?.[GRUPO_DOC[modo]]?.documental?.[cod] || {};
+  const m = document.createElement('div'); m.id = 'menuSit'; m.className = 'menu-sit'; m.setAttribute('role', 'menu');
+  m.innerHTML = `<div class="cab">Situação de «${esc(x.nome)}»</div>
+    ${x.manual ? '<button type="button" data-ac="tirar">Tirar a marca «Verificar» (volta ao calculado)</button>' : '<button type="button" data-ac="verificar">Marcar para verificar… <small>pede o motivo</small></button>'}
+    <hr>${ACOES_DOC.map(([k, t]) => `<button type="button" data-ac="${k}">${doc[k] ? `✓ ${t} · ${fmtData(paraData(doc[k]))} <small>desfazer</small>` : `${t} <small>grava no Fluxo</small>`}</button>`).join('')}
+    <hr><div class="rodape">Situação calculada: ${esc(SITUACAO_FECH[x.situacaoCalculada || x.situacao].nome)}</div>`;
+  document.body.appendChild(m);
+  const r = btn.getBoundingClientRect(), w = 320;
+  m.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left)) + 'px';
+  m.style.top = (r.bottom + 4 + m.offsetHeight > window.innerHeight ? Math.max(8, r.top - m.offsetHeight - 4) : r.bottom + 4) + 'px';
+  m.querySelectorAll('[data-ac]').forEach(b => b.onclick = async e => { e.stopPropagation(); fecharMenuSituacao(); await acaoSituacao(b.dataset.ac, modo, x); });
+}
+async function acaoSituacao(ac, modo, x) {
+  if (!exigirAberta(S.comp, 'mudar a situação')) return;
+  const op = await exigirOperador(); if (!op) return;
+  const tipo = x.tipo;   // as marcas manuais usam a tabela do prestador (usg ou img; V3 fica em img)
+  if (ac === 'verificar') {
+    const r = await dialogo(`Marcar «${x.nome}» para verificar`, `<p class="small muted">A marca fica por cima da situação calculada até você tirar. Aparece na tela e na planilha (cor «Verificar»).</p><label class="campo">Motivo (obrigatório)<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Marcar']]);
+    if (r.botao !== 'ok') return;
+    if (!r.campos.motivo.trim()) return avisar('Informe o motivo.', 'warn');
+    salvarFech(fe => { fe.manual = fe.manual || {}; fe.manual[tipo] = { ...(fe.manual[tipo] || {}), [x.cod]: { motivo: r.campos.motivo.trim(), por: op, em: agoraISO() } }; });
+    avisar(`${x.nome} marcado para verificar.`, 'ok');
+  } else if (ac === 'tirar') {
+    salvarFech(fe => { if (fe.manual?.[tipo]) delete fe.manual[tipo][x.cod]; });
+    avisar(`Marca «Verificar» retirada de ${x.nome}.`, 'ok');
+  } else {
+    const comp = S.fluxo.competencias[S.comp], g = comp?.grupos?.[GRUPO_DOC[modo]];
+    if (!comp) return avisar(`Inicie o checklist da competência ${rotuloCompetencia(S.comp)} no Fluxo mensal para registrar envio e NF.`, 'warn');
+    if (!g?.documental) return avisar('O grupo deste repasse no Fluxo mensal não tem controle documental.', 'warn');
+    const d = g.documental[x.cod] = g.documental[x.cod] || novoDocumental({ cod: x.cod, nome: x.nome });
+    d[ac] = d[ac] ? '' : isoDia(new Date());
+    salvarFluxo(); avisar(`${x.nome}: ${ACOES_DOC.find(a => a[0] === ac)[1]} ${d[ac] ? `registrado em ${fmtData(paraData(d[ac]))}` : 'desfeito'} (controle documental do Fluxo).`, 'ok');
+  }
+  RENDER.fechamento();
 }

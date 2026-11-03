@@ -114,6 +114,9 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     // Situação
     const d = [doc(x.tipo, x.cod), x.tipo === 'img' ? doc('curitiba', x.cod) : null].filter(Boolean);
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
+    // Marca manual «Verificar» (SOL-F32) fica por cima do cálculo até ser retirada.
+    const manual = fech.manual?.[x.tipo]?.[x.cod];
+    if (manual) { x.situacaoCalculada = x.situacao; x.situacao = 'verificar'; x.manual = manual; x.avisos.push(`marcado para verificar: ${manual.motivo}`); }
     if (x.semAceite.length) x.avisos.push(`sem aceite na(s) unidade(s) ${x.semAceite.join(', ')}`);
     if (x.pendencias) x.avisos.push(`${x.pendencias} pendência(s) na conferência`);
     // Classe (IMG) e produção

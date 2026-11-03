@@ -241,3 +241,11 @@ small.evid{display:block;color:var(--info)}
 .busca-lista .op b{min-width:48px;color:var(--accent)}.busca-lista .op small{margin-left:auto;color:var(--muted);font-size:11px;text-align:right}
 .busca-lista .op.novo{border-top:1px solid var(--line);color:var(--accent);font-weight:600}.busca-lista .op.vazio{color:var(--muted);cursor:default}
 #dlgCorpo{overflow:visible}
+/* Menu da situação do prestador (Fechamento) */
+button.fs{border:0;cursor:pointer;font:inherit;font-size:11px;font-weight:700}
+.fs-manual{display:block;font-size:11px;color:var(--err);white-space:normal;max-width:240px;margin-top:2px}
+.menu-sit{position:fixed;z-index:80;width:320px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:6px}
+.menu-sit .cab{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:6px 10px 4px;font-weight:700}
+.menu-sit button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500}
+.menu-sit button:hover{background:var(--infobg)}.menu-sit small{color:var(--muted);font-size:11px;white-space:nowrap}
+.menu-sit hr{border:0;border-top:1px solid var(--line);margin:4px 0}.menu-sit .rodape{font-size:12px;color:var(--muted);padding:6px 10px}

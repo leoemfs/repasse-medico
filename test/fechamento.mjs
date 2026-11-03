@@ -122,6 +122,20 @@ ok(ev === '1,ni', `evidência registrada na etapa de envio de USG sem concluí-l
 await S(() => { const r = window.__RM.S.rodadas.at(-1), c = JSON.parse(JSON.stringify(r)); c.id = 'rodant'; c.chaveCompetencia = '2026-09'; c.em = '2026-09-20T10:00:00Z'; c.linhas.forEach(l => { l.vlRepasse = l.vlRepasse / 2; }); window.__RM.S.rodadas.push(c); return new Promise(res => { const rq = indexedDB.open('repasse-medico-v2', 1); rq.onsuccess = () => { const tx = rq.result.transaction('rodadas', 'readwrite'); tx.objectStore('rodadas').put(c); tx.oncomplete = () => res(); }; }); });
 await abrirFech();
 ok(/variação de \+/.test(await linhaPrest('15').textContent()), 'aviso de variação acima de 30% contra a competência anterior');
+// 10) Situação com ação manual (F32).
+const menu = async () => { await linhaPrest('15').locator('[data-sit]').click(); await p.waitForSelector('#menuSit'); };
+await menu();
+await p.screenshot({ path: out + 'fechamento_menu_situacao.png' });
+ok(/Marcar para verificar/.test(await p.textContent('#menuSit')) && /Situação calculada: Conferido/.test(await p.textContent('#menuSit')), 'menu da situação abre no selo');
+await p.click('#menuSit [data-ac="relatorio"]'); await p.waitForTimeout(400);
+ok(/E-mail enviado/.test(await linhaPrest('15').textContent()) && await S(() => window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.documental['15'].relatorio) === '2026-10-30', '«E-mail enviado» grava a data no controle documental do Fluxo');
+await menu(); await p.click('#menuSit [data-ac="verificar"]'); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="motivo"]', 'conferir plantão com a escala'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForTimeout(400);
+const l15b = await linhaPrest('15').textContent();
+ok(/Verificar ✎/.test(l15b) && /conferir plantão com a escala/.test(l15b), 'marca manual «Verificar» com motivo por cima do calculado');
+await menu(); ok(/Situação calculada: E-mail enviado/.test(await p.textContent('#menuSit')), 'menu mostra a situação calculada por baixo da marca');
+await p.click('#menuSit [data-ac="tirar"]'); await p.waitForTimeout(400);
+ok(/E-mail enviado/.test(await linhaPrest('15').textContent()) && !/✎/.test(await linhaPrest('15').textContent()), 'tirar a marca volta ao calculado');
 // Celular sem rolagem da página.
 const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true })).newPage();
 await m.goto(html + '#fechamento'); await m.waitForSelector('[data-fsub]');
