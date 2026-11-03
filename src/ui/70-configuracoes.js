@@ -48,7 +48,7 @@ RENDER.configuracoes = () => {
       S.cfg = b.configuracao; S.eq = b.equivalencias; salvarCfg(); salvarEq();
       if (b.fluxo && !validarFluxo(b.fluxo).length) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = b.fluxo; salvarFluxo(); }
       if (b.competencias && !validarRegistroCompetencias(b.competencias).length) { S.compReg = b.competencias; salvarCompReg(); }
-      if (b.nc && !validarNC(b.nc).length) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = b.nc; aplicarRetencaoNC(S.nc, retencaoNC()); salvarNC(); }
+      if (b.nc && !validarNC(b.nc).length) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = b.nc; aplicarRetencaoNC(S.nc, retencaoNC()); S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos; S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave)); salvarNC(); }
       if (migrarConfig(S.cfg)) salvarCfg();
       if (Array.isArray(b.rodadas)) for (const r of b.rodadas) await guardarRodada(r);
       avisar('Backup restaurado.', 'ok'); RENDER.configuracoes();

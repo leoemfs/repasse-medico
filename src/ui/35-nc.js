@@ -13,6 +13,8 @@ function carregarNC() {
   const b = lerLocal(CHAVES.nc);
   S.nc = b && !validarNC(b).length ? b : ncVazia();
   const n = aplicarRetencaoNC(S.nc, retencaoNC());
+  S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos;
+  S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave));
   if (n) { salvarNC(); setTimeout(() => avisar(`${n} não conformidade(s) passaram de ${retencaoNC()} dias: nome e ID do paciente foram apagados (retenção).`, 'info'), 400); }
 }
 function salvarNC(msg = '') {
@@ -28,10 +30,18 @@ function atualizarNavNC() {
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
 }
 
-/* ---------- Candidatos da sessão (só na memória: somem ao recarregar a página) ---------- */
+/* ---------- Candidatos das análises (SOL-F17) ----------
+ * Guardados na base de NCs, por competência, com a mesma retenção (60 dias): ao recarregar a página
+ * a revisão continua de onde parou. A análise rodada de novo substitui os candidatos dela. */
 function guardarCandidatosNC(chave, rotulo, curto, itens) {
-  S.ncCand = (S.ncCand || []).filter(f => f.chave !== chave);
-  S.ncCand.push({ chave, rotulo, curto, itens, competencia: S.comp });
+  S.nc.candidatos = (S.nc.candidatos || []).filter(f => f.chave !== chave);
+  S.nc.candidatos.push({ chave, rotulo, curto, itens, competencia: S.comp, em: agoraISO() });
+  S.ncCand = S.nc.candidatos; salvarNC();
+}
+function dispensarCandidatosNC(cands) {
+  S.nc.dispensados = S.nc.dispensados || [];
+  for (const c of cands) if (!S.ncDispensados.has(c.chave)) { S.ncDispensados.add(c.chave); S.nc.dispensados.push({ chave: c.chave, competencia: S.comp, por: S.operador || '', em: agoraISO() }); }
+  salvarNC();
 }
 function chavesRegistradasNC() { return new Set(S.nc.itens.flatMap(x => [chaveNC(x), x.origem?.chaveCandidato]).filter(Boolean)); }
 // Lista achatada com o estado de cada candidato: nova, registrada ou dispensada.
@@ -215,8 +225,8 @@ function desenharRevisao() {
   $('rvReg').onclick = async () => { const s = selecionados(); if (!s.length) return avisar('Selecione ao menos uma linha.', 'warn'); if (await abrirRegistroNC(s)) { NCV.selCand.clear(); RENDER.nc(); } };
   $('rvDisp').onclick = () => {
     const s = selecionados(); if (!s.length) return avisar('Selecione ao menos uma linha.', 'warn');
-    S.ncDispensados = S.ncDispensados || new Set(); s.forEach(c => S.ncDispensados.add(c.chave)); NCV.selCand.clear();
-    avisar(`${s.length} candidato(s) dispensado(s) nesta sessão.`, 'ok'); RENDER.nc();
+    dispensarCandidatosNC(s); NCV.selCand.clear();
+    avisar(`${s.length} candidato(s) dispensado(s). Fica guardado na competência.`, 'ok'); RENDER.nc();
   };
 }
 

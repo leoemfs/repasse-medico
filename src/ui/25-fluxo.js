@@ -36,7 +36,8 @@ const nomeTarefaRef = (comp, gId, ref) => {
   return tarefa ? { g, t, nome: (g !== gId ? grupo.nome + ': ' : '') + tarefa.nome, status: comp.grupos[g]?.tarefas[t]?.status } : null;
 };
 
-RENDER.fluxo = () => {
+RENDER.fluxo = async () => {
+  if (DB.ok) S.rodadas = await dbTodas();   // sugestões e classificação usam as rodadas mais recentes
   FX.chave = S.comp || chaveAtual();
   const p = $('pag-fluxo');
   p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
@@ -58,6 +59,8 @@ function desenharAcompanhamento() {
     $('fxIrModelo').onclick = () => { FX.sub = 'modelo'; RENDER.fluxo(); };
     c.querySelectorAll('[data-k]').forEach(a => a.onclick = e => { e.preventDefault(); mudarCompetencia(a.dataset.k); });
   } else {
+    // SOL-F14: prestadores de USG, IMG e Curitiba vêm de Bases (só inclui; remover é manual).
+    if (!compFechada(FX.chave)) { const n = sincronizarDocumentalComBases(comp); if (n) { salvarFluxo(); FX.incluidosBases = n; } }
     const ind = indicadoresFluxo(comp), hoje = diaSerial(paraData(new Date()));
     const prox = [...ind.vencidas, ...ind.proximas].sort((a, b) => a.prazo - b.prazo).slice(0, 4);
     const pend = ['and', 'ter', 'cor'].reduce((a, k) => a + ind[k], 0);
@@ -119,6 +122,7 @@ function passaFiltro(comp, g, t, mk) {
 }
 
 function desenharGrupos(comp) {
+  FX.sug = sugestoesFluxo(comp);
   const ind = indicadoresFluxo(comp), mk = ind.mk, cont = $('fxGrupos'), filtrando = FX.filtro !== 'todos' || FX.busca;
   const blocos = [];
   for (const g of comp.modelo.grupos) {
@@ -155,6 +159,7 @@ function corpoGrupo(comp, g, tarefas, mk) {
     const rods = rodadasParaTarefa(S.rodadas, comp, t.vinculo);
     return `<tr data-t="${t.id}"><td class="t-nome">${t.marco ? '<span class="badge info">marco</span> ' : ''}${esc(t.nome)}
         ${e.evidencias?.length ? `<small class="evid">📎 ${esc(e.evidencias.at(-1).desc)} em ${new Date(e.evidencias.at(-1).em).toLocaleDateString('pt-BR')}${e.evidencias.length > 1 ? ` (${e.evidencias.length}×)` : ''} — evidência, não conclui a etapa</small>` : ''}
+        ${(() => { const sg = sugestaoDaTarefa(FX.sug || {}, g.id, t.id, e.status); return sg ? `<small class="sug-fx">💡 Sugestão: <b>${esc(STATUS_TAREFA[sg.status])}</b> — ${esc(sg.texto)} <button type="button" class="sec mini" data-sug="${t.id}">Confirmar</button></small>` : ''; })()}
         ${deps.length ? `<small class="dep">aguarda: ${deps.map(d => esc(d.nome)).join('; ')} (aviso, não bloqueia)</small>` : ''}
         ${t.vinculo ? (rods.length ? `<small><a href="#" data-rod="${t.id}">${rods.length} rodada(s) de ${t.vinculo === 'conferencia' ? 'conferência' : 'correção'} neste mês${e.rodada ? ' · vinculada ✓' : ' — vincular e confirmar'}</a></small>` : `<small class="muted">sem rodada de ${t.vinculo === 'conferencia' ? 'conferência' : 'correção'} neste mês</small>`) : ''}</td>
       <td><select data-c="status" class="sel-${e.status}" aria-label="Status">${opcoes(OPCOES_STATUS, e.status)}</select></td>
@@ -171,23 +176,13 @@ function corpoGrupo(comp, g, tarefas, mk) {
 
 function blocoDocumental(comp, g) {
   const lista = Object.values(comp.grupos[g.id].documental);
-  return `<h4 class="sub-fx">Controle documental por prestador</h4><div class="tw"><table class="tab-fx"><thead><tr><th>Prestador</th><th>Relatório e prévia enviados</th><th>NF recebida</th><th>NF encaminhada ao Financeiro</th><th>Pendência</th><th></th></tr></thead><tbody>${lista.length ? lista.map(d => `<tr data-doc="${esc(d.cod)}">
-      <td>${esc(d.cod)} · ${esc(d.nome)}${d.unidade ? ` <small class="muted">unid. ${esc(d.unidade)}</small>` : ''}</td>
+  const deBases = GRUPOS_FLUXO_BASES[g.id];
+  return `<h4 class="sub-fx">Controle documental por prestador</h4>${deBases ? `<p class="small muted">A lista vem de Bases (${g.id === 'usg' ? 'prestadores com faixa de USG' : g.id === 'img' ? 'prestadores que recebem IMG' : 'médicos V3'}); quem for cadastrado lá entra aqui sozinho. Remover daqui vale só para este mês.</p>` : ''}<div class="tw"><table class="tab-fx"><thead><tr><th>Prestador</th><th>Relatório e prévia enviados</th><th>NF recebida</th><th>NF encaminhada ao Financeiro</th><th>Pendência</th><th></th></tr></thead><tbody>${lista.length ? lista.map(d => `<tr data-doc="${esc(d.cod)}">
+      <td>${esc(d.cod)} · ${esc(d.nome)}${d.unidade ? ` <small class="muted">unid. ${esc(d.unidade)}</small>` : ''}${d.origem === 'Bases' ? ' <small class="muted" title="Incluído automaticamente pelas regras de Bases">· Bases</small>' : ''}</td>
       <td><input type="date" data-d="relatorio" value="${esc(d.relatorio)}" aria-label="Relatório enviado em"></td><td><input type="date" data-d="nfRecebida" value="${esc(d.nfRecebida)}" aria-label="NF recebida em"></td>
       <td><input type="date" data-d="nfFinanceiro" value="${esc(d.nfFinanceiro)}" aria-label="NF encaminhada em"></td><td><input type="text" data-d="pendencia" value="${esc(d.pendencia)}" aria-label="Pendência"></td>
       <td><button class="perigo ic" data-docrm="${esc(d.cod)}" title="Remover deste mês" aria-label="Remover deste mês">✕</button></td></tr>`).join('') : '<tr><td colspan="6" class="muted">Nenhum prestador neste fluxo. Adicione abaixo ou cadastre a lista no modelo.</td></tr>'}</tbody></table></div>
     <div class="acoes"><button class="sec" data-docadd="${g.id}">+ Prestador</button><button class="sec" data-docmv="${g.id}">Importar dos relatórios do MV carregados</button><button class="sec" data-docmodelo="${g.id}">Salvar esta lista no modelo</button></div>`;
-}
-function blocoClassificacao(comp, g) {
-  const cl = comp.grupos[g.id].classificacao, img = comp.grupos.img?.documental || {};
-  const prest = [...new Map([...Object.values(img), ...Object.values(cl)].map(p => [p.cod, p])).values()];
-  return `<h4 class="sub-fx">Classificação por prestador (registrada manualmente)</h4><p class="small muted">A classe é informada por você; nenhuma regra automática até os critérios de enquadramento serem validados. A lista vem dos prestadores do fluxo de IMG.</p>
-    <div class="tw"><table class="tab-fx"><thead><tr><th>Prestador</th><th>Produção bruta USG (R$)</th><th>Classe aplicada</th><th>Situação</th></tr></thead><tbody>${prest.length ? prest.map(p => {
-      const e = cl[p.cod] || {};
-      return `<tr data-cl="${esc(p.cod)}" data-nome="${esc(p.nome)}"><td>${esc(p.cod)} · ${esc(p.nome)}</td><td><input type="number" step="0.01" data-k="producao" value="${esc(e.producao ?? '')}" aria-label="Produção bruta"></td>
-        <td><select data-k="classe" aria-label="Classe">${opcoes([['', '—'], ['A', 'A'], ['B', 'B'], ['C', 'C'], ['D', 'D'], ['sem', 'Sem produção: regra a definir']], e.classe || '')}</select></td>
-        <td>${e.classe && e.classe !== 'sem' ? stTarefa('ok') : e.classe === 'sem' ? stTarefa('cor') : stTarefa('ni')}</td></tr>`;
-    }).join('') : '<tr><td colspan="4" class="muted">Cadastre os prestadores do fluxo de IMG para classificar.</td></tr>'}</tbody></table></div>`;
 }
 function blocoMatriz(comp, g) {
   const un = S.cfg.unidades.filter(u => !(g.matriz.excetoUnidades || []).includes(String(u.cod))), mz = comp.grupos[g.id].matriz;
@@ -207,21 +202,24 @@ function ligarGrupos(comp) {
         e[c] = inp.value.trim(); e.historico.push({ em: agoraISO(), por: S.operador, campo: c, valor: e[c] }); salvarFluxo();
       });
       const bp = tr.querySelector('[data-prazo]'); if (bp) bp.onclick = () => ajustarPrazo(comp, gId, g.tarefas.find(t => t.id === tId));
+      const bs = tr.querySelector('[data-sug]'); if (bs) bs.onclick = () => {
+        const sg = sugestaoDaTarefa(FX.sug || {}, gId, tId, e.status); if (!sg) return;
+        mudarStatusTarefa(comp, gId, tId, sg.status, S.operador);
+        e.historico.push({ em: agoraISO(), por: S.operador, campo: 'sugestão confirmada', valor: sg.texto });
+        salvarFluxo(`Etapa marcada como «${STATUS_TAREFA[sg.status]}» (sugestão confirmada).`); desenharAcompanhamento();
+      };
       const br = tr.querySelector('[data-rod]'); if (br) br.onclick = ev => { ev.preventDefault(); vincularRodada(comp, gId, g.tarefas.find(t => t.id === tId)); };
     });
     sec.querySelectorAll('[data-obs]').forEach(t => t.onchange = () => { eg.obs = t.value; salvarFluxo(); });
     sec.querySelectorAll('tr[data-doc]').forEach(tr => tr.querySelectorAll('[data-d]').forEach(inp => inp.onchange = () => { eg.documental[tr.dataset.doc][inp.dataset.d] = inp.value.trim(); salvarFluxo(); desenharEntrega(comp, indicadoresFluxo(comp)); }));
-    sec.querySelectorAll('[data-docrm]').forEach(b => b.onclick = async () => { if (await confirmar('Remover prestador deste mês?', 'O registro documental deste prestador nesta competência será removido. O modelo não muda.', 'Remover')) { delete eg.documental[b.dataset.docrm]; salvarFluxo(); desenharAcompanhamento(); } });
+    sec.querySelectorAll('[data-docrm]').forEach(b => b.onclick = async () => { if (await confirmar('Remover prestador deste mês?', 'O registro documental deste prestador nesta competência será removido. O modelo não muda.', 'Remover')) { delete eg.documental[b.dataset.docrm]; eg.removidos = [...new Set([...(eg.removidos || []), b.dataset.docrm])]; salvarFluxo(); desenharAcompanhamento(); } });
     sec.querySelectorAll('[data-docadd]').forEach(b => b.onclick = () => adicionarPrestadorFluxo(comp, gId));
     sec.querySelectorAll('[data-docmv]').forEach(b => b.onclick = () => importarPrestadoresMV(comp, gId));
     sec.querySelectorAll('[data-docmodelo]').forEach(b => b.onclick = () => {
       S.fluxo.modelo.prestadores[gId] = Object.values(eg.documental).map(d => ({ cod: d.cod, nome: d.nome, unidade: d.unidade }));
       S.fluxo.modelo.revisao++; S.fluxo.modelo.atualizadoEm = agoraISO(); salvarFluxo('Lista de prestadores salva no modelo: será usada nas próximas competências.');
     });
-    sec.querySelectorAll('tr[data-cl]').forEach(tr => tr.querySelectorAll('[data-k]').forEach(inp => inp.onchange = () => {
-      const e = eg.classificacao[tr.dataset.cl] ||= { cod: tr.dataset.cl, nome: tr.dataset.nome };
-      e[inp.dataset.k] = inp.dataset.k === 'producao' ? (inp.value === '' ? '' : +inp.value) : inp.value; e.por = S.operador; e.em = agoraISO(); salvarFluxo(); desenharGrupos(comp);
-    }));
+    if (eg.classificacao) ligarClassificacao(comp, sec);
     sec.querySelectorAll('tr[data-un]').forEach(tr => tr.querySelectorAll('[data-col]').forEach(sel => sel.onchange = () => { (eg.matriz[tr.dataset.un] ||= [])[+sel.dataset.col] = sel.value; salvarFluxo(); }));
   });
 }
@@ -257,7 +255,7 @@ async function adicionarPrestadorFluxo(comp, gId) {
   const cod = (r.campos.cod || '').trim(); if (r.botao !== 'ok' || !cod) return;
   const nome = r.campos.nome.trim() || S.cfg.prestadores.find(p => String(p.cod) === cod)?.nomeMV || '';
   const doc = comp.grupos[gId].documental; if (doc[cod]) return avisar('Este prestador já está na lista do mês.', 'warn');
-  doc[cod] = novoDocumental({ cod, nome, unidade: r.campos.un }); salvarFluxo(); desenharAcompanhamento();
+  doc[cod] = novoDocumental({ cod, nome, unidade: r.campos.un }); comp.grupos[gId].removidos = (comp.grupos[gId].removidos || []).filter(c => c !== cod); salvarFluxo(); desenharAcompanhamento();
 }
 function importarPrestadoresMV(comp, gId) {
   if (!S.relatorios.length) return avisar('Carregue os relatórios do MV no Início para importar os prestadores dos cabeçalhos.', 'warn');

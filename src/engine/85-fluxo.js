@@ -128,7 +128,7 @@ function modeloFluxoPadrao() {
         TF('valid', 'Validação final para envio', MK('envioUSG'), { depende: ['corr'] }),
         TF('envio', 'Envio dos relatórios e prévias', MK('envioUSG'), { depende: ['valid'] }),
         TF('nf', 'Notas fiscais e encaminhamento ao Financeiro', MK('pagUSG'), { depende: ['envio'] })] },
-      { id: 'classif', nome: 'Classificação dos prestadores por produção', desc: 'produção bruta de USG → classes A/B/C/D (registradas manualmente)', classificacao: true, tarefas: [
+      { id: 'classif', nome: 'Classificação dos prestadores por produção', desc: 'produção bruta de USG → classes A/B/C/D (calculadas no Fechamento, conferidas aqui)', classificacao: true, tarefas: [
         TF('apurar', 'Apurar a produção bruta de USG por prestador', MK('inicioIMG')),
         TF('conferir', 'Conferir valores e base de cálculo', null, { depende: ['apurar'] }),
         TF('classificar', 'Classificar cada prestador (A, B, C ou D)', null, { depende: ['conferir'] }),

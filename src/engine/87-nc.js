@@ -157,6 +157,9 @@ function anonimizarNC(nc) { nc.paciente = ''; nc.idAtendimento = ''; nc.anonimiz
 function aplicarRetencaoNC(base, dias, hoje = new Date()) {
   let n = 0;
   for (const nc of base.itens) if (!nc.anonimizada && (nc.paciente || nc.idAtendimento) && idadeDias(nc.criadaEm, hoje) > dias) { anonimizarNC(nc); n++; }
+  // Candidatos guardados (SOL-F17) têm dados de pacientes: mesma retenção das NCs (a análise inteira sai).
+  if (Array.isArray(base.candidatos)) base.candidatos = base.candidatos.filter(f => idadeDias(f.em, hoje) <= dias);
+  if (Array.isArray(base.dispensados)) base.dispensados = base.dispensados.filter(d => idadeDias(d.em, hoje) <= dias);
   return n;
 }
 const vencendoRetencaoNC = (base, dias, janela = 7, hoje = new Date()) =>
