@@ -73,7 +73,7 @@ RENDER.bases = () => {
   pg.querySelectorAll('[data-alias]').forEach(b => b.onclick = () => adicionarAlias(+b.dataset.alias, medApolo));
   $('prAdd').onclick = async () => {
     const op = await exigirOperador(); if (!op) return;
-    const r = await dialogo('Prestador manual', `<label class="campo">Código do prestador no MV<input type="text" name="cod"></label><label class="campo">Nome como no MV<input type="text" name="nome"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    const r = await dialogo('Prestador manual', `${campoBusca({ nome: 'nome', rotulo: 'Nome como no MV', fonte: 'prestador', preencheCod: 'cod', dica: 'A lista mostra também os médicos do Apolo sem código e os códigos do Power BI ainda sem nome.' })}<label class="campo">Código do prestador no MV<input type="text" name="cod"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     if (r.botao !== 'ok' || !r.campos.cod.trim() || !r.campos.nome.trim()) return;
     if (S.cfg.prestadores.some(p => String(p.cod) === r.campos.cod.trim())) return avisar('Já existe prestador com esse código.', 'warn');
     S.cfg.prestadores.push({ cod: r.campos.cod.trim(), nomeMV: r.campos.nome.trim(), aliases: [], naoRealizaRepasse: false, origem: `cadastro manual (${op})`, em: agoraISO() });
@@ -88,7 +88,7 @@ RENDER.bases = () => {
   pg.querySelectorAll('[data-fatrm]').forEach(b => b.onclick = async () => { const f = S.cfg.faturistas[+b.dataset.fatrm];
     if (await confirmar('Remover faturista?', `«${esc(f.nome)}» sai da lista. As NCs já registradas mantêm o nome.`, 'Remover')) { S.cfg.faturistas.splice(+b.dataset.fatrm, 1); salvarCfg('Faturista removido.'); RENDER.bases(); } });
   $('fatAdd').onclick = async () => {
-    const r = await dialogo('Novo faturista', `<label class="campo">Nome (como aparece no MV / na planilha)<input type="text" name="nome" placeholder="ex.: GISLAINE.CARVALHO"></label><label class="campo">Unidade(s)<input type="text" name="un" placeholder="opcional, ex.: 17"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    const r = await dialogo('Novo faturista', `${campoBusca({ nome: 'nome', rotulo: 'Nome (como aparece no MV / na planilha)', fonte: 'faturista', dica: 'A lista mostra também quem fechou contas no Power BI e ainda não está cadastrado.' })}<label class="campo">Unidade(s)<input type="text" name="un" placeholder="opcional, ex.: 17"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
     if (!registrarFaturistas(S.cfg, [r.campos.nome], `cadastro manual (${S.operador || '—'})`)) return avisar('Esse nome já está na lista.', 'warn');
     S.cfg.faturistas[S.cfg.faturistas.length - 1].unidades = r.campos.un.trim(); salvarCfg(`Faturista «${r.campos.nome.trim()}» adicionado.`, 'faturistas'); RENDER.bases();

@@ -50,3 +50,21 @@
    - **Exportar indicadores** gera um arquivo à parte.
 
 A classe de quem não tem classe fixa depende da produção de USG: rode e aceite todos os relatórios de USG da competência antes de fechar o IMG.
+
+## Novidades da v2.0.0-alpha.11
+
+- **Situação com ação manual:** clique no selo da situação. As opções são:
+  - **Marcar para verificar…**, com motivo obrigatório. A marca vale por cima do cálculo até você usar **Tirar a marca**.
+  - **E-mail enviado**, **NF recebida** e **NF encaminhada ao Financeiro**. Essas três gravam a data no controle documental do Fluxo mensal; clique de novo para desfazer.
+- **NF complementar** nas sub-abas USG, IMG e Curitiba (V3): **+ NF complementar**.
+  - O prestador vem da busca no cadastro.
+  - A categoria tem sugestões; PET-CT, Pluvicto, Cetrus e Reajuste aparecem no IMG.
+  - A unidade/CNPJ de emissão é obrigatória.
+  - O valor é a quantidade × o valor unitário, ou o total direto.
+  - Cada categoria lembra a unidade e o valor unitário usados por último.
+  - Na planilha, sai um bloco por CNPJ, com uma coluna por categoria. Também entra na «Copiar prévia».
+- **Sub-aba Repasse Curitiba (V3)** com os médicos V3 (eles saíram do IMG). As regras próprias da V3 virão com a SOL-F30.
+- **Exportação no layout do modelo:**
+  - USG em blocos por faixa;
+  - abas IMG, Curitiba e Produção;
+  - mesclagens, bordas, formato R$ e zoom de 85%.

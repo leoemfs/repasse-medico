@@ -252,8 +252,8 @@ async function vincularRodada(comp, gId, t) {
 }
 
 async function adicionarPrestadorFluxo(comp, gId) {
-  const r = await dialogo('Adicionar prestador a este mês', `<label class="campo">Código do prestador no MV<input type="text" name="cod" list="dlPrest"></label><datalist id="dlPrest">${S.cfg.prestadores.map(p => `<option value="${esc(p.cod)}">${esc(p.nomeMV)}</option>`).join('')}</datalist>
-    <label class="campo">Nome<input type="text" name="nome"></label><label class="campo">Unidade (opcional)<select name="un"><option value="">—</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]))}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+  const r = await dialogo('Adicionar prestador a este mês', `${campoBusca({ nome: 'nome', rotulo: 'Prestador', fonte: 'prestador', preencheCod: 'cod' })}
+    <label class="campo">Código do prestador no MV<input type="text" name="cod"></label><label class="campo">Unidade (opcional)<select name="un"><option value="">—</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]))}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
   const cod = (r.campos.cod || '').trim(); if (r.botao !== 'ok' || !cod) return;
   const nome = r.campos.nome.trim() || S.cfg.prestadores.find(p => String(p.cod) === cod)?.nomeMV || '';
   const doc = comp.grupos[gId].documental; if (doc[cod]) return avisar('Este prestador já está na lista do mês.', 'warn');
@@ -378,7 +378,7 @@ function desenharModeloFluxo() {
   c.querySelectorAll('[data-trm]').forEach(b => b.onclick = async () => { copia(); const g = md.grupos.find(x => x.id === b.closest('[data-mg]').dataset.mg); if (await confirmar('Remover etapa do modelo?', `«${esc(g.tarefas[+b.dataset.trm].nome)}» deixa de ser criada nos próximos meses.`, 'Remover')) { g.tarefas.splice(+b.dataset.trm, 1); desenharModeloFluxo(); } });
   c.querySelectorAll('[data-tadd]').forEach(b => b.onclick = () => { copia(); const g = md.grupos.find(x => x.id === b.closest('[data-mg]').dataset.mg); g.tarefas.push({ id: novoId('t'), nome: 'Nova etapa', prazo: null }); desenharModeloFluxo(); c.querySelector(`[data-mg="${g.id}"]`).open = true; });
   c.querySelectorAll('[data-padd]').forEach(b => b.onclick = async () => { copia(); const gId = b.closest('[data-mg]').dataset.mg;
-    const r = await dialogo('Prestador do fluxo', `<label class="campo">Código no MV<input type="text" name="cod" list="dlPrest2"></label><datalist id="dlPrest2">${S.cfg.prestadores.map(p => `<option value="${esc(p.cod)}">${esc(p.nomeMV)}</option>`).join('')}</datalist><label class="campo">Nome<input type="text" name="nome"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    const r = await dialogo('Prestador do fluxo', `${campoBusca({ nome: 'nome', rotulo: 'Prestador', fonte: 'prestador', preencheCod: 'cod' })}<label class="campo">Código no MV<input type="text" name="cod"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     const cod = (r.campos.cod || '').trim(); if (r.botao !== 'ok' || !cod) return;
     const l = md.prestadores[gId] ||= []; if (!l.some(p => p.cod === cod)) l.push({ cod, nome: r.campos.nome.trim() || S.cfg.prestadores.find(p => String(p.cod) === cod)?.nomeMV || '', unidade: '' });
     desenharModeloFluxo(); c.querySelector(`[data-mg="${gId}"]`).open = true; });

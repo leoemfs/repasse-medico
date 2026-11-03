@@ -105,7 +105,7 @@ function ligarRegras(pg) {
   if ($('cvPbi')) $('cvPbi').onclick = () => { const r = registrarConvenios(S.cfg, S.pbi.convenios, `Power BI ${S.pbi.nome}`); salvarCfg(`${r.novos} convênio(s) novo(s) e ${r.tipados} com tipo preenchido, do Power BI.`, 'regras'); RENDER.bases(); };
   if ($('cvMV')) $('cvMV').onclick = () => { const r = registrarConvenios(S.cfg, conveniosVistos().map(n => [n, '']), 'relatórios do MV'); salvarCfg(`${r.novos} convênio(s) dos relatórios do MV (sem tipo: marque SUS, Convênio ou Particular).`, 'regras'); BS.soSemTipo = true; RENDER.bases(); };
   $('cvAdd').onclick = async () => {
-    const r = await dialogo('Novo convênio', `<label class="campo">Nome (como no MV)<input type="text" name="nome"></label><label class="campo">Tipo<select name="tipo">${opcoes(Object.entries(TIPOS_CONVENIO), 'SUS')}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
+    const r = await dialogo('Novo convênio', `${campoBusca({ nome: 'nome', rotulo: 'Nome (como no MV)', fonte: 'convenio', dica: 'A lista mostra também os convênios dos relatórios do MV e do Power BI ainda sem cadastro.' })}<label class="campo">Tipo<select name="tipo">${opcoes(Object.entries(TIPOS_CONVENIO), 'SUS')}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
     if (r.botao !== 'ok' || !r.campos.nome.trim()) return;
     const x = registrarConvenios(S.cfg, [[r.campos.nome, r.campos.tipo]], `cadastro manual (${S.operador || '—'})`);
     if (!x.novos) return avisar('Esse convênio já está cadastrado.', 'warn');

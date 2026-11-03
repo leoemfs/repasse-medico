@@ -48,7 +48,30 @@ ok(/Cadastrar faturista/.test(await p.textContent('#dlgTitulo')), 'faturista for
 await okDlg();
 const r = await S(() => ({ fat: window.__RM.S.cfg.faturistas.some(f => f.nome === 'NOVO.FATURISTA'), nc: window.__RM.S.nc.itens.at(-1) }));
 ok(r.fat && r.nc.responsavel === 'NOVO.FATURISTA' && r.nc.prestadorIncorreto === '2' && /MARCELO/i.test(r.nc.medico), 'NC gravada com os valores escolhidos e o faturista cadastrado');
-// Registro em lote: responsável com busca.
-await S(() => { window.__RM.S.nc.itens.at(-1).responsavel = ''; });
+
+// ---- Parte 2 ----
+// Bases → Faturistas: a busca mostra quem fechou contas no Power BI e ainda não está cadastrado.
+await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="faturistas"]'); await p.click('#fatAdd'); await p.waitForSelector('#dlg[open]');
+await p.fill(campo('nome'), 'caroline'); await p.waitForSelector(lista('nome') + ':not([hidden])');
+ok(/CAROLINE\.HASHIMOTO.*Power BI, sem cadastro/.test(await p.textContent(lista('nome'))), 'Bases → novo faturista: sugere os nomes do Power BI ainda sem cadastro');
+await p.click('#dlgBotoes button[value=""]'); await p.waitForTimeout(200);
+// Atualizar a base de dados com o Power BI (uma ação).
+await p.goto(html + '#inicio'); await p.waitForSelector('#btPbiBase'); await p.click('#btPbiBase'); await p.waitForSelector('#dlg[open]');
+ok(/faturista\(s\) novo\(s\)/.test(await p.textContent('#dlgCorpo')) && /procedimento\(s\) \(TUSS\)/.test(await p.textContent('#dlgCorpo')), 'prévia da atualização: faturistas, convênios e procedimentos');
+await okDlg();
+const base = await S(() => ({ fat: window.__RM.S.cfg.faturistas.length, conv: window.__RM.S.cfg.convenios.length, tuss: (window.__RM.S.eq.catalogoTUSS || []).length, un: window.__RM.S.cfg.faturistas.find(f => f.nome === 'MARCOS.CAETANO')?.unidades }));
+ok(base.fat >= 50 && base.conv === 220 && base.tuss > 50 && /\d/.test(base.un || ''), `base atualizada: ${base.fat} faturistas, ${base.conv} convênios, ${base.tuss} procedimentos (MARCOS.CAETANO: un. ${base.un})`);
+// Fluxo: + Prestador do mês pela busca.
+await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.click('#fxCriar'); await p.waitForSelector('[data-tg="usg"]'); await p.click('[data-tg="usg"]');
+await p.click('[data-g="usg"] [data-docadd]'); await p.waitForSelector('#dlg[open]');
+await p.fill(campo('nome'), 'roberto'); await p.waitForSelector(lista('nome') + ':not([hidden])'); await p.press(campo('nome'), 'Enter');
+ok(await p.inputValue(campo('cod')) === '9', 'Fluxo → + Prestador: escolher pelo nome preenche o código (9)');
+await okDlg();
+ok(await S(() => !!window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.documental['9']), 'prestador incluído no controle documental do mês');
+// Equivalências: código TUSS pela busca no catálogo.
+await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqNova'); await p.click('#eqNova'); await p.waitForSelector('#dlg[open]');
+await p.fill(campo('codigo'), '4090112'); await p.waitForSelector(lista('codigo') + ':not([hidden])'); await p.press(campo('codigo'), 'Enter');
+ok(/^4090112\d$/.test(await p.inputValue(campo('codigo'))), `Equivalências → nova relação: código TUSS do catálogo (${await p.inputValue(campo('codigo'))})`);
+await p.click('#dlgBotoes button[value=""]');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

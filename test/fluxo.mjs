@@ -75,7 +75,7 @@ ok(prev === '16/10/2026', `modelo: pagamento USG dia 16 → ${prev}`);
 const compPag = await p.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].modelo.marcos.find(m => m.id === 'pagUSG').regra.dia);
 ok(compPag === 15, 'competência já iniciada mantém o modelo antigo (histórico preservado)');
 // Persistência e nav
-await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.fluxo);
+await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.fluxo && window.__RM.S.fluxo.competencias['2026-10'], null, { polling: 200, timeout: 30000 });
 const persist = await p.evaluate(() => { const c = window.__RM.S.fluxo.competencias['2026-10']; return [c.grupos.usg.tarefas.gerar.status, c.anotacoes.length, c.grupos.usg.obs, window.__RM.S.fluxo.modelo.marcos.find(m => m.id === 'pagUSG').regra.dia]; });
 ok(JSON.stringify(persist) === JSON.stringify(['ok', 1, 'Aguardando 2 NFs.', 16]), `persistência após recarregar (${persist})`);
 const dica = await p.$eval('a[data-pag="fluxo"]', a => a.getAttribute('aria-label'));

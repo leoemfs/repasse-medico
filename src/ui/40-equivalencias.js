@@ -75,8 +75,8 @@ async function novaRelacaoManual() {
   const op = await exigirOperador(); if (!op) return;
   const tuss = S.eq.catalogoTUSS || [];
   const r = await dialogo('Nova relação código × título', `
-    <label class="campo">Código TUSS do MV<input type="text" name="codigo" list="dlTuss" placeholder="ex.: 40901203"></label><datalist id="dlTuss">${tuss.map(t => `<option value="${esc(t.codigo)}">${esc(t.desc)}</option>`).join('')}</datalist>
-    <label class="campo">TITLE do Apolo (exatamente como aparece)<input type="text" name="titulo"></label>
+    ${campoBusca({ nome: 'codigo', rotulo: 'Código TUSS do MV', fonte: 'tuss', valorCodigo: true, livre: true })}
+    ${campoBusca({ nome: 'titulo', rotulo: 'TITLE do Apolo (exatamente como aparece)', fonte: 'titulo', livre: true })}
     <div class="grid2"><label class="campo">Unidade<select name="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]))}</select></label>
     <label class="campo">Modalidade<select name="modalidade"><option value="*">Todas</option>${opcoes(Object.entries(NOME_MODALIDADE))}</select></label></div>
     <label class="campo">Justificativa<input type="text" name="just"></label>
@@ -84,7 +84,7 @@ async function novaRelacaoManual() {
   if (r.botao !== 'ok') return;
   const codigo = (r.campos.codigo || '').replace(/\D/g, ''), titulo = (r.campos.titulo || '').trim();
   if (codigo.length < 5 || !titulo) return avisar('Informe o código TUSS completo e o título.', 'warn');
-  const e = novaRelacao({ codigo, titulo, descMV: tuss.find(t => t.codigo === codigo)?.desc || '', escopo: { unidade: r.campos.unidade, modalidade: r.campos.modalidade }, justificativa: r.campos.just || '', origem: `cadastro manual (${op})` });
+  const e = novaRelacao({ codigo, titulo, descMV: tuss.find(t => t.codigo === codigo)?.desc || catalogo('tuss', S.cfg, contextoCatalogo()).find(t => t.cod === codigo)?.nome || '', escopo: { unidade: r.campos.unidade, modalidade: r.campos.modalidade }, justificativa: r.campos.just || '', origem: `cadastro manual (${op})` });
   const m = mesclarEquivalencias(S.eq, [e]);
   if (!m.adicionadas) return avisar('Essa relação já existe na base.', 'warn');
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();

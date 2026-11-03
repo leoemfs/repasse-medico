@@ -23,7 +23,7 @@ RENDER.inicio = () => {
       <div class="estado" id="stApolo">${a ? resumoApolo(a) : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
     <div class="card fonte"><h3>Power BI (.xlsx) — opcional</h3>
       <div class="dz" id="dzPBI">Clique ou arraste a planilha do Power BI<small>Catálogo de unidades, grupos, procedimentos e códigos de prestador</small><input id="inPBI" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span>` : '<span class="muted">Não carregado.</span>'}</div></div>
+      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>` : '<span class="muted">Não carregado.</span>'}</div></div>
   </div>
   <div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do MV carregados</h2>${S.relatorios.length || S.apolo || S.pbi ? '<button class="sec" id="btLimpar">Limpar arquivos…</button>' : ''}</div><div id="listaMV"></div></div>
   <div class="grid2">
@@ -36,6 +36,7 @@ RENDER.inicio = () => {
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
   ligarPainelCompetencia();
   if ($('btLimpar')) $('btLimpar').onclick = limparArquivosSessao;
+  if ($('btPbiBase')) $('btPbiBase').onclick = atualizarBasePowerBI;
   desenharListaMV();
 };
 
@@ -186,7 +187,7 @@ async function carregarPBI(f) {
   try {
     const pb = await lerPowerBI(await lerArquivo(f), f.name);
     if (!await aceitarProducao(f.name, producaoDoArquivo(pb, () => pb.linhas.map(l => l.data)))) return RENDER.inicio();
-    S.pbi = pb; avisar(`${f.name}: ${S.pbi.linhas.length} linhas (base de consulta).`, 'ok');
+    S.pbi = pb; avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
   }
   catch (e) { S.pbi = null; avisar(`${f.name}: ${e.message}`, 'err'); }
   RENDER.inicio();
@@ -249,4 +250,23 @@ async function oferecerLimpezaNaTroca() {
   if (await confirmar('Arquivos de outra produção', `A competência ${rotuloCompetencia(S.comp)} espera produção ${rotuloMes(esp)}, mas há ${fora.length} arquivo(s) carregado(s) de produção ${meses}. Limpar todos os arquivos da sessão?`, 'Limpar arquivos')) {
     limparSessao('tudo'); avisar('Arquivos da sessão limpos para a nova competência.', 'ok'); irPara(paginaAtual);
   }
+}
+
+// Ação única: o que o Power BI traz de novo para a base de dados (faturistas, convênios, procedimentos).
+async function atualizarBasePowerBI() {
+  if (!S.pbi) return avisar('Carregue a planilha do Power BI no Início.', 'warn');
+  const op = await exigirOperador(); if (!op) return;
+  const pv = previaAtualizacaoPowerBI(S.cfg, S.eq, S.pbi);
+  const item = (k, n, txt, exemplos) => `<label class="opcao-conf"><input type="checkbox" name="${k}"${n ? ' checked' : ' disabled'}> <b>${n}</b> ${txt}${n ? `<small class="nc-det">${esc(exemplos.slice(0, 6).join(' · '))}${n > 6 ? ' …' : ''}</small>` : ''}</label>`;
+  const r = await dialogo('Atualizar base de dados com o Power BI', `<p class="small muted">${esc(S.pbi.nome)}. Só entram catálogos, sem dados de pacientes. Nada do que foi marcado à mão é trocado.</p>
+    ${item('faturistas', pv.faturistas.length, 'faturista(s) novo(s), com as unidades em que fecharam contas', pv.faturistas)}
+    ${item('convenios', pv.convenios.length + pv.tipar.length, `convênio(s): ${pv.convenios.length} novo(s), ${pv.tipar.length} sem tipo que recebem o tipo do Power BI`, [...pv.convenios, ...pv.tipar].map(([n, t]) => `${n} (${TIPOS_CONVENIO[t] || 'sem tipo'})`))}
+    ${item('tuss', pv.tuss.length, 'procedimento(s) (TUSS) novo(s) no catálogo', pv.tuss.map(p => `${p.codigo} ${p.desc}`))}
+    <p class="small muted">O SUS continua marcado à mão em Bases → Convênios: o Power BI só traz Convênio ou Particular.</p>`, [['', 'Cancelar', 'sec'], ['ok', 'Atualizar']]);
+  if (r.botao !== 'ok') return;
+  const x = aplicarAtualizacaoPowerBI(S.cfg, S.eq, S.pbi, r.campos);
+  if (x.faturistas || x.unidadesFaturistas || x.convenios || x.tipados) salvarCfg(`Base atualizada com o Power BI: ${x.faturistas} faturista(s), ${x.convenios} convênio(s) novo(s), ${x.tipados} convênio(s) tipado(s).`, 'regras');
+  if (x.tuss) salvarEq(`${x.tuss} procedimento(s) do Power BI no catálogo TUSS.`);
+  avisar(`Base de dados atualizada: ${x.faturistas} faturista(s), ${x.convenios} convênio(s) novo(s) e ${x.tipados} tipado(s), ${x.tuss} procedimento(s).`, 'ok');
+  RENDER.inicio();
 }

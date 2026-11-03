@@ -267,7 +267,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - dias de antecedência na entrega ao Financeiro.
 - **Proposta:** uma aba «Retrospectiva» na competência, com comparação entre meses e um campo de «o que melhorar no próximo mês» (vira item do backlog).
 
-## SOL-F21 — Atualizar bases com o Power BI — PLANEJADO (junto com SOL-F9)
+## SOL-F21 — Atualizar bases com o Power BI — IMPLEMENTADA na v2.0.0-alpha.11 (faturistas com unidades, convênios com tipo, procedimentos TUSS; o restante da SOL-F9 continua planejado)
 - **Hoje:** carregar no Início e depois importar faturistas e convênios em botões separados.
 - **Proposta:** ao carregar o Power BI, uma ação única «Atualizar bases» com o resumo do que entra (faturistas e unidades, convênios e tipos, catálogo de procedimentos) e a comparação com a última importação.
 - **Aceite:** um passo em vez de três; nada marcado à mão (ex.: SUS) é sobrescrito.
@@ -368,7 +368,7 @@ Pedido e prévia aprovada em 01/11/2026.
   - a linha da faixa (USG), que também fica parada à esquerda, com fundo próprio.
 - **Revisar junto:** as tabelas de USG, IMG, V3 e Produção, no computador e no celular, com rolagem para baixo e para o lado.
 
-## SOL-F28 — NF complementar editável (um cartão de cadastro no lugar dos blocos fixos) — A FAZER HOJE
+## SOL-F28 — NF complementar editável (um cartão de cadastro no lugar dos blocos fixos) — IMPLEMENTADA na v2.0.0-alpha.11
 - **Hoje:** o Fechamento → Repasse IMG tem dois blocos fixos, «PET-CT e Pluvicto» e «Curso Cetrus (R$ 1.000 por período)». Eles nem sempre existem (Cetrus e Pluvicto são sazonais) e não aceitam outros tipos.
 - **Proposta:** um único cartão **«NFs complementares da competência»**, com «+ NF complementar» abrindo um formulário com:
   - **Prestador:** escolhido do cadastro (Bases), preenchendo código e nome sozinho. Dá para digitar um prestador fora do cadastro.
@@ -386,7 +386,7 @@ Pedido e prévia aprovada em 01/11/2026.
 - **Migração:** o que já foi lançado nos blocos atuais (PET-CT/Pluvicto e Cetrus) vira NF complementar sem perder dados.
 - **Liga com:** o «Reajuste repasse Dr. Roberto (classe B)» da pasta de rede (SOL-F10, dúvida 4) entra aqui como NF complementar do tipo «Reajuste».
 
-## SOL-F29 — Base de dados de referência e campos que buscam no cadastro (sem redigitar) — A FAZER HOJE
+## SOL-F29 — Base de dados de referência e campos que buscam no cadastro (sem redigitar) — IMPLEMENTADA na v2.0.0-alpha.11 (partes 1 e 2, com a SOL-F21)
 Pedido de 03/11/2026: «onde exige prestador, deve recuperar da base cadastrada; não faz sentido cadastrar e depois ficar digitando». Vale para as coisas comuns: **prestadores, convênios, faturistas, TUSS e unidades**.
 
 ### 1. Base de dados de referência (uma só, usada pelo sistema inteiro)
@@ -525,7 +525,7 @@ Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curi
 ## Nota de comunicação
 O usuário prefere poucas perguntas por vez, sem listas numeradas longas. Ao responder, o campo de texto dele continua a numeração sozinho.
 
-## SOL-F32 — Situação do prestador no Fechamento com ação manual — A FAZER (prévia antes)
+## SOL-F32 — Situação do prestador no Fechamento com ação manual — IMPLEMENTADA na v2.0.0-alpha.11 (inclui a SOL-F12)
 Pergunta de 03/11/2026: «no fechamento, em status não consigo selecionar nada; se precisar colocar como verificar, faço como?»
 - **Hoje:** a situação é só calculada (sem aceite = Verificar; sem relatório = Sem valores; com aceite = Conferido; relatório enviado no Fluxo = E-mail enviado; NF ao Financeiro = Concluído). Não há como marcar à mão.
 - **Proposta:** o selo da situação vira um menu com ações:

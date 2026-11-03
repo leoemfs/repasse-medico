@@ -70,3 +70,29 @@ function buscarCatalogo(lista, termo, limite = 8) {
   };
   return lista.map(it => [pontos(it), it]).filter(([p]) => p >= 0).sort((a, b) => a[0] - b[0] || a[1].nome.localeCompare(b[1].nome)).slice(0, limite).map(([, it]) => it);
 }
+
+/* ---------- Atualizar a base de dados com o Power BI (SOL-F21) ----------
+ * Só catálogos, sem dados de pacientes: faturistas (com as unidades em que fecharam contas),
+ * convênios (com o tipo do Power BI; o tipo marcado à mão nunca é trocado) e procedimentos (TUSS). */
+function previaAtualizacaoPowerBI(cfg, eq, pbi) {
+  const fat = (pbi.faturistas || []).map(([n]) => n).filter(n => !cfg.faturistas.some(f => norm(f.nome) === norm(n)));
+  const conv = (pbi.convenios || []).filter(([n]) => !(cfg.convenios || []).some(c => norm(c.nome) === norm(n)));
+  const tipar = (pbi.convenios || []).filter(([n, t]) => t && (cfg.convenios || []).some(c => norm(c.nome) === norm(n) && !c.tipo));
+  const tussBase = new Set((eq.catalogoTUSS || []).map(t => String(t.codigo)));
+  const tuss = (pbi.procedimentos || []).filter(p => p.codigo && !tussBase.has(String(p.codigo)));
+  return { faturistas: fat, convenios: conv, tipar, tuss };
+}
+function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, convenios: true, tuss: true }) {
+  const r = { faturistas: 0, unidadesFaturistas: 0, convenios: 0, tipados: 0, tuss: 0 };
+  if (escolhas.faturistas) {
+    r.faturistas = registrarFaturistas(cfg, (pbi.faturistas || []).map(([n]) => n), `Power BI ${pbi.nome}`);
+    for (const f of cfg.faturistas) { const m = pbi.unidadesDoFaturista?.[f.nome]; if (m && !f.unidades && !f.generico) { f.unidades = Object.entries(m).sort((a, b) => b[1] - a[1]).map(([c]) => c).join(', '); r.unidadesFaturistas++; } }
+  }
+  if (escolhas.convenios) { const x = registrarConvenios(cfg, pbi.convenios || [], `Power BI ${pbi.nome}`); r.convenios = x.novos; r.tipados = x.tipados; }
+  if (escolhas.tuss) {
+    eq.catalogoTUSS = eq.catalogoTUSS || [];
+    const tem = new Set(eq.catalogoTUSS.map(t => String(t.codigo)));
+    for (const p of pbi.procedimentos || []) if (p.codigo && !tem.has(String(p.codigo))) { eq.catalogoTUSS.push({ codigo: String(p.codigo), desc: p.desc, grupo: p.grupo, origem: 'Power BI' }); tem.add(String(p.codigo)); r.tuss++; }
+  }
+  return r;
+}
