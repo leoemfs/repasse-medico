@@ -598,3 +598,25 @@ Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume�
 ## Conferência: médico do laudo pelo cadastro e nome do Excel (03/11/2026, v2.0.0-alpha.15)
 - **Médico do laudo:** ao escolher o relatório e a unidade, a ferramenta já seleciona o médico do Apolo ligado ao prestador no cadastro (nome igual ao do cabeçalho do MV ou alias validado) e mostra o nome dele na lista, com «(do cadastro)» e de onde veio o vínculo. A escolha manual só é lembrada para o mesmo relatório e a mesma unidade. Sem vínculo e com nome parecido no Apolo, aparece «Vincular … como alias» (alias validado com o operador, RN-208).
 - **Nome do Excel** da conferência e da correção: `conferencia_medico_3_unidade_17_comp_10-2026_rodada_<id>.xlsx`. O antigo usava a data do repasse com «/», que cortava o nome. A chave da rodada é a mesma do resultado, da aba «Informações» e da nova coluna «Rodada» em Rodadas (onde fica o aceite).
+
+## SOL-F34 — Troca do Apolo pelo Cloov (laudos) — A FAZER quando houver o primeiro arquivo do Cloov
+Aviso de 03/11/2026: em alguns dias a plataforma de laudos muda do Apolo para o **Cloov**. Ainda não se sabe como será a extração dos dados.
+- **Hoje:** a ferramenta lê a planilha do Apolo pelos nomes das colunas (`30-fontes.js`, `lerApolo`), com duas grafias aceitas para cada campo.
+- **Campos que a conferência precisa** (o resto é opcional):
+
+  | Campo | Apolo hoje | Para quê |
+  |---|---|---|
+  | Unidade | BRANCH_NAME | filtrar os laudos da unidade |
+  | Paciente | PATIENT_NAME | casar com a linha do MV |
+  | Data do exame | STUDY_DATETIME | casar pela data (tolerância) |
+  | Título do procedimento | TITLE | equivalência TUSS × título |
+  | Médico que laudou | NAME_MEDICO | médico do laudo / aliases |
+  | Modalidade | MODALITY | US, CT, MR, CR/DX, MG, OT |
+  | Opcionais | PATIENT_ID, PATIENT_INSURANCE, ID, ACCESSION_NUMBER, STATUS | duplicidade de cadastro, convênio, chave do laudo |
+- **Plano:**
+  1. Com o primeiro arquivo do Cloov, mapear as colunas para os campos acima. Se possível, ler o formato automaticamente, como o Apolo.
+  2. Se os nomes forem diferentes, criar **«De-para de colunas» configurável** em Bases (escolher qual coluna do arquivo é cada campo, uma vez só, guardado na configuração), aceitando Apolo e Cloov.
+  3. **Nomes:** unidades (BRANCH_NAME → «Nome(s) no Apolo» das unidades), médicos (aliases) e títulos (equivalências TUSS × título) podem vir escritos de outro jeito no Cloov. Prever revisão de unidades e aliases, e reaproveitar as equivalências validadas quando o título for igual.
+  4. **Modalidade:** se o Cloov não trouxer MODALITY, deduzir pelo título ou pelo grupo, com aviso.
+  5. Manter o Apolo funcionando para competências antigas e para a transição (mês com parte no Apolo e parte no Cloov: carregar os dois arquivos).
+- **Para o usuário pedir ao Cloov:** exportação em Excel/CSV com, no mínimo, os campos da tabela, um laudo por linha e o período escolhido.
