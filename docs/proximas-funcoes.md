@@ -444,3 +444,51 @@ Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curi
   2. As regras de valor são as mesmas (% de USG, classe do IMG) ou a V3 tem regras próprias por prestador?
   3. Exportação: aba na planilha de controle geral, ou arquivo separado (há a pasta «REPASSE V3»)?
   4. O bloco «Médicos V3 que recebem pela SRA» continua no IMG ou passa para a nova sub-aba?
+
+---
+
+# Respostas de 03/11/2026 (para a execução dos objetivos de hoje)
+
+## SOL-F27 (complemento) — percentuais no cabeçalho do Fechamento
+- O percentual de cada unidade fica **embaixo do nome da unidade, no cabeçalho** da tabela de USG, para ficar visualmente organizado.
+- Hoje ele aparece na linha da faixa. Ali continua só o nome da faixa; quando a faixa tiver percentual diferente, o valor aparece por faixa.
+
+## SOL-F28 (definido) — NF complementar
+- **Unidade/CNPJ de emissão:** obrigatório e editável ao incluir uma NF nova. Cada categoria tem um CNPJ padrão, que pode ser trocado.
+- **Layout como no exemplo:** Cód. · Prestador · Descrição 1 · Descrição 2 (cada descrição/categoria em sua coluna, com o valor) · Total.
+- **Em todos os fechamentos:** USG, IMG e Curitiba. Não aparece em Produção.
+- **Competência:** sempre a do mês atual (a do topo), mesmo que se refira ao mês anterior.
+- **Tipos iniciais:** Laudos PET-CT, Aplicação Pluvicto, Curso Cetrus e Reajuste. São sugeridos **só no fechamento do IMG** (pagos no último dia útil). Nos outros fechamentos, a categoria é livre.
+
+## SOL-F31 (nova) — Descontos parcelados com alerta
+- **Cadastro de desconto por prestador:** motivo (ex.: pensão alimentícia, adiantamento), valor da parcela, número de parcelas, parcela inicial e competência de início.
+- **No Fechamento:** a parcela do mês entra sozinha em DESCONTOS, com a observação «parcela 7/10».
+- **Alertas:**
+  - prestador com desconto ativo;
+  - última parcela;
+  - desconto sem valor no mês;
+  - desconto maior que o repasse.
+- **Histórico** das parcelas pagas por competência.
+
+## SOL-F30 (definido) — Curitiba = V3
+- **Termo:** sempre que se falar em V3, é Curitiba (unidade 5).
+- **Relatórios:** Curitiba gera relatório de repasse por prestador no MV, como as demais unidades.
+- **Regras:** **diferenciadas por prestador**, sem padrão para todos. Alguns fazem certos exames e outros não, e o valor muda por médico.
+  - Em Bases → Prestadores, um **espaço só para os prestadores de Curitiba**, com as regras de cada um.
+  - **Exemplo — Dr. Ian e Dr. Augusto Venício:**
+    - Ultrassonografia, regra por volume de exames no mês:
+
+      | Exames de USG no mês | Repasse |
+      |---|---|
+      | até 799 | 65% do faturamento líquido |
+      | 800 a 999 | 68% do faturamento líquido |
+      | 1000 ou mais | 70% do faturamento líquido |
+
+    - Densitometria: 10% do valor bruto.
+  - **HM (só Curitiba paga HM):**
+    - só HM de **USG e Doppler**; HM de raio-X, mamografia e demais não é paga;
+    - só HM do convênio **Unimed**;
+    - vale para todos os prestadores que fazem USG, com o valor da regra do prestador pago.
+  - Se necessário, essas regras entram no motor de conferência como «regra da V3».
+- **Exportação:** uma aba a mais na planilha de controle geral. Isso vale para qualquer controle novo que entrar.
+- **Bloco «Médicos V3 que recebem pela SRA»:** sai do IMG e vai para a aba de Curitiba.
