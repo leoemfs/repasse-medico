@@ -18,7 +18,7 @@ await page.waitForFunction(() => document.getElementById('stInit').textContent.i
 const passo = async (nome, fn) => { const t = Date.now(); await fn(); console.log(`✔ ${nome} (${Date.now() - t} ms)`); };
 await passo('carregar PDFs', async () => { await page.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf'), d('mv_correcao_unidade2.pdf')]); await page.waitForFunction(() => window.__RM.S.relatorios.length === 2, null, { timeout: 60000 }); });
 await passo('carregar Apolo', async () => { await page.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await page.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 }); });
-await passo('importar equivalências', async () => { await page.setInputFiles('#inEq', d('equivalencias_tuss.xlsx')); await page.waitForFunction(() => window.__RM.S.eq.itens.length > 900, null, { timeout: 60000 }); });
+await passo('importar equivalências', async () => { await page.goto(page.url().split('#')[0] + '#equivalencias'); await page.waitForSelector('#eqArqX', { state: 'attached' }); await page.setInputFiles('#eqArqX', d('equivalencias_tuss.xlsx')); await page.waitForFunction(() => window.__RM.S.eq.itens.length > 900, null, { timeout: 60000 }); });
 await passo('carregar Power BI', async () => { await page.setInputFiles('#inPBI', d('powerbi_09-2026.xlsx')); await page.waitForFunction(() => !!window.__RM.S.pbi, null, { timeout: 60000 }); });
 await page.screenshot({ path: out + 'tela_inicio.png', fullPage: true });
 await passo('conferência cruzada', async () => {

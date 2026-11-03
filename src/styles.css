@@ -227,4 +227,8 @@ small.evid{display:block;color:var(--info)}
 .nc-kpi .fs{white-space:normal}
 .fh-tab th.fh-un{white-space:normal;min-width:84px;max-width:120px;line-height:1.2}.fh-tab th.fh-un small{display:block;font-weight:400;font-size:10px;opacity:.85}
 .fh-tab .fh-nome{position:sticky;left:0;z-index:1;background:var(--card);box-shadow:1px 0 0 var(--line)}
-.fh-tab th.fh-nome{background:var(--accent)}.fh-faixa td:first-child{position:sticky;left:0}
+.fh-tab th.fh-nome{background:var(--accent)}
+/* Cabeçalho acima das linhas ao rolar para baixo; o título da coluna do prestador acima de tudo (fixo nos dois sentidos). */
+.fh-tab th{z-index:2}.fh-tab th.fh-nome{z-index:3}
+.fh-faixa td.fh-pct{font-size:12.5px;white-space:nowrap}
+.fontes .card{margin-bottom:0}.grid3.fontes{margin-bottom:14px}

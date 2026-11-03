@@ -10,20 +10,17 @@ RENDER.inicio = () => {
     <ol class="passos">
       <li class="${r.length ? 'feito' : ''}"><div><strong>Relatório(s) de repasse do MV</strong> <span class="muted">— PDF, um ou vários.</span></div></li>
       <li class="${a ? 'feito' : ''}"><div><strong>Planilha de laudos do Apolo</strong> <span class="muted">— competência de produção (ex.: 09/2026 para o repasse 10/2026).</span></div></li>
-      <li class="${eqv ? 'feito' : ''}"><div><strong>Equivalências TUSS validadas</strong> <span class="muted">— ${eqv} validadas · ${eqp} pendentes. Sem validação, nada é confirmado automaticamente.</span></div></li>
+      <li class="${eqv ? 'feito' : ''}"><div><strong>Equivalências TUSS validadas</strong> <span class="muted">— ${eqv} validadas · ${eqp} pendentes. Sem validação, nada é confirmado automaticamente.</span> <a href="#equivalencias">Abrir Equivalências TUSS →</a></div></li>
       <li class="${S.pbi ? 'feito' : ''}"><div><strong>Power BI</strong> <span class="muted">— opcional, só consulta; não interfere nos motores.</span></div></li>
     </ol>
   </div>
-  <div class="grid2">
+  <div class="grid3 fontes">
     <div class="card fonte"><h3>Relatório de repasse MV (PDF)</h3>
       <div class="dz" id="dzMV">Clique ou arraste o(s) PDF(s)<small>Relatório de Repasse de Prestadores do SOULMV</small><input id="inMV" type="file" accept=".pdf,application/pdf" multiple hidden></div>
       <div class="estado" id="stMV">${r.length ? `${r.length} relatório(s) carregado(s).` : '<span class="muted">Nenhum PDF carregado.</span>'}</div></div>
     <div class="card fonte"><h3>Laudos do Apolo (.xlsx)</h3>
       <div class="dz" id="dzApolo">Clique ou arraste a planilha<small>Formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input id="inApolo" type="file" accept=".xlsx" hidden></div>
       <div class="estado" id="stApolo">${a ? resumoApolo(a) : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
-    <div class="card fonte"><h3>Equivalências TUSS</h3>
-      <div class="dz" id="dzEq">Importar planilha de análise (.xlsx) ou base (.json)<small>Candidatos entram como pendentes; validação em «Equivalências TUSS»</small><input id="inEq" type="file" accept=".xlsx,.json" hidden></div>
-      <div class="estado"><span class="badge ${eqv ? 'ok' : 'warn'}">${eqv} validadas</span> <span class="badge ${eqp ? 'warn' : 'ok'}">${eqp} pendentes</span> <span class="muted small">revisão ${S.eq.revisao}</span></div></div>
     <div class="card fonte"><h3>Power BI (.xlsx) — opcional</h3>
       <div class="dz" id="dzPBI">Clique ou arraste a planilha do Power BI<small>Catálogo de unidades, grupos, procedimentos e códigos de prestador</small><input id="inPBI" type="file" accept=".xlsx" hidden></div>
       <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span>` : '<span class="muted">Não carregado.</span>'}</div></div>
@@ -35,7 +32,6 @@ RENDER.inicio = () => {
   </div>`;
   zonaArquivo($('dzMV'), $('inMV'), carregarPDFs);
   zonaArquivo($('dzApolo'), $('inApolo'), fs => carregarApolo(fs[0]));
-  zonaArquivo($('dzEq'), $('inEq'), fs => importarEquivalenciasArquivo(fs[0], 'mesclar'));
   zonaArquivo($('dzPBI'), $('inPBI'), fs => carregarPBI(fs[0]));
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
   ligarPainelCompetencia();

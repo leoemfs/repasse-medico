@@ -344,7 +344,7 @@ Pedido e prévia aprovada em 01/11/2026.
 
 # Objetivos de mudança para 03/11/2026 (aguardando os demais ajustes antes de executar)
 
-## SOL-F26 — Início: tirar o anexo de equivalências e pôr os arquivos em três cards lado a lado — A FAZER HOJE
+## SOL-F26 — Início: tirar o anexo de equivalências e pôr os arquivos em três cards lado a lado — IMPLEMENTADA na v2.0.0-alpha.9
 - **Retirar do Início** o card «Equivalências TUSS» (importar planilha de análise/base). A importação fica só dentro da aba Equivalências TUSS, que já tem esses botões.
 - **Três cards lado a lado**, na mesma linha:
   1. Relatório de repasse MV (PDF);
@@ -355,7 +355,7 @@ Pedido e prévia aprovada em 01/11/2026.
 - **O resto da página não muda:** passos «Preparar o repasse», lista de relatórios do MV, atalhos para Conferência e Correção, painel da competência.
 - **A decidir na execução:** o passo 3 da lista «Preparar o repasse» (equivalências validadas) continua como indicador, com link para a aba Equivalências.
 
-## SOL-F27 — Fechamento: tabela «quebrando» ao rolar (nomes por cima do cabeçalho) — A FAZER HOJE
+## SOL-F27 — Fechamento: tabela «quebrando» ao rolar (nomes por cima do cabeçalho) — IMPLEMENTADA na v2.0.0-alpha.9 (com os percentuais da faixa embaixo de cada unidade)
 - **Sintoma** (print de 03/11, aba Repasse IMG): ao rolar a tabela para baixo, os nomes das primeiras linhas (Amanda, Gustavo) aparecem **por cima do cabeçalho**, cobrindo «Prestador».
 - **Causa:** a tabela tem duas fixações:
   - o cabeçalho fica parado ao rolar para baixo (`th` com `position:sticky; top:0; z-index:1`);
@@ -524,3 +524,12 @@ Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curi
 
 ## Nota de comunicação
 O usuário prefere poucas perguntas por vez, sem listas numeradas longas. Ao responder, o campo de texto dele continua a numeração sozinho.
+
+## SOL-F32 — Situação do prestador no Fechamento com ação manual — A FAZER (prévia antes)
+Pergunta de 03/11/2026: «no fechamento, em status não consigo selecionar nada; se precisar colocar como verificar, faço como?»
+- **Hoje:** a situação é só calculada (sem aceite = Verificar; sem relatório = Sem valores; com aceite = Conferido; relatório enviado no Fluxo = E-mail enviado; NF ao Financeiro = Concluído). Não há como marcar à mão.
+- **Proposta:** o selo da situação vira um menu com ações:
+  - «Marcar para verificar…»: com motivo obrigatório, vale por cima do calculado e aparece com ✎ e o motivo; «Tirar a marca» volta ao calculado;
+  - «Marcar e-mail enviado» (SOL-F12): grava a data no controle documental do Fluxo, que é o dono do dado;
+  - «NF recebida» e «NF encaminhada ao Financeiro»: também gravam no controle documental do Fluxo.
+- A marca manual fica na competência, com quem fez e quando, e conta nos indicadores e na exportação (cor «Verificar»).

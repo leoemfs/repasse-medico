@@ -16,7 +16,7 @@ await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 await p.setInputFiles('#inMV', [d('mv_correcao_unidade2.pdf')]); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 60000 });
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
-await p.setInputFiles('#inEq', d('equivalencias_tuss.xlsx')); await p.waitForFunction(() => window.__RM.S.eq.itens.length > 900, null, { timeout: 60000 });
+await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqArqX', { state: 'attached' }); await p.setInputFiles('#eqArqX', d('equivalencias_tuss.xlsx')); await p.waitForFunction(() => window.__RM.S.eq.itens.length > 900, null, { timeout: 60000 });
 // Simula a validação das relações de confiança Alta (como no teste do motor).
 await p.evaluate(() => { for (const e of window.__RM.S.eq.itens) if (e.confianca === 'Alta' && !e.ambiguo) { e.status = 'validada'; e.responsavel = 'Teste'; e.validadoEm = new Date().toISOString(); } });
 await p.goto(html + '#correcao'); await p.waitForSelector('#coRodar'); await p.selectOption('#coUn', '2'); await p.click('#coRodar'); await p.waitForSelector('#coTab table');

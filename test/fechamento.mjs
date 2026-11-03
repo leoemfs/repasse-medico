@@ -30,7 +30,13 @@ await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.clic
 await abrirFech();
 const nSem = (await p.$$('#fhCorpo .fs-sem')).length;
 ok(/PRÉVIA/.test(await p.textContent('#pag-fechamento .aviso-fixo')) && nSem === 33, `sem rodadas: ${nSem} prestadores de USG «Sem valores» e fechamento em prévia`);
-ok(/Repasse médicos geral — 44% · 49% · 40% · 40% · 44% · 42%/.test(await p.textContent('#fhCorpo')) && /Repasse com acréscimo de 2% — 46% · 51% · 42% · 42% · 46% · 44%/.test(await p.textContent('#fhCorpo')), 'faixas com os percentuais por unidade');
+const faixas = await p.$$eval('#fhCorpo tr.fh-faixa', trs => trs.map(tr => [...tr.cells].map(c => c.textContent.trim()).filter(Boolean).join('|')));
+ok(faixas.some(f => f === 'Repasse médicos geral|44%|49%|40%|40%|44%|42%') && faixas.some(f => f === 'Repasse com acréscimo de 2%|46%|51%|42%|42%|46%|44%'), `percentuais da faixa embaixo de cada unidade (${faixas[0]})`);
+// Ao rolar a tabela para baixo, o cabeçalho continua por cima dos nomes (SOL-F27).
+await p.$eval('#fhCorpo .tw', el => { el.scrollTop = 400; }); await p.waitForTimeout(150);
+const topo = await p.$eval('#fhCorpo th.fh-nome', th => { const r = th.getBoundingClientRect(); const e = document.elementFromPoint(r.left + 10, r.top + r.height / 2); return e === th || th.contains(e); });
+ok(topo, 'ao rolar, o cabeçalho «Prestador» fica por cima das linhas');
+await p.$eval('#fhCorpo .tw', el => { el.scrollTop = 0; });
 
 // 2) Conferência do relatório de USG do prestador 15 na unidade 1 (sem aceite → Verificar).
 await p.goto(html + '#inicio');
