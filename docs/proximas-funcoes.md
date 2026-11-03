@@ -424,3 +424,23 @@ Junta e guarda, de forma permanente e sem dados de pacientes, o que hoje está e
 1. Componente de busca e catálogos atuais: prestadores, convênios, faturistas, unidades, TUSS das equivalências.
 2. Aplicar nas telas acima.
 3. Atualização pelo Power BI (junto com SOL-F21 e SOL-F9).
+
+## SOL-F30 — Fechamento: controle do repasse de Curitiba (V3) — A FAZER (com dúvidas)
+Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curitiba; hoje não controlo como os demais, fica só no e-mail».
+- **O que já existe:**
+  - **Fluxo mensal:** grupo «Repasse de Curitiba» (fluxo próprio, sem separação USG/IMG, até o 20º dia útil, pagamento no último dia útil), com controle documental.
+  - **Fechamento → IMG:** bloco «Médicos V3 que recebem pela SRA (laudos)», com os médicos da V3 que laudam para outras unidades.
+  - **Bases:** unidade 5 = AlphaSonic Curitiba, CNPJ 10.563.835/0001-03; regra V3 no prestador.
+  - **Pasta de rede:** «REPASSE V3 - RELATORIOS PRESTADORES».
+- **Proposta:** nova sub-aba **«Repasse Curitiba (V3)»** no Fechamento, igual às de USG e IMG:
+  - pagamento e prazo de envio do Fluxo (pagCuritiba / envioCuritiba);
+  - prestadores com regra «Curitiba/V3» em Bases, mais quem tiver relatório da unidade 5 na competência;
+  - valores das rodadas com aceite da unidade 5 (USG e IMG juntos, como no fluxo de Curitiba);
+  - situação por cor (Verificar · Sem valores · Conferido · E-mail enviado · Concluído), lida do controle documental do grupo Curitiba do Fluxo;
+  - plantão, descontos e observações do mês; «Copiar prévia» com o CNPJ da V3;
+  - aba própria na exportação e nos indicadores.
+- **Dúvidas para o usuário:**
+  1. Curitiba gera no MV relatórios de repasse por prestador, como as outras unidades?
+  2. As regras de valor são as mesmas (% de USG, classe do IMG) ou a V3 tem regras próprias por prestador?
+  3. Exportação: aba na planilha de controle geral, ou arquivo separado (há a pasta «REPASSE V3»)?
+  4. O bloco «Médicos V3 que recebem pela SRA» continua no IMG ou passa para a nova sub-aba?
