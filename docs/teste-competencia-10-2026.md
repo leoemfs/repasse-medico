@@ -46,7 +46,7 @@ O Fechamento usa o valor do relatório do MV que você enviou. Três prestadores
 A ferramenta não altera os valores do MV.
 
 ### V3 (Curitiba)
-- **Dr. Ian (10490), regra percentual:** 1.543 exames de USG (com Doppler) · USG bruto 93.158,47 · HM Unimed 21.907,88 · menos 9,15% = 104.537,78 · 70% = 73.176,44, mais densitometria 10% (8,33) = **NF 73.184,77**.
+- **Dr. Ian (10490), regra percentual:** 1.543 exames de USG (com Doppler) · USG bruto 93.158,47 · HM Unimed 21.907,88 · menos 9,15% = 104.537,78 · 70% ≈ 73.176,45, mais densitometria 10% (8,33) = **NF 73.184,77**.
   - O e-mail que você mandou de exemplo dava 73.608,69, com 1.539 exames e USG 93.838,16. O HM Unimed é igual (21.907,88), mas o USG bruto não bate.
   - Esses números do e-mail não batem nem com este PDF do MV nem com o Power BI (1.542 · 92.708,85).
   - **Pergunta:** de onde saíram 1.539 e 93.838,16?
