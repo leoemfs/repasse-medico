@@ -367,3 +367,21 @@ Pedido e prévia aprovada em 01/11/2026.
   - cabeçalho da coluna do prestador acima de tudo (`z-index:3`), para ficar parado nos dois sentidos;
   - a linha da faixa (USG), que também fica parada à esquerda, com fundo próprio.
 - **Revisar junto:** as tabelas de USG, IMG, V3 e Produção, no computador e no celular, com rolagem para baixo e para o lado.
+
+## SOL-F28 — NF complementar editável (um cartão de cadastro no lugar dos blocos fixos) — A FAZER HOJE
+- **Hoje:** o Fechamento → Repasse IMG tem dois blocos fixos, «PET-CT e Pluvicto» e «Curso Cetrus (R$ 1.000 por período)». Eles nem sempre existem (Cetrus e Pluvicto são sazonais) e não aceitam outros tipos.
+- **Proposta:** um único cartão **«NFs complementares da competência»**, com «+ NF complementar» abrindo um formulário com:
+  - **Prestador:** escolhido do cadastro (Bases), preenchendo código e nome sozinho. Dá para digitar um prestador fora do cadastro.
+  - **Do que se trata:** texto livre com sugestões dos tipos já usados (Laudos PET-CT, Aplicação Pluvicto, Curso Cetrus, Reajuste de classe…). A lista de sugestões cresce com o uso.
+  - **Valor:** total, ou quantidade × valor unitário (ex.: 4 períodos × R$ 1.000).
+  - **Competência da NF:** o mês de referência do serviço, que pode ser diferente da competência do repasse (ex.: complemento retroativo). Padrão: a competência do topo.
+  - **Unidade / CNPJ de emissão:** padrão unidade 17 (Palhano), como nas NFs de PET-CT e Cetrus de hoje.
+  - **Observação.**
+- **Lista do cartão:** cada NF com editar e excluir; total por prestador e geral. Some quando não houver NF no mês.
+- **Exportação:**
+  - na planilha do IMG, bloco «NF COMPLEMENTAR», agrupado pelo tipo e com o CNPJ de emissão;
+  - na «Copiar prévia» do prestador;
+  - no pacote da competência;
+  - nos indicadores (total de NFs complementares).
+- **Migração:** o que já foi lançado nos blocos atuais (PET-CT/Pluvicto e Cetrus) vira NF complementar sem perder dados.
+- **Liga com:** o «Reajuste repasse Dr. Roberto (classe B)» da pasta de rede (SOL-F10, dúvida 4) entra aqui como NF complementar do tipo «Reajuste».
