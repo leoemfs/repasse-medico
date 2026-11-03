@@ -65,11 +65,26 @@ RENDER.conferencia = () => {
     const ligados = rel ? medicosDoPrestador(S.cfg, rel.rel.cab.prestadorCod) : [];
     const medUn = [...new Set(laudosDaUnidade(S.apolo, S.cfg, un || '*').map(l => l.medico).filter(Boolean))].sort();
     const presentes = ligados.filter(n => medUn.some(m => norm(m) === n));
-    const sel = S.conf?.ctx?.relId === rel?.id ? S.conf.ctx.medicoSel : (presentes.length ? '@prest' : '*');
+    const nomesPresentes = presentes.map(n => medUn.find(m => norm(m) === n));
+    // O médico do laudo vem do cadastro: nome do cabeçalho do MV ou alias validado. A escolha manual
+    // só é lembrada para o mesmo relatório e a mesma unidade.
+    const mesmo = S.conf?.ctx?.relId === rel?.id && S.conf?.ctx?.unidadeCod === un;
+    const sel = mesmo ? S.conf.ctx.medicoSel : (presentes.length ? '@prest' : '*');
+    const prest = S.cfg.prestadores.find(x => String(x.cod) === String(rel?.rel.cab.prestadorCod));
+    const viaAlias = presentes.some(n => prest && norm(prest.nomeMV) !== n);
+    const parecidos = !presentes.length && prest ? medUn.filter(m => { const a = tokensNome(norm(m)), b = tokensNome(norm(prest.nomeMV)); const [menor, maior] = a.length <= b.length ? [a, b] : [b, a]; return menor.length >= 2 && menor.every(x => maior.includes(x)); }).slice(0, 3) : [];
     $('cfExtra').innerHTML = `<label class="campo">Médico do laudo («Só no laudo»)<select id="cfMed">
-      <option value="@prest"${sel === '@prest' ? ' selected' : ''}${presentes.length ? '' : ' disabled'}>Prestador do relatório${presentes.length ? '' : ' (sem vínculo nesta unidade)'}</option>
+      <option value="@prest"${sel === '@prest' ? ' selected' : ''}${presentes.length ? '' : ' disabled'}>${presentes.length ? `${esc(nomesPresentes.join(' + '))} (do cadastro)` : 'Prestador do relatório (sem vínculo nesta unidade)'}</option>
       <option value="*"${sel === '*' ? ' selected' : ''}>Todos os médicos da unidade</option>${opcoes(medUn.map(m => [norm(m), m]), sel)}</select>
-      <span class="small muted">${presentes.length ? 'Vínculo pelo nome do cabeçalho do MV ou alias validado.' : 'Nome do prestador não encontrado entre os médicos do Apolo: vincule em Bases → Prestadores ou escolha o médico.'}</span></label>`;
+      <span class="small muted">${presentes.length ? `Escolhido pelo cadastro do prestador ${esc(rel.rel.cab.prestadorCod)}: ${viaAlias ? 'alias validado' : 'nome igual ao do cabeçalho do MV'}.` : 'O nome do prestador não está entre os médicos do Apolo nesta unidade: crie um alias em Bases → Prestadores ou escolha o médico.'}</span>
+      ${parecidos.length ? `<span class="small">Parecido no Apolo: ${parecidos.map(m => `<button type="button" class="sec mini" data-cfalias="${esc(m)}">Vincular «${esc(m)}» como alias</button>`).join(' ')}</span>` : ''}</label>`;
+    $('cfExtra').querySelectorAll('[data-cfalias]').forEach(b => b.onclick = async () => {
+      const op = await exigirOperador(); if (!op || !prest) return;
+      if (!await confirmar('Vincular como alias?', `«${esc(b.dataset.cfalias)}» (Apolo) passa a identificar o prestador ${esc(prest.cod)} - ${esc(prest.nomeMV)}. O alias fica validado por ${esc(op)}.`, 'Vincular')) return;
+      prest.aliases = prest.aliases || [];
+      prest.aliases.push({ nome: b.dataset.cfalias, status: 'validado', responsavel: op, em: agoraISO(), motivo: 'vinculado na Conferência', origem: 'conferência', competencia: S.comp });
+      salvarCfg(`Alias «${b.dataset.cfalias}» validado para o prestador ${prest.cod}.`, 'aliases'); extra();
+    });
   };
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
   $('cfRodar').onclick = executarConferencia;
@@ -122,7 +137,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; desenharConferencia(); };
-  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, ctx), `Conferencia_${nomeSeguro(ctx.relatorio.cab.prestadorNome)}_${ctx.relatorio.cab.repasse}_${carimbo()}.xlsx`);
+  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, ctx), nomeArquivoAnalise('conferencia', ctx));
   const filtrar = () => {
     const q = norm(S.conf.busca);
     return res.linhas.filter(x => (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))

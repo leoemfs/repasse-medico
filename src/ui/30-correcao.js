@@ -48,7 +48,7 @@ function desenharCorrecao() {
     <div class="card"><h2>Equivalências desta rodada</h2><div id="coEq"></div></div></div>`;
   ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.corr.filtro; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharCorrecao(); });
-  $('coExcel').onclick = () => baixarZip(xlsxCorrecao(res, ctx), `Correcao_prestador_${nomeSeguro(ctx.relatorio.cab.prestadorNome)}_${ctx.relatorio.cab.repasse}_${carimbo()}.xlsx`);
+  $('coExcel').onclick = () => baixarZip(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx));
   const filtrar = () => {
     const q = norm(S.corr.busca);
     return res.linhas.filter(o => (!S.corr.filtro.size || S.corr.filtro.has(o.estado)) && (!q || norm([o.r.paciente, o.r.codigo, o.r.procDesc, o.medico].join(' ')).includes(q)));

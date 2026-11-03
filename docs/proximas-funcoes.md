@@ -594,3 +594,7 @@ Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume�
   - **Percentual do faturamento (como o Dr. Ian):** a regra que já existia. Os «outros grupos» também passaram a ser escolhidos na lista de grupos do MV.
 - **Lista de prestadores:** médico marcado como V3 que **só** atua na V3 (sem faixa de USG, IMG ou BOARD do SRA) sai da lista geral e fica só em «Médicos V3». Quem atua também nas outras unidades continua na lista geral e aparece em «Médicos V3» com «V3 e outras unidades». O cartão V3 ganhou aliases do Apolo e «+ Alias».
 - **Atalho do Apolo:** o tipo «Médico V3 (Curitiba)» cadastra o médico já na V3 e abre a regra.
+
+## Conferência: médico do laudo pelo cadastro e nome do Excel (03/11/2026, v2.0.0-alpha.15)
+- **Médico do laudo:** ao escolher o relatório e a unidade, a ferramenta já seleciona o médico do Apolo ligado ao prestador no cadastro (nome igual ao do cabeçalho do MV ou alias validado) e mostra o nome dele na lista, com «(do cadastro)» e de onde veio o vínculo. A escolha manual só é lembrada para o mesmo relatório e a mesma unidade. Sem vínculo e com nome parecido no Apolo, aparece «Vincular … como alias» (alias validado com o operador, RN-208).
+- **Nome do Excel** da conferência e da correção: `conferencia_medico_3_unidade_17_comp_10-2026_rodada_<id>.xlsx`. O antigo usava a data do repasse com «/», que cortava o nome. A chave da rodada é a mesma do resultado, da aba «Informações» e da nova coluna «Rodada» em Rodadas (onde fica o aceite).

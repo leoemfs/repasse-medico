@@ -42,6 +42,10 @@ await p.goto(html + '#inicio');
 await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 60000 });
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
 const rodar = async () => { const n = await S(() => window.__RM.S.rodadas.length); await p.goto(html + '#conferencia'); await p.waitForSelector('#cfRodar'); await p.waitForTimeout(200); await p.selectOption('#cfUn', '1'); await p.selectOption('#cfMed', '*'); await p.click('#cfRodar'); await p.waitForFunction(k => window.__RM.S.rodadas.length === k, n + 1); await p.waitForSelector('#cfTab table'); };
+// Médico do laudo vem do cadastro (nome do cabeçalho do MV ou alias validado), já selecionado com o nome.
+await p.goto(html + '#conferencia'); await p.waitForSelector('#cfRodar'); await p.selectOption('#cfUn', '1'); await p.waitForTimeout(200);
+const medSel = await S(() => { const s = document.getElementById('cfMed'); return [s.value, s.selectedOptions[0].textContent]; });
+ok(medSel[0] === '@prest' && /Marcelo Miyazaki Yoshida.*\(do cadastro\)/i.test(medSel[1]), `médico do laudo escolhido pelo cadastro, com o nome (${medSel[1]})`);
 await rodar();
 const nCand0 = await S(() => window.__RM.S.ncCand.at(-1).itens.length);
 // Considerar no repasse a primeira linha pendente do MV.
@@ -61,6 +65,8 @@ ok(dec.rod === 'considerar', 'a rodada guarda a decisão por linha');
 await p.screenshot({ path: out + 'decisoes_conferencia.png' });
 // Excel da conferência (SOL-F23): MV × Apolo lado a lado, decisão e abas técnicas à parte.
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#cfExcel')]); const xl = out + 'conferencia_f23.xlsx'; await dl.saveAs(xl);
+const rodId = await S(() => window.__RM.S.conf.ctx.rodadaId);
+ok(dl.suggestedFilename() === `conferencia_medico_15_unidade_1_comp_10-2026_rodada_${rodId}.xlsx`, `nome do arquivo com médico, unidade, competência e rodada (${dl.suggestedFilename()})`);
 const xs = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
 wb=openpyxl.load_workbook(sys.argv[1]); c=wb['Conferência']; cab=[x.value for x in c[1]]
 linhas=list(c.iter_rows(min_row=2,values_only=True)); pend=wb['Pendências'].max_row-1

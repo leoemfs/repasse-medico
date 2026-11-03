@@ -12,7 +12,7 @@ RENDER.rodadas = async () => {
     <div id="rdTab" style="margin-top:10px"></div></div>`;
   tabela($('rdTab'), {
     linhas: lista, vazio: RD.todas ? 'Nenhuma rodada ainda.' : `Nenhuma rodada na competência ${rotuloCompetencia(S.comp)}.`, colunas: [
-      { t: 'Competência', v: r => rotuloCompetencia(competenciaDaRodada(r)) }, { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
+      { t: 'Competência', v: r => rotuloCompetencia(competenciaDaRodada(r)) }, { t: 'Rodada', html: r => `<code class="small">${esc(r.id)}</code>` }, { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
       { t: 'Prestador', v: r => `${r.prestadorCod} - ${r.prestadorNome}` }, { t: 'Repasse', v: r => `${r.repasse} · ${r.descricao}` }, { t: 'Unidade', v: r => r.unidadeCod },
       { t: 'Resultado', v: r => Object.entries(r.contagens).filter(([, n]) => n).map(([k, n]) => `${(STATUS_CONF[k] || ESTADO_CORR[k])?.nome || k}: ${n}`).join(' · ') },
       { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span>` : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }

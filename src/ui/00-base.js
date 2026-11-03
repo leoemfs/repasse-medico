@@ -124,6 +124,9 @@ function baixarBlob(blob, nome) {
 const baixarJSON = (obj, nome) => baixarBlob(new Blob([JSON.stringify(obj, null, 1)], { type: 'application/json' }), nome);
 const nomeSeguro = s => norm(s).replace(/\s+/g, '_').slice(0, 60);
 const carimbo = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+// Nome do Excel de uma análise: tipo, médico (código do MV), unidade, competência e a rodada — a mesma
+// chave que aparece no resultado, na aba «Informações» e em Rodadas (aceite). Sem «/», que corta o nome.
+const nomeArquivoAnalise = (tipo, ctx) => `${tipo}_medico_${String(ctx.relatorio.cab.prestadorCod || 'sem-codigo').replace(/[^\w-]/g, '')}_unidade_${ctx.unidadeCod === '*' ? 'todas' : String(ctx.unidadeCod || 'x').replace(/[^\w-]/g, '')}_comp_${(ctx.chaveCompetencia || S.comp).slice(5)}-${(ctx.chaveCompetencia || S.comp).slice(0, 4)}_rodada_${ctx.rodadaId || carimbo()}.xlsx`;
 const lerArquivo = f => f.arrayBuffer().then(b => new Uint8Array(b));
 
 // Área de soltar/clicar para arquivos.
