@@ -41,7 +41,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     for (let d = dia - tol; d <= dia + tol; d++) for (const l of porDia.get(d) || []) {
       if (mods && !mods.includes(l.modalidade)) continue;
       const nm = nivelNome(pn, l.pn, minTrunc);
-      if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade }) });
+      if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, convenio: r.convenio, modalidade: l.modalidade }) });
       else if (nm === 1) semelhantes.push(l);
     }
     const validos = seguros.filter(c => c.proc.estado === 'validada');

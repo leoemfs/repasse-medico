@@ -17,6 +17,7 @@ RENDER.equivalencias = () => {
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
     <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
+  ${cardCompostas()}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
     <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas']], FE.status)}</select></label>
@@ -25,7 +26,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
-  ligarAbasEq($('pag-equivalencias'));
+  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();

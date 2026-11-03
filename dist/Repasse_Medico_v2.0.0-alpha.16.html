@@ -1531,7 +1531,29 @@ const TIPOS_EQ = { titulo: 'Validada por título', descricao: 'Validada por desc
 const chaveTitulo = t => norm(t).replace(/\s+(OP|HM)$/, '').trim();
 
 function eqVazia() {
-  return { schema: SCHEMA_EQ, versaoSchema: 1, revisao: 0, atualizadoEm: agoraISO(), itens: [], catalogoTitulos: [], catalogoTUSS: [] };
+  return { schema: SCHEMA_EQ, versaoSchema: 1, revisao: 0, atualizadoEm: agoraISO(), itens: [], compostas: [], catalogoTitulos: [], catalogoTUSS: [] };
+}
+
+/* ---------- Regras compostas e por convênio (SOL-F5) ----------
+ * Um título do laudo pode corresponder a MAIS DE UM código na conta, e isso pode variar por convênio.
+ * Ex.: «USG DE OMBRO COM DOPPLER» = articular + doppler; na UNIMED, só o doppler.
+ * {id, titulo, codigos:[...], porConvenio:[{convenio:'UNIMED', codigos:[...]}], escopo, status, responsavel,
+ *  validadoEm, justificativa, historico}. Só regra VALIDADA vale na conferência. */
+function novaComposta(campos) {
+  return { id: novoId('cmp'), titulo: '', codigos: [], porConvenio: [], escopo: { unidade: '*', modalidade: '*' }, status: 'pendente', responsavel: '', validadoEm: '', justificativa: '', historico: [], ...campos };
+}
+// Códigos esperados para o convênio da linha (a primeira variação cujo texto está no nome do convênio).
+function codigosDaComposta(c, convenio = '') {
+  const n = norm(convenio || ''), v = (c.porConvenio || []).find(x => x.convenio && n.includes(norm(x.convenio)));
+  return v ? v.codigos : c.codigos;
+}
+function alterarStatusComposta(base, id, novoStatus, responsavel, motivo = '', competencia = '') {
+  if (!responsavel) throw new Error('Informe o responsável antes de validar regras compostas.');
+  const c = (base.compostas || []).find(x => x.id === id); if (!c || c.status === novoStatus) return 0;
+  c.historico.push({ em: agoraISO(), por: responsavel, de: c.status, para: novoStatus, motivo, competencia });
+  c.status = novoStatus; if (novoStatus === 'validada') { c.responsavel = responsavel; c.validadoEm = agoraISO(); }
+  base.revisao++; base.atualizadoEm = agoraISO();
+  return 1;
 }
 
 function novaRelacao(campos) {
@@ -1598,7 +1620,11 @@ async function importarPlanilhaEquivalencias(bytes, nomeArquivo) {
 
 /* Mescla relações novas numa base: o par (código, chave do título, escopo) identifica a relação.
  * Uma relação já existente nunca é rebaixada nem apagada pela importação. */
-function mesclarEquivalencias(base, novos, { catalogoTitulos = [], catalogoTUSS = [] } = {}) {
+function mesclarEquivalencias(base, novos, { catalogoTitulos = [], catalogoTUSS = [], compostas = [] } = {}) {
+  // Regras compostas (SOL-F5): entram as de título e escopo ainda não cadastrados.
+  base.compostas = base.compostas || [];
+  const kc = c => `${chaveTitulo(c.titulo)}|${c.escopo?.unidade || '*'}`, temC = new Set(base.compostas.map(kc));
+  for (const c of compostas) if (!temC.has(kc(c))) { base.compostas.push({ ...c, historico: c.historico || [] }); temC.add(kc(c)); }
   const k = e => `${e.codigo}|${chaveTitulo(e.titulo)}|${e.escopo?.unidade || '*'}|${e.escopo?.modalidade || '*'}`;
   const existentes = new Map(base.itens.map(e => [k(e), e]));
   let adicionadas = 0, ignoradas = 0;
@@ -1637,21 +1663,32 @@ const escopoCobre = (escopo, unidade, modalidade) =>
 /* Índice de consulta para os motores. Para cada chave de título: relações por código.
  * Conflito = o mesmo título validado para dois ou mais códigos em escopos que se sobrepõem. */
 function indiceEquivalencias(base) {
-  const porTitulo = new Map(), porCodigo = new Map();
+  const porTitulo = new Map(), porCodigo = new Map(), compostas = new Map();
+  for (const c of base.compostas || []) {
+    if (c.status !== 'validada') continue;
+    const kt = chaveTitulo(c.titulo); if (kt) (compostas.get(kt) || compostas.set(kt, []).get(kt)).push(c);
+  }
   for (const e of base.itens) {
     if (e.status === 'desativada') continue;
     const kt = chaveTitulo(e.titulo); if (!kt) continue;
     (porTitulo.get(kt) || porTitulo.set(kt, []).get(kt)).push(e);
     (porCodigo.get(e.codigo) || porCodigo.set(e.codigo, []).get(e.codigo)).push(e);
   }
-  return { porTitulo, porCodigo, revisao: base.revisao };
+  return { porTitulo, porCodigo, compostas, revisao: base.revisao };
 }
 
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
  * Resultado: validada · conflito · pendente · divergente (código tem validação, título não) · sem-cadastro */
-function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '' } = {}) {
+function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
   const kt = chaveTitulo(titulo);
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
+  // Regra composta validada para o título: vale por cima das relações simples (SOL-F5).
+  const comp = (idx.compostas?.get(kt) || []).find(c => escopoCobre(c.escopo, unidade, modalidade));
+  if (comp) {
+    const esperados = codigosDaComposta(comp, convenio), porConv = esperados !== comp.codigos;
+    if (esperados.includes(codigo)) return { estado: 'validada', composta: comp, esperados, motivo: `Regra composta validada: «${titulo}» = ${esperados.join(' + ')}${porConv ? ` (convênio ${convenio})` : ''} (${comp.responsavel || 'sem responsável'})` };
+    return { estado: 'divergente', composta: comp, esperados, sobra: true, motivo: `Regra composta: ${porConv ? `no convênio ${convenio}, ` : ''}«${titulo}» = ${esperados.join(' + ')}; o código ${codigo} não faz parte` };
+  }
   const doTitulo = (idx.porTitulo.get(kt) || []).filter(e => escopoCobre(e.escopo, unidade, modalidade));
   const valTitulo = doTitulo.filter(e => e.status === 'validada');
   const relacao = doTitulo.filter(e => e.codigo === codigo);
@@ -1800,6 +1837,8 @@ const MARCADORES = {
   'possivel-bilateral': 'Laudo já usado por linha do mesmo código',
   'modalidade-desconhecida': 'Modalidade do grupo não mapeada',
   'laudo-sem-data': 'Laudo sem data válida',
+  'composta': 'Regra composta',
+  'composta-falta': 'Composição incompleta',
   'hm-v3-devido': 'HM V3 devido',
   'hm-v3-excluir': 'HM V3 a excluir'
 };
@@ -1842,7 +1881,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     for (let d = b.dia - tol; d <= b.dia + tol; d++) for (const l of porDia.get(d) || []) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
       const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
-      const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade });
+      const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });
       const dd = Math.abs(b.dia - l.dia);
       const tier = (proc.estado === 'validada' && nm >= 2 && dd === 0) ? 1 : (proc.estado === 'validada' && nm >= 2) ? 2
         : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2 && dd === 0) ? 3
@@ -1857,12 +1896,20 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   }
 
   // 2) Pareamento um-para-um por faixa: a faixa mais segura escolhe primeiro.
-  const usado = new Map();   // laudo.i → b
+  const usado = new Map();   // laudo.i → b (primeira linha)
+  // Regra composta (SOL-F5): o mesmo laudo sustenta uma linha por código esperado da composição.
+  const compostoUsos = new Map();   // laudo.i → { id, esperados, codes:Set, bs:[] }
+  const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i); return !!(c.proc.composta && u && u.id === c.proc.composta.id && !u.codes.has(b.r.codigo) && u.codes.size < u.esperados.length); };
   for (let t = 1; t <= 6; t++) {
     const fila = [];
-    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && !usado.has(c.l.i)) fila.push({ b, c });
+    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
-    for (const { b, c } of fila) { if (b.par || usado.has(c.l.i)) continue; b.par = c; usado.set(c.l.i, b); }
+    for (const { b, c } of fila) {
+      if (b.par) continue;
+      if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.codes.add(b.r.codigo); u.bs.push(b); continue; }
+      b.par = c; usado.set(c.l.i, b);
+      if (c.proc.composta) compostoUsos.set(c.l.i, { id: c.proc.composta.id, esperados: c.proc.esperados, codes: new Set([b.r.codigo]), bs: [b] });
+    }
   }
 
   // 3) Categoria principal + marcadores de cada linha do MV.
@@ -1908,11 +1955,20 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l)
         && !(usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && usado.get(c.l.i) !== b));
       if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
+      if (p.proc.composta) {
+        marc.add('composta');
+        const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(c => !u.codes.has(c)) : [];
+        motivos.push(`${p.proc.motivo}.${falta.length ? '' : ' Composição completa no MV.'}`);
+        if (falta.length) { marc.add('composta-falta'); motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${u.esperados.join(' + ')}; falta ${falta.join(', ')} no MV.`); }
+      }
       const bloqueio = p.tier >= 3 || marc.has('ambiguo') || marc.has('outro-medico');
-      out.status = bloqueio ? 'pendente' : (p.tier === 2 || marc.has('convenio-divergente') || marc.has('id-duplo')) ? 'ressalva' : 'conferido';
+      out.status = bloqueio ? 'pendente' : (p.tier === 2 || marc.has('convenio-divergente') || marc.has('id-duplo') || marc.has('composta-falta')) ? 'ressalva' : 'conferido';
       if (out.status === 'conferido') motivos.unshift(`Par único: ${p.nm === 3 ? 'nome idêntico' : 'nome truncado compatível'}, mesma data, ${p.proc.motivo.toLowerCase()}`);
     } else {
       out.status = 'so-faturamento';
+      // Regra composta: código que não faz parte da composição para o convênio (ex.: articular na UNIMED).
+      const sobra = (b.cands || []).find(c => c.proc.sobra);
+      if (sobra) { marc.add('eq-divergente'); motivos.push(`${sobra.proc.motivo}: cobrança sem sustentação no laudo «${sobra.l.titulo}».`); }
       const irmao = (b.cands || []).find(c => usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && c.tier <= 4);
       if (irmao) { marc.add('possivel-bilateral'); motivos.push(`Há laudo compatível («${irmao.l.titulo}») já associado a outra linha do mesmo código: verificar cobrança por lado ou duplicidade.`); }
       else if (b.cands && b.cands.length) motivos.push(`Laudos do paciente existem, mas já estão associados a outras linhas (${b.cands.length} candidato(s)).`);
@@ -2000,7 +2056,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     for (let d = dia - tol; d <= dia + tol; d++) for (const l of porDia.get(d) || []) {
       if (mods && !mods.includes(l.modalidade)) continue;
       const nm = nivelNome(pn, l.pn, minTrunc);
-      if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade }) });
+      if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, convenio: r.convenio, modalidade: l.modalidade }) });
       else if (nm === 1) semelhantes.push(l);
     }
     const validos = seguros.filter(c => c.proc.estado === 'validada');
@@ -5833,6 +5889,7 @@ RENDER.equivalencias = () => {
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
     <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
+  ${cardCompostas()}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
     <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas']], FE.status)}</select></label>
@@ -5841,7 +5898,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
-  ligarAbasEq($('pag-equivalencias'));
+  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
@@ -5923,6 +5980,76 @@ async function desfazerConflito(c) {
     salvarEq(`Conflito desfeito em «${c.titulo}»: mantido ${r.campos.codigo}; ${n} relação(ões) voltaram a pendente.`);
   } catch (e) { return avisar(e.message, 'err'); }
   RENDER.equivalencias();
+}
+
+/* ---- src/ui/41-compostas.js ---- */
+/* ============================================================
+ * Equivalências → regras compostas e por convênio (SOL-F5)
+ * Um laudo pode sustentar mais de uma linha do MV (ex.: articular + doppler), e o conjunto de códigos
+ * pode mudar por convênio (ex.: UNIMED = só doppler). Só regra validada, com responsável, vale.
+ * ============================================================ */
+function cardCompostas() {
+  const l = S.eq.compostas || [];
+  return `<div class="card" id="cardCompostas"><h2>Regras compostas e por convênio <span class="muted small">${l.filter(c => c.status === 'validada').length} validada(s) · ${l.filter(c => c.status === 'pendente').length} pendente(s)</span></h2>
+    <p class="lead">Quando um laudo corresponde a <b>mais de um código</b> na conta. Ex.: «USG DE OMBRO COM DOPPLER» = articular + doppler; na UNIMED, só o doppler. A regra composta vale por cima das relações simples do mesmo título: a conferência aceita um laudo para cada código esperado e aponta o código que falta ou que sobra.</p>
+    ${l.length ? `<div class="tw"><table><thead><tr><th>Título do Apolo</th><th>Códigos esperados</th><th>Por convênio</th><th>Escopo</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
+      <td>${esc(c.titulo)}</td><td>${c.codigos.map(esc).join(' + ')}</td><td class="small">${(c.porConvenio || []).map(v => `${esc(v.convenio)}: ${v.codigos.map(esc).join(' + ')}`).join('<br>') || '<span class="muted">—</span>'}</td>
+      <td class="small">${c.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + esc(c.escopo.unidade)}</td>
+      <td><span class="badge ${c.status === 'validada' ? 'ok' : c.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[c.status])}</span>${c.responsavel ? `<small class="nc-det">${esc(c.responsavel)} · ${new Date(c.validadoEm).toLocaleDateString('pt-BR')}</small>` : ''}</td>
+      <td style="white-space:nowrap">${c.status !== 'validada' ? `<button class="mini" data-cmpval="${c.id}">Validar</button> ` : ''}<button class="sec mini" data-cmped="${c.id}">✎</button> ${c.status !== 'desativada' ? `<button class="perigo mini" data-cmpdes="${c.id}" title="Desativar">✕</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma regra composta ainda.</p>'}
+    <div class="acoes"><button class="sec" id="cmpNova">+ Regra composta</button></div></div>`;
+}
+function ligarCompostas(raiz) {
+  if (!raiz.querySelector('#cardCompostas')) return;
+  $('cmpNova').onclick = () => editarComposta(null);
+  raiz.querySelectorAll('[data-cmped]').forEach(b => b.onclick = () => editarComposta(b.dataset.cmped));
+  const mudar = async (id, status, rotulo) => {
+    const op = await exigirOperador(); if (!op) return;
+    const c = S.eq.compostas.find(x => x.id === id);
+    const r = await dialogo(`${rotulo} regra composta`, `<p class="small">«${esc(c.titulo)}» = ${c.codigos.map(esc).join(' + ')}${(c.porConvenio || []).map(v => ` · ${esc(v.convenio)}: ${v.codigos.map(esc).join(' + ')}`).join('')}</p><p class="small">Responsável: <b>${esc(op)}</b>.</p><label class="campo">Justificativa${status === 'validada' ? '' : ' (obrigatória)'}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
+    if (r.botao !== 'ok') return;
+    if (status !== 'validada' && !r.campos.motivo.trim()) return avisar('Informe a justificativa.', 'warn');
+    alterarStatusComposta(S.eq, id, status, op, r.campos.motivo.trim(), S.comp);
+    salvarEq(`Regra composta «${c.titulo}» ${status === 'validada' ? 'validada' : 'desativada'}. Rode a conferência de novo para aplicar.`); RENDER.equivalencias();
+  };
+  raiz.querySelectorAll('[data-cmpval]').forEach(b => b.onclick = () => mudar(b.dataset.cmpval, 'validada', 'Validar'));
+  raiz.querySelectorAll('[data-cmpdes]').forEach(b => b.onclick = () => mudar(b.dataset.cmpdes, 'desativada', 'Desativar'));
+}
+const lerCodigos = t => [...new Set(String(t || '').split(/[\s,;+]+/).map(x => x.replace(/\D/g, '')).filter(x => x.length >= 5))];
+async function editarComposta(id) {
+  const op = await exigirOperador(); if (!op) return;
+  S.eq.compostas = S.eq.compostas || [];
+  const atual = id ? S.eq.compostas.find(x => x.id === id) : null;
+  const c = atual || novaComposta({});
+  const conv = [...(c.porConvenio || [])]; while (conv.length < 3) conv.push({ convenio: '', codigos: [] });
+  const r = await dialogo(`${atual ? 'Editar' : 'Nova'} regra composta`, `
+    ${campoBusca({ nome: 'titulo', rotulo: 'Título do laudo no Apolo (exatamente como aparece)', fonte: 'titulo', valor: c.titulo, livre: true })}
+    <label class="campo">Códigos esperados na conta (TUSS, separados por vírgula)<input type="text" name="codigos" value="${esc(c.codigos.join(', '))}" placeholder="ex.: 40901220, 40901386"><span class="small muted">No geral: todos os códigos que o laudo sustenta (ex.: articular + doppler).</span></label>
+    <h4 style="margin:8px 0 4px">Por convênio <span class="muted small">(texto no nome do convênio → códigos esperados naquele convênio)</span></h4>
+    <div class="tw"><table><thead><tr><th>Convênio contém</th><th>Códigos esperados</th></tr></thead><tbody>${conv.slice(0, 3).map((v, k) => `<tr><td><input type="text" name="cv${k}" value="${esc(v.convenio)}" placeholder="${k ? '' : 'ex.: UNIMED'}"></td><td><input type="text" name="cvc${k}" value="${esc((v.codigos || []).join(', '))}" placeholder="${k ? '' : 'ex.: 40901386'}"></td></tr>`).join('')}</tbody></table></div>
+    <div class="grid2"><label class="campo">Unidade<select name="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), c.escopo.unidade)}</select></label>
+      <label class="campo">Justificativa<input type="text" name="just" value="${esc(c.justificativa || '')}"></label></div>
+    ${atual ? '' : `<label class="small"><input type="checkbox" name="validar"> já validar (responsável: ${esc(op)})</label>`}
+    <p class="small muted">Editar uma regra validada volta ela para pendente: valide de novo para valer.</p>`, [['', 'Cancelar', 'sec'], ['ok', atual ? 'Salvar' : 'Cadastrar']]);
+  if (r.botao !== 'ok') return;
+  const k = r.campos, titulo = (k.titulo || '').trim(), codigos = lerCodigos(k.codigos);
+  const porConvenio = [0, 1, 2].map(i => ({ convenio: (k['cv' + i] || '').trim().toUpperCase(), codigos: lerCodigos(k['cvc' + i]) })).filter(v => v.convenio && v.codigos.length);
+  if (!titulo || codigos.length < 1) return avisar('Informe o título e ao menos um código (para um código só, use a relação simples).', 'warn');
+  if (codigos.length < 2 && !porConvenio.length) return avisar('Regra composta precisa de dois ou mais códigos, ou de uma variação por convênio.', 'warn');
+  const outra = S.eq.compostas.find(x => x !== atual && x.status !== 'desativada' && chaveTitulo(x.titulo) === chaveTitulo(titulo) && x.escopo.unidade === k.unidade);
+  if (outra) return avisar('Já existe regra composta para esse título nesse escopo: edite a existente.', 'warn');
+  const dados = { titulo, codigos, porConvenio, escopo: { unidade: k.unidade, modalidade: '*' }, justificativa: k.just.trim() };
+  if (atual) {
+    const mudou = JSON.stringify([atual.titulo, atual.codigos, atual.porConvenio, atual.escopo]) !== JSON.stringify([dados.titulo, dados.codigos, dados.porConvenio, dados.escopo]);
+    Object.assign(atual, dados);
+    if (mudou && atual.status === 'validada') { atual.historico.push({ em: agoraISO(), por: op, de: 'validada', para: 'pendente', motivo: 'regra editada', competencia: S.comp }); atual.status = 'pendente'; }
+  } else {
+    const nova = novaComposta({ ...dados, origem: `cadastro manual (${op})` });
+    S.eq.compostas.push(nova);
+    if (k.validar) alterarStatusComposta(S.eq, nova.id, 'validada', op, dados.justificativa || 'cadastro manual', S.comp);
+  }
+  S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
+  salvarEq(`Regra composta «${titulo}» ${atual ? 'atualizada' : 'cadastrada'}.`); RENDER.equivalencias();
 }
 
 /* ---- src/ui/42-destrava.js ---- */
@@ -6736,7 +6863,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias } };   // usado pelos testes automatizados
 })();
 
 </script>
