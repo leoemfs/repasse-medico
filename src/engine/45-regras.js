@@ -47,7 +47,14 @@ function classesPadrao() {
     ]
   };
 }
-const FECHAMENTO_PADRAO = { cnpjBoard: '10.304.593/0007-29', cnpjPlantao: '10.304.593/0001-33', variacaoAlerta: 30, toleranciaPct: 0.5, toleranciaValor: 0.05 };
+// Categorias de NF complementar: padrão de unidade/CNPJ de emissão e valor unitário, editáveis pelo uso.
+const CATEGORIAS_NF_PADRAO = [
+  { nome: 'Laudos PET-CT', tipos: ['img'], unidade: '17', valorUnitario: 0 },
+  { nome: 'Aplicação Pluvicto', tipos: ['img'], unidade: '17', valorUnitario: 0 },
+  { nome: 'Curso Cetrus', tipos: ['img'], unidade: '17', valorUnitario: 1000 },
+  { nome: 'Reajuste', tipos: ['img'], unidade: '', valorUnitario: 0 }
+];
+const FECHAMENTO_PADRAO = { cnpjBoard: '10.304.593/0007-29', cnpjPlantao: '10.304.593/0001-33', variacaoAlerta: 30, toleranciaPct: 0.5, toleranciaValor: 0.05, categoriasNF: CATEGORIAS_NF_PADRAO };
 const TIPOS_CONVENIO = { SUS: 'SUS', CONVENIO: 'Convênio', PARTICULAR: 'Particular' };
 
 // Acrescenta as regras a configurações antigas sem apagar o que o usuário editou.
@@ -61,7 +68,8 @@ function migrarRegras(c) {
   if (!Array.isArray(c.faixasUSG)) { c.faixasUSG = clone(FAIXAS_USG_PADRAO); mudou = true; }
   if (!c.classes) { c.classes = classesPadrao(); mudou = true; }
   if (!Array.isArray(c.convenios)) { c.convenios = []; mudou = true; }
-  if (!c.fechamento) { c.fechamento = { ...FECHAMENTO_PADRAO }; mudou = true; }
+  if (!c.fechamento) { c.fechamento = clone(FECHAMENTO_PADRAO); mudou = true; }
+  if (!Array.isArray(c.fechamento.categoriasNF)) { c.fechamento.categoriasNF = clone(CATEGORIAS_NF_PADRAO); mudou = true; }
   for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
   return mudou;
 }

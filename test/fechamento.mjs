@@ -71,12 +71,27 @@ await p.screenshot({ path: out + 'fechamento_usg.png' });
 // 6) IMG: classe fixa e blocos manuais.
 await abrirFech('img');
 ok(/Marcelo Miyazaki Yoshida/.test(await p.textContent('#fhCorpo')) && /fixo/.test(await linhaPrest('15').textContent()), 'IMG lista os prestadores do cadastro com classe fixa');
-ok(/Médicos V3/i.test(await p.textContent('#fhCorpo')), 'bloco dos médicos V3');
-await p.click('[data-fhadd="cetrus"]'); await p.waitForTimeout(250);
-await p.fill('[data-bl="cetrus|0|cod"]', '10175'); await p.dispatchEvent('[data-bl="cetrus|0|cod"]', 'change');
-await p.fill('[data-bl="cetrus|0|nome"]', 'Henrique Pini Sonomiya'); await p.dispatchEvent('[data-bl="cetrus|0|nome"]', 'change');
-await p.fill('[data-bl="cetrus|0|periodos"]', '4'); await p.dispatchEvent('[data-bl="cetrus|0|periodos"]', 'change'); await p.waitForTimeout(200);
-ok(await S(() => window.__RM.S.compReg.itens['2026-10'].fechamento.blocos.cetrus[0].periodos) === 4, 'bloco do Curso Cetrus gravado na competência');
+ok(!/Gilson/i.test(await p.textContent('#fhCorpo')), 'médicos V3 saíram do IMG');
+// NF complementar (F28): Curso Cetrus com prestador do cadastro; a categoria traz a unidade 17 e R$ 1.000 por período.
+await p.click('[data-nf-nova="img"]'); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="prestador"]', 'henrique pini'); await p.waitForSelector('#dlgCorpo .busca-lista:not([hidden])'); await p.press('#dlgCorpo [name="prestador"]', 'Enter');
+await p.fill('#dlgCorpo [name="categoria"]', 'Curso Cetrus'); await p.dispatchEvent('#dlgCorpo [name="categoria"]', 'change');
+await p.fill('#dlgCorpo [name="quantidade"]', '4');
+const nfForm = await S(() => [document.querySelector('#dlgCorpo [name="cod"]').value, document.querySelector('#dlgCorpo [name="unidade"]').value, document.querySelector('#dlgCorpo [name="valorUnitario"]').value]);
+ok(nfForm.join() === '10175,17,1000', `formulário: código do cadastro, unidade 17 e R$ 1.000 da categoria (${nfForm})`);
+await p.click('#dlgBotoes button[value=ok]'); await p.waitForTimeout(300);
+const nf = await S(() => window.__RM.S.compReg.itens['2026-10'].fechamento.nfs[0]);
+ok(nf && nf.valor === 4000 && nf.tipo === 'img' && nf.unidade === '17' && /Henrique/i.test(nf.nome), 'NF complementar gravada: 4 × R$ 1.000 = R$ 4.000, unidade 17');
+ok(/Curso Cetrus/.test(await p.textContent('.nf-cartao')) && /4\.000,00/.test(await p.textContent('.nf-cartao')), 'cartão mostra a NF com uma coluna por categoria');
+// Sem unidade/CNPJ não grava.
+await p.click('[data-nf-nova="img"]'); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="cod"]', '5'); await p.fill('#dlgCorpo [name="categoria"]', 'Reajuste nova'); await p.fill('#dlgCorpo [name="valor"]', '300');
+await p.click('#dlgBotoes button[value=ok]'); await p.waitForTimeout(300);
+ok(/unidade\/CNPJ/.test(await p.textContent('#aviso')) && await S(() => window.__RM.S.compReg.itens['2026-10'].fechamento.nfs.length) === 1, 'CNPJ de emissão obrigatório');
+// Curitiba (V3): sub-aba própria com os médicos V3 e NF complementar.
+await abrirFech('curitiba');
+ok(/Gilson/i.test(await p.textContent('#fhCorpo')) && !!(await p.$('[data-nf-nova="curitiba"]')), 'sub-aba Curitiba (V3) com os médicos V3 e NF complementar');
+await abrirFech('img');
 await p.screenshot({ path: out + 'fechamento_img.png' });
 
 // 7) Produção e indicadores.

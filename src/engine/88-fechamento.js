@@ -14,7 +14,41 @@ const SITUACAO_FECH = {
   enviado: { nome: 'E-mail enviado / aguardando nota', cor: '00B0F0', fc: '000000' },
   concluido: { nome: 'Concluído', cor: '00B050', fc: 'FFFFFF' }
 };
-const fechamentoVazio = () => ({ ajustes: { usg: {}, img: {} }, blocos: { complementar: [], cetrus: [] }, valorPeriodoCetrus: 1000, obs: { usg: '', img: '' } });
+const fechamentoVazio = () => ({ ajustes: { usg: {}, img: {}, curitiba: {} }, nfs: [], blocos: { complementar: [], cetrus: [] }, valorPeriodoCetrus: 1000, obs: { usg: '', img: '', curitiba: '' }, manual: {} });
+
+/* ---------- NF complementar (SOL-F28): lançamentos da competência em USG, IMG e Curitiba ----------
+ * {id, tipo:'usg'|'img'|'curitiba', cod, nome, categoria, unidade (cód. da unidade do CNPJ de emissão),
+ *  quantidade, valorUnitario, valor, obs, por, em}. A competência é sempre a do fechamento. */
+// Lançamentos da competência; os blocos antigos (PET-CT/Pluvicto e Cetrus) viram lançamentos.
+function nfsDoFechamento(fech) {
+  if ((fech.nfs || []).length) return fech.nfs;
+  const out = [], b = fech.blocos || {};
+  for (const c of b.complementar || []) {
+    if (+c.petct) out.push({ id: novoId('nf'), tipo: 'img', cod: String(c.cod || ''), nome: c.nome || '', categoria: 'Laudos PET-CT', unidade: '17', quantidade: 0, valorUnitario: 0, valor: +c.petct, obs: '', migrado: true });
+    if (+c.pluvicto) out.push({ id: novoId('nf'), tipo: 'img', cod: String(c.cod || ''), nome: c.nome || '', categoria: 'Aplicação Pluvicto', unidade: '17', quantidade: 0, valorUnitario: 0, valor: +c.pluvicto, obs: '', migrado: true });
+  }
+  for (const c of b.cetrus || []) if (+c.periodos) out.push({ id: novoId('nf'), tipo: 'img', cod: String(c.cod || ''), nome: c.nome || '', categoria: 'Curso Cetrus', unidade: '17', quantidade: +c.periodos, valorUnitario: +fech.valorPeriodoCetrus || 1000, valor: r2(+c.periodos * (+fech.valorPeriodoCetrus || 1000)), obs: '', migrado: true });
+  return out;
+}
+const valorNF = d => (+d.quantidade > 0 && +d.valorUnitario > 0) ? r2(+d.quantidade * +d.valorUnitario) : r2(+d.valor || 0);
+function validarNF(d) {
+  const e = [];
+  if (!String(d.cod || '').trim() && !String(d.nome || '').trim()) e.push('informe o prestador');
+  if (!String(d.categoria || '').trim()) e.push('informe do que se trata (categoria)');
+  if (!String(d.unidade || '').trim()) e.push('escolha a unidade/CNPJ de emissão');
+  if (!(valorNF(d) > 0)) e.push('informe o valor (ou quantidade × valor unitário)');
+  return e;
+}
+// Categorias sugeridas para um fechamento: as cadastradas para o tipo (PET-CT, Pluvicto, Cetrus e Reajuste só no IMG).
+const categoriasNF = (cfg, tipo) => (cfg.fechamento.categoriasNF || []).filter(c => (c.tipos || []).includes(tipo));
+// Aprende o padrão (unidade e valor unitário) da categoria a cada lançamento.
+function lembrarCategoriaNF(cfg, tipo, categoria, unidade, valorUnitario) {
+  const l = cfg.fechamento.categoriasNF = cfg.fechamento.categoriasNF || [];
+  let c = l.find(x => norm(x.nome) === norm(categoria));
+  if (!c) { c = { nome: String(categoria).trim(), tipos: [], unidade: '', valorUnitario: 0 }; l.push(c); }
+  if (!c.tipos.includes(tipo)) c.tipos.push(tipo);
+  c.unidade = unidade || c.unidade; if (+valorUnitario > 0) c.valorUnitario = +valorUnitario;
+}
 
 // USG ou IMG: pela descrição do repasse; sem descrição, pelos grupos das linhas.
 function tipoRepasseDaRodada(r) {
@@ -118,7 +152,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   usg.sort((a, b) => ordemFaixa(faixaDe(a)) - ordemFaixa(faixaDe(b)) || a.nome.localeCompare(b.nome));
   img.sort((a, b) => (!!a.p?.regras?.v3 - !!b.p?.regras?.v3) || a.nome.localeCompare(b.nome));
   const semAceite = todos.filter(x => x.situacao === 'verificar').length;
-  return { chave, prestadores: todos, usg, img, semAceite, previa: semAceite > 0 || !todos.some(x => x.temValores), fech };
+  return { chave, prestadores: todos, usg, img, semAceite, previa: semAceite > 0 || !todos.some(x => x.temValores), fech, nfs: nfsDoFechamento(fech) };
 }
 
 function indicadoresFechamento(f, cfg, ncs = []) {
@@ -132,12 +166,13 @@ function indicadoresFechamento(f, cfg, ncs = []) {
     porSituacao: Object.keys(SITUACAO_FECH).map(k => [SITUACAO_FECH[k].nome, f.prestadores.filter(x => x.situacao === k).length]),
     variacoes: f.prestadores.filter(x => x.variacao !== undefined && Math.abs(x.variacao) > (+cfg.fechamento.variacaoAlerta || 0)).map(x => [`${x.tipo.toUpperCase()} · ${x.cod} - ${x.nome}`, x.variacao]),
     ncs: { total: ncs.length, impactam: ncs.filter(n => n.impactaPagamento).length, valor: r2(ncs.filter(n => n.impactaPagamento).reduce((s, n) => s + (+n.valor || 0), 0)) },
-    decisoes: f.prestadores.reduce((s, x) => s + x.decisoes, 0)
+    decisoes: f.prestadores.reduce((s, x) => s + x.decisoes, 0),
+    nfComplementar: ['usg', 'img', 'curitiba'].map(t => [{ usg: 'USG', img: 'IMG', curitiba: 'Curitiba (V3)' }[t], r2((f.nfs || []).filter(n => n.tipo === t).reduce((s, n) => s + valorNF(n), 0))]).filter(([, v]) => v)
   };
 }
 
 // Texto da prévia de um prestador, para colar no e-mail (uma NF por CNPJ).
-function textoPreviaPrestador(x, cfg, chave, dataPagamento) {
+function textoPreviaPrestador(x, cfg, chave, dataPagamento, nfs = []) {
   const un = u => unidadePorCod(cfg, u), L = [];
   L.push(`Prévia do repasse de ${x.tipo === 'usg' ? 'USG' : 'IMG'} — competência ${rotuloCompetencia(chave)} (produção ${rotuloMes(producaoEsperada(chave))})`);
   L.push(`Prestador: ${x.cod} - ${x.nome}${x.tipo === 'img' ? ` · classe ${x.classe}${x.classeFixa ? ' (fixa)' : ''}` : ''}`, '');
@@ -145,7 +180,13 @@ function textoPreviaPrestador(x, cfg, chave, dataPagamento) {
   if (x.board) L.push(`BOARD (CNPJ ${cfg.fechamento.cnpjBoard}): R$ ${fmtBR(x.board)}`);
   if (x.plantao) L.push(`PLANTÃO (CNPJ ${cfg.fechamento.cnpjPlantao}): R$ ${fmtBR(x.plantao)}`);
   if (x.descontos) L.push(`Descontos: − R$ ${fmtBR(x.descontos)}${x.obs ? ` (${x.obs})` : ''}`);
-  L.push(`Total geral bruto: R$ ${fmtBR(x.totalGeral)}`, '', `Emitir uma NF por CNPJ.${dataPagamento ? ` Pagamento previsto: ${fmtData(dataPagamento)}.` : ''}`);
+  L.push(`Total geral bruto: R$ ${fmtBR(x.totalGeral)}`);
+  const minhas = nfs.filter(n => String(n.cod) === String(x.cod));
+  if (minhas.length) {
+    L.push('', 'NF complementar:');
+    for (const n of minhas) { const u = un(n.unidade); L.push(`${n.categoria}${+n.quantidade > 0 ? ` (${n.quantidade} × R$ ${fmtBR(n.valorUnitario)})` : ''} — ${u ? `${u.cod}- ${u.nome}${u.cnpj ? ` (CNPJ ${u.cnpj})` : ''}` : ''}: R$ ${fmtBR(valorNF(n))}`); }
+  }
+  L.push('', `Emitir uma NF por CNPJ.${dataPagamento ? ` Pagamento previsto: ${fmtData(dataPagamento)}.` : ''}`);
   return L.join('\n');
 }
 
@@ -174,6 +215,25 @@ function xlsxFechamento(f, cfg, meta = {}) {
   const sit = (x, base) => { const s = SITUACAO_FECH[x.situacao]; return x.situacao === 'sem' && !meta.corSemValores ? { ...base, fc: '000000' } : { ...base, fill: s.cor, fc: s.fc }; };
   const unNome = u => `${u.cod}- ${u.nome}`;
   const topo = (titulo, ultima, M) => { M.push(`A1:${col(ultima)}1`); return [[{ v: f.previa ? `PRÉVIA — ${f.semAceite} prestador(es) sem aceite. Valores sujeitos a alteração.` : titulo, st: f.previa ? E.aviso : { ...E.aviso, fc: '1F4E78' } }], []]; };
+  // NF complementar: um bloco por unidade/CNPJ de emissão, uma coluna por categoria (como no modelo).
+  const blocosNF = (L, M, A, lista, c0) => {
+    const porUnidade = new Map();
+    for (const n of lista) (porUnidade.get(n.unidade) || porUnidade.set(n.unidade, []).get(n.unidade)).push(n);
+    for (const [uc, nfs] of porUnidade) {
+      const u = unidadePorCod(cfg, uc), cats = [...new Set(nfs.map(n => n.categoria))], pad = Array(c0).fill(''), ult = c0 + 2 + cats.length;
+      L.push([]); let r = L.length + 1;
+      L.push([...pad, { v: `NF COMPLEMENTAR ${u ? `${u.cod}- ${u.nome} ${u.cnpj || ''}` : ''}`.trim(), st: E.titulo }, ...Array(ult - c0).fill({ v: '', st: E.titulo })]); M.push(`${col(c0)}${r}:${col(ult)}${r}`);
+      r = L.length + 1;
+      L.push([...pad, { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, ...cats.map(c => ({ v: c.toUpperCase(), st: E.cab })), { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], [...pad, ...Array(ult - c0 + 1).fill({ v: '', st: E.cab })]);
+      M.push(`${col(c0)}${r}:${col(c0 + 1)}${r + 1}`, ...[...cats.map((_, k) => c0 + 2 + k), ult].map(c => `${col(c)}${r}:${col(c)}${r + 1}`)); A[r] = 26.25; A[r + 1] = 26.25;
+      const porPrest = new Map();
+      for (const n of nfs) { const k = n.cod || norm(n.nome), e = porPrest.get(k) || { cod: n.cod, nome: n.nome, v: {} }; e.v[n.categoria] = r2((e.v[n.categoria] || 0) + valorNF(n)); porPrest.set(k, e); }
+      for (const e of porPrest.values()) {
+        const n = L.length + 1;
+        L.push([...pad, { v: +e.cod || e.cod, st: E.centro }, { v: e.nome, st: E.texto }, ...cats.map(c => ({ v: e.v[c] ?? '', st: E.valor })), { v: r2(Object.values(e.v).reduce((s2, x) => s2 + x, 0)), f: `SUM(${col(c0 + 2)}${n}:${col(ult - 1)}${n})`, st: E.valorB }]);
+      }
+    }
+  };
   const legenda = (L, c) => { L.push([], []); const pad = Array(c).fill(''); L.push([...pad, { v: 'LEGENDA', st: E.rotulo }]); for (const s of Object.values(SITUACAO_FECH)) L.push([...pad, { v: s.nome, st: { ...E.rotulo, fill: s.cor, fc: s.fc } }]); };
   const observacoes = (L, c, linhas) => { if (!linhas.length) return; const pad = Array(c).fill(''); L.push([], [...pad, { v: 'OBSERVAÇÕES:', st: { b: true } }], ...linhas.map(t => [...pad, t])); };
 
@@ -202,6 +262,7 @@ function xlsxFechamento(f, cfg, meta = {}) {
     }
     U.push([]);
   }
+  blocosNF(U, MU, AU, f.nfs.filter(n => n.tipo === 'usg'), 0);
   observacoes(U, 1, [...f.usg.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.usg ? [f.fech.obs.usg] : [])]);
   legenda(U, 1);
 
@@ -228,25 +289,7 @@ function xlsxFechamento(f, cfg, meta = {}) {
   const unIMG = cfg.unidades.filter(u => u.cnpj && (u.pctUSG || u.cod === '5' || imgPrincipal.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => +a.cod - +b.cod);
   const MI = [], AI = {}, tI = tabelaIMG(imgPrincipal, unIMG, MI, AI);
   const I = [...topo(`REPASSE IMG — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagIMG ? fmtData(meta.pagIMG) : ''}`, tI.ultima, MI), ...tI.L];
-  // NFs complementares (Curso Cetrus; PET-CT e Pluvicto) no layout da planilha.
-  const u17 = unidadePorCod(cfg, '17');
-  const cet = f.fech.blocos.cetrus || [], comp = f.fech.blocos.complementar || [];
-  if (cet.length) {
-    I.push([]); let r = I.length + 1;
-    I.push(['', '', { v: `NF COMPLEMENTAR REPASSE CURSO CETRUS 17- ${u17?.nome || ''} ${u17?.cnpj || ''}`, st: E.titulo }, { v: '', st: E.titulo }, { v: '', st: E.titulo }, { v: '', st: E.titulo }]); MI.push(`C${r}:F${r}`);
-    r = I.length + 1;
-    I.push(['', '', { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, { v: `R$ ${fmtBR(f.fech.valorPeriodoCetrus)} POR PERÍODO`, st: E.cab }, { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], ['', '', { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }, { v: '', st: E.cab }]);
-    MI.push(`C${r}:D${r + 1}`, `E${r}:E${r + 1}`, `F${r}:F${r + 1}`);
-    for (const c of cet) { const n = I.length + 1; I.push(['', '', { v: +c.cod || c.cod, st: E.centro }, { v: c.nome, st: E.texto }, { v: +c.periodos || 0, st: E.centro }, { v: r2((+c.periodos || 0) * f.fech.valorPeriodoCetrus), f: `E${n}*${f.fech.valorPeriodoCetrus}`, st: E.valorB }]); }
-  }
-  if (comp.length) {
-    I.push([]); let r = I.length + 1;
-    I.push(['', '', { v: `NF COMPLEMENTAR REPASSE LAUDOS PET-CT E PLUVICTO 17- ${u17?.nome || ''} ${u17?.cnpj || ''}`, st: E.titulo }, ...Array(4).fill({ v: '', st: E.titulo })]); MI.push(`C${r}:G${r}`);
-    r = I.length + 1;
-    I.push(['', '', { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, { v: 'LAUDOS PET-CT', st: E.cab }, { v: 'APLICAÇÃO PLUVICTO', st: E.cab }, { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], ['', '', ...Array(5).fill({ v: '', st: E.cab })]);
-    MI.push(`C${r}:D${r + 1}`, `E${r}:E${r + 1}`, `F${r}:F${r + 1}`, `G${r}:G${r + 1}`); AI[r] = 26.25; AI[r + 1] = 26.25;
-    for (const c of comp) { const n = I.length + 1; I.push(['', '', { v: +c.cod || c.cod, st: E.centro }, { v: c.nome, st: E.texto }, { v: +c.petct || '', st: E.valor }, { v: +c.pluvicto || '', st: E.valor }, { v: r2((+c.petct || 0) + (+c.pluvicto || 0)), f: `SUM(E${n}:F${n})`, st: E.valorB }]); }
-  }
+  blocosNF(I, MI, AI, f.nfs.filter(n => n.tipo === 'img'), 2);
   observacoes(I, 3, [...imgPrincipal.filter(x => x.descontos && x.obs).map(x => `DESCONTO ${x.nome.toUpperCase()} R$ ${fmtBR(x.descontos)} ${x.obs.toUpperCase()}`), ...(f.fech.obs.img ? [f.fech.obs.img] : [])]);
   legenda(I, 3);
 
@@ -255,6 +298,7 @@ function xlsxFechamento(f, cfg, meta = {}) {
   const unV3 = cfg.unidades.filter(u => u.cnpj && (u.cod === '5' || v3.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => +a.cod - +b.cod);
   const MC = [], AC = {}, tC = tabelaIMG(v3, unV3, MC, AC);
   const C = [...topo(`REPASSE CURITIBA (V3) — COMPETÊNCIA ${rotuloCompetencia(f.chave)} · PAGAMENTO ${meta.pagCuritiba ? fmtData(meta.pagCuritiba) : ''}`, tC.ultima, MC), ...tC.L];
+  blocosNF(C, MC, AC, f.nfs.filter(n => n.tipo === 'curitiba'), 2);
   if (!v3.length) C.push([], [{ v: 'Nenhum médico da V3 cadastrado (Bases → Prestadores e regras → «Médico V3»).', st: { va: 'center' } }]);
   C.push([], [{ v: 'Regras próprias da V3 (faixas por volume, impostos, HM Unimed de USG e Doppler) em implementação: SOL-F30. Valores conforme os relatórios do MV.', st: { fc: '7F7F7F' } }]);
   legenda(C, 3);
@@ -285,6 +329,6 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
     ...linhasMeta([['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || ''], ['Total USG', `R$ ${fmtBR(ind.totais.usg)}`], ['Total IMG', `R$ ${fmtBR(ind.totais.img)}`],
       ['NCs da competência', `${ind.ncs.total} · ${ind.ncs.impactam} impactam o pagamento (R$ ${fmtBR(ind.ncs.valor)} nas vindas do MV)`], ['Linhas com decisão (NC ou considerada)', ind.decisoes]]), [],
     ...bloco('USG por unidade', ind.usgPorUnidade), ...bloco('USG por faixa', ind.usgPorFaixa), ...bloco('IMG por unidade', ind.imgPorUnidade), ...bloco('IMG por classe', ind.imgPorClasse),
-    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
+    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
   return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
 }
