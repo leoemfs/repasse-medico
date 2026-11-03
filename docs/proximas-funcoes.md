@@ -585,3 +585,5 @@ Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume�
 - **Avisos recolhíveis no Fechamento** (USG, IMG e Curitiba): botão «⚠ N avisos»; clicar no botão ou na linha abre a lista embaixo, como o detalhe da Conferência, e clicar de novo recolhe.
 - **«Exportar competência»** sem «(3 abas)».
 - **NF complementar na exportação: um bloco por categoria** (e por unidade/CNPJ), com QUANTIDADE e VALOR UNITÁRIO quando houver e total com fórmula. Substitui o bloco com uma coluna por categoria da F28.
+- **Atalho «+ Cadastrar» nos médicos do Apolo sem vínculo** (Bases → Prestadores e regras): cadastra um novo prestador com o código do MV (médico ou residente) ou liga o nome a um prestador já cadastrado como alias validado (RN-208). Nomes parecidos no cadastro aparecem só como dica para conferir; nada é ligado sozinho.
+- **Regras do prestador:** «Recebe repasse de IMG» e «Médico V3 (Curitiba)» viraram cartões com explicação, em vez de caixas soltas.

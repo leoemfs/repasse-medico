@@ -28,7 +28,8 @@ RENDER.bases = () => {
       <td class="small">${resumoRegras(p)}</td><td><input type="checkbox" data-nr="${i}"${p.naoRealizaRepasse ? ' checked' : ''}></td><td class="small muted">${esc(p.origem || '')}</td><td style="white-space:nowrap"><button class="sec mini" data-regras="${i}">Regras…</button> <button class="sec mini" data-alias="${i}">+ Alias</button></td></tr>`).join('') : '<tr><td colspan="7" class="muted">Carregue um relatório do MV para registrar o prestador do cabeçalho, ou adicione manualmente.</td></tr>'}</tbody></table></div>
     <div class="acoes"><button id="prAdd" class="sec">+ Prestador manual</button><button id="prCtrl" class="sec">Importar regras da planilha de controle (.xlsx)</button><input type="file" id="prCtrlArq" accept=".xlsx" hidden></div>
     <p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
-    ${S.apolo ? `<details style="margin-top:12px"><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Lista para conferência. Nenhum vínculo é criado automaticamente.</p><ul class="small">${semVinculo.map(([m, n]) => `<li>${esc(m)} — ${n} laudos</li>`).join('')}</ul></details>` : ''}</div>
+    ${S.apolo ? `<details id="semVinc" style="margin-top:12px"${BS.semVincAberto ? ' open' : ''}><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Nenhum vínculo é criado automaticamente. Use «+ Cadastrar» para incluir o médico ou residente com o código do MV, ou para ligar o nome a um prestador já cadastrado.</p>
+      <ul class="small lista-semvinc">${semVinculo.map(([m, n]) => { const par = parecidosNoCadastro(m); return `<li><span>${esc(m)} — ${n} laudos${par.length ? ` <span class="muted">· parecido no cadastro: ${par.map(x => `${esc(x.cod)} - ${esc(x.nomeMV)}`).join(', ')}</span>` : ''}</span> <button class="sec mini" data-cadapolo="${esc(m)}" data-n="${n}">+ Cadastrar</button></li>`; }).join('')}</ul></details>` : ''}</div>
 
   ${cardMedicosV3()}${cardDescontos()}${cardClasses()}${cardConvenios()}
   <div class="card" id="cardFat" data-sub="faturistas"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
@@ -71,6 +72,8 @@ RENDER.bases = () => {
   pg.querySelectorAll('[data-arm]').forEach(a => a.onclick = async ev => { ev.preventDefault(); const [i, j] = a.dataset.arm.split(':').map(Number); const p = S.cfg.prestadores[i];
     if (await confirmar('Remover alias?', `«${esc(p.aliases[j].nome)}» deixará de identificar o prestador ${esc(p.cod)}.`, 'Remover')) { p.aliases.splice(j, 1); salvarCfg('Alias removido.'); RENDER.bases(); } });
   pg.querySelectorAll('[data-alias]').forEach(b => b.onclick = () => adicionarAlias(+b.dataset.alias, medApolo));
+  if ($('semVinc')) $('semVinc').ontoggle = e => { BS.semVincAberto = e.target.open; };
+  pg.querySelectorAll('[data-cadapolo]').forEach(b => b.onclick = () => cadastrarMedicoApolo(b.dataset.cadapolo, +b.dataset.n));
   $('prAdd').onclick = async () => {
     const op = await exigirOperador(); if (!op) return;
     const r = await dialogo('Prestador manual', `${campoBusca({ nome: 'nome', rotulo: 'Nome como no MV', fonte: 'prestador', preencheCod: 'cod', dica: 'A lista mostra também os médicos do Apolo sem código e os códigos do Power BI ainda sem nome.' })}<label class="campo">Código do prestador no MV<input type="text" name="cod"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Adicionar']]);
@@ -134,4 +137,54 @@ async function adicionarAlias(i, medApolo) {
   p.aliases = p.aliases || [];
   p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: r.campos.motivo || '', origem: 'cadastro manual', competencia: S.comp });
   salvarCfg(`Alias «${nome}» validado para o prestador ${p.cod}.`, 'aliases'); RENDER.bases();
+}
+
+/* ---------- Atalho: cadastrar médico ou residente do Apolo sem vínculo ----------
+ * Novo prestador (código do MV) ou alias validado para um prestador já cadastrado (RN-208: o vínculo
+ * só existe com responsável). Nomes parecidos no cadastro aparecem só como dica; nada é ligado sozinho. */
+function parecidosNoCadastro(nome) {
+  const t = tokensNome(norm(nome));
+  return S.cfg.prestadores.filter(p => {
+    const q = tokensNome(norm(p.nomeMV)); if (!q.length) return false;
+    const [menor, maior] = q.length <= t.length ? [q, t] : [t, q];
+    return menor.length >= 2 && menor.every(x => maior.includes(x));
+  }).slice(0, 3);
+}
+async function cadastrarMedicoApolo(nome, laudos) {
+  const op = await exigirOperador(); if (!op) return;
+  const par = parecidosNoCadastro(nome);
+  const pr = dialogo(`Cadastrar «${nome}» (${laudos} laudos no Apolo)`, `
+    <div class="campo"><label class="small"><input type="radio" name="modo" value="novo"${par.length ? '' : ' checked'}> Novo prestador (código do MV)</label>
+      <label class="small"><input type="radio" name="modo" value="alias"${par.length ? ' checked' : ''}> Ligar a um prestador já cadastrado (mesmo médico, nome diferente no MV)</label></div>
+    <div data-modo="novo"${par.length ? ' hidden' : ''}><div class="grid2">
+      <label class="campo">Código do prestador no MV *<input type="text" name="cod" inputmode="numeric"></label>
+      <label class="campo">Tipo<select name="tipo">${opcoes([['medico', 'Médico'], ['residente', 'Residente']], 'medico')}</select></label></div>
+      <label class="campo">Nome como no MV<input type="text" name="nomeMV" value="${esc(nome.toUpperCase())}"><span class="small muted">Se for diferente do Apolo, o nome do Apolo fica como alias validado.</span></label></div>
+    <div data-modo="alias"${par.length ? '' : ' hidden'}>
+      ${campoBusca({ nome: 'prestador', rotulo: 'Prestador do cadastro', fonte: 'prestador', valor: par[0]?.nomeMV || '', cod: par[0]?.cod || '', preencheCod: 'codAlias' })}<input type="hidden" name="codAlias" value="${esc(par[0]?.cod || '')}">
+      ${par.length ? `<p class="small muted">Parecido no cadastro: ${par.map(x => `${esc(x.cod)} - ${esc(x.nomeMV)}`).join(', ')}. Confira antes de ligar.</p>` : ''}
+      <label class="campo">Justificativa<input type="text" name="motivo" placeholder="ex.: mesmo médico, nome abreviado no MV"></label></div>
+    <p class="small muted">O cadastro e o vínculo ficam registrados com o seu nome (${esc(op)}).</p>`, [['', 'Cancelar', 'sec'], ['ok', 'Cadastrar']]);
+  $('dlgCorpo').querySelectorAll('[name="modo"]').forEach(r => r.onchange = () => $('dlgCorpo').querySelectorAll('[data-modo]').forEach(d => { d.hidden = d.dataset.modo !== r.value; }));
+  const r = await pr;
+  if (r.botao !== 'ok') return;
+  const c = r.campos;
+  if (c.modo === 'novo') {
+    const cod = c.cod.trim(), nomeMV = (c.nomeMV || nome).trim();
+    if (!cod) return avisar('Informe o código do prestador no MV.', 'warn');
+    if (S.cfg.prestadores.some(p => String(p.cod) === cod)) return avisar(`Já existe prestador com o código ${cod}. Use «Ligar a um prestador já cadastrado».`, 'warn');
+    const p = { cod, nomeMV, aliases: [], naoRealizaRepasse: false, origem: `médico do Apolo (${op})`, em: agoraISO(), regras: { ...regrasPrestadorVazias(), tipo: c.tipo } };
+    if (norm(nomeMV) !== norm(nome)) p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: 'nome do Apolo no cadastro do prestador', origem: 'cadastro pelo Apolo', competencia: S.comp });
+    S.cfg.prestadores.push(p);
+    salvarCfg(`${c.tipo === 'residente' ? 'Residente' : 'Médico'} ${cod} - ${nomeMV} cadastrado a partir do Apolo.`, 'prestadores');
+    avisar(`${cod} - ${nomeMV} cadastrado. As regras de repasse ficam em «Regras…».`, 'ok');
+  } else {
+    const p = S.cfg.prestadores.find(x => String(x.cod) === String(c.codAlias || c.prestadorCod || '').trim());
+    if (!p) return avisar('Escolha o prestador do cadastro na lista.', 'warn');
+    p.aliases = p.aliases || [];
+    p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: c.motivo || '', origem: 'cadastro pelo Apolo', competencia: S.comp });
+    salvarCfg(`Alias «${nome}» validado para o prestador ${p.cod}.`, 'aliases');
+    avisar(`«${nome}» ligado a ${p.cod} - ${p.nomeMV}.`, 'ok');
+  }
+  BS.semVincAberto = true; RENDER.bases();
 }

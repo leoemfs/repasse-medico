@@ -63,5 +63,32 @@ ok(await S(() => window.__RM.S.cfg.prestadores.length === 36 && window.__RM.S.cf
 ok(await S(() => window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'prestadores') && window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'regras')), 'alterações registradas na competência 10/2026');
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await sub('prestadores'); await p.screenshot({ path: out + 'regras_prestadores.png' });
 await sub('classes'); await p.screenshot({ path: out + 'regras_classes.png', fullPage: true });
+// 7) Atalho «+ Cadastrar» nos médicos do Apolo sem vínculo; caixas de IMG/V3 nas regras.
+await sub('prestadores'); await p.click('[data-regras]'); await p.waitForSelector('#dlg[open]');
+ok((await p.$$('#dlgCorpo .opcoes-check label')).length === 2 && /Laudos de imagem pagos pela classe/.test(await p.textContent('#dlgCorpo .opcoes-check')), 'regras: «Recebe repasse de IMG» e «Médico V3» em cartões com explicação');
+await p.screenshot({ path: out + 'regras_dialogo.png' });
+await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open);
+await p.goto(html + '#inicio'); await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
+await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await sub('prestadores');
+await p.click('#semVinc summary');
+const nSem = (await p.$$('[data-cadapolo]')).length;
+ok(nSem > 0, `cada médico do Apolo sem vínculo tem «+ Cadastrar» (${nSem})`);
+await p.locator('#semVinc').screenshot({ path: out + 'regras_apolo_semvinculo.png' });
+const alvo = await p.getAttribute('#semVinc li:not(:has(.muted)) [data-cadapolo]', 'data-cadapolo');
+await p.click(`[data-cadapolo="${alvo}"]`); await p.waitForSelector('#dlg[open]');
+await p.check('#dlgCorpo [name="modo"][value="novo"]');
+await p.fill('#dlgCorpo [name="cod"]', '99901'); await p.selectOption('#dlgCorpo [name="tipo"]', 'residente');
+await okDlg();
+const novo = await p.evaluate(() => window.__RM.S.cfg.prestadores.find(x => x.cod === '99901'));
+ok(novo && novo.regras.tipo === 'residente' && (await p.$$('[data-cadapolo]')).length === nSem - 1 && await p.isVisible('#semVinc[open]'), `novo residente 99901 cadastrado a partir do Apolo (${novo?.nomeMV}); sai da lista e a lista continua aberta`);
+// Nome parecido no cadastro: abre já em «Ligar a um prestador» com o parecido; vira alias validado.
+const parecido = await p.$('#semVinc li:has(.muted) [data-cadapolo]');
+if (parecido) {
+  const nomeAp = await parecido.getAttribute('data-cadapolo'); await parecido.click(); await p.waitForSelector('#dlg[open]');
+  const cod = await p.inputValue('#dlgCorpo [name="codAlias"]');
+  ok(await p.isChecked('#dlgCorpo [name="modo"][value="alias"]') && !!cod, `nome parecido (${nomeAp}): sugere ligar ao ${cod}, para conferir`);
+  await okDlg();
+  ok(await p.evaluate(([c, n]) => window.__RM.S.cfg.prestadores.find(x => x.cod === c).aliases.some(a => a.nome === n && a.status === 'validado' && a.responsavel === 'Teste Regras'), [cod, nomeAp]), 'alias validado com responsável');
+} else ok(true, 'nenhum nome parecido no cadastro (sem sugestão)');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
