@@ -89,6 +89,12 @@ function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, 
     for (const f of cfg.faturistas) { const m = pbi.unidadesDoFaturista?.[f.nome]; if (m && !f.unidades && !f.generico) { f.unidades = Object.entries(m).sort((a, b) => b[1] - a[1]).map(([c]) => c).join(', '); r.unidadesFaturistas++; } }
   }
   if (escolhas.convenios) { const x = registrarConvenios(cfg, pbi.convenios || [], `Power BI ${pbi.nome}`); r.convenios = x.novos; r.tipados = x.tipados; }
+  // Unidades em que cada código de prestador aparece no faturamento (SOL-F9: base de dados).
+  r.prestadoresUnidades = 0;
+  for (const p of cfg.prestadores) {
+    const un = [...new Set((pbi.linhas || []).filter(l => l.prestador === String(p.cod)).map(l => l.unidadeCod))].sort((a, b) => +a - +b).join(', ');
+    if (un && p.unidadesPBI !== un) { p.unidadesPBI = un; r.prestadoresUnidades++; }
+  }
   if (escolhas.tuss) {
     eq.catalogoTUSS = eq.catalogoTUSS || [];
     const tem = new Set(eq.catalogoTUSS.map(t => String(t.codigo)));

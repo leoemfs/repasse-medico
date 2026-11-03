@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.0.0-alpha.16</title>
+<title>Repasse Médico v2.1.0-alpha</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -274,13 +274,14 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .hist-cob span{display:block;width:60%;margin:0 auto 3px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.7}.hist-cob span.atual{background:var(--ok);opacity:1}
 .lote-dv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--infobg);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.lote-dv.vazio{opacity:.8}
 .sug-fx{display:block;margin-top:3px;font-size:11.5px;color:var(--info)}.sug-fx button{margin-left:4px;padding:1px 8px;font-size:11px}
+.pbi-resumo{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.pbi-resumo .marc{cursor:default}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.16 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -331,7 +332,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.0.0-alpha.16';
+const MOTOR_VERSAO = '2.1.0-alpha';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -823,6 +824,7 @@ async function lerPowerBI(bytes, nome) {
     empresa: ['Nome Empresa'], convenio: ['Nome Convenio'], grupo: ['Grupo Procedimento'], atendimento: ['Cod. Atendimento'],
     conta: ['Cod. Conta'], paciente: ['Nome Paciente'], codigo: ['Cod. Procedimento'], desc: ['Desc. Procedimento'],
     data: ['Data Atendimento'], quant: ['Quant. Lancamento'], valor: ['Valor Total Conta'], prestador: ['CD_PRESTADOR'], tipoConv: ['Tipo Convenio'],
+    contaFechada: ['Conta Fechada?', 'Conta Fechada'], remessa: ['Cod. Remessa', 'Remessa'], guia: ['Numero Guia', 'Nr. Guia'],
     // Opcional: quem fechou a conta. Só é usado para sugerir o responsável de uma NC.
     faturista: ['Nome do Usuario que Fechou a Conta', 'Usuario que Fechou a Conta', 'Faturista', 'Usuario Fechamento', 'Usuario Fechamento Conta', 'Usuario Fech. Conta', 'Responsavel Fechamento', 'Responsavel Pelo Fechamento', 'NM_USUARIO_FECHAMENTO', 'CD_USUARIO_FECHAMENTO', 'Usuario Faturamento', 'Faturado Por']
   });
@@ -839,7 +841,9 @@ async function lerPowerBI(bytes, nome) {
       atendimento: String(g(r, 'atendimento')).replace(/\.0+$/, ''), conta: String(g(r, 'conta')).replace(/\.0+$/, ''),
       codigo: cod, desc: String(fixMojibake(g(r, 'desc'))).trim(), data: paraData(g(r, 'data')),
       prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim(),
-      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase()
+      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase(),
+      // Conciliação (SOL-F9): só na memória da sessão. O nome do paciente nunca é gravado a partir do Power BI.
+      pn: norm(g(r, 'paciente')), contaFechada: X.contaFechada < 0 ? '' : String(g(r, 'contaFechada')).trim(), remessa: String(g(r, 'remessa')).replace(/\.0+$/, '').trim(), guia: String(g(r, 'guia')).replace(/\.0+$/, '').trim()
     });
   }
   const datas = linhas.map(l => l.data).filter(Boolean).map(d => d.getTime());
@@ -1306,6 +1310,12 @@ function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, 
     for (const f of cfg.faturistas) { const m = pbi.unidadesDoFaturista?.[f.nome]; if (m && !f.unidades && !f.generico) { f.unidades = Object.entries(m).sort((a, b) => b[1] - a[1]).map(([c]) => c).join(', '); r.unidadesFaturistas++; } }
   }
   if (escolhas.convenios) { const x = registrarConvenios(cfg, pbi.convenios || [], `Power BI ${pbi.nome}`); r.convenios = x.novos; r.tipados = x.tipados; }
+  // Unidades em que cada código de prestador aparece no faturamento (SOL-F9: base de dados).
+  r.prestadoresUnidades = 0;
+  for (const p of cfg.prestadores) {
+    const un = [...new Set((pbi.linhas || []).filter(l => l.prestador === String(p.cod)).map(l => l.unidadeCod))].sort((a, b) => +a - +b).join(', ');
+    if (un && p.unidadesPBI !== un) { p.unidadesPBI = un; r.prestadoresUnidades++; }
+  }
   if (escolhas.tuss) {
     eq.catalogoTUSS = eq.catalogoTUSS || [];
     const tem = new Set(eq.catalogoTUSS.map(t => String(t.codigo)));
@@ -3382,6 +3392,81 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
   return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
 }
 
+/* ---- src/engine/89-conciliacao.js ---- */
+/* ============================================================
+ * Conciliação com o Power BI (SOL-F9)
+ * O Power BI (faturamento) é consultado para explicar o que a conferência encontrou:
+ * - laudo «Só no laudo»: há lançamento? em qual conta? para qual prestador? a conta está fechada?
+ *   tem remessa? quem fechou?
+ * Só sugere a natureza e o responsável da NC; nada é decidido sozinho. Nomes de pacientes do Power BI
+ * ficam só na memória da sessão (não são gravados); CPF nunca é lido.
+ * ============================================================ */
+const SITUACAO_PBI = {
+  'sem-lancamento': { nome: 'Sem lançamento no Power BI', natureza: 'nao-lancado' },
+  'outro-prestador': { nome: 'Lançado para outro prestador', natureza: 'prestador-incorreto' },
+  'outro-relatorio': { nome: 'Lançado para o médico do laudo (está no relatório dele)', natureza: '' },
+  'conta-aberta': { nome: 'Lançado, conta aberta', natureza: 'conta-aberta' },
+  'sem-remessa': { nome: 'Conta fechada, sem remessa', natureza: 'sem-remessa' },
+  'lancado': { nome: 'Lançado (depois da geração do repasse?)', natureza: 'apos-geracao' }
+};
+const contaFechadaPBI = v => /^(S|SIM|Y|YES|TRUE|1|FECHADA)$/i.test(String(v || '').trim());
+// Índice por dia (lançamentos com paciente e data).
+function indicePBIPorDia(pbi) {
+  if (pbi._porDia) return pbi._porDia;
+  const m = new Map();
+  for (const l of pbi.linhas) { if (!l.pn || !l.data) continue; const d = diaSerial(l.data); (m.get(d) || m.set(d, []).get(d)).push(l); }
+  Object.defineProperty(pbi, '_porDia', { value: m, enumerable: false });
+  return m;
+}
+/* Procura o atendimento do laudo no Power BI.
+ * laudo: {pn, dia, titulo, modalidade}; opc: {unidadeCod, tol, prestadorCod, cfg, idxEq} */
+function conciliarLaudo(pbi, laudo, opc) {
+  if (!pbi || !laudo?.pn || laudo.dia === null || laudo.dia === undefined) return null;
+  const porDia = indicePBIPorDia(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
+  for (let d = laudo.dia - tol; d <= laudo.dia + tol; d++) for (const l of porDia.get(d) || []) {
+    if (opc.unidadeCod && opc.unidadeCod !== '*' && String(l.unidadeCod) !== String(opc.unidadeCod)) continue;
+    const nm = nivelNome(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;
+    const mods = modalidadesDoGrupo(l.grupo);
+    const eq = opc.idxEq && laudo.titulo ? avaliarProcedimento(opc.idxEq, l.codigo, laudo.titulo, { unidade: opc.unidadeCod, convenio: l.convenio }).estado : '';
+    const pontos = (eq === 'validada' ? 4 : eq === 'pendente' ? 2 : 0) + (mods && laudo.modalidade && mods.includes(laudo.modalidade) ? 1 : 0) + (diaSerial(l.data) === laudo.dia ? 1 : 0) + (nm === 3 ? 1 : 0);
+    if (!mods || !laudo.modalidade || mods.includes(laudo.modalidade) || eq === 'validada') cands.push({ l, pontos, eq });
+  }
+  if (!cands.length) return { situacao: 'sem-lancamento', ...SITUACAO_PBI['sem-lancamento'], texto: `Power BI: nenhum lançamento do paciente em ±${tol} dia(s)${opc.unidadeCod && opc.unidadeCod !== '*' ? ` na unidade ${opc.unidadeCod}` : ''} compatível com o laudo.` };
+  cands.sort((a, b) => b.pontos - a.pontos);
+  const l = cands[0].l, base = `conta ${l.conta || '—'} · atendimento ${l.atendimento || '—'} · ${l.codigo} ${l.desc}`;
+  const faturista = l.faturista || '';
+  let s;
+  // Médico do laudo pelo cadastro (nome do MV ou alias validado): lançado para ele = está no relatório dele.
+  const doLaudo = laudo.medico && opc.cfg ? prestadorDoMedico(opc.idxPrest || indicePrestadores(opc.cfg), laudo.medico) : null;
+  if (opc.prestadorCod && l.prestador && String(l.prestador) !== String(opc.prestadorCod)) s = doLaudo?.estado === 'ok' && String(doLaudo.prestador.cod) === String(l.prestador) ? 'outro-relatorio' : 'outro-prestador';
+  else if (l.contaFechada !== '' && !contaFechadaPBI(l.contaFechada)) s = 'conta-aberta';
+  else if (l.contaFechada !== '' && !l.remessa) s = 'sem-remessa';
+  else s = 'lancado';
+  const detalhe = s === 'outro-relatorio' ? `lançado para o prestador ${l.prestador}, que é o médico do laudo` : s === 'outro-prestador' ? `lançado para o prestador ${l.prestador}, não ${opc.prestadorCod}` : s === 'conta-aberta' ? 'conta ainda aberta' : s === 'sem-remessa' ? 'conta fechada, sem remessa' : `lançado${l.remessa ? ` (remessa ${l.remessa})` : ''}: pode ter entrado depois da geração do repasse`;
+  return { situacao: s, ...SITUACAO_PBI[s], linha: l, faturista, conta: l.conta, atendimento: l.atendimento, prestador: l.prestador,
+    texto: `Power BI: ${base} — ${detalhe}${faturista ? ` · conta fechada por ${faturista}` : ''}.` };
+}
+/* Enriquece os candidatos «Só no laudo» com o que o Power BI mostra: natureza sugerida, responsável
+ * (quem fechou a conta), conta e atendimento. Devolve o resumo por situação. */
+function enriquecerCandidatosComPBI(cands, pbi, opc) {
+  const resumo = Object.fromEntries(Object.keys(SITUACAO_PBI).map(k => [k, 0]));
+  if (!pbi) return resumo;
+  for (const c of cands) {
+    if (c.tipo !== 'so-laudo') continue;
+    const k = c.campos, data = paraData(k.data);
+    const r = conciliarLaudo(pbi, { pn: norm(k.paciente), dia: data ? diaSerial(data) : null, titulo: k.titulo, modalidade: k.modalidade, medico: k.medico }, opc);
+    if (!r) continue;
+    resumo[r.situacao]++;
+    c.pbi = { situacao: r.situacao, nome: r.nome, texto: r.texto };
+    c.natureza = r.natureza || c.natureza;
+    if (r.faturista && !k.responsavel) k.responsavel = r.faturista;
+    if (r.conta && !k.conta) k.conta = r.conta;
+    if (r.atendimento && !k.idAtendimento) k.idAtendimento = r.atendimento;
+    c.motivo = `${c.motivo}${c.motivo ? ' · ' : ''}${r.texto}`;
+  }
+  return resumo;
+}
+
 /* ---- src/engine/90-relatorios.js ---- */
 /* ============================================================
  * Relatórios Excel. Códigos TUSS sempre como texto; dados originais preservados;
@@ -4411,7 +4496,14 @@ async function rodarConferencia(x, un, tol, medSel) {
   await guardarRodada(rodada);
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
   ctx.fonteNC = `conf|${x.id}|${un}`;
-  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaConferencia(res, ctx, S.cfg));
+  // Conciliação com o Power BI (SOL-F9): explica os «Só no laudo» e sugere natureza e responsável.
+  const cands = candidatosDaConferencia(res, ctx, S.cfg);
+  if (S.pbi) {
+    const opcPBI = { unidadeCod: un, tol, prestadorCod: x.rel.cab.prestadorCod, cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), idxPrest: indicePrestadores(S.cfg) };
+    for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } }
+    ctx.pbiResumo = enriquecerCandidatosComPBI(cands, S.pbi, opcPBI); ctx.pbiNome = S.pbi.nome;
+  }
+  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, cands);
   return { res, ctx, rodada };
 }
 /* Depois de validar equivalências: roda de novo, com os mesmos parâmetros, a última conferência de cada
@@ -4440,6 +4532,7 @@ function desenharConferencia() {
     <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
     ${comparacao ? resumoComparacao(comparacao) : ''}
     ${quadroAceite()}
+    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}
     <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
     <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
@@ -6863,7 +6956,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo } };   // usado pelos testes automatizados
 })();
 
 </script>

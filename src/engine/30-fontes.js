@@ -52,6 +52,7 @@ async function lerPowerBI(bytes, nome) {
     empresa: ['Nome Empresa'], convenio: ['Nome Convenio'], grupo: ['Grupo Procedimento'], atendimento: ['Cod. Atendimento'],
     conta: ['Cod. Conta'], paciente: ['Nome Paciente'], codigo: ['Cod. Procedimento'], desc: ['Desc. Procedimento'],
     data: ['Data Atendimento'], quant: ['Quant. Lancamento'], valor: ['Valor Total Conta'], prestador: ['CD_PRESTADOR'], tipoConv: ['Tipo Convenio'],
+    contaFechada: ['Conta Fechada?', 'Conta Fechada'], remessa: ['Cod. Remessa', 'Remessa'], guia: ['Numero Guia', 'Nr. Guia'],
     // Opcional: quem fechou a conta. Só é usado para sugerir o responsável de uma NC.
     faturista: ['Nome do Usuario que Fechou a Conta', 'Usuario que Fechou a Conta', 'Faturista', 'Usuario Fechamento', 'Usuario Fechamento Conta', 'Usuario Fech. Conta', 'Responsavel Fechamento', 'Responsavel Pelo Fechamento', 'NM_USUARIO_FECHAMENTO', 'CD_USUARIO_FECHAMENTO', 'Usuario Faturamento', 'Faturado Por']
   });
@@ -68,7 +69,9 @@ async function lerPowerBI(bytes, nome) {
       atendimento: String(g(r, 'atendimento')).replace(/\.0+$/, ''), conta: String(g(r, 'conta')).replace(/\.0+$/, ''),
       codigo: cod, desc: String(fixMojibake(g(r, 'desc'))).trim(), data: paraData(g(r, 'data')),
       prestador: String(g(r, 'prestador')).replace(/\.0+$/, ''), convenio: String(fixMojibake(g(r, 'convenio'))).trim(),
-      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase()
+      faturista: String(fixMojibake(g(r, 'faturista'))).trim(), tipoConvenio: String(g(r, 'tipoConv')).trim().toUpperCase(),
+      // Conciliação (SOL-F9): só na memória da sessão. O nome do paciente nunca é gravado a partir do Power BI.
+      pn: norm(g(r, 'paciente')), contaFechada: X.contaFechada < 0 ? '' : String(g(r, 'contaFechada')).trim(), remessa: String(g(r, 'remessa')).replace(/\.0+$/, '').trim(), guia: String(g(r, 'guia')).replace(/\.0+$/, '').trim()
     });
   }
   const datas = linhas.map(l => l.data).filter(Boolean).map(d => d.getTime());

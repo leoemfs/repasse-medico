@@ -73,7 +73,7 @@ Pendências de definição: tipos oficiais de NC usados no Qualiex, campos exigi
 2. Não conformidades (aproveita a conferência que já existe).
 3. Fluxo + anotações.
 
-## SOL-F5 — Equivalências compostas e por convênio — EM LEVANTAMENTO (futuro)
+## SOL-F5 — Equivalências compostas e por convênio — IMPLEMENTADA na v2.1.0-alpha
 
 Pedido de 30/10/2026: um laudo pode corresponder a mais de um código na conta, e isso pode variar por convênio.
 - Exemplo: «USG de ombro com doppler» não corresponde ao articular sozinho. Na conta, precisa de um **articular + um doppler**; na **UNIMED, só o doppler**.
@@ -111,7 +111,7 @@ Pedido de 30/10/2026, com exemplo `REPASSE_10-2026_CONTROLE.xlsx`. O fechamento 
 
 No painel de conflitos de «Equivalências TUSS»: escolher o código correto do título e tirar a validação dos demais, com justificativa e histórico.
 
-## SOL-F9 — Power BI como base de dados da competência — REGISTRADO (memorizar)
+## SOL-F9 — Power BI como base de dados da competência — IMPLEMENTADA (conciliação) na v2.1.0-alpha
 
 Pedido de 30/10/2026.
 - **Regra de competência:** a planilha do Power BI carregada no Início segue a regra de competência. Os dados são do **mês anterior** (produção): competência 10/2026 = dados de 09/2026. Hoje a ferramenta só avisa quando o mês não bate (SOL-F4).
@@ -197,14 +197,14 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - desfazer é possível;
   - o Fluxo precisa estar iniciado na competência (senão, a tela avisa).
 
-## SOL-F13 — Classificação do Fluxo lida do Fechamento — PLANEJADO
+## SOL-F13 — Classificação do Fluxo lida do Fechamento — IMPLEMENTADA na v2.1.0-alpha
 - **Hoje:** produção bruta e classe são digitadas no grupo «Classificação» do Fluxo, e o Fechamento já as calcula.
 - **Proposta:** o bloco do Fluxo mostra o calculado e só registra a conferência humana («conferido por… em…»). O ajuste manual fica permitido, com justificativa.
 - **Aceite:**
   - sem digitação duplicada;
   - divergência entre o ajuste manual e o calculado aparece como aviso.
 
-## SOL-F14 — Lista documental do Fluxo lida de Bases — PLANEJADO
+## SOL-F14 — Lista documental do Fluxo lida de Bases — IMPLEMENTADA na v2.1.0-alpha
 - **Hoje:** os prestadores do controle documental vêm de uma lista própria do modelo do Fluxo, separada das regras de Bases.
 - **Proposta:** de onde vem cada lista:
 
@@ -225,7 +225,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - sugestão de uso: uma sessão de validação de 1 a 2 horas no início de cada competência.
 - **Aceite:** a cobertura sobe de uma competência para a outra e aparece no histórico.
 
-## SOL-F16 — Status sugerido nas etapas do Fluxo — PLANEJADO
+## SOL-F16 — Status sugerido nas etapas do Fluxo — IMPLEMENTADA na v2.1.0-alpha
 - **Hoje:** o status das etapas é digitado mesmo quando a ferramenta já sabe o que aconteceu.
 - **Proposta:** cada etapa ligada a um dado mostra a sugestão; um clique confirma. Nada conclui sozinho (decisão de 29/10/2026). Exemplos:
   - «12 de 14 prestadores com aceite»;
@@ -233,7 +233,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - «planilha de fechamento gerada».
 - **Aceite:** a sugestão nunca altera o status sem confirmação; a confirmação fica no histórico da etapa.
 
-## SOL-F17 — Candidatos a NC guardados na competência — PLANEJADO
+## SOL-F17 — Candidatos a NC guardados na competência — IMPLEMENTADA na v2.1.0-alpha
 - **Hoje:** os candidatos ficam só na memória e se perdem ao recarregar a página.
 - **Proposta:** guardar os candidatos (e os dispensados) na competência, com a mesma retenção de 60 dias das NCs para os dados de pacientes.
 - **Aceite:** depois de recarregar, a revisão continua de onde parou.
@@ -629,3 +629,12 @@ Prévia aprovada: «pode desfazer aceite e rodar sozinha».
   - **Equivalências → «O que mais destrava»:** pares título × código que travam (pendente, sem cadastro, em conflito), ordenados pelas linhas que viram «Conferido» com a validação. Inclui «ver pares» com exemplos (prestador, unidade, data, conta/atendimento), filtro por unidade e simulação do ganho de cobertura. «Validar selecionados» valida com responsável e justificativa (cria a relação quando não existe) e roda de novo, sozinha, as conferências afetadas que estão carregadas na sessão. «Não correspondem» desativa a relação pendente e tira o par da lista; a linha continua pendente na conferência. Par em conflito fica fora do lote.
   - **Fechamento → Indicadores:** cobertura por prestador, com o maior bloqueio (título × código), e o mesmo bloco no Excel de indicadores.
   - As rodadas passam a guardar, por linha, o título do laudo pareado, a situação da equivalência e a data (sem paciente). Rodadas antigas não entram na lista.
+
+## v2.1.0-alpha — F17, F14, F13, F16, F5 e F9 (03/11/2026)
+Pedido: «da F17 até a F16, F5, F9, pode executar na ordem que for melhor; depois lance uma versão v2.1.0-alpha».
+- **F17 – Candidatos a NC guardados:** ficam na base de NCs, por competência, com a mesma retenção de 60 dias (a análise inteira sai ao vencer). A análise rodada de novo substitui os candidatos dela. Dispensados também ficam guardados (com quem e quando). Depois de recarregar a página, a revisão continua pela aba Não conformidades.
+- **F14 – Lista documental de Bases:** USG = prestadores com faixa de USG (fora V3); IMG = recebem IMG (fora V3); Curitiba = médicos V3. Quem é cadastrado em Bases entra sozinho no mês aberto (marcado «· Bases»). Remover do mês vale só para o mês e não volta sozinho. PET, Sedação etc. continuam com lista própria.
+- **F13 – Classificação do Fluxo:** produção bruta de USG e classe vêm do Fechamento. O Fluxo registra a conferência humana («Conferir» / «Conferir todos os que não têm ajuste», com quem e quando). Se o valor muda depois, aparece «valor mudou depois da conferência». Ajuste manual exige justificativa e aparece como aviso quando difere do calculado (o Fechamento continua usando a regra de Bases).
+- **F16 – Status sugerido:** cada etapa ligada a um dado mostra «💡 Sugestão: Concluída — 12 de 12 com aceite» e o botão «Confirmar». Nada muda sem o clique; a confirmação fica no histórico da etapa. Fontes: aceites do Fechamento (USG, IMG, Curitiba), envio e NF do controle documental, classificação conferida, rodadas de correção e NCs enviadas ao Qualiex. A sugestão só aparece quando avança o status atual.
+- **F5 – Regras compostas e por convênio** (Equivalências → «Regras compostas e por convênio»): título do laudo → vários códigos (ex.: articular + doppler), com variação por convênio (ex.: UNIMED = só doppler) e escopo por unidade. Só regra validada, com responsável, vale; editar uma validada volta a pendente. Na conferência: um laudo sustenta uma linha por código esperado (marcador «Regra composta»); código esperado que não está no MV → «Composição incompleta» (ressalva, diz qual falta); código lançado que não faz parte para aquele convênio → «Procedimento diverge», com o motivo. A mescla de base JSON leva as regras compostas.
+- **F9 – Conciliação com o Power BI:** com o Power BI carregado, cada «Só no laudo» da conferência é procurado no faturamento (mesmo paciente, data na tolerância, unidade, procedimento compatível) e classificado: sem lançamento · lançado para outro prestador · lançado para o médico do laudo (está no relatório dele) · conta aberta · conta fechada sem remessa · lançado (provavelmente depois da geração do repasse). Isso sugere a natureza da NC, o responsável (quem fechou a conta), a conta e o atendimento; o resumo aparece no resultado da conferência. Nomes de pacientes do Power BI ficam só na memória da sessão; CPF nunca é lido. A atualização da base pelo Power BI também guarda as unidades de cada código de prestador.
