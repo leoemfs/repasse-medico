@@ -58,7 +58,7 @@ await p.goto(html + '#inicio'); await p.goto(html + '#bases'); await p.waitForSe
 ok(await p.evaluate(n => window.__RM.S.cfg.convenios.find(c => c.nome === n).tipo, nome) === 'SUS', `tipo marcado à mão (${nome} → SUS) não é trocado ao reimportar`);
 
 // 6) Persistência e registro na competência.
-await p.reload(); await p.waitForFunction(() => window.__RM, null, { polling: 200, timeout: 30000 });
+await p.reload(); await p.waitForFunction(() => window.__RM && document.getElementById('stInit').textContent.includes('Pronto') && !!window.__RM.S.compReg?.itens?.['2026-10'], null, { polling: 200, timeout: 30000 });
 ok(await S(() => window.__RM.S.cfg.prestadores.length === 36 && window.__RM.S.cfg.convenios.length === 220), 'regras gravadas após recarregar');
 ok(await S(() => window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'prestadores') && window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'regras')), 'alterações registradas na competência 10/2026');
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await sub('prestadores'); await p.screenshot({ path: out + 'regras_prestadores.png' });

@@ -2,9 +2,10 @@
  * Equivalências TUSS: revisão, validação em lote, conflitos, importação e exportação
  * ============================================================ */
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
-const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set() };
+const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base' };
 
 RENDER.equivalencias = () => {
+  if (FE.sub === 'destrava') return desenharDestrava();
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, conf = conflitosEquivalencias(S.eq);
   $('pag-equivalencias').innerHTML = `
   <div class="card"><h2>Base de equivalências <span class="muted small">revisão ${S.eq.revisao} · ${S.eq.atualizadoEm ? new Date(S.eq.atualizadoEm).toLocaleString('pt-BR') : ''}</span></h2>
@@ -13,7 +14,7 @@ RENDER.equivalencias = () => {
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
-      <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div></div>
+      <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
     <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
   <div class="card"><div class="filtros">
@@ -24,6 +25,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
+  ligarAbasEq($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();

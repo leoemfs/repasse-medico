@@ -72,7 +72,11 @@ function painelCompetencia() {
         <div class="l"><div>Rodadas de correção de prestador<small>${unCorr ? `unidade(s) ${esc(unCorr)}` : '—'}</small></div><span class="v">${R.corr.length}</span></div>
         <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
         <div class="l"><div>Fluxo mensal<small>${R.indFx ? `${R.indFx.ok} de ${R.indFx.total} etapas concluídas · ${R.indFx.vencidas.length} vencida(s)` : 'checklist não iniciado'}</small></div><span class="v">${R.indFx ? pct + '%' : '—'}</span></div>
-        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}</div>
+        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}
+        ${(() => { const h = historicoCobertura(S.rodadas, ch, 4), cob = coberturaCompetencia(S.rodadas, ch), ant = h[h.length - 2], d = cob.total && ant?.total ? Math.round((cob.pct - ant.pct) * 10) / 10 : null, f = v => fmtPct(v);
+          return `<div class="l" id="cobInicio"><div>Cobertura automática<small>${cob.total ? `${cob.conferidas} de ${cob.total} linhas conferidas sem decisão manual${d !== null ? ` · ${d >= 0 ? '+' : ''}${f(d)} p.p. vs ${rotuloCompetencia(ant.chave)}` : ''}` : 'sem rodadas de conferência'} · <a href="#equivalencias" data-destrava>o que mais destrava</a></small></div><span class="v">${cob.total ? f(cob.pct) + '%' : '—'}</span></div>
+          ${cob.total ? `<div class="barra"><i style="width:${cob.pct}%"></i></div>` : ''}
+          <div class="hist-cob" title="Cobertura das últimas competências">${h.map(x => `<div><span style="height:${Math.max(2, Math.round(x.pct * 0.4))}px"${x.chave === ch ? ' class="atual"' : ''}></span>${x.total ? f(x.pct) + '%' : '—'}<small>${rotuloCompetencia(x.chave)}</small></div>`).join('')}</div>`; })()}</div>
       <div><h3>Bases alteradas nesta competência</h3>
         <div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
         ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div>

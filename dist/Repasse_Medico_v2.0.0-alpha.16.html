@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.0.0-alpha.15</title>
+<title>Repasse Médico v2.0.0-alpha.16</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -268,13 +268,18 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .opcoes-check label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
 .opcoes-check label:has(input:checked){border-color:var(--accent);background:var(--infobg)}
 .opcoes-check input{margin-top:3px;width:16px;height:16px;flex:none}.opcoes-check b{display:block;font-size:13.5px}.opcoes-check small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.35}
+.aceite-box{border:2px solid var(--accent);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--infobg)}
+.aceite-box.feito{border-color:var(--ok);background:var(--okbg)}.aceite-box .campo{margin-top:4px}
+.hist-cob{display:flex;align-items:flex-end;gap:8px;margin-top:6px}.hist-cob div{flex:1;text-align:center;font-size:11px;color:var(--muted)}.hist-cob small{display:block;font-size:10px}
+.hist-cob span{display:block;width:60%;margin:0 auto 3px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.7}.hist-cob span.atual{background:var(--ok);opacity:1}
+.lote-dv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--infobg);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.lote-dv.vazio{opacity:.8}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.15 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.0.0-alpha.16 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -325,7 +330,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.0.0-alpha.15';
+const MOTOR_VERSAO = '2.0.0-alpha.16';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -417,6 +422,7 @@ function paraData(v) {
 const diaSerial = d => d ? Math.round(d.getTime() / 86400000) : null;
 const isoDia = d => d ? d.toISOString().slice(0, 10) : '';
 const fmtData = d => d ? isoDia(d).split('-').reverse().join('/') : '';
+const fmtPct = n => (Math.round((+n || 0) * 10) / 10).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 const fmtBR = n => (+n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const numBR = s => parseFloat(String(s).replace(/\./g, '').replace(',', '.'));
 const r2 = x => Math.round(x * 100) / 100;
@@ -1680,6 +1686,85 @@ function resolverConflito(base, chaveT, codigoManter, responsavel, justificativa
   return alterarStatusEq(base, ids, 'pendente', responsavel, `Conflito desfeito: mantido o código ${codigoManter}. ${justificativa.trim()}`, competencia);
 }
 
+/* ---- src/engine/52-cobertura.js ---- */
+/* ============================================================
+ * Cobertura de equivalências (SOL-F15)
+ * Cobertura = linhas de procedimento do MV com status «Conferido» ÷ total de linhas de procedimento,
+ * na última rodada de conferência de cada relatório da competência (prestador × unidade × repasse).
+ * «O que mais destrava»: pares título do Apolo × código do MV que impedem a conferência automática.
+ * Usa só o que a rodada guarda (sem nome de paciente).
+ * ============================================================ */
+const chaveRelatorioRodada = r => `${r.prestadorCod}|${r.unidadeCod}|${r.repasse}|${r.descricao || ''}`;
+function ultimasRodadasConferencia(rodadas, chave) {
+  const m = new Map();
+  for (const r of rodadas) {
+    if (r.tipo !== 'conferencia' || competenciaDaRodada(r) !== chave) continue;
+    const k = chaveRelatorioRodada(r), a = m.get(k);
+    if (!a || r.em > a.em) m.set(k, r);
+  }
+  return [...m.values()];
+}
+const ehLinhaProcedimento = l => !l.tipoItem || l.tipoItem === 'procedimento';
+function coberturaCompetencia(rodadas, chave) {
+  const ult = ultimasRodadasConferencia(rodadas, chave), por = new Map();
+  let total = 0, conferidas = 0;
+  for (const r of ult) {
+    const proc = r.linhas.filter(ehLinhaProcedimento), ok = proc.filter(l => l.estado === 'conferido').length;
+    total += proc.length; conferidas += ok;
+    const e = por.get(r.prestadorCod) || { cod: r.prestadorCod, nome: r.prestadorNome, total: 0, conferidas: 0, bloqueios: new Map() };
+    e.total += proc.length; e.conferidas += ok;
+    for (const l of proc) if (l.eq && EQ_TRAVA.includes(l.eq) && l.estado !== 'conferido') { const k = `${l.titulo} × ${l.codigo}`; e.bloqueios.set(k, (e.bloqueios.get(k) || 0) + 1); }
+    por.set(r.prestadorCod, e);
+  }
+  const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
+  const porPrestador = [...por.values()].map(e => ({ ...e, pct: pct(e.conferidas, e.total), maiorBloqueio: [...e.bloqueios].sort((a, b) => b[1] - a[1])[0] || null })).sort((a, b) => a.pct - b.pct);
+  return { chave, rodadas: ult.length, total, conferidas, pct: pct(conferidas, total), porPrestador };
+}
+function historicoCobertura(rodadas, chave, meses = 4) {
+  const h = [];
+  for (let i = meses - 1; i >= 0; i--) { const c = competenciaVizinha(chave, -i), x = coberturaCompetencia(rodadas, c); h.push({ chave: c, pct: x.pct, total: x.total, conferidas: x.conferidas }); }
+  return h;
+}
+
+/* Pares que travam. A situação é reavaliada com a base de equivalências atual (pode ter mudado
+ * depois da rodada). Linhas já conferidas ou com decisão não entram. */
+function paresQueTravam(rodadas, chave, eqBase, { unidade = '*' } = {}) {
+  const idx = indiceEquivalencias(eqBase), m = new Map();
+  for (const r of ultimasRodadasConferencia(rodadas, chave)) {
+    if (unidade !== '*' && String(r.unidadeCod) !== String(unidade)) continue;
+    for (const l of r.linhas) {
+      if (!l.titulo || !l.eq || !EQ_TRAVA.includes(l.eq) || l.estado === 'conferido' || l.decisao) continue;
+      const k = `${chaveTitulo(l.titulo)}|${l.codigo}`;
+      const e = m.get(k) || { chave: k, titulo: l.titulo, codigo: l.codigo, descMV: l.desc || '', linhas: 0, travadas: 0, prestadores: new Set(), unidades: new Set(), exemplos: [] };
+      e.linhas++; if (l.eqTrava) e.travadas++;
+      e.prestadores.add(`${r.prestadorCod} - ${r.prestadorNome}`); e.unidades.add(String(r.unidadeCod));
+      if (e.exemplos.length < 3) { const [, conta, atend] = String(l.kd || '').split('|'); e.exemplos.push({ prestador: `${r.prestadorCod} - ${r.prestadorNome}`, unidade: r.unidadeCod, data: l.data, conta, atendimento: atend, desc: l.desc, eq: l.eq }); }
+      m.set(k, e);
+    }
+  }
+  return [...m.values()].map(e => {
+    const av = avaliarProcedimento(idx, e.codigo, e.titulo);
+    return { ...e, situacao: av.estado, relacao: av.relacao || null, prestadores: [...e.prestadores], unidades: [...e.unidades].sort((a, b) => +a - +b) };
+  }).filter(e => EQ_TRAVA.includes(e.situacao)).sort((a, b) => b.travadas - a.travadas || b.linhas - a.linhas || a.titulo.localeCompare(b.titulo));
+}
+
+/* Validação em lote: valida a relação pendente ou cria e valida a que não existe (com responsável).
+ * Conflito não entra (precisa «desfazer conflito»). Devolve quantas foram validadas. */
+function validarParesEmLote(eqBase, pares, responsavel, motivo, competencia) {
+  if (!responsavel) throw new Error('Informe o responsável antes de validar equivalências.');
+  let n = 0;
+  for (const p of pares) {
+    if (p.situacao === 'conflito') continue;
+    let rel = eqBase.itens.find(e => e.codigo === p.codigo && chaveTitulo(e.titulo) === chaveTitulo(p.titulo) && e.status !== 'desativada');
+    if (!rel) {
+      rel = novaRelacao({ codigo: p.codigo, titulo: p.titulo, descMV: p.descMV, justificativa: motivo, origem: `validação em lote (${responsavel})` });
+      eqBase.itens.push(rel); eqBase.revisao++;
+    }
+    n += alterarStatusEq(eqBase, [rel.id], 'validada', responsavel, motivo, competencia);
+  }
+  return n;
+}
+
 /* ---- src/engine/60-conferencia.js ---- */
 /* ============================================================
  * Motor de conferência cruzada MV × Apolo
@@ -2000,7 +2085,7 @@ function registroRodada(res, ctx) {
     // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
       vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
-      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '' })),
+      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
     aceite: null
   };
 }
@@ -2026,6 +2111,28 @@ function compararRodadas(ant, atual) {
   }
   for (const [k, a] of A) if (!B.has(k)) grupos.desapareceram.push(a);
   return grupos;
+}
+
+/* Equivalência que trava a linha (SOL-F15): título do laudo pareado, situação do par e se a linha seria
+ * conferida com a equivalência validada (mesmo paciente, mesma data, sem outro bloqueio). Sem paciente. */
+const EQ_TRAVA = ['pendente', 'sem-cadastro', 'conflito'];
+function infoEquivalencia(x) {
+  if (!x.par || !x.r) return {};
+  const est = x.par.proc?.estado || '', m = x.marcadores || new Set();
+  const outros = ['ambiguo', 'outro-medico', 'data-divergente', 'nome-semelhante', 'convenio-divergente', 'id-duplo'].some(k => m.has(k));
+  return { titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
+}
+
+/* Aceite (SOL-F11): o mesmo registro feito em Rodadas ou na Conferência. Desfazer guarda o histórico. */
+function aceitarRodada(r, por, obs, pendencias) {
+  r.aceite = { por, em: agoraISO(), obs: String(obs || '').trim(), pendencias };
+  return r.aceite;
+}
+function desfazerAceiteRodada(r, por, motivo = '') {
+  if (!r.aceite) return false;
+  r.aceitesDesfeitos = [...(r.aceitesDesfeitos || []), { ...r.aceite, desfeitoPor: por, desfeitoEm: agoraISO(), motivo }];
+  r.aceite = null;
+  return true;
 }
 
 /* ---- src/engine/82-competencia.js ---- */
@@ -3210,6 +3317,7 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
     ...linhasMeta([['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || ''], ['Total USG', `R$ ${fmtBR(ind.totais.usg)}`], ['Total IMG', `R$ ${fmtBR(ind.totais.img)}`], ['Total Curitiba (V3)', `R$ ${fmtBR(ind.totais.curitiba)}`],
       ['NCs da competência', `${ind.ncs.total} · ${ind.ncs.impactam} impactam o pagamento (R$ ${fmtBR(ind.ncs.valor)} nas vindas do MV)`], ['Linhas com decisão (NC ou considerada)', ind.decisoes]]), [],
     ...bloco('USG por unidade', ind.usgPorUnidade), ...bloco('USG por faixa', ind.usgPorFaixa), ...bloco('IMG por unidade', ind.imgPorUnidade), ...bloco('IMG por classe', ind.imgPorClasse),
+    ...(ind.cobertura ? bloco(`Cobertura automática por prestador (%) — competência ${fmtBR(ind.cobertura.pct)}%`, ind.cobertura.porPrestador.map(e => [`${e.cod} - ${e.nome} (${e.conferidas} de ${e.total})${e.maiorBloqueio ? ` · maior bloqueio: ${e.maiorBloqueio[0]}` : ''}`, e.pct]), '') : []),
     ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
   return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
 }
@@ -3849,7 +3957,11 @@ function painelCompetencia() {
         <div class="l"><div>Rodadas de correção de prestador<small>${unCorr ? `unidade(s) ${esc(unCorr)}` : '—'}</small></div><span class="v">${R.corr.length}</span></div>
         <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
         <div class="l"><div>Fluxo mensal<small>${R.indFx ? `${R.indFx.ok} de ${R.indFx.total} etapas concluídas · ${R.indFx.vencidas.length} vencida(s)` : 'checklist não iniciado'}</small></div><span class="v">${R.indFx ? pct + '%' : '—'}</span></div>
-        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}</div>
+        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}
+        ${(() => { const h = historicoCobertura(S.rodadas, ch, 4), cob = coberturaCompetencia(S.rodadas, ch), ant = h[h.length - 2], d = cob.total && ant?.total ? Math.round((cob.pct - ant.pct) * 10) / 10 : null, f = v => fmtPct(v);
+          return `<div class="l" id="cobInicio"><div>Cobertura automática<small>${cob.total ? `${cob.conferidas} de ${cob.total} linhas conferidas sem decisão manual${d !== null ? ` · ${d >= 0 ? '+' : ''}${f(d)} p.p. vs ${rotuloCompetencia(ant.chave)}` : ''}` : 'sem rodadas de conferência'} · <a href="#equivalencias" data-destrava>o que mais destrava</a></small></div><span class="v">${cob.total ? f(cob.pct) + '%' : '—'}</span></div>
+          ${cob.total ? `<div class="barra"><i style="width:${cob.pct}%"></i></div>` : ''}
+          <div class="hist-cob" title="Cobertura das últimas competências">${h.map(x => `<div><span style="height:${Math.max(2, Math.round(x.pct * 0.4))}px"${x.chave === ch ? ' class="atual"' : ''}></span>${x.total ? f(x.pct) + '%' : '—'}<small>${rotuloCompetencia(x.chave)}</small></div>`).join('')}</div>`; })()}</div>
       <div><h3>Bases alteradas nesta competência</h3>
         <div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
         ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div>
@@ -4133,7 +4245,9 @@ function semRelatorioPara(prefixo) {
 }
 function seletoresAnalise(prefixo, tolPadrao) {
   const rels = relatoriosPara(prefixo);
-  const ultimo = S[prefixo === 'cf' ? 'conf' : 'corr']?.ctx;
+  const proximo = prefixo === 'cf' && S.cfProximo && rels.some(r => r.id === S.cfProximo.relId) ? S.cfProximo : null;
+  const ultimo = proximo || S[prefixo === 'cf' ? 'conf' : 'corr']?.ctx;
+  if (proximo) S.cfProximo = null;
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
   const sugerida = rel ? unidadeSugeridaPeloArquivo(rel.nome) : '';
@@ -4219,6 +4333,13 @@ async function executarConferencia() {
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
   if (!exigirAberta(S.comp, 'executar uma conferência')) return;
+  const { res, rodada } = await rodarConferencia(x, un, tol, medSel);
+  desenharConferencia();
+  avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
+  return rodada;
+}
+// Executa e registra uma conferência (usada pelo botão e para rodar de novo após validar equivalências).
+async function rodarConferencia(x, un, tol, medSel) {
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
   const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos }), indiceDecisoesComp());
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
@@ -4231,8 +4352,20 @@ async function executarConferencia() {
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
   ctx.fonteNC = `conf|${x.id}|${un}`;
   guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaConferencia(res, ctx, S.cfg));
-  desenharConferencia();
-  avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
+  return { res, ctx, rodada };
+}
+/* Depois de validar equivalências: roda de novo, com os mesmos parâmetros, a última conferência de cada
+ * relatório afetado que estiver carregado nesta sessão (PDF do MV e Apolo). Devolve o que rodou e o que faltou. */
+async function rodarDeNovoAfetadas(rodadas) {
+  const feitas = [], faltam = [];
+  for (const r of rodadas) {
+    const hash = (r.arquivos || []).find(a => a.papel === 'MV')?.hash;
+    const x = S.relatorios.find(y => y.hash === hash) || S.relatorios.find(y => String(y.rel.cab.prestadorCod) === String(r.prestadorCod) && y.rel.cab.repasse === r.repasse);
+    if (!x || !S.apolo) { faltam.push(r); continue; }
+    const novo = await rodarConferencia(x, r.unidadeCod, r.parametros?.tol ?? S.cfg.parametros.tolConferencia, r.parametros?.medico || '@prest');
+    feitas.push({ antes: r, depois: novo.rodada });
+  }
+  return { feitas, faltam };
 }
 
 function desenharConferencia() {
@@ -4246,6 +4379,7 @@ function desenharConferencia() {
     <dt>Volume</dt><dd>${res.nMV} linhas do MV (${res.nProcedimentos} procedimentos) · ${res.nLaudosEscopo} laudos no escopo · ${res.nPares} pares</dd>
     <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
     ${comparacao ? resumoComparacao(comparacao) : ''}
+    ${quadroAceite()}
     <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
     <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
@@ -4258,6 +4392,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; desenharConferencia(); };
   $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, ctx), nomeArquivoAnalise('conferencia', ctx));
+  ligarQuadroAceite();
   const filtrar = () => {
     const q = norm(S.conf.busca);
     return res.linhas.filter(x => (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
@@ -4320,6 +4455,60 @@ async function removerDecisaoConsiderar(x) {
   if (!await confirmar('Remover decisão?', 'A linha volta a aparecer como pendente na conferência.', 'Remover')) return false;
   removerConsiderar(S.compReg, S.comp, x.decisao.id); salvarCompReg(); avisar('Decisão removida.', 'ok');
   return true;
+}
+
+/* ---------- Aceite na própria Conferência (SOL-F11) ----------
+ * Mesmas regras de Rodadas: observação obrigatória quando há pendências (já descontadas as decisões).
+ * O aceite fica na rodada (aparece em Rodadas e muda a situação no Fechamento). Desfazer guarda o histórico. */
+const rodadaDaConf = () => S.conf && (S.rodadas.find(r => r.id === S.conf.ctx.rodadaId) || S.conf.rodada);
+function proximoRelatorioConf() {
+  const rels = relatoriosPara('cf'), i = rels.findIndex(r => r.id === S.conf?.ctx.relId);
+  return i >= 0 && i < rels.length - 1 ? rels[i + 1] : null;
+}
+function quadroAceite() {
+  const r = rodadaDaConf(); if (!r) return '';
+  const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
+  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => idx.has(l.kd) || (l.kl && idx.has(l.kl)));
+  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => idx.get(l.kd)?.tipo === 'nc' || (l.kl && idx.get(l.kl)?.tipo === 'nc')).length;
+  if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge ok">aceito</span>
+    <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
+    <div class="acoes" style="margin:0">${fechada ? '<span class="small muted">Competência fechada: reabra no Início para desfazer.</span>' : '<button class="sec mini" id="cfDesfazer">Desfazer aceite</button>'}<a href="#rodadas" class="small">Ver em Rodadas</a>
+    ${prox ? `<button class="sec mini" id="cfProximo">Ir para o próximo relatório (${esc(prox.rel.cab.prestadorCod)} - ${esc(prox.rel.cab.prestadorNome)})</button>` : ''}</div></div>`;
+  return `<div class="aceite-box" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge warn">sem aceite</span>
+    <p class="small" style="margin:6px 0">${abertas.length} linha(s) com pendência ou ressalva · <b>${comDecisao.length} já com decisão</b>${comDecisao.length ? ` (${nNC} NC, ${comDecisao.length - nNC} considerada(s) no repasse)` : ''} · <b>${pend} pendente(s)</b></p>
+    ${fechada ? `<div class="acoes" style="margin:0"><button disabled>Registrar aceite</button><span class="small muted">Competência ${rotuloCompetencia(chave)} fechada: reabra no Início para registrar aceite.</span></div>` : `
+    <label class="campo">Observação do aceite${pend ? ' (obrigatória: há pendências)' : ' (opcional)'}<textarea id="cfAceiteObs" rows="2" style="min-height:0;height:58px"></textarea></label>
+    <div class="acoes" style="margin:0"><button id="cfAceitar">Registrar aceite</button>${prox ? `<button class="sec" id="cfAceitarProx">Registrar aceite e ir para o próximo relatório</button>` : ''}</div>
+    <p class="small muted" style="margin:6px 0 0">O aceite aparece em Rodadas e muda a situação no Fechamento para «Conferido · a enviar».${prox ? ` Próximo relatório: ${esc(prox.rel.cab.prestadorCod)} - ${esc(prox.rel.cab.prestadorNome)}.` : ''}</p>`}</div>`;
+}
+function ligarQuadroAceite() {
+  const irProximo = () => {
+    const prox = proximoRelatorioConf(); if (!prox) return;
+    S.cfProximo = { relId: prox.id, unidadeCod: S.conf.ctx.unidadeCod };
+    S.conf = null; RENDER.conferencia(); window.scrollTo(0, 0);
+    avisar(`Próximo relatório: ${prox.rel.cab.prestadorCod} - ${prox.rel.cab.prestadorNome}. Confira a unidade e o médico e execute a conferência.`, 'ok');
+  };
+  const aceitar = async proximo => {
+    const r = rodadaDaConf(), chave = competenciaDaRodada(r);
+    if (!exigirAberta(chave, 'registrar aceite')) return;
+    const op = await exigirOperador(); if (!op) return;
+    const pend = pendenciasDaRodada(r, indiceDecisoesComp(chave)).length, obs = ($('cfAceiteObs')?.value || '').trim();
+    if (pend && !obs) { avisar('Com pendências abertas, informe uma observação para o aceite.', 'warn'); $('cfAceiteObs')?.focus(); return; }
+    aceitarRodada(r, op, obs, pend); await guardarRodada(r);
+    avisar(`Aceite registrado (${r.prestadorCod} - ${r.prestadorNome} · unidade ${r.unidadeCod}).`, 'ok');
+    if (proximo) irProximo(); else desenharConferencia();
+  };
+  if ($('cfAceitar')) $('cfAceitar').onclick = () => aceitar(false);
+  if ($('cfAceitarProx')) $('cfAceitarProx').onclick = () => aceitar(true);
+  if ($('cfProximo')) $('cfProximo').onclick = irProximo;
+  if ($('cfDesfazer')) $('cfDesfazer').onclick = async () => {
+    const r = rodadaDaConf();
+    if (!exigirAberta(competenciaDaRodada(r), 'desfazer o aceite')) return;
+    const op = await exigirOperador(); if (!op) return;
+    if (!await confirmar('Desfazer o aceite?', `O aceite de ${esc(r.aceite.por)} sai desta rodada e fica no histórico. O Fechamento volta a mostrar «Verificar» para este prestador e unidade, se não houver outra rodada aceita.`, 'Desfazer aceite')) return;
+    desfazerAceiteRodada(r, op); await guardarRodada(r);
+    avisar('Aceite desfeito.', 'ok'); desenharConferencia();
+  };
 }
 
 /* ---- src/ui/25-fluxo.js ---- */
@@ -5222,7 +5411,7 @@ RENDER.fechamento = async () => {
     <div id="fhCorpo"></div>`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
-  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
+  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp) }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
@@ -5393,7 +5582,10 @@ function desenharIndicadoresFech(corpo, f) {
   corpo.innerHTML = `<div class="nc-kpis"><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.usg)}</b><small>total USG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.img)}</b><small>total IMG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.curitiba)}</b><small>total Curitiba (V3)</small></div>
     <div class="nc-kpi warn"><b>${ind.variacoes.length}</b><small>variações acima de ${S.cfg.fechamento.variacaoAlerta}%</small></div><div class="nc-kpi err"><b>${ind.ncs.impactam}</b><small>NCs que impactam o pagamento</small></div><div class="nc-kpi"><b>${ind.decisoes}</b><small>linhas com decisão</small></div></div>
     <div class="grid3">${tab('USG por unidade', ind.usgPorUnidade)}${tab('USG por faixa', ind.usgPorFaixa)}${tab('Prestadores por situação', ind.porSituacao, v => v)}
-      ${tab('IMG por unidade', ind.imgPorUnidade)}${tab('IMG por classe', ind.imgPorClasse)}${tab('Variação × competência anterior', ind.variacoes, v => (v > 0 ? '+' : '') + fmtBR(v) + '%')}</div>`;
+      ${tab('IMG por unidade', ind.imgPorUnidade)}${tab('IMG por classe', ind.imgPorClasse)}${tab('Variação × competência anterior', ind.variacoes, v => (v > 0 ? '+' : '') + fmtBR(v) + '%')}</div>
+    ${(() => { const cob = coberturaCompetencia(S.rodadas, S.comp); return `<div class="card" id="cobFech"><h3>Cobertura automática por prestador <span class="muted small">${cob.total ? `${fmtPct(cob.pct)}% na competência · ${cob.conferidas} de ${cob.total} linhas` : 'sem rodadas de conferência'}</span></h3>
+      ${cob.porPrestador.length ? `<div class="tw"><table><thead><tr><th>Prestador</th><th class="n">Linhas</th><th class="n">Conferidas</th><th class="n">Cobertura</th><th>Maior bloqueio (título × código)</th></tr></thead><tbody>${cob.porPrestador.map(e => `<tr><td>${esc(e.cod)} - ${esc(e.nome)}</td><td class="n">${e.total}</td><td class="n">${e.conferidas}</td><td class="n"><b>${fmtPct(e.pct)}%</b></td><td>${e.maiorBloqueio ? `${esc(e.maiorBloqueio[0])} <span class="muted small">(${e.maiorBloqueio[1]} linha(s))</span>` : '<span class="muted small">—</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <div class="acoes"><a href="#equivalencias" data-destrava class="small">Ver o que mais destrava →</a></div></div>`; })()}`;
 }
 
 function ligarFech(corpo, f, mk) {
@@ -5506,9 +5698,10 @@ async function acaoSituacao(ac, modo, x) {
  * Equivalências TUSS: revisão, validação em lote, conflitos, importação e exportação
  * ============================================================ */
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
-const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set() };
+const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base' };
 
 RENDER.equivalencias = () => {
+  if (FE.sub === 'destrava') return desenharDestrava();
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, conf = conflitosEquivalencias(S.eq);
   $('pag-equivalencias').innerHTML = `
   <div class="card"><h2>Base de equivalências <span class="muted small">revisão ${S.eq.revisao} · ${S.eq.atualizadoEm ? new Date(S.eq.atualizadoEm).toLocaleString('pt-BR') : ''}</span></h2>
@@ -5517,7 +5710,7 @@ RENDER.equivalencias = () => {
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
-      <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div></div>
+      <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
     <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
   <div class="card"><div class="filtros">
@@ -5528,6 +5721,7 @@ RENDER.equivalencias = () => {
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
       <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
+  ligarAbasEq($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
@@ -5609,6 +5803,88 @@ async function desfazerConflito(c) {
     salvarEq(`Conflito desfeito em «${c.titulo}»: mantido ${r.campos.codigo}; ${n} relação(ões) voltaram a pendente.`);
   } catch (e) { return avisar(e.message, 'err'); }
   RENDER.equivalencias();
+}
+
+/* ---- src/ui/42-destrava.js ---- */
+/* ============================================================
+ * Equivalências → «O que mais destrava» (SOL-F15)
+ * Pares título do Apolo × código do MV que travam a conferência automática na competência, do que
+ * mais trava para o que menos trava. Validação em lote (com responsável e justificativa) e, em seguida,
+ * a ferramenta roda de novo as conferências afetadas que estiverem carregadas nesta sessão.
+ * ============================================================ */
+const DV = { unidade: '*', sel: new Set(), abertos: new Set() };
+const abasEq = () => `<div class="subabas" role="tablist">${[['base', 'Base de equivalências'], ['destrava', 'O que mais destrava']].map(([k, t]) => `<button role="tab" class="${(FE.sub || 'base') === k ? 'on' : ''}" aria-selected="${(FE.sub || 'base') === k}" data-esub="${k}">${t}</button>`).join('')}</div>`;
+function ligarAbasEq(raiz) { raiz.querySelectorAll('[data-esub]').forEach(b => b.onclick = () => { FE.sub = b.dataset.esub; RENDER.equivalencias(); }); }
+// Atalho do Início («o que mais destrava»).
+document.addEventListener('click', e => { if (e.target.closest('[data-destrava]')) FE.sub = 'destrava'; });
+const SIT_PAR = { pendente: ['warn', 'pendente'], 'sem-cadastro': ['err', 'sem cadastro'], conflito: ['err', 'em conflito'] };
+
+async function desenharDestrava() {
+  S.rodadas = await dbTodas();
+  const pg = $('pag-equivalencias');
+  const naoCorr = new Set((S.eq.naoCorrespondem || []).map(x => `${chaveTitulo(x.titulo)}|${x.codigo}`));
+  const pares = paresQueTravam(S.rodadas, S.comp, S.eq, { unidade: DV.unidade }).filter(p => !naoCorr.has(p.chave));
+  for (const k of [...DV.sel]) if (!pares.some(p => p.chave === k && p.situacao !== 'conflito')) DV.sel.delete(k);
+  const cob = coberturaCompetencia(S.rodadas, S.comp);
+  const selPares = pares.filter(p => DV.sel.has(p.chave)), ganho = selPares.reduce((s, p) => s + p.travadas, 0);
+  const novaPct = cob.total ? Math.round((cob.conferidas + ganho) / cob.total * 1000) / 10 : 0;
+  const unidades = [...new Set(ultimasRodadasConferencia(S.rodadas, S.comp).map(r => String(r.unidadeCod)))].sort((a, b) => +a - +b);
+  pg.innerHTML = `<div class="card"><h2>Equivalências TUSS <span class="muted small">revisão ${S.eq.revisao}</span></h2>${abasEq()}</div>
+    <div class="card" id="cardDestrava"><h2>O que mais destrava <span class="muted small">competência ${rotuloCompetencia(S.comp)} · cobertura ${cob.total ? `${fmtPct(cob.pct)}% (${cob.conferidas} de ${cob.total} linhas)` : '—'}</span></h2>
+    <p class="lead">Pares <b>título do Apolo × código do MV</b> que impedem a conferência automática, na última rodada de cada relatório desta competência. «Linhas que destravam» são as que viram «Conferido» com a equivalência validada (mesmo paciente, mesma data, sem outro bloqueio). Nada é validado sozinho.</p>
+    <div class="acoes"><label class="small">Unidade <select id="dvUn"><option value="*">Todas</option>${opcoes(unidades.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`]), DV.unidade)}</select></label>
+      <span class="small muted">As rodadas desta versão em diante guardam o título pareado; rodadas antigas não entram na lista.</span></div>
+    <div class="lote-dv${DV.sel.size ? '' : ' vazio'}"><b>${DV.sel.size} selecionado(s)</b>${DV.sel.size ? ` · validar destrava <b>+${ganho} linha(s)</b> (cobertura ${fmtPct(cob.pct)}% → ${fmtPct(novaPct)}%)` : ' · marque os pares para validar em lote'}
+      <button id="dvValidar"${DV.sel.size ? '' : ' disabled'}>Validar selecionados…</button><button class="sec" id="dvNao"${DV.sel.size ? '' : ' disabled'}>Não correspondem…</button></div>
+    ${pares.length ? `<div class="tw"><table class="dv-tab"><thead><tr><th><input type="checkbox" id="dvTodos" aria-label="Selecionar todos"></th><th>Título do Apolo</th><th>Código MV · descrição</th><th class="n">Linhas que destravam</th><th class="n">Linhas travadas</th><th class="n">Prestadores</th><th>Unidades</th><th>Situação hoje</th><th></th></tr></thead><tbody>
+      ${pares.map(p => { const [c, t] = SIT_PAR[p.situacao] || ['', p.situacao]; return `<tr><td><input type="checkbox" data-dv="${esc(p.chave)}"${DV.sel.has(p.chave) ? ' checked' : ''}${p.situacao === 'conflito' ? ' disabled title="Desfaça o conflito na Base de equivalências antes de validar"' : ''}></td>
+        <td>${esc(p.titulo)}</td><td>${esc(p.codigo)} · ${esc(p.descMV)}</td><td class="n"><b>${p.travadas}</b></td><td class="n">${p.linhas}</td><td class="n" title="${esc(p.prestadores.join('\n'))}">${p.prestadores.length}</td><td>${esc(p.unidades.join(', '))}</td>
+        <td><span class="badge ${c}">${t}</span></td><td><button class="sec mini" data-dvver="${esc(p.chave)}">${DV.abertos.has(p.chave) ? 'esconder' : `ver ${p.exemplos.length} par(es)`}</button></td></tr>
+        <tr class="detalhe"${DV.abertos.has(p.chave) ? '' : ' hidden'} data-dvdet="${esc(p.chave)}"><td colspan="9"><ul class="small" style="margin:4px 0">${p.exemplos.map(x => `<li>${esc(x.prestador)} · unidade ${esc(x.unidade)} · ${x.data ? fmtData(paraData(x.data)) : 'sem data'} · conta ${esc(x.conta || '—')} / atendimento ${esc(x.atendimento || '—')} · MV «${esc(x.desc || '')}» × laudo «${esc(p.titulo)}»</li>`).join('')}</ul></td></tr>`; }).join('')}</tbody></table></div>`
+      : `<p class="muted">${ultimasRodadasConferencia(S.rodadas, S.comp).length ? 'Nenhum par travando a conferência nesta competência.' : 'Nenhuma rodada de conferência nesta competência ainda.'}</p>`}
+    <p class="small muted">Par em conflito aparece, mas não entra no lote: desfaça o conflito na Base de equivalências. «Não correspondem» tira o par da lista (a linha continua pendente na conferência, para tratar como divergência). Sugestão: uma sessão de 1 a 2 horas no começo de cada competência, de cima para baixo.</p></div>`;
+  ligarAbasEq(pg);
+  $('dvUn').onchange = e => { DV.unidade = e.target.value; DV.sel.clear(); desenharDestrava(); };
+  pg.querySelectorAll('[data-dv]').forEach(ch => ch.onchange = () => { ch.checked ? DV.sel.add(ch.dataset.dv) : DV.sel.delete(ch.dataset.dv); desenharDestrava(); });
+  if ($('dvTodos')) $('dvTodos').onchange = e => { DV.sel.clear(); if (e.target.checked) pares.filter(p => p.situacao !== 'conflito').forEach(p => DV.sel.add(p.chave)); desenharDestrava(); };
+  pg.querySelectorAll('[data-dvver]').forEach(b => b.onclick = () => { const k = b.dataset.dvver; DV.abertos.has(k) ? DV.abertos.delete(k) : DV.abertos.add(k); desenharDestrava(); });
+  $('dvValidar').onclick = () => validarLoteDestrava(selPares, cob, ganho, novaPct);
+  $('dvNao').onclick = () => naoCorrespondem(selPares);
+}
+
+async function validarLoteDestrava(pares, cob, ganho, novaPct) {
+  if (!pares.length) return;
+  const op = await exigirOperador(); if (!op) return;
+  const r = await dialogo(`Validar ${pares.length} equivalência(s)?`, `<ul class="small">${pares.map(p => `<li>${esc(p.titulo)} ↔ ${esc(p.codigo)} · ${esc(p.descMV)} <span class="muted">(${p.travadas} linha(s))</span></li>`).join('')}</ul>
+    <label class="campo">Justificativa (vale para todos)<input type="text" name="motivo" value="títulos e códigos conferidos na sessão de validação de ${rotuloCompetencia(S.comp)}"></label>
+    <p class="small muted">Ficam validadas por <b>${esc(op)}</b>, com data e revisão da base. Em seguida a ferramenta roda de novo as conferências afetadas que estiverem carregadas nesta sessão (cobertura esperada: ${fmtPct(cob.pct)}% → ${fmtPct(novaPct)}%, +${ganho} linha(s)).</p>`, [['', 'Cancelar', 'sec'], ['ok', `Validar ${pares.length}`]]);
+  if (r.botao !== 'ok') return;
+  if (!r.campos.motivo.trim()) return avisar('Informe a justificativa.', 'warn');
+  const n = validarParesEmLote(S.eq, pares, op, r.campos.motivo.trim(), S.comp);
+  salvarEq(`${n} equivalência(s) validadas em lote (O que mais destrava).`);
+  DV.sel.clear();
+  // Rodar de novo as conferências afetadas (aprovado em 03/11/2026).
+  const chaves = new Set(pares.map(p => p.chave));
+  const afetadas = ultimasRodadasConferencia(S.rodadas, S.comp).filter(rd => rd.linhas.some(l => l.titulo && chaves.has(`${chaveTitulo(l.titulo)}|${l.codigo}`)));
+  if (compFechada()) { avisar(`${n} equivalência(s) validadas. A competência está fechada: as conferências não foram rodadas de novo.`, 'ok'); return desenharDestrava(); }
+  const antes = coberturaCompetencia(S.rodadas, S.comp);
+  const { feitas, faltam } = await rodarDeNovoAfetadas(afetadas);
+  const depois = coberturaCompetencia(S.rodadas, S.comp);
+  avisar(`${n} equivalência(s) validadas. ${feitas.length} conferência(s) rodadas de novo: cobertura ${fmtPct(antes.pct)}% → ${fmtPct(depois.pct)}%.${faltam.length ? ` ${faltam.length} relatório(s) não estão carregados nesta sessão (${faltam.map(x => `${x.prestadorCod} un. ${x.unidadeCod}`).join(', ')}): carregue o PDF e rode a conferência.` : ''}`, faltam.length ? 'warn' : 'ok');
+  desenharDestrava();
+}
+async function naoCorrespondem(pares) {
+  if (!pares.length) return;
+  const op = await exigirOperador(); if (!op) return;
+  const r = await dialogo(`${pares.length} par(es) não correspondem?`, `<p class="small">O título do laudo não sustenta o código do MV. Os pares saem desta lista e as relações pendentes são desativadas. As linhas continuam pendentes na conferência, para tratar como divergência (NC ou correção).</p><ul class="small">${pares.map(p => `<li>${esc(p.titulo)} × ${esc(p.codigo)}</li>`).join('')}</ul><label class="campo">Motivo<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Confirmar']]);
+  if (r.botao !== 'ok') return;
+  S.eq.naoCorrespondem = S.eq.naoCorrespondem || [];
+  for (const p of pares) {
+    S.eq.naoCorrespondem.push({ titulo: p.titulo, codigo: p.codigo, por: op, em: agoraISO(), motivo: r.campos.motivo.trim(), competencia: S.comp });
+    if (p.relacao && p.relacao.status === 'pendente') alterarStatusEq(S.eq, [p.relacao.id], 'desativada', op, `não corresponde: ${r.campos.motivo.trim()}`, S.comp);
+  }
+  S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
+  salvarEq(`${pares.length} par(es) marcados como «não correspondem».`); DV.sel.clear(); desenharDestrava();
 }
 
 /* ---- src/ui/50-bases.js ---- */
@@ -6204,17 +6480,26 @@ RENDER.rodadas = async () => {
       { t: 'Competência', v: r => rotuloCompetencia(competenciaDaRodada(r)) }, { t: 'Rodada', html: r => `<code class="small">${esc(r.id)}</code>` }, { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
       { t: 'Prestador', v: r => `${r.prestadorCod} - ${r.prestadorNome}` }, { t: 'Repasse', v: r => `${r.repasse} · ${r.descricao}` }, { t: 'Unidade', v: r => r.unidadeCod },
       { t: 'Resultado', v: r => Object.entries(r.contagens).filter(([, n]) => n).map(([k, n]) => `${(STATUS_CONF[k] || ESTADO_CORR[k])?.nome || k}: ${n}`).join(' · ') },
-      { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span>` : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }
+      { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span> <button class="sec mini" data-desfazer="${r.id}" title="Desfazer aceite">↺</button>` : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }
     ],
     detalhe: r => {
       const ant = rodadaAnterior(S.rodadas, r), g = ant ? compararRodadas(ant, r) : null;
       return `<div class="det"><div><h4>Entradas e versões</h4><ul class="small">${r.arquivos.map(a => `<li>${esc(a.papel)}: ${esc(a.nome)} <code>${esc(a.hash || '')}</code></li>`).join('')}
         <li>Motor ${esc(r.versoes.motor)} · equivalências rev. ${r.versoes.equivalencias} · configuração rev. ${r.versoes.configuracao}</li><li>Parâmetros: ${esc(JSON.stringify(r.parametros))}</li></ul>
+        ${(r.aceitesDesfeitos || []).length ? `<h4>Aceites desfeitos</h4><ul class="small">${r.aceitesDesfeitos.map(a => `<li>${esc(a.por)} em ${new Date(a.em).toLocaleString('pt-BR')} — desfeito por ${esc(a.desfeitoPor)} em ${new Date(a.desfeitoEm).toLocaleString('pt-BR')}</li>`).join('')}</ul>` : ''}
         ${r.aceite ? `<h4>Aceite</h4><p class="small">${esc(r.aceite.por)} em ${new Date(r.aceite.em).toLocaleString('pt-BR')}: ${esc(r.aceite.obs || '')} (${r.aceite.pendencias} pendência(s) abertas no aceite)</p>` : ''}</div>
         <div><h4>Comparação com a rodada anterior</h4>${g ? `<ul class="small"><li>Agora conferidos/identificados: ${g.agoraIdentificados.length}</li><li>Continuam pendentes: ${g.continuamPendentes.length}</li><li>Mudaram de categoria: ${g.mudaramEstado.length}</li><li>Mudaram de médico: ${g.mudaramMedico.length}</li><li>Novas linhas: ${g.novos.length}</li><li>Saíram da extração: ${g.desapareceram.length}</li><li>Sem mudança: ${g.semMudanca.length}</li></ul>` : '<p class="muted small">Sem rodada anterior comparável (mesma competência, tipo, unidade e prestador).</p>'}</div></div>`;
     }
   });
   $('rdTab').addEventListener('click', async e => {
+    const bd = e.target.closest('[data-desfazer]');
+    if (bd) {
+      const r = S.rodadas.find(x => x.id === bd.dataset.desfazer);
+      if (!exigirAberta(competenciaDaRodada(r), 'desfazer o aceite')) return;
+      const op = await exigirOperador(); if (!op) return;
+      if (!await confirmar('Desfazer o aceite?', `O aceite de ${esc(r.aceite.por)} sai desta rodada e fica no histórico.`, 'Desfazer aceite')) return;
+      desfazerAceiteRodada(r, op); await guardarRodada(r); avisar('Aceite desfeito.', 'ok'); RENDER.rodadas(); return;
+    }
     const b = e.target.closest('[data-ac]'); if (!b) return;
     const r = S.rodadas.find(x => x.id === b.dataset.ac);
     if (!exigirAberta(competenciaDaRodada(r), 'registrar aceite')) return;
@@ -6223,7 +6508,7 @@ RENDER.rodadas = async () => {
     const d = await dialogo('Registrar aceite da rodada', `<p>${pend ? `<span class="badge warn">${pend} linha(s) ainda não conferidas/identificadas (já descontadas as NCs e as linhas consideradas no repasse)</span>` : '<span class="badge ok">Sem pendências</span>'}</p><p class="small">O aceite registra que <strong>${esc(op)}</strong> revisou o resultado. Ele não altera o MV nem os dados.</p><label class="campo">Observação${pend ? ' (obrigatória com pendências)' : ''}<input type="text" name="obs"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar aceite']]);
     if (d.botao !== 'ok') return;
     if (pend && !d.campos.obs.trim()) return avisar('Com pendências abertas, informe uma observação para o aceite.', 'warn');
-    r.aceite = { por: op, em: agoraISO(), obs: d.campos.obs.trim(), pendencias: pend };
+    aceitarRodada(r, op, d.campos.obs, pend);
     await guardarRodada(r); avisar('Aceite registrado.', 'ok'); RENDER.rodadas();
   });
   $('rdTodas').onchange = e => { RD.todas = e.target.checked; RENDER.rodadas(); };
@@ -6331,7 +6616,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia } };   // usado pelos testes automatizados
 })();
 
 </script>

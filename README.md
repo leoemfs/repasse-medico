@@ -34,6 +34,7 @@ node test/correcao_excel.mjs    # Excel da correção de prestador (aba «Corrig
 node test/busca.mjs             # campo de busca no cadastro (NCs)
 node test/v3.mjs                # regras da V3 (Curitiba): cálculo, e-mail, fechamento, exportação e HM na conferência
 node test/descontos.mjs         # descontos parcelados: parcela automática, alertas, adiar e exportação
+node test/aceite_cobertura.mjs  # aceite na Conferência (F11) e cobertura/validação em lote (F15)
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

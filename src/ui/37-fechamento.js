@@ -41,7 +41,7 @@ RENDER.fechamento = async () => {
     <div id="fhCorpo"></div>`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
-  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
+  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp) }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
@@ -212,7 +212,10 @@ function desenharIndicadoresFech(corpo, f) {
   corpo.innerHTML = `<div class="nc-kpis"><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.usg)}</b><small>total USG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.img)}</b><small>total IMG</small></div><div class="nc-kpi"><b>R$ ${fmtBR(ind.totais.curitiba)}</b><small>total Curitiba (V3)</small></div>
     <div class="nc-kpi warn"><b>${ind.variacoes.length}</b><small>variações acima de ${S.cfg.fechamento.variacaoAlerta}%</small></div><div class="nc-kpi err"><b>${ind.ncs.impactam}</b><small>NCs que impactam o pagamento</small></div><div class="nc-kpi"><b>${ind.decisoes}</b><small>linhas com decisão</small></div></div>
     <div class="grid3">${tab('USG por unidade', ind.usgPorUnidade)}${tab('USG por faixa', ind.usgPorFaixa)}${tab('Prestadores por situação', ind.porSituacao, v => v)}
-      ${tab('IMG por unidade', ind.imgPorUnidade)}${tab('IMG por classe', ind.imgPorClasse)}${tab('Variação × competência anterior', ind.variacoes, v => (v > 0 ? '+' : '') + fmtBR(v) + '%')}</div>`;
+      ${tab('IMG por unidade', ind.imgPorUnidade)}${tab('IMG por classe', ind.imgPorClasse)}${tab('Variação × competência anterior', ind.variacoes, v => (v > 0 ? '+' : '') + fmtBR(v) + '%')}</div>
+    ${(() => { const cob = coberturaCompetencia(S.rodadas, S.comp); return `<div class="card" id="cobFech"><h3>Cobertura automática por prestador <span class="muted small">${cob.total ? `${fmtPct(cob.pct)}% na competência · ${cob.conferidas} de ${cob.total} linhas` : 'sem rodadas de conferência'}</span></h3>
+      ${cob.porPrestador.length ? `<div class="tw"><table><thead><tr><th>Prestador</th><th class="n">Linhas</th><th class="n">Conferidas</th><th class="n">Cobertura</th><th>Maior bloqueio (título × código)</th></tr></thead><tbody>${cob.porPrestador.map(e => `<tr><td>${esc(e.cod)} - ${esc(e.nome)}</td><td class="n">${e.total}</td><td class="n">${e.conferidas}</td><td class="n"><b>${fmtPct(e.pct)}%</b></td><td>${e.maiorBloqueio ? `${esc(e.maiorBloqueio[0])} <span class="muted small">(${e.maiorBloqueio[1]} linha(s))</span>` : '<span class="muted small">—</span>'}</td></tr>`).join('')}</tbody></table></div>` : ''}
+      <div class="acoes"><a href="#equivalencias" data-destrava class="small">Ver o que mais destrava →</a></div></div>`; })()}`;
 }
 
 function ligarFech(corpo, f, mk) {

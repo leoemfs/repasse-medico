@@ -13,7 +13,9 @@ function semRelatorioPara(prefixo) {
 }
 function seletoresAnalise(prefixo, tolPadrao) {
   const rels = relatoriosPara(prefixo);
-  const ultimo = S[prefixo === 'cf' ? 'conf' : 'corr']?.ctx;
+  const proximo = prefixo === 'cf' && S.cfProximo && rels.some(r => r.id === S.cfProximo.relId) ? S.cfProximo : null;
+  const ultimo = proximo || S[prefixo === 'cf' ? 'conf' : 'corr']?.ctx;
+  if (proximo) S.cfProximo = null;
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
   const sugerida = rel ? unidadeSugeridaPeloArquivo(rel.nome) : '';
@@ -99,6 +101,13 @@ async function executarConferencia() {
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
   if (!exigirAberta(S.comp, 'executar uma conferência')) return;
+  const { res, rodada } = await rodarConferencia(x, un, tol, medSel);
+  desenharConferencia();
+  avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
+  return rodada;
+}
+// Executa e registra uma conferência (usada pelo botão e para rodar de novo após validar equivalências).
+async function rodarConferencia(x, un, tol, medSel) {
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
   const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos }), indiceDecisoesComp());
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
@@ -111,8 +120,20 @@ async function executarConferencia() {
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
   ctx.fonteNC = `conf|${x.id}|${un}`;
   guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaConferencia(res, ctx, S.cfg));
-  desenharConferencia();
-  avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
+  return { res, ctx, rodada };
+}
+/* Depois de validar equivalências: roda de novo, com os mesmos parâmetros, a última conferência de cada
+ * relatório afetado que estiver carregado nesta sessão (PDF do MV e Apolo). Devolve o que rodou e o que faltou. */
+async function rodarDeNovoAfetadas(rodadas) {
+  const feitas = [], faltam = [];
+  for (const r of rodadas) {
+    const hash = (r.arquivos || []).find(a => a.papel === 'MV')?.hash;
+    const x = S.relatorios.find(y => y.hash === hash) || S.relatorios.find(y => String(y.rel.cab.prestadorCod) === String(r.prestadorCod) && y.rel.cab.repasse === r.repasse);
+    if (!x || !S.apolo) { faltam.push(r); continue; }
+    const novo = await rodarConferencia(x, r.unidadeCod, r.parametros?.tol ?? S.cfg.parametros.tolConferencia, r.parametros?.medico || '@prest');
+    feitas.push({ antes: r, depois: novo.rodada });
+  }
+  return { feitas, faltam };
 }
 
 function desenharConferencia() {
@@ -126,6 +147,7 @@ function desenharConferencia() {
     <dt>Volume</dt><dd>${res.nMV} linhas do MV (${res.nProcedimentos} procedimentos) · ${res.nLaudosEscopo} laudos no escopo · ${res.nPares} pares</dd>
     <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
     ${comparacao ? resumoComparacao(comparacao) : ''}
+    ${quadroAceite()}
     <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
     <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
@@ -138,6 +160,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; desenharConferencia(); };
   $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, ctx), nomeArquivoAnalise('conferencia', ctx));
+  ligarQuadroAceite();
   const filtrar = () => {
     const q = norm(S.conf.busca);
     return res.linhas.filter(x => (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
@@ -200,4 +223,58 @@ async function removerDecisaoConsiderar(x) {
   if (!await confirmar('Remover decisão?', 'A linha volta a aparecer como pendente na conferência.', 'Remover')) return false;
   removerConsiderar(S.compReg, S.comp, x.decisao.id); salvarCompReg(); avisar('Decisão removida.', 'ok');
   return true;
+}
+
+/* ---------- Aceite na própria Conferência (SOL-F11) ----------
+ * Mesmas regras de Rodadas: observação obrigatória quando há pendências (já descontadas as decisões).
+ * O aceite fica na rodada (aparece em Rodadas e muda a situação no Fechamento). Desfazer guarda o histórico. */
+const rodadaDaConf = () => S.conf && (S.rodadas.find(r => r.id === S.conf.ctx.rodadaId) || S.conf.rodada);
+function proximoRelatorioConf() {
+  const rels = relatoriosPara('cf'), i = rels.findIndex(r => r.id === S.conf?.ctx.relId);
+  return i >= 0 && i < rels.length - 1 ? rels[i + 1] : null;
+}
+function quadroAceite() {
+  const r = rodadaDaConf(); if (!r) return '';
+  const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
+  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => idx.has(l.kd) || (l.kl && idx.has(l.kl)));
+  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => idx.get(l.kd)?.tipo === 'nc' || (l.kl && idx.get(l.kl)?.tipo === 'nc')).length;
+  if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge ok">aceito</span>
+    <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
+    <div class="acoes" style="margin:0">${fechada ? '<span class="small muted">Competência fechada: reabra no Início para desfazer.</span>' : '<button class="sec mini" id="cfDesfazer">Desfazer aceite</button>'}<a href="#rodadas" class="small">Ver em Rodadas</a>
+    ${prox ? `<button class="sec mini" id="cfProximo">Ir para o próximo relatório (${esc(prox.rel.cab.prestadorCod)} - ${esc(prox.rel.cab.prestadorNome)})</button>` : ''}</div></div>`;
+  return `<div class="aceite-box" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge warn">sem aceite</span>
+    <p class="small" style="margin:6px 0">${abertas.length} linha(s) com pendência ou ressalva · <b>${comDecisao.length} já com decisão</b>${comDecisao.length ? ` (${nNC} NC, ${comDecisao.length - nNC} considerada(s) no repasse)` : ''} · <b>${pend} pendente(s)</b></p>
+    ${fechada ? `<div class="acoes" style="margin:0"><button disabled>Registrar aceite</button><span class="small muted">Competência ${rotuloCompetencia(chave)} fechada: reabra no Início para registrar aceite.</span></div>` : `
+    <label class="campo">Observação do aceite${pend ? ' (obrigatória: há pendências)' : ' (opcional)'}<textarea id="cfAceiteObs" rows="2" style="min-height:0;height:58px"></textarea></label>
+    <div class="acoes" style="margin:0"><button id="cfAceitar">Registrar aceite</button>${prox ? `<button class="sec" id="cfAceitarProx">Registrar aceite e ir para o próximo relatório</button>` : ''}</div>
+    <p class="small muted" style="margin:6px 0 0">O aceite aparece em Rodadas e muda a situação no Fechamento para «Conferido · a enviar».${prox ? ` Próximo relatório: ${esc(prox.rel.cab.prestadorCod)} - ${esc(prox.rel.cab.prestadorNome)}.` : ''}</p>`}</div>`;
+}
+function ligarQuadroAceite() {
+  const irProximo = () => {
+    const prox = proximoRelatorioConf(); if (!prox) return;
+    S.cfProximo = { relId: prox.id, unidadeCod: S.conf.ctx.unidadeCod };
+    S.conf = null; RENDER.conferencia(); window.scrollTo(0, 0);
+    avisar(`Próximo relatório: ${prox.rel.cab.prestadorCod} - ${prox.rel.cab.prestadorNome}. Confira a unidade e o médico e execute a conferência.`, 'ok');
+  };
+  const aceitar = async proximo => {
+    const r = rodadaDaConf(), chave = competenciaDaRodada(r);
+    if (!exigirAberta(chave, 'registrar aceite')) return;
+    const op = await exigirOperador(); if (!op) return;
+    const pend = pendenciasDaRodada(r, indiceDecisoesComp(chave)).length, obs = ($('cfAceiteObs')?.value || '').trim();
+    if (pend && !obs) { avisar('Com pendências abertas, informe uma observação para o aceite.', 'warn'); $('cfAceiteObs')?.focus(); return; }
+    aceitarRodada(r, op, obs, pend); await guardarRodada(r);
+    avisar(`Aceite registrado (${r.prestadorCod} - ${r.prestadorNome} · unidade ${r.unidadeCod}).`, 'ok');
+    if (proximo) irProximo(); else desenharConferencia();
+  };
+  if ($('cfAceitar')) $('cfAceitar').onclick = () => aceitar(false);
+  if ($('cfAceitarProx')) $('cfAceitarProx').onclick = () => aceitar(true);
+  if ($('cfProximo')) $('cfProximo').onclick = irProximo;
+  if ($('cfDesfazer')) $('cfDesfazer').onclick = async () => {
+    const r = rodadaDaConf();
+    if (!exigirAberta(competenciaDaRodada(r), 'desfazer o aceite')) return;
+    const op = await exigirOperador(); if (!op) return;
+    if (!await confirmar('Desfazer o aceite?', `O aceite de ${esc(r.aceite.por)} sai desta rodada e fica no histórico. O Fechamento volta a mostrar «Verificar» para este prestador e unidade, se não houver outra rodada aceita.`, 'Desfazer aceite')) return;
+    desfazerAceiteRodada(r, op); await guardarRodada(r);
+    avisar('Aceite desfeito.', 'ok'); desenharConferencia();
+  };
 }

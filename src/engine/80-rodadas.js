@@ -13,7 +13,7 @@ function registroRodada(res, ctx) {
     // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
       vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
-      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '' })),
+      kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
     aceite: null
   };
 }
@@ -39,4 +39,26 @@ function compararRodadas(ant, atual) {
   }
   for (const [k, a] of A) if (!B.has(k)) grupos.desapareceram.push(a);
   return grupos;
+}
+
+/* Equivalência que trava a linha (SOL-F15): título do laudo pareado, situação do par e se a linha seria
+ * conferida com a equivalência validada (mesmo paciente, mesma data, sem outro bloqueio). Sem paciente. */
+const EQ_TRAVA = ['pendente', 'sem-cadastro', 'conflito'];
+function infoEquivalencia(x) {
+  if (!x.par || !x.r) return {};
+  const est = x.par.proc?.estado || '', m = x.marcadores || new Set();
+  const outros = ['ambiguo', 'outro-medico', 'data-divergente', 'nome-semelhante', 'convenio-divergente', 'id-duplo'].some(k => m.has(k));
+  return { titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
+}
+
+/* Aceite (SOL-F11): o mesmo registro feito em Rodadas ou na Conferência. Desfazer guarda o histórico. */
+function aceitarRodada(r, por, obs, pendencias) {
+  r.aceite = { por, em: agoraISO(), obs: String(obs || '').trim(), pendencias };
+  return r.aceite;
+}
+function desfazerAceiteRodada(r, por, motivo = '') {
+  if (!r.aceite) return false;
+  r.aceitesDesfeitos = [...(r.aceitesDesfeitos || []), { ...r.aceite, desfeitoPor: por, desfeitoEm: agoraISO(), motivo }];
+  r.aceite = null;
+  return true;
 }

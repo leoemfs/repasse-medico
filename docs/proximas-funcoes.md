@@ -182,7 +182,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 | 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
 | 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | **implementado na v2.0.0-alpha.6** |
 
-## SOL-F11 — Aceite na própria conferência — PLANEJADO
+## SOL-F11 — Aceite na própria conferência — IMPLEMENTADA na v2.0.0-alpha.16
 - **Hoje:** o resultado está na Conferência e o aceite fica em Rodadas (troca de tela a cada relatório).
 - **Proposta:** botão «Registrar aceite» no resultado da conferência, com as mesmas regras (observação obrigatória com pendências, já descontadas as decisões). Rodadas continua como histórico.
 - **Aceite:**
@@ -217,7 +217,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 
 - **Aceite:** um prestador cadastrado em Bases aparece no Fluxo do mês sem um segundo cadastro.
 
-## SOL-F15 — Cobertura de equivalências e validação em lote — PLANEJADO
+## SOL-F15 — Cobertura de equivalências e validação em lote — IMPLEMENTADA na v2.0.0-alpha.16
 - **Hoje:** sem equivalência validada nada é conferido automaticamente (prestador 15: 67 de 67 pendentes).
 - **Proposta:**
   - indicador de **cobertura**: % de linhas conferidas automaticamente por competência, no painel do Início e nos indicadores do Fechamento;
@@ -620,3 +620,12 @@ Aviso de 03/11/2026: em alguns dias a plataforma de laudos muda do Apolo para o 
   4. **Modalidade:** se o Cloov não trouxer MODALITY, deduzir pelo título ou pelo grupo, com aviso.
   5. Manter o Apolo funcionando para competências antigas e para a transição (mês com parte no Apolo e parte no Cloov: carregar os dois arquivos).
 - **Para o usuário pedir ao Cloov:** exportação em Excel/CSV com, no mínimo, os campos da tabela, um laudo por linha e o período escolhido.
+
+## SOL-F11 e SOL-F15 — implementação (v2.0.0-alpha.16, 03/11/2026)
+Prévia aprovada: «pode desfazer aceite e rodar sozinha».
+- **F11 – Aceite na Conferência:** quadro «Aceite desta rodada» no resultado, com linhas pendentes já descontadas as decisões e observação obrigatória quando há pendências. Botões «Registrar aceite» e «Registrar aceite e ir para o próximo relatório» (seleciona o próximo PDF da conferência, na mesma unidade, sem rodar sozinho). Depois do aceite: quem, quando, observação e «Desfazer aceite» (com a competência aberta). O aceite desfeito fica no histórico da rodada (Rodadas → detalhe). Em Rodadas, o botão ↺ também desfaz. Competência fechada bloqueia.
+- **F15 – Cobertura:** cobertura = linhas de procedimento «Conferido» ÷ linhas de procedimento, na última rodada de conferência de cada relatório da competência.
+  - **Início:** cobertura da competência, variação contra o mês anterior, mini-histórico de 4 meses e o atalho «o que mais destrava».
+  - **Equivalências → «O que mais destrava»:** pares título × código que travam (pendente, sem cadastro, em conflito), ordenados pelas linhas que viram «Conferido» com a validação. Inclui «ver pares» com exemplos (prestador, unidade, data, conta/atendimento), filtro por unidade e simulação do ganho de cobertura. «Validar selecionados» valida com responsável e justificativa (cria a relação quando não existe) e roda de novo, sozinha, as conferências afetadas que estão carregadas na sessão. «Não correspondem» desativa a relação pendente e tira o par da lista; a linha continua pendente na conferência. Par em conflito fica fora do lote.
+  - **Fechamento → Indicadores:** cobertura por prestador, com o maior bloqueio (título × código), e o mesmo bloco no Excel de indicadores.
+  - As rodadas passam a guardar, por linha, o título do laudo pareado, a situação da equivalência e a data (sem paciente). Rodadas antigas não entram na lista.
