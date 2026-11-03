@@ -339,3 +339,18 @@ Pedido e prévia aprovada em 01/11/2026.
 - **Fechar a gaveta:** ✕, toque fora, deslizar para a esquerda, Esc ou escolher uma aba.
 - **Barra de baixo:** Início · Fluxo · Conferir · Prestador · NCs · Fechar, com ponto laranja de pendência. O ☰ ganha ponto laranja quando uma aba fora da barra tem pendência.
 - **No computador:** nada muda. Só a ordem do menu: Rodadas passou para o grupo de trabalho do mês, antes de Equivalências.
+
+---
+
+# Objetivos de mudança para 03/11/2026 (aguardando os demais ajustes antes de executar)
+
+## SOL-F26 — Início: tirar o anexo de equivalências e pôr os arquivos em três cards lado a lado — A FAZER HOJE
+- **Retirar do Início** o card «Equivalências TUSS» (importar planilha de análise/base). A importação fica só dentro da aba Equivalências TUSS, que já tem esses botões.
+- **Três cards lado a lado**, na mesma linha:
+  1. Relatório de repasse MV (PDF);
+  2. Laudos do Apolo (.xlsx);
+  3. Power BI (.xlsx) — opcional.
+
+  No celular, um embaixo do outro.
+- **O resto da página não muda:** passos «Preparar o repasse», lista de relatórios do MV, atalhos para Conferência e Correção, painel da competência.
+- **A decidir na execução:** o passo 3 da lista «Preparar o repasse» (equivalências validadas) continua como indicador, com link para a aba Equivalências.
