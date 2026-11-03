@@ -385,3 +385,42 @@ Pedido e prévia aprovada em 01/11/2026.
   - nos indicadores (total de NFs complementares).
 - **Migração:** o que já foi lançado nos blocos atuais (PET-CT/Pluvicto e Cetrus) vira NF complementar sem perder dados.
 - **Liga com:** o «Reajuste repasse Dr. Roberto (classe B)» da pasta de rede (SOL-F10, dúvida 4) entra aqui como NF complementar do tipo «Reajuste».
+
+## SOL-F29 — Base de dados de referência e campos que buscam no cadastro (sem redigitar) — A FAZER HOJE
+Pedido de 03/11/2026: «onde exige prestador, deve recuperar da base cadastrada; não faz sentido cadastrar e depois ficar digitando». Vale para as coisas comuns: **prestadores, convênios, faturistas, TUSS e unidades**.
+
+### 1. Base de dados de referência (uma só, usada pelo sistema inteiro)
+Junta e guarda, de forma permanente e sem dados de pacientes, o que hoje está espalhado ou só na sessão:
+
+| Catálogo | Fontes | Campos |
+|---|---|---|
+| Prestadores | cabeçalho dos PDFs do MV, planilha de controle, Power BI (CD_PRESTADOR), Bases | código, nome no MV, aliases/nome no Apolo, unidades onde atua, regras |
+| Convênios | Power BI (nome + tipo), relatórios do MV, cadastro manual | nome, tipo (SUS/Convênio/Particular), unidades |
+| Faturistas | Power BI («Nome do Usuario que Fechou a Conta»), planilha de NCs, cadastro manual | nome, unidades |
+| TUSS / procedimentos | Power BI (código, descrição, grupo), MV, equivalências | código, descrição, grupo, títulos do Apolo ligados |
+| Unidades | cadastro padrão, Power BI, Apolo (BRANCH_NAME) | código, nome, nomes no Apolo e no Power BI, CNPJ, % USG |
+| Médicos do Apolo | planilha do Apolo (NAME_MEDICO) | nome, ligação com o código de prestador |
+
+- **Atualização:** o **Power BI é a principal fonte** (SOL-F9 e SOL-F21). Ao carregar, «Atualizar base de dados» mostra o que é novo e o que mudou; nada marcado à mão é sobrescrito.
+- **Limite:** o Power BI traz o código do prestador, mas não o nome do médico. O nome vem do cabeçalho do MV, da planilha de controle ou do vínculo com o Apolo.
+- **Origem:** cada item guarda de onde veio e quando, e a alteração entra no registro da competência (SOL-F4).
+
+### 2. Campo de busca igual em todo o sistema
+- **Como funciona:** um componente único («digite 2 letras ou o código → lista do cadastro»). Escolher o item preenche os campos ligados (ex.: prestador → código + nome; convênio → nome + tipo; TUSS → código + descrição).
+- **Fora do cadastro:** quando for permitido, a opção «usar o texto digitado» fica disponível e pergunta se quer cadastrar.
+- **Onde aplicar** (campos hoje digitados):
+  - **Não conformidades** (nova/editar): médico, convênio, prestador incorreto e corrigido, unidade e responsável (hoje só sugestão simples).
+  - **Fechamento:** NF complementar (SOL-F28) e qualquer prestador avulso.
+  - **Fluxo mensal:** «+ Prestador» do mês e do modelo.
+  - **Bases:** prestador manual (buscar o código no Power BI), alias (médicos do Apolo, já é lista), faturista e convênio (sugerir os vistos no Power BI e ainda não cadastrados).
+  - **Equivalências:** nova relação, com código TUSS (catálogo) e TITLE (títulos do Apolo carregado).
+  - **Regras do prestador e faixas.**
+- **Aceite:**
+  - nenhum campo de prestador, convênio, faturista, TUSS ou unidade exige digitar o que já está no cadastro;
+  - o item escolhido sempre leva o código junto (sem divergência de grafia);
+  - funciona no celular.
+
+### Ordem sugerida
+1. Componente de busca e catálogos atuais: prestadores, convênios, faturistas, unidades, TUSS das equivalências.
+2. Aplicar nas telas acima.
+3. Atualização pelo Power BI (junto com SOL-F21 e SOL-F9).
