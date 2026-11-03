@@ -492,3 +492,35 @@ Pedido de 03/11/2026: «quero um controle também para os prestadores da V3 Curi
   - Se necessário, essas regras entram no motor de conferência como «regra da V3».
 - **Exportação:** uma aba a mais na planilha de controle geral. Isso vale para qualquer controle novo que entrar.
 - **Bloco «Médicos V3 que recebem pela SRA»:** sai do IMG e vai para a aba de Curitiba.
+
+## SOL-F30 (respostas de 03/11/2026) — Regras da V3 (Curitiba)
+- **Cálculo fora do MV.** Na V3 o repasse é calculado fora do MV, hoje no e-mail. Exemplo do Dr. Ian (competência 10/2026):
+
+  > Foram realizados 1539 exames de ultrassom. Densitometria: R$ 0,00 (sem produção). Honorários USG UNIMED: R$ 21.907,88. USG: R$ 93.838,16.
+  > Ultrassom R$ 93.838,16 + HM R$ 21.907,88 = R$ 115.746,04 − impostos (9,15%) = R$ 105.155,28 × 70% = **R$ 73.608,69** (total para emissão da NF).
+
+  Portanto, o Fechamento da V3 **calcula** o valor da NF pela regra do prestador. A conta fica visível, e o e-mail pode ser gerado com «Copiar prévia».
+- **Volume de exames:** soma da **quantidade** dos procedimentos de USG do prestador na V3 no mês, e não o nº de linhas.
+- **Regras por prestador:** cadastro em **Bases → Prestadores → Médicos V3**, uma regra por médico, porque não há padrão. Cada regra tem:
+  - exames que o médico faz;
+  - forma de cálculo: % do líquido por faixa de volume, % do bruto ou valor por laudo;
+  - base de cálculo e % de impostos (padrão 9,15%);
+  - faixas, quando houver;
+  - como paga o HM.
+  - **Dr. Ian e Dr. Augusto Venício:** USG + HM com faixas por volume (até 799: 65% · 800 a 999: 68% · 1000 ou mais: 70%) sobre o líquido, já descontados os impostos; densitometria a 10% do valor bruto.
+  - **Demais prestadores** (ex.: Dr. Alexandre Romanus): o valor do HM é o mesmo do laudo de USG. As regras de cada um são cadastradas pelo usuário na tela.
+- **HM na V3 (regra da unidade):**
+  - só se paga HM de **USG e Doppler** do convênio **Unimed** (nome contém «UNIMED», ex.: «UNIMED CURITIBA»);
+  - todo procedimento de USG/Doppler Unimed executado na V3 gera HM a pagar, **mesmo sem laudo correspondente**;
+  - HM de outro grupo (raio-X, mamografia…) ou de outro convênio **não é pago** e é **sinalizado para exclusão**. Não é necessariamente uma NC;
+  - essa regra entra no motor de conferência como «regra da V3» para a unidade 5. Hoje o HM fica como «HM — regra pendente».
+- **Classe A/B/C/D:** não se aplica aos médicos da V3. A produção que médicos do SRA fazem na V3 fica separada da classificação do SRA.
+- **Aba da V3:** só médicos da V3, sem misturar com os do SRA. Inclui o bloco «Médicos V3 que recebem pela SRA».
+
+## Decisões confirmadas
+- **F26:** o passo «Equivalências TUSS validadas» fica no Início como indicador, com link para a aba.
+- **F29:** prestador fora do cadastro → a ferramenta pergunta se quer cadastrar. Do Power BI ficam só os catálogos, sem dados de pacientes.
+- **F28:** uma coluna por categoria (como «LAUDOS PET-CT» | «APLICAÇÃO PLUVICTO» | TOTAL), para testar.
+
+## Nota de comunicação
+O usuário prefere poucas perguntas por vez, sem listas numeradas longas. Ao responder, o campo de texto dele continua a numeração sozinho.
