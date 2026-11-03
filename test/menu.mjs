@@ -20,7 +20,7 @@ ok(await p.isVisible('.nav a[data-pag="equivalencias"] .dica'), 'dica aparece ao
 await p.screenshot({ path: out + 'menu_recolhido.png' });
 await p.click('.nav a[data-pag="bases"]'); await p.waitForFunction(() => document.getElementById('titulo').textContent === 'Bases', null, { timeout: 3000 }).catch(() => {});
 ok(await p.textContent('#titulo') === 'Bases', 'ícone recolhido funciona como atalho');
-await p.reload(); await p.waitForFunction(() => window.__RM);
+await p.reload(); await p.waitForFunction(() => window.__RM, null, { polling: 200, timeout: 30000 });
 ok(await larg() === 64, 'escolha lembrada após recarregar');
 await p.keyboard.press('Control+b');
 ok(await larg() === 232, 'Ctrl+B expande');

@@ -95,7 +95,7 @@ function avisar(texto, tipo = 'info') {
 // Diálogo simples: devolve o valor do botão clicado e os campos preenchidos.
 function dialogo(titulo, corpoHtml, botoes = [['ok', 'OK']]) {
   return new Promise(res => {
-    const d = $('dlg'); $('dlgTitulo').textContent = titulo; $('dlgCorpo').innerHTML = corpoHtml;
+    const d = $('dlg'); $('dlgTitulo').textContent = titulo; $('dlgCorpo').innerHTML = corpoHtml; ligarBuscas($('dlgCorpo'));
     $('dlgBotoes').innerHTML = botoes.map(([v, t, cls]) => `<button value="${esc(v)}" class="${cls || ''}">${esc(t)}</button>`).join('');
     d.onclose = () => {
       const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { if (el.type === 'radio') { if (el.checked) campos[el.name] = el.value; else if (!(el.name in campos)) campos[el.name] = ''; } else campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });

@@ -232,3 +232,12 @@ small.evid{display:block;color:var(--info)}
 .fh-tab th{z-index:2}.fh-tab th.fh-nome{z-index:3}
 .fh-faixa td.fh-pct{font-size:12.5px;white-space:nowrap}
 .fontes .card{margin-bottom:0}.grid3.fontes{margin-bottom:14px}
+/* ---------- Campo de busca no cadastro ---------- */
+.campo-busca{position:relative}
+.busca-lista{position:absolute;left:0;right:0;top:100%;margin-top:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.16);z-index:60;max-height:280px;overflow-y:auto}
+.busca-lista[hidden]{display:none}
+.busca-lista .op{display:flex;gap:10px;align-items:baseline;padding:7px 10px;font-size:13px;color:var(--text);cursor:pointer}
+.busca-lista .op.on,.busca-lista .op:hover{background:var(--infobg)}
+.busca-lista .op b{min-width:48px;color:var(--accent)}.busca-lista .op small{margin-left:auto;color:var(--muted);font-size:11px;text-align:right}
+.busca-lista .op.novo{border-top:1px solid var(--line);color:var(--accent);font-weight:600}.busca-lista .op.vazio{color:var(--muted);cursor:default}
+#dlgCorpo{overflow:visible}

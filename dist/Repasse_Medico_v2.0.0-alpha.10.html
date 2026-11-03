@@ -240,6 +240,15 @@ small.evid{display:block;color:var(--info)}
 .fh-tab th{z-index:2}.fh-tab th.fh-nome{z-index:3}
 .fh-faixa td.fh-pct{font-size:12.5px;white-space:nowrap}
 .fontes .card{margin-bottom:0}.grid3.fontes{margin-bottom:14px}
+/* ---------- Campo de busca no cadastro ---------- */
+.campo-busca{position:relative}
+.busca-lista{position:absolute;left:0;right:0;top:100%;margin-top:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.16);z-index:60;max-height:280px;overflow-y:auto}
+.busca-lista[hidden]{display:none}
+.busca-lista .op{display:flex;gap:10px;align-items:baseline;padding:7px 10px;font-size:13px;color:var(--text);cursor:pointer}
+.busca-lista .op.on,.busca-lista .op:hover{background:var(--infobg)}
+.busca-lista .op b{min-width:48px;color:var(--accent)}.busca-lista .op small{margin-left:auto;color:var(--muted);font-size:11px;text-align:right}
+.busca-lista .op.novo{border-top:1px solid var(--line);color:var(--accent);font-weight:600}.busca-lista .op.vazio{color:var(--muted);cursor:default}
+#dlgCorpo{overflow:visible}
 
 </style>
 </head>
@@ -1168,6 +1177,80 @@ function aplicarPlanilhaControle(cfg, lida, origem) {
   }
   for (const [cod, c] of Object.entries(lida.cnpj)) { const u = unidadePorCod(cfg, cod); if (u && !u.cnpj) u.cnpj = c; }
   return { novos, atualizados };
+}
+
+/* ---- src/engine/46-catalogo.js ---- */
+/* ============================================================
+ * Base de dados de referência (SOL-F29): catálogos usados pelos campos de busca do sistema.
+ * Junta o que está cadastrado (Bases, equivalências) com o que veio dos arquivos da sessão
+ * (MV, Apolo, Power BI), sem dados de pacientes. Cada item: {cod, nome, info, origem}.
+ * ============================================================ */
+const FONTES_CATALOGO = { prestador: 'Prestadores', convenio: 'Convênios', faturista: 'Faturistas', tuss: 'Procedimentos (TUSS)', unidade: 'Unidades', titulo: 'Títulos do Apolo' };
+
+function resumoPrestador(p) {
+  const r = p.regras || {}, partes = [];
+  if (r.faixaUSG) partes.push('USG'); if (r.participaIMG && !r.v3) partes.push('IMG'); if (r.v3) partes.push('V3');
+  return partes.join(' · ');
+}
+// ctx: { apolo, pbi, relatorios, eq }
+function catalogo(fonte, cfg, ctx = {}) {
+  const vistos = new Set(), out = [];
+  const add = (item, chave) => { const k = chave ?? `${item.cod}|${norm(item.nome)}`; if (vistos.has(k)) return; vistos.add(k); out.push(item); };
+  switch (fonte) {
+    case 'prestador': {
+      for (const p of cfg.prestadores) add({ cod: String(p.cod), nome: p.nomeMV, info: resumoPrestador(p), origem: 'cadastro' }, 'c' + p.cod);
+      // Médicos do Apolo sem vínculo com código: aparecem para não precisar digitar o nome.
+      const ligados = new Set(cfg.prestadores.flatMap(p => [norm(p.nomeMV), ...(p.aliases || []).map(a => norm(a.nome))]));
+      if (ctx.apolo) for (const m of new Set(ctx.apolo.laudos.map(l => l.medico).filter(Boolean))) if (!ligados.has(norm(m))) add({ cod: '', nome: m, info: 'médico do Apolo, sem código', origem: 'apolo' }, 'a' + norm(m));
+      if (ctx.pbi) for (const [c] of ctx.pbi.prestadores) if (c && !cfg.prestadores.some(p => String(p.cod) === String(c))) add({ cod: String(c), nome: '', info: 'código no Power BI, sem nome', origem: 'pbi' }, 'c' + c);
+      break;
+    }
+    case 'convenio':
+      for (const c of cfg.convenios || []) add({ cod: '', nome: c.nome, info: TIPOS_CONVENIO[c.tipo] || 'sem tipo', origem: 'cadastro' }, norm(c.nome));
+      for (const x of ctx.relatorios || []) for (const r of x.rel.regs) if (r.convenio) add({ cod: '', nome: r.convenio, info: 'relatório do MV, sem cadastro', origem: 'mv' }, norm(r.convenio));
+      if (ctx.pbi) for (const [n, t] of ctx.pbi.convenios || []) add({ cod: '', nome: n, info: `Power BI · ${TIPOS_CONVENIO[t] || ''}`, origem: 'pbi' }, norm(n));
+      break;
+    case 'faturista':
+      for (const f of cfg.faturistas || []) if (f.ativo !== false) add({ cod: '', nome: f.nome, info: f.generico ? 'genérico' : (f.unidades ? `un. ${f.unidades}` : ''), origem: 'cadastro' }, norm(f.nome));
+      if (ctx.pbi?.temFaturista) for (const [n] of ctx.pbi.faturistas) add({ cod: '', nome: n, info: 'Power BI, sem cadastro', origem: 'pbi' }, norm(n));
+      break;
+    case 'tuss': {
+      const porCod = new Map();
+      const pega = (codigo, desc, grupo, origem) => { if (!codigo) return; const e = porCod.get(codigo); if (!e) porCod.set(codigo, { cod: String(codigo), nome: desc || '', info: grupo || '', origem }); else { if (!e.nome && desc) e.nome = desc; if (!e.info && grupo) e.info = grupo; } };
+      for (const t of ctx.eq?.catalogoTUSS || []) pega(t.codigo, t.desc, t.grupo, 'equivalências');
+      for (const e of ctx.eq?.itens || []) pega(e.codigo, e.descMV, '', 'equivalências');
+      for (const x of ctx.relatorios || []) for (const r of x.rel.regs) pega(r.codigo, r.procDesc, r.grupoNome, 'mv');
+      for (const p of ctx.pbi?.procedimentos || []) pega(p.codigo, p.desc, p.grupo, 'pbi');
+      for (const e of porCod.values()) add(e, e.cod);
+      break;
+    }
+    case 'unidade':
+      for (const u of cfg.unidades) add({ cod: String(u.cod), nome: u.nome, info: [...(u.apolo || [])].join(' · '), origem: 'cadastro' }, 'u' + u.cod);
+      break;
+    case 'titulo': {
+      const n = new Map();
+      for (const t of ctx.eq?.catalogoTitulos || []) n.set(chaveTitulo(t.titulo), { cod: '', nome: t.titulo, info: 'catálogo', origem: 'equivalências' });
+      if (ctx.apolo) for (const [t, q] of contar(ctx.apolo.laudos, l => l.titulo)) if (t) n.set(chaveTitulo(t), { cod: '', nome: t, info: `${q} laudo(s) no Apolo`, origem: 'apolo' });
+      for (const e of n.values()) add(e, norm(e.nome));
+      break;
+    }
+  }
+  return out;
+}
+// Busca por código (começo) ou por palavras do nome (todas presentes, em qualquer ordem).
+function buscarCatalogo(lista, termo, limite = 8) {
+  const t = norm(termo), palavras = t.split(' ').filter(Boolean);
+  if (!palavras.length) return lista.slice(0, limite);
+  const pontos = it => {
+    const c = norm(it.cod), n = norm(it.nome);
+    if (c && c === t) return 0;
+    if (c && c.startsWith(t)) return 1;
+    if (n.startsWith(t)) return 2;
+    if (palavras.every(p => n.includes(p))) return 3;
+    if (palavras.every(p => `${n} ${norm(it.info)}`.includes(p))) return 4;
+    return -1;
+  };
+  return lista.map(it => [pontos(it), it]).filter(([p]) => p >= 0).sort((a, b) => a[0] - b[0] || a[1].nome.localeCompare(b[1].nome)).slice(0, limite).map(([, it]) => it);
 }
 
 /* ---- src/engine/50-equivalencias.js ---- */
@@ -2965,7 +3048,7 @@ function avisar(texto, tipo = 'info') {
 // Diálogo simples: devolve o valor do botão clicado e os campos preenchidos.
 function dialogo(titulo, corpoHtml, botoes = [['ok', 'OK']]) {
   return new Promise(res => {
-    const d = $('dlg'); $('dlgTitulo').textContent = titulo; $('dlgCorpo').innerHTML = corpoHtml;
+    const d = $('dlg'); $('dlgTitulo').textContent = titulo; $('dlgCorpo').innerHTML = corpoHtml; ligarBuscas($('dlgCorpo'));
     $('dlgBotoes').innerHTML = botoes.map(([v, t, cls]) => `<button value="${esc(v)}" class="${cls || ''}">${esc(t)}</button>`).join('');
     d.onclose = () => {
       const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { if (el.type === 'radio') { if (el.checked) campos[el.name] = el.value; else if (!(el.name in campos)) campos[el.name] = ''; } else campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
@@ -3148,6 +3231,76 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
 }
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');
+
+/* ---- src/ui/05-busca.js ---- */
+/* ============================================================
+ * Campo de busca no cadastro (SOL-F29): o mesmo em todo o sistema.
+ * Digite o nome ou o código → lista da base de dados → escolher preenche o campo e o código.
+ * ============================================================ */
+const contextoCatalogo = () => ({ apolo: S.apolo, pbi: S.pbi, relatorios: S.relatorios, eq: S.eq });
+// opções: nome (do campo), rotulo, fonte (prestador|convenio|faturista|tuss|unidade|titulo), valor, cod,
+// livre (aceita texto fora do cadastro), valorCodigo (o campo guarda o código, não o nome), preencheCod (nome de outro campo que recebe o código)
+function campoBusca({ nome, rotulo, fonte, valor = '', cod = '', livre = true, valorCodigo = false, preencheCod = '', dica = '', obrigatorio = false }) {
+  return `<label class="campo campo-busca" data-busca="${fonte}" data-livre="${livre ? 1 : 0}"${valorCodigo ? ' data-valor-codigo="1"' : ''}${preencheCod ? ` data-preenche-cod="${esc(preencheCod)}"` : ''}>${esc(rotulo)}${obrigatorio ? ' *' : ''}
+    <input type="text" name="${esc(nome)}" value="${esc(valor)}" autocomplete="off" spellcheck="false" placeholder="digite o nome ou o código…" data-busca-input role="combobox" aria-expanded="false">
+    <input type="hidden" name="${esc(nome)}Cod" value="${esc(cod)}">
+    ${dica ? `<span class="small muted">${esc(dica)}</span>` : ''}<div class="busca-lista" role="listbox" hidden></div></label>`;
+}
+function ligarBuscas(raiz) {
+  raiz.querySelectorAll('[data-busca]').forEach(rot => {
+    if (rot.dataset.ligado) return; rot.dataset.ligado = '1';
+    const inp = rot.querySelector('[data-busca-input]'), cod = rot.querySelector('input[type=hidden]'), lista = rot.querySelector('.busca-lista');
+    const fonte = rot.dataset.busca, livre = rot.dataset.livre === '1';
+    let base = null, itens = [], ativo = 0;
+    const fechar = () => { lista.hidden = true; inp.setAttribute('aria-expanded', 'false'); };
+    const desenhar = () => {
+      base = base || catalogo(fonte, S.cfg, contextoCatalogo());
+      itens = buscarCatalogo(base, inp.value, 8);
+      const texto = inp.value.trim(), exato = itens.some(it => norm(it.nome) === norm(texto) || (it.cod && it.cod === texto));
+      const novo = livre && texto && !exato;
+      lista.innerHTML = itens.map((it, i) => `<div class="op${i === ativo ? ' on' : ''}" role="option" data-i="${i}">${it.cod ? `<b>${esc(it.cod)}</b>` : ''}<span>${esc(it.nome || '(sem nome)')}</span><small>${esc(it.info || '')}</small></div>`).join('')
+        + (novo ? `<div class="op novo${itens.length === ativo ? ' on' : ''}" data-i="${itens.length}">+ Usar «${esc(texto)}»${['faturista', 'convenio'].includes(fonte) ? ' e cadastrar' : ''}</div>` : '')
+        + (!itens.length && !novo ? `<div class="op vazio">Nada encontrado em ${esc(FONTES_CATALOGO[fonte] || fonte)}.</div>` : '');
+      lista.hidden = false; inp.setAttribute('aria-expanded', 'true');
+    };
+    const escolher = i => {
+      const it = itens[i];
+      if (it) {
+        inp.value = rot.dataset.valorCodigo ? (it.cod || it.nome) : (it.nome || it.cod); cod.value = it.cod || '';
+        if (rot.dataset.preencheCod) { const alvo = rot.closest('form, .card, #dlgCorpo, section')?.querySelector(`[name="${rot.dataset.preencheCod}"]`); if (alvo && it.cod) alvo.value = it.cod; }
+        rot.dataset.escolhido = it.origem; delete rot.dataset.novo;
+      } else if (livre && inp.value.trim()) { cod.value = ''; rot.dataset.novo = '1'; delete rot.dataset.escolhido; }
+      fechar(); inp.dispatchEvent(new CustomEvent('busca-escolha', { bubbles: true, detail: it || { nome: inp.value.trim(), cod: '', origem: 'livre' } }));
+    };
+    inp.addEventListener('focus', () => { base = null; });
+    inp.addEventListener('input', () => { cod.value = ''; delete rot.dataset.escolhido; ativo = 0; desenhar(); });
+    inp.addEventListener('keydown', e => {
+      const n = lista.querySelectorAll('.op[data-i]').length;
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (lista.hidden) { ativo = 0; desenhar(); } else { ativo = Math.min(n - 1, ativo + 1); desenhar(); } }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); ativo = Math.max(0, ativo - 1); desenhar(); }
+      else if (e.key === 'Enter' && !lista.hidden && n) { e.preventDefault(); e.stopPropagation(); escolher(ativo); }
+      else if (e.key === 'Escape' && !lista.hidden) { e.preventDefault(); e.stopPropagation(); fechar(); }
+    });
+    lista.addEventListener('mousedown', e => { const op = e.target.closest('.op[data-i]'); if (!op) return; e.preventDefault(); escolher(+op.dataset.i); });
+    inp.addEventListener('blur', () => setTimeout(fechar, 120));
+  });
+}
+// Texto escolhido fora do cadastro (faturista ou convênio): pergunta se quer cadastrar.
+async function oferecerCadastro(fonte, nome) {
+  nome = String(nome || '').trim(); if (!nome) return false;
+  if (fonte === 'faturista') {
+    if (S.cfg.faturistas.some(f => norm(f.nome) === norm(nome))) return false;
+    if (!await confirmar('Cadastrar faturista?', `«${esc(nome)}» não está no cadastro de faturistas. Cadastrar agora (Bases → Faturistas)?`, 'Cadastrar')) return false;
+    registrarFaturistas(S.cfg, [nome], `cadastro rápido (${S.operador || '—'})`); salvarCfg(`Faturista «${nome}» cadastrado.`, 'faturistas'); return true;
+  }
+  if (fonte === 'convenio') {
+    if (S.cfg.convenios.some(c => norm(c.nome) === norm(nome))) return false;
+    const r = await dialogo('Cadastrar convênio?', `<p>«${esc(nome)}» não está no cadastro de convênios.</p><label class="campo">Tipo<select name="tipo">${opcoes([['', '— sem tipo —'], ...Object.entries(TIPOS_CONVENIO)], '')}</select></label>`, [['', 'Agora não', 'sec'], ['ok', 'Cadastrar']]);
+    if (r.botao !== 'ok') return false;
+    registrarConvenios(S.cfg, [[nome, r.campos.tipo]], `cadastro rápido (${S.operador || '—'})`); salvarCfg(`Convênio «${nome}» cadastrado.`, 'regras'); return true;
+  }
+  return false;
+}
 
 /* ---- src/ui/10-inicio.js ---- */
 /* ============================================================
@@ -4381,12 +4534,13 @@ async function abrirRegistroNC(cands) {
     <div class="grid2"><label class="campo">Natureza<select name="natureza">${natSug ? '' : `<option value="">${semSugestao === cands.length ? '— escolher —' : 'Sugerida de cada linha'}</option>`}${opcoes(NATUREZAS_NC.map(n => [n.id, n.nome]), natSug)}</select></label>
     <label class="campo">Categoria (aba)<select name="categoria">${catSug ? '' : '<option value="">Sugerida de cada linha (particular pelo convênio)</option>'}${opcoes(Object.entries(CATEGORIA_NC), catSug)}</select></label>
     <label class="campo">Detalhe<input type="text" name="detalhe" placeholder="ex.: RX patela"></label>
-    <label class="campo">Responsável pelo fechamento da conta<input type="text" name="responsavel" list="dlFat" placeholder="${pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : 'escolher ou digitar'}"></label>
+    ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', dica: pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : '' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['', 'Padrão da natureza'], ['sim', 'Sim'], ['nao', 'Não']], '')}</select></label>
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(compSug)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>${datalistFaturistas()}`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return false;
   const e = r.campos;
+  await cadastrosNovosDoDialogo();
   if (!e.natureza && cands.some(c => !c.natureza)) { avisar(`Escolha a natureza: ${cands.filter(c => !c.natureza).length} linha(s) não têm sugestão.`, 'warn'); return false; }
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) { avisar('Competência inválida.', 'warn'); return false; }
   if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
@@ -4406,7 +4560,7 @@ function formNC(d) {
     <label class="campo">Natureza<select name="natureza">${opcoes(NATUREZAS_NC.map(n => [n.id, n.nome]), d.natureza)}</select></label>
     <label class="campo">Detalhe<input type="text" name="detalhe" value="${esc(d.detalhe)}" placeholder="ex.: RX patela"></label>
     <label class="campo">Situação<select name="situacao">${opcoes(Object.entries(SITUACAO_NC), d.situacao)}</select></label>
-    <label class="campo">Unidade<input type="text" name="unidade" list="dlUn" value="${esc(d.unidade)}"></label>
+    ${campoBusca({ nome: 'unidade', rotulo: 'Unidade', fonte: 'unidade', valor: d.unidade })}
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(d.competencia)}"></label>
     <label class="campo">Paciente${d.anonimizada ? '<input type="text" name="paciente" value="" placeholder="apagado pela retenção" disabled>' : `<input type="text" name="paciente" value="${esc(d.paciente)}">`}</label>
     <label class="campo">ID / atendimento${d.anonimizada ? '<input type="text" name="idAtendimento" value="" disabled>' : `<input type="text" name="idAtendimento" value="${esc(d.idAtendimento)}">`}</label>
@@ -4414,13 +4568,13 @@ function formNC(d) {
     <label class="campo">Modalidade<select name="modalidade">${opcoes(MODALIDADES_NC, d.modalidade)}</select></label>
     <label class="campo">Título do laudo<input type="text" name="titulo" value="${esc(d.titulo)}"></label>
     <label class="campo">Título do estudo<input type="text" name="tituloEstudo" value="${esc(d.tituloEstudo)}"></label>
-    <label class="campo">Convênio<input type="text" name="convenio" value="${esc(d.convenio)}"></label>
-    <label class="campo">Médico<input type="text" name="medico" value="${esc(d.medico)}"></label>
-    <label class="campo">Responsável pelo fechamento da conta<input type="text" name="responsavel" list="dlFat" value="${esc(d.responsavel)}"><span class="small muted">Não usado em «Correção de prestadores».</span></label>
+    ${campoBusca({ nome: 'convenio', rotulo: 'Convênio', fonte: 'convenio', valor: d.convenio })}
+    ${campoBusca({ nome: 'medico', rotulo: 'Médico', fonte: 'prestador', valor: d.medico })}
+    ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', valor: d.responsavel, dica: 'Não usado em «Correção de prestadores».' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['sim', 'Sim'], ['nao', 'Não']], d.impactaPagamento ? 'sim' : 'nao')}</select></label>
-    <label class="campo">Prestador incorreto (código)<input type="text" name="prestadorIncorreto" value="${esc(d.prestadorIncorreto)}"><span class="small muted">Só em «Correção de prestadores».</span></label>
-    <label class="campo">Prestador corrigido<input type="text" name="prestadorCorrigido" value="${esc(d.prestadorCorrigido)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>${datalistFaturistas()}${datalistUnidades()}`;
+    ${campoBusca({ nome: 'prestadorIncorreto', rotulo: 'Prestador incorreto (código)', fonte: 'prestador', valor: d.prestadorIncorreto, valorCodigo: true, dica: 'Só em «Correção de prestadores».' })}
+    ${campoBusca({ nome: 'prestadorCorrigido', rotulo: 'Prestador corrigido', fonte: 'prestador', valor: d.prestadorCorrigido })}</div>
+    <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>`;
 }
 async function editarNC(nc) {
   if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
@@ -4432,6 +4586,7 @@ async function editarNC(nc) {
   const e = r.campos;
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) return avisar('Competência inválida.', 'warn');
   if (!exigirAberta(e.competencia, 'gravar NCs')) return;
+  await cadastrosNovosDoDialogo();
   const dados = { ...e, impactaPagamento: e.impacta === 'sim', unidadeCod: ncDaUnidade(S.cfg, e.unidade) };
   delete dados.impacta;
   if (d.anonimizada) { delete dados.paciente; delete dados.idAtendimento; }
@@ -4455,8 +4610,9 @@ async function acaoLoteNC(acao) {
   let msg = '';
   if (acao === 'enviada') { const n = sel.filter(x => mudarSituacaoNC(x, 'enviada', op)).length; msg = `${n} NC(s) marcadas como enviadas ao Qualiex.`; }
   else if (acao === 'responsavel') {
-    const r = await dialogo(`Responsável de ${sel.length} NC(s)`, `<label class="campo">Responsável pelo fechamento da conta<input type="text" name="resp" list="dlFat"></label>${datalistFaturistas()}`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
+    const r = await dialogo(`Responsável de ${sel.length} NC(s)`, `${campoBusca({ nome: 'resp', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista' })}`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
     if (r.botao !== 'ok') return;
+    await cadastrosNovosDoDialogo();
     const n = sel.filter(x => x.categoria !== 'prestador' && alterarNC(x, { responsavel: r.campos.resp.trim() }, op)).length; msg = `Responsável definido em ${n} NC(s).`;
   } else if (acao === 'situacao') {
     const r = await dialogo(`Situação de ${sel.length} NC(s)`, `<label class="campo">Nova situação<select name="sit">${opcoes(Object.entries(SITUACAO_NC), 'tratativa')}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
@@ -4504,6 +4660,14 @@ async function exportarNC(itens, pr) {
   if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;
     abertas.forEach(x => mudarSituacaoNC(x, 'enviada', op)); salvarNC(`${abertas.length} NC(s) marcadas como enviadas.`); RENDER.nc();
+  }
+}
+
+// Depois de um diálogo: faturista ou convênio digitado fora do cadastro → oferecer cadastrar.
+async function cadastrosNovosDoDialogo() {
+  for (const rot of [...$('dlgCorpo').querySelectorAll('[data-busca][data-novo]')]) {
+    const fonte = rot.dataset.busca, valor = rot.querySelector('[data-busca-input]').value;
+    if (fonte === 'faturista' || fonte === 'convenio') await oferecerCadastro(fonte, valor);
   }
 }
 

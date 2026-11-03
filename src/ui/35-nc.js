@@ -235,12 +235,13 @@ async function abrirRegistroNC(cands) {
     <div class="grid2"><label class="campo">Natureza<select name="natureza">${natSug ? '' : `<option value="">${semSugestao === cands.length ? '— escolher —' : 'Sugerida de cada linha'}</option>`}${opcoes(NATUREZAS_NC.map(n => [n.id, n.nome]), natSug)}</select></label>
     <label class="campo">Categoria (aba)<select name="categoria">${catSug ? '' : '<option value="">Sugerida de cada linha (particular pelo convênio)</option>'}${opcoes(Object.entries(CATEGORIA_NC), catSug)}</select></label>
     <label class="campo">Detalhe<input type="text" name="detalhe" placeholder="ex.: RX patela"></label>
-    <label class="campo">Responsável pelo fechamento da conta<input type="text" name="responsavel" list="dlFat" placeholder="${pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : 'escolher ou digitar'}"></label>
+    ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', dica: pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : '' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['', 'Padrão da natureza'], ['sim', 'Sim'], ['nao', 'Não']], '')}</select></label>
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(compSug)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>${datalistFaturistas()}`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return false;
   const e = r.campos;
+  await cadastrosNovosDoDialogo();
   if (!e.natureza && cands.some(c => !c.natureza)) { avisar(`Escolha a natureza: ${cands.filter(c => !c.natureza).length} linha(s) não têm sugestão.`, 'warn'); return false; }
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) { avisar('Competência inválida.', 'warn'); return false; }
   if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
@@ -260,7 +261,7 @@ function formNC(d) {
     <label class="campo">Natureza<select name="natureza">${opcoes(NATUREZAS_NC.map(n => [n.id, n.nome]), d.natureza)}</select></label>
     <label class="campo">Detalhe<input type="text" name="detalhe" value="${esc(d.detalhe)}" placeholder="ex.: RX patela"></label>
     <label class="campo">Situação<select name="situacao">${opcoes(Object.entries(SITUACAO_NC), d.situacao)}</select></label>
-    <label class="campo">Unidade<input type="text" name="unidade" list="dlUn" value="${esc(d.unidade)}"></label>
+    ${campoBusca({ nome: 'unidade', rotulo: 'Unidade', fonte: 'unidade', valor: d.unidade })}
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(d.competencia)}"></label>
     <label class="campo">Paciente${d.anonimizada ? '<input type="text" name="paciente" value="" placeholder="apagado pela retenção" disabled>' : `<input type="text" name="paciente" value="${esc(d.paciente)}">`}</label>
     <label class="campo">ID / atendimento${d.anonimizada ? '<input type="text" name="idAtendimento" value="" disabled>' : `<input type="text" name="idAtendimento" value="${esc(d.idAtendimento)}">`}</label>
@@ -268,13 +269,13 @@ function formNC(d) {
     <label class="campo">Modalidade<select name="modalidade">${opcoes(MODALIDADES_NC, d.modalidade)}</select></label>
     <label class="campo">Título do laudo<input type="text" name="titulo" value="${esc(d.titulo)}"></label>
     <label class="campo">Título do estudo<input type="text" name="tituloEstudo" value="${esc(d.tituloEstudo)}"></label>
-    <label class="campo">Convênio<input type="text" name="convenio" value="${esc(d.convenio)}"></label>
-    <label class="campo">Médico<input type="text" name="medico" value="${esc(d.medico)}"></label>
-    <label class="campo">Responsável pelo fechamento da conta<input type="text" name="responsavel" list="dlFat" value="${esc(d.responsavel)}"><span class="small muted">Não usado em «Correção de prestadores».</span></label>
+    ${campoBusca({ nome: 'convenio', rotulo: 'Convênio', fonte: 'convenio', valor: d.convenio })}
+    ${campoBusca({ nome: 'medico', rotulo: 'Médico', fonte: 'prestador', valor: d.medico })}
+    ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', valor: d.responsavel, dica: 'Não usado em «Correção de prestadores».' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['sim', 'Sim'], ['nao', 'Não']], d.impactaPagamento ? 'sim' : 'nao')}</select></label>
-    <label class="campo">Prestador incorreto (código)<input type="text" name="prestadorIncorreto" value="${esc(d.prestadorIncorreto)}"><span class="small muted">Só em «Correção de prestadores».</span></label>
-    <label class="campo">Prestador corrigido<input type="text" name="prestadorCorrigido" value="${esc(d.prestadorCorrigido)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>${datalistFaturistas()}${datalistUnidades()}`;
+    ${campoBusca({ nome: 'prestadorIncorreto', rotulo: 'Prestador incorreto (código)', fonte: 'prestador', valor: d.prestadorIncorreto, valorCodigo: true, dica: 'Só em «Correção de prestadores».' })}
+    ${campoBusca({ nome: 'prestadorCorrigido', rotulo: 'Prestador corrigido', fonte: 'prestador', valor: d.prestadorCorrigido })}</div>
+    <label class="campo">Observações<textarea name="obs" rows="2">${esc(d.obs)}</textarea></label>`;
 }
 async function editarNC(nc) {
   if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
@@ -286,6 +287,7 @@ async function editarNC(nc) {
   const e = r.campos;
   if (!/^\d{4}-\d{2}$/.test(e.competencia)) return avisar('Competência inválida.', 'warn');
   if (!exigirAberta(e.competencia, 'gravar NCs')) return;
+  await cadastrosNovosDoDialogo();
   const dados = { ...e, impactaPagamento: e.impacta === 'sim', unidadeCod: ncDaUnidade(S.cfg, e.unidade) };
   delete dados.impacta;
   if (d.anonimizada) { delete dados.paciente; delete dados.idAtendimento; }
@@ -309,8 +311,9 @@ async function acaoLoteNC(acao) {
   let msg = '';
   if (acao === 'enviada') { const n = sel.filter(x => mudarSituacaoNC(x, 'enviada', op)).length; msg = `${n} NC(s) marcadas como enviadas ao Qualiex.`; }
   else if (acao === 'responsavel') {
-    const r = await dialogo(`Responsável de ${sel.length} NC(s)`, `<label class="campo">Responsável pelo fechamento da conta<input type="text" name="resp" list="dlFat"></label>${datalistFaturistas()}`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
+    const r = await dialogo(`Responsável de ${sel.length} NC(s)`, `${campoBusca({ nome: 'resp', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista' })}`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
     if (r.botao !== 'ok') return;
+    await cadastrosNovosDoDialogo();
     const n = sel.filter(x => x.categoria !== 'prestador' && alterarNC(x, { responsavel: r.campos.resp.trim() }, op)).length; msg = `Responsável definido em ${n} NC(s).`;
   } else if (acao === 'situacao') {
     const r = await dialogo(`Situação de ${sel.length} NC(s)`, `<label class="campo">Nova situação<select name="sit">${opcoes(Object.entries(SITUACAO_NC), 'tratativa')}</select></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Aplicar']]);
@@ -358,5 +361,13 @@ async function exportarNC(itens, pr) {
   if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;
     abertas.forEach(x => mudarSituacaoNC(x, 'enviada', op)); salvarNC(`${abertas.length} NC(s) marcadas como enviadas.`); RENDER.nc();
+  }
+}
+
+// Depois de um diálogo: faturista ou convênio digitado fora do cadastro → oferecer cadastrar.
+async function cadastrosNovosDoDialogo() {
+  for (const rot of [...$('dlgCorpo').querySelectorAll('[data-busca][data-novo]')]) {
+    const fonte = rot.dataset.busca, valor = rot.querySelector('[data-busca-input]').value;
+    if (fonte === 'faturista' || fonte === 'convenio') await oferecerCadastro(fonte, valor);
   }
 }

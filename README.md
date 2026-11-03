@@ -31,6 +31,7 @@ node test/regras.mjs            # regras de repasse em Bases e importação da p
 node test/fechamento.mjs        # aba Fechamento: valores com aceite, situação, prévia do e-mail e exportação
 node test/arquivos.mjs          # arquivos da sessão: genérico na correção, limpar, outra produção
 node test/correcao_excel.mjs    # Excel da correção de prestador (aba «Corrigir no MV»)
+node test/busca.mjs             # campo de busca no cadastro (NCs)
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

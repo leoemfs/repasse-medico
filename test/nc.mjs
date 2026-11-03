@@ -107,7 +107,7 @@ ok(/Não conformidades desta competência: 5/.test(await p.textContent('[data-g=
 
 // 10) Retenção: NC registrada há 70 dias perde nome e ID ao abrir; a de 55 dias gera aviso.
 await S(() => { const it = window.__RM.S.nc.itens, t = Date.now(); it[0].criadaEm = new Date(t - 70 * 864e5).toISOString(); it[1].criadaEm = new Date(t - 55 * 864e5).toISOString(); localStorage.setItem('rm2.nc', JSON.stringify(window.__RM.S.nc)); });
-await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.nc.itens.length > 200);
+await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.nc && window.__RM.S.nc.itens.length > 200, null, { polling: 200, timeout: 30000 });
 const ret = await S(() => { const it = window.__RM.S.nc.itens; return [it[0].paciente, it[0].idAtendimento, !!it[0].anonimizada, it[0].natureza, !!it[1].paciente]; });
 ok(ret[0] === '' && ret[1] === '' && ret[2] && ret[3] && ret[4], 'após 60 dias: nome e ID apagados; natureza mantida; a NC mais nova fica intacta');
 await p.goto(html + '#nc'); await p.waitForSelector('.nc-kpis');
