@@ -52,6 +52,21 @@ ok(m.faixas.join() === '65,68,68,70', `faixas por volume: 799→65 · 800→68 �
 ok(m.densito === r2(73608.694 + 1200), `densitometria a 10% do bruto soma ao total (${m.densito})`);
 ok(m.alex.total === 2240 && m.alex.semRegra.join() === 'MAMOGRAFIA', `por laudo: 110 × 20 (USG + HM = laudo) + 5 RX × 8 = ${m.alex.total}; mamografia fora, com aviso`);
 function r2(x) { return Math.round(x * 100) / 100; }
+// Valor fixo por grupo (Dr. Alexandre): USG R$ 33 o laudo e R$ 33 o HM Unimed; ressonância R$ 45.
+const fx = await S(() => {
+  const { calcularV3, textoEmailV3 } = window.__RM.t;
+  const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, valorHM: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45, valorHM: 0 }] };
+  const c = calcularV3(regra, [
+    { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG TIREOIDE', quant: 90, vlTotal: 9000, tipoItem: 'procedimento' },
+    { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'DOPPLER COLORIDO VENOSO', quant: 10, vlTotal: 2000, tipoItem: 'procedimento' },
+    { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
+    { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 40, tipoItem: 'hm' },
+    { grupo: 'RESSONANCIA MAGNETICA', desc: 'RMN JOELHO', quant: 3, vlTotal: 1500, tipoItem: 'procedimento' },
+    { grupo: 'MAMOGRAFIA', desc: 'MAMOGRAFIA DIGITAL', quant: 2, vlTotal: 400, tipoItem: 'procedimento' }]);
+  return { total: c.total, exames: c.exames, hm: c.hm.valor, exc: c.hmExcluir.qtd, sem: [...c.semRegra.keys()], texto: textoEmailV3(c) };
+});
+ok(fx.total === 3765 && fx.exames === 100 && fx.hm === 330 && fx.exc === 1 && fx.sem.join() === 'MAMOGRAFIA', `valor fixo por grupo: 100 USG × 33 + 10 HM × 33 + 3 resso × 45 = ${fx.total}; RX HM a excluir; mamografia sem regra`);
+ok(/USG \(inclui Doppler\): 100 laudo\(s\) × R\$ 33,00 = R\$ 3\.300,00\nHonorários USG UNIMED: 10 × R\$ 33,00 = R\$ 330,00\nRESSONANCIA MAGNETICA: 3 laudo\(s\) × R\$ 45,00 = R\$ 135,00/.test(fx.texto) && /Total para emissão da nota fiscal: R\$ 3\.765,00$/.test(fx.texto), 'texto do e-mail no modo de valor fixo');
 
 // 2) Bases → Prestadores → Médicos V3.
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="prestadores"]');
@@ -61,7 +76,9 @@ ok(v3.length >= 1 && await p.isVisible('#cardV3') && (await p.$$('#cardV3 tbody 
 ok(/sem regra cadastrada/.test(await p.textContent('#cardV3')), 'médico V3 sem regra aparece marcado');
 const [codV3, nomeV3] = v3[0];
 await p.click(`#cardV3 tr:has(td:text-is("${codV3}")) [data-v3regra]`); await p.waitForSelector('#dlg[open]');
-ok(await p.inputValue('#dlgCorpo [name="impostos"]') === '9.15' && await p.inputValue('#dlgCorpo [name="fxPct2"]') === '70', 'regra nova começa com a do Dr. Ian (9,15%, 65/68/70)');
+ok(await p.isChecked('#dlgCorpo [name="modo"][value="fixo"]') && await p.isHidden('#dlgCorpo [name="impostos"]'), 'regra nova começa em «valor fixo por laudo» (só o Dr. Ian é percentual)');
+await p.check('#dlgCorpo [name="modo"][value="percentual"]');
+ok(await p.inputValue('#dlgCorpo [name="impostos"]') === '9.15' && await p.inputValue('#dlgCorpo [name="fxPct2"]') === '70', '«como o Dr. Ian» traz 9,15% e 65/68/70');
 await p.screenshot({ path: out + 'v3_regra.png' });
 await okDlg();
 const regra = await S(cod => window.__RM.S.cfg.prestadores.find(x => x.cod === cod).regras.v3regra, codV3);
@@ -70,11 +87,22 @@ ok(/65 \/ 68 \/ 70% do líquido por volume/.test(await p.textContent('#cardV3'))
 // + Médico V3 com regra por laudo.
 await p.click('#v3Add'); await p.waitForSelector('#dlg[open]');
 await p.fill('#dlgCorpo [name="prestador"]', 'roberto'); await p.waitForSelector('#dlgCorpo .busca-lista:not([hidden])'); await p.press('#dlgCorpo [name="prestador"]', 'Enter');
-await p.click('#dlgBotoes button[value="ok"]'); await p.waitForFunction(() => document.getElementById('dlg').open && /Regras da V3/.test(document.getElementById('dlgTitulo').textContent));
-await p.selectOption('#dlgCorpo [name="usgForma"]', 'por-laudo'); await p.fill('#dlgCorpo [name="usgValor"]', '20'); await p.selectOption('#dlgCorpo [name="hm"]', 'valor-laudo');
+await p.click('#dlgBotoes button[value="ok"]'); await p.waitForFunction(() => document.getElementById('dlg').open && /Regra da V3/.test(document.getElementById('dlgTitulo').textContent));
+ok((await p.$$eval('#dlGruposV3 option', o => o.map(x => x.value))).includes('USG (inclui Doppler)'), 'lista de grupos do MV com «USG (inclui Doppler)»');
+await p.fill('#dlgCorpo [name="fxGrupo0"]', 'USG (inclui Doppler)'); await p.fill('#dlgCorpo [name="fxLaudo0"]', '33'); await p.fill('#dlgCorpo [name="fxHM0"]', '33');
+await p.fill('#dlgCorpo [name="fxGrupo1"]', 'RESSONANCIA MAGNETICA'); await p.fill('#dlgCorpo [name="fxLaudo1"]', '45');
+await p.screenshot({ path: out + 'v3_regra_fixa.png' });
 await okDlg();
 const r9 = await S(() => window.__RM.S.cfg.prestadores.find(x => x.cod === '9').regras);
-ok(r9.v3 && r9.v3regra.usg.forma === 'por-laudo' && r9.v3regra.usg.valor === 20 && r9.v3regra.hm === 'valor-laudo', '+ Médico V3: prestador da busca entra na V3 com regra por laudo');
+ok(r9.v3 && r9.v3regra.modo === 'fixo' && JSON.stringify(r9.v3regra.grupos) === JSON.stringify([{ grupo: '*USG*', valorLaudo: 33, valorHM: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45, valorHM: 0 }]), '+ Médico V3: valor fixo por grupo (USG R$ 33 + HM R$ 33; ressonância R$ 45)');
+ok(/Valor fixo por laudo — USG \(inclui Doppler\): R\$ 33,00 \(HM Unimed R\$ 33,00\)/.test(await p.textContent('#cardV3')), 'resumo da regra fixa no cartão');
+// Médico só da V3 sai da lista geral; quem atua também nas outras unidades fica nas duas.
+await p.click('#prAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="nome"]', 'ALEXANDRE ROMANUS'); await p.press('#dlgCorpo [name="nome"]', 'Escape'); await p.fill('#dlgCorpo [name="cod"]', '6703'); await okDlg();
+const linhaGeral = cod => p.locator(`#pag-bases .card:has(#prAdd) tbody tr:has(td:text-is("${cod}"))`);
+ok(await linhaGeral('6703').count() === 1, 'prestador novo aparece na lista geral');
+await linhaGeral('6703').locator('[data-regras]').click(); await p.waitForSelector('#dlg[open]'); await p.check('#dlgCorpo [name="v3"]'); await okDlg();
+ok(await linhaGeral('6703').count() === 0 && /só V3/.test(await p.locator('#cardV3 tr:has(td:text-is("6703"))').textContent()), 'marcado como V3 (só V3): sai da lista geral e fica em «Médicos V3»');
+ok(await linhaGeral('9').count() === 1 && /V3 e outras unidades/.test(await p.locator('#cardV3 tr:has(td:text-is("9"))').textContent()), 'V3 que atua também nas outras unidades continua na lista geral');
 
 // 3) Fechamento → Curitiba com rodada da unidade 5 (aceita).
 await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.click('#fxCriar'); await p.waitForSelector('.marco');

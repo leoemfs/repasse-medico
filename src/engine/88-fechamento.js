@@ -358,8 +358,8 @@ function xlsxFechamento(f, cfg, meta = {}) {
   for (const x of v3) {
     const n = C.length + 1, c = x.v3;
     C.push([{ v: +x.cod || x.cod, st: sit(x, E.centro) }, { v: x.nome, st: sit(x, E.texto) },
-      { v: c ? c.exames : '', st: E.centro }, { v: c ? c.brutoUSG : '', st: E.valor }, { v: c ? c.hm.valor : '', st: E.valor }, { v: c ? r2(c.outros.reduce((s2, o) => s2 + o.valor, 0)) : '', st: E.valor },
-      { v: c && c.forma !== 'por-laudo' ? c.liquido : '', st: E.valor }, { v: c && c.pct ? c.pct / 100 : '', st: { ...E.pct, fill: undefined } },
+      { v: c ? c.exames : '', st: E.centro }, { v: c ? c.brutoUSG : '', st: E.valor }, { v: c ? c.hm.valor : '', st: E.valor }, { v: c ? (c.modo === 'fixo' ? c.outrosValor : r2(c.outros.reduce((s2, o) => s2 + o.valor, 0))) : '', st: E.valor },
+      { v: c && c.modo !== 'fixo' && c.forma !== 'por-laudo' ? c.liquido : '', st: E.valor }, { v: c && c.pct ? c.pct / 100 : '', st: { ...E.pct, fill: undefined } },
       ...unV3.map(u => ({ v: x.unidades[u.cod] ?? '', st: E.valor })), { v: x.plantao || '', st: E.valor },
       { v: x.total, f: `SUM(${col(c0)}${n}:${col(cPlC)}${n})`, st: E.valorB }, { v: x.descontos, st: E.valorB }, { v: x.totalGeral, f: `${col(cToC)}${n}-${col(cDeC)}${n}`, st: E.valorB }]);
   }

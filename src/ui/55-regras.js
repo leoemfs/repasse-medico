@@ -181,21 +181,36 @@ async function importarPlanilhaControle(f) {
 
 /* ---------- Médicos V3 (Curitiba) — SOL-F30 ----------
  * Um espaço só para os médicos da V3, com a regra de cada um. Não usam classe A/B/C/D nem as faixas
- * de USG do SRA. Doppler é sempre parte do grupo de USG. */
+ * de USG do SRA. Doppler é sempre parte do grupo de USG.
+ * Médico só da V3 (sem regra de USG/IMG/BOARD do SRA) fica só aqui; quem atua também nas outras
+ * unidades continua na lista geral de prestadores. */
+const soV3 = p => !!p.regras?.v3 && !p.regras.faixaUSG && !p.regras.participaIMG && !+p.regras.board;
+// Grupos de procedimento conhecidos (relatórios do MV, rodadas, Power BI e catálogo TUSS), sem os de HM.
+function gruposMVConhecidos() {
+  const m = new Map(), add = g => { const n = String(g || '').trim(); if (n && !/HONORARIO/.test(norm(n)) && !m.has(norm(n))) m.set(norm(n), n); };
+  for (const x of S.relatorios || []) for (const r of x.rel.regs) add(r.grupoNome);
+  for (const r of S.rodadas || []) for (const l of r.linhas || []) add(l.grupo);
+  for (const p of S.pbi?.procedimentos || []) add(p.grupo);
+  for (const t of S.eq?.catalogoTUSS || []) add(t.grupo);
+  return [...m.values()].sort((a, b) => a.localeCompare(b));
+}
 function cardMedicosV3() {
   const v3 = S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => p.regras?.v3);
   return `<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">${v3.length} médico(s)</span></h2>
-    <p class="lead">Na V3 o repasse é calculado fora do MV. O Fechamento → Repasse Curitiba (V3) calcula o valor da NF pela regra de cada médico e gera o texto do e-mail. Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago (mesmo sem laudo); os demais ficam sinalizados para exclusão.</p>
-    <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Regra</th><th></th></tr></thead><tbody>
-    ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td><td class="small">${p.regras.v3regra ? esc(resumoRegraV3(p.regras.v3regra)) : '<span class="badge warn">sem regra cadastrada</span>'}</td>
-      <td style="white-space:nowrap"><button class="sec mini" data-v3regra="${i}">Regras…</button> <button class="perigo mini" data-v3rm="${i}" aria-label="Tirar da V3" title="Tirar da V3">✕</button></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Nenhum médico da V3. Use «+ Médico V3» ou importe a planilha de controle (bloco «MÉDICOS V3»).</td></tr>'}</tbody></table></div>
+    <p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago (mesmo sem laudo).</p>
+    <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Aliases do Apolo</th><th>Atua em</th><th>Regra</th><th></th></tr></thead><tbody>
+    ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td>
+      <td>${(p.aliases || []).map(a => `<span class="badge ${a.status === 'validado' ? 'ok' : 'warn'}">${esc(a.nome)}</span>`).join(' ') || '<span class="muted small">—</span>'}</td>
+      <td class="small">${soV3(p) ? 'só V3' : '<span title="Também está na lista geral de prestadores">V3 e outras unidades</span>'}</td>
+      <td class="small">${p.regras.v3regra ? esc(resumoRegraV3(p.regras.v3regra)) : '<span class="badge warn">sem regra cadastrada</span>'}</td>
+      <td style="white-space:nowrap"><button class="sec mini" data-v3regra="${i}">Regra da V3…</button> <button class="sec mini" data-alias="${i}">+ Alias</button> <button class="perigo mini" data-v3rm="${i}" aria-label="Tirar da V3" title="Tirar da V3">✕</button></td></tr>`).join('') || '<tr><td colspan="6" class="muted">Nenhum médico da V3. Use «+ Médico V3», o atalho «+ Cadastrar» dos médicos do Apolo, ou importe a planilha de controle.</td></tr>'}</tbody></table></div>
     <div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div></div>`;
 }
 function ligarMedicosV3(pg) {
   pg.querySelectorAll('[data-v3regra]').forEach(b => b.onclick = () => editarRegraV3(S.cfg.prestadores[+b.dataset.v3regra]));
   pg.querySelectorAll('[data-v3rm]').forEach(b => b.onclick = async () => {
     const p = S.cfg.prestadores[+b.dataset.v3rm];
-    if (!await confirmar(`Tirar ${esc(p.nomeMV)} da V3?`, 'O médico sai do Fechamento de Curitiba. A regra cadastrada fica guardada, caso volte.', 'Tirar da V3')) return;
+    if (!await confirmar(`Tirar ${esc(p.nomeMV)} da V3?`, 'O médico sai do Fechamento de Curitiba e volta para a lista geral de prestadores. A regra cadastrada fica guardada, caso volte.', 'Tirar da V3')) return;
     p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: false };
     salvarCfg(`${p.cod} - ${p.nomeMV} deixou de ser médico V3.`, 'prestadores'); RENDER.bases();
   });
@@ -211,43 +226,66 @@ function ligarMedicosV3(pg) {
 }
 async function editarRegraV3(p) {
   const op = await exigirOperador(); if (!op) return;
-  const atual = p.regras?.v3regra, g = JSON.parse(JSON.stringify(atual || regraV3Padrao()));
+  const atual = p.regras?.v3regra;
+  const modo = atual?.modo || (atual ? 'percentual' : 'fixo');
+  const gPerc = JSON.parse(JSON.stringify(atual && modo === 'percentual' ? atual : regraV3Padrao()));
+  const gFixo = JSON.parse(JSON.stringify(atual && modo === 'fixo' ? atual : regraV3Fixa()));
   const outrosV3 = S.cfg.prestadores.filter(x => x !== p && x.regras?.v3 && x.regras.v3regra);
-  const faixas = [...g.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
-  const outros = [...g.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
-  const d = await dialogo(`Regras da V3 — ${p.cod} - ${p.nomeMV}`, `<span class="dlg-largo" hidden></span>
-    ${outrosV3.length ? `<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option>${opcoes(outrosV3.map(x => [String(x.cod), `${x.cod} - ${x.nomeMV}`]), '')}</select></label>` : ''}
-    ${atual ? '' : '<p class="small muted">Sem regra cadastrada: os campos vêm com a regra do Dr. Ian como ponto de partida. Ajuste e salve.</p>'}
-    <div class="grid4"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${g.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
-      <label class="campo">USG (inclui Doppler)<select name="usgForma">${opcoes(Object.entries(FORMAS_V3), g.usg.forma)}</select></label>
-      <label class="campo">% da USG<input type="number" step="0.01" min="0" name="usgPct" value="${g.usg.pct || ''}"><span class="small muted">para «% do líquido» ou «% do bruto»</span></label>
-      <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${g.usg.valor || ''}"></label></div>
-    <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(para «% do líquido por faixa»; volume = quantidade de exames de USG e Doppler no mês)</span></h4>
-    <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
-    <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), g.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, outros convênios) nunca são pagos na V3 e ficam sinalizados para exclusão.</span></label>
-    <h4 style="margin:8px 0 4px">Outros exames <span class="muted small">(texto que aparece no grupo ou na descrição do MV, ex.: DENSITOM)</span></h4>
-    <div class="tw"><table><thead><tr><th>Exame</th><th>Texto de busca</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
-      <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" value="${esc(o.padrao)}" style="width:110px"></td>
-      <td><select name="oForma${k}">${opcoes(FORMAS_OUTROS_V3.map(f => [f, FORMAS_V3[f]]), o.forma)}</select></td>
-      <td><input type="number" step="0.01" min="0" name="oPct${k}" value="${o.pct || ''}" style="width:70px"></td><td><input type="number" step="0.01" min="0" name="oVal${k}" value="${o.valor || ''}" style="width:90px"></td></tr>`).join('')}</tbody></table></div>
-    <p class="small muted">Exames da V3 que não forem USG/Doppler nem estiverem aqui ficam fora do cálculo, com aviso no Fechamento.</p>`,
+  const grupos = gruposMVConhecidos();
+  const linhasFixo = [...gFixo.grupos]; while (linhasFixo.length < 8) linhasFixo.push({ grupo: '', valorLaudo: '', valorHM: '' });
+  const faixas = [...gPerc.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
+  const outros = [...gPerc.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
+  const valGrupo = g => g === GRUPO_USG_V3 ? rotuloGrupoV3(g) : g;
+  const pr = dialogo(`Regra da V3 — ${p.cod} - ${p.nomeMV}`, `<span class="dlg-largo" hidden></span>
+    ${outrosV3.length ? `<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option>${opcoes(outrosV3.map(x => [String(x.cod), `${x.cod} - ${x.nomeMV} (${x.regras.v3regra.modo === 'fixo' ? 'valor fixo' : 'percentual'})`]), '')}</select></label>` : ''}
+    <div class="opcoes-check" role="radiogroup" aria-label="Como o médico recebe na V3">
+      <label><input type="radio" name="modo" value="fixo"${modo === 'fixo' ? ' checked' : ''}><span><b>Valor fixo por laudo</b><small>Valor por grupo de procedimento do MV, como está no MV. Ex.: USG R$ 33,00 o laudo e R$ 33,00 o HM Unimed; ressonância R$ 45,00.</small></span></label>
+      <label><input type="radio" name="modo" value="percentual"${modo === 'percentual' ? ' checked' : ''}><span><b>Percentual do faturamento (como o Dr. Ian)</b><small>USG + HM Unimed menos impostos, com % por faixa de volume; outros grupos por % ou valor.</small></span></label></div>
+
+    <div data-modo="fixo"${modo === 'fixo' ? '' : ' hidden'}>
+      <h4 style="margin:10px 0 4px">Valor por grupo de procedimento <span class="muted small">(escolha o grupo na lista; «USG (inclui Doppler)» pega todos os procedimentos de ultrassom)</span></h4>
+      <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th><th>R$ por HM Unimed</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
+        <td><input type="text" name="fxGrupo${k}" list="dlGruposV3" value="${esc(valGrupo(g.grupo))}" placeholder="${k === 0 ? 'USG (inclui Doppler)' : k === 1 ? 'ex.: RESSONANCIA MAGNETICA' : ''}" style="min-width:300px"></td>
+        <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td>
+        <td><input type="number" step="0.01" min="0" name="fxHM${k}" value="${g.valorHM || ''}" style="width:110px"></td></tr>`).join('')}</tbody></table></div>
+      <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, pelo valor de HM do grupo de USG. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
+
+    <div data-modo="percentual"${modo === 'percentual' ? '' : ' hidden'}>
+      <div class="grid4" style="margin-top:8px"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${gPerc.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
+        <label class="campo">USG (inclui Doppler)<select name="usgForma">${opcoes(Object.entries(FORMAS_V3), gPerc.usg.forma)}</select></label>
+        <label class="campo">% da USG<input type="number" step="0.01" min="0" name="usgPct" value="${gPerc.usg.pct || ''}"><span class="small muted">para «% do líquido» ou «% do bruto»</span></label>
+        <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${gPerc.usg.valor || ''}"></label></div>
+      <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(volume = quantidade de exames de USG e Doppler no mês)</span></h4>
+      <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
+      <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), gPerc.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, outros convênios) nunca são pagos na V3 e ficam sinalizados para exclusão.</span></label>
+      <h4 style="margin:8px 0 4px">Outros grupos <span class="muted small">(escolha o grupo do procedimento na lista)</span></h4>
+      <div class="tw"><table><thead><tr><th>Nome</th><th>Grupo do procedimento (MV)</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
+        <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" list="dlGruposV3" value="${esc(o.padrao)}" style="min-width:200px"></td>
+        <td><select name="oForma${k}">${opcoes(FORMAS_OUTROS_V3.map(f => [f, FORMAS_V3[f]]), o.forma)}</select></td>
+        <td><input type="number" step="0.01" min="0" name="oPct${k}" value="${o.pct || ''}" style="width:70px"></td><td><input type="number" step="0.01" min="0" name="oVal${k}" value="${o.valor || ''}" style="width:90px"></td></tr>`).join('')}</tbody></table></div></div>
+    <datalist id="dlGruposV3"><option value="USG (inclui Doppler)"></option>${grupos.map(g => `<option value="${esc(g)}"></option>`).join('')}</datalist>
+    ${grupos.length ? '' : '<p class="small muted">A lista de grupos vem dos relatórios do MV, das rodadas e do Power BI carregados. Sem eles, digite o nome do grupo como aparece no MV.</p>'}`,
     [['', 'Cancelar', 'sec'], ...(atual ? [['limpar', 'Apagar regra', 'perigo']] : []), ['ok', 'Salvar regra']]);
+  $('dlgCorpo').querySelectorAll('[name="modo"]').forEach(r => r.onchange = () => $('dlgCorpo').querySelectorAll('[data-modo]').forEach(d => { d.hidden = d.dataset.modo !== r.value; }));
+  const d = await pr;
   if (d.botao === 'limpar') {
     p.regras = { ...p.regras, v3regra: null, alteradoPor: op, alteradoEm: agoraISO() };
     salvarCfg(`Regra da V3 de ${p.cod} - ${p.nomeMV} apagada.`, 'prestadores'); RENDER.bases(); return;
   }
   if (d.botao !== 'ok') return;
-  const c = d.campos;
+  const c = d.campos, num = v => v === '' || v === undefined ? '' : +v;
   let regra;
   if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
-  else {
-    const num = v => v === '' || v === undefined ? '' : +v;
+  else if (c.modo === 'fixo') {
+    const lerGrupo = t => { const v = String(t || '').trim(); return norm(v) === norm(rotuloGrupoV3(GRUPO_USG_V3)) ? GRUPO_USG_V3 : v; };
+    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => ({ grupo: lerGrupo(c['fxGrupo' + k]), valorLaudo: +c['fxLaudo' + k] || 0, valorHM: +c['fxHM' + k] || 0 })).filter(g => g.grupo) };
+  } else {
     regra = {
-      impostos: +c.impostos || 0,
+      modo: 'percentual', impostos: +c.impostos || 0,
       usg: { forma: c.usgForma, pct: +c.usgPct || 0, valor: +c.usgValor || 0,
         faixas: [0, 1, 2, 3, 4].map(k => ({ de: num(c['fxDe' + k]), pct: num(c['fxPct' + k]) })).filter(f => f.pct !== '').map(f => ({ de: +f.de || 0, pct: +f.pct })).sort((a, b) => a.de - b.de) },
       hm: c.hm,
-      outros: [0, 1, 2, 3].map(k => ({ nome: (c['oNome' + k] || '').trim(), padrao: String(c['oPad' + k] || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim(), forma: c['oForma' + k], pct: +c['oPct' + k] || 0, valor: +c['oVal' + k] || 0 })).filter(o => o.nome || o.padrao)
+      outros: [0, 1, 2, 3].map(k => ({ nome: (c['oNome' + k] || '').trim(), padrao: String(c['oPad' + k] || '').trim(), forma: c['oForma' + k], pct: +c['oPct' + k] || 0, valor: +c['oVal' + k] || 0 })).filter(o => o.nome || o.padrao).map(o => ({ ...o, nome: o.nome || o.padrao }))
     };
   }
   const erros = validarRegraV3(regra);

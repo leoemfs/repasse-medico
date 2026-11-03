@@ -101,7 +101,7 @@ function desenharCuritiba(corpo, f, mk) {
   const v = (x, fn) => x.v3 ? fn(x.v3) : '<span class="muted small">—</span>';
   const linha = x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'curitiba')}</td>
     <td class="n">${v(x, c => c.exames.toLocaleString('pt-BR'))}</td><td class="n">${v(x, c => fmtBR(c.brutoUSG))}</td><td class="n">${v(x, c => c.hmNaBase || c.hm.valor ? fmtBR(c.hm.valor) : '<span class="muted small">não entra</span>')}</td>
-    <td class="n">${v(x, c => fmtBR(c.outros.reduce((s2, o) => s2 + o.valor, 0)))}</td><td class="n">${v(x, c => c.forma === 'por-laudo' ? '<span class="small">por laudo</span>' : fmtBR(c.liquido))}</td>
+    <td class="n">${v(x, c => fmtBR(c.modo === 'fixo' ? c.outrosValor : c.outros.reduce((s2, o) => s2 + o.valor, 0)))}</td><td class="n">${v(x, c => c.modo === 'fixo' ? '<span class="small">valor fixo</span>' : c.forma === 'por-laudo' ? '<span class="small">por laudo</span>' : fmtBR(c.liquido))}</td>
     <td class="n">${v(x, c => c.pct ? `<b>${fmtBR(c.pct).replace(',00', '')}%</b>${c.faixa ? `<small class="nc-det">${esc(rotuloFaixaV3(c.faixa))}</small>` : ''}` : c.forma === 'por-laudo' ? `<small>R$ ${fmtBR(c.valorLaudo)}</small>` : '')}</td>
     ${un.map(u => `<td class="n">${ehUnidadeV3(S.cfg, u.cod) && x.v3 ? `<b>${celValor(x.unidades[u.cod])}</b>` : celValor(x.unidades[u.cod])}</td>`).join('')}
     <td class="n">${inputAjuste('curitiba', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('curitiba', x, 'descontos')}</td><td>${inputAjuste('curitiba', x, 'obs', 160)}</td>
@@ -122,15 +122,20 @@ function desenharCuritiba(corpo, f, mk) {
 async function memoriaV3(x) {
   const c = x.v3, texto = textoEmailV3(c);
   const exc = [...c.hmExcluir.itens].sort((a, b) => b[1] - a[1]);
+  const origem = c.modo === 'fixo' ? `<li><b>Regra:</b> valor fixo por laudo, por grupo do MV.</li>
+      ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${i.qtd} laudo(s) × R$ ${fmtBR(i.valorLaudo)} = R$ ${fmtBR(i.valor)}${i.hmQtd ? ` · HM Unimed ${i.hmQtd} × R$ ${fmtBR(i.valorHM)} = R$ ${fmtBR(i.hmValor)}` : ''}.</li>`).join('')}
+      <li>Exames de USG e Doppler no mês: ${c.exames} (USG bruto no MV: R$ ${fmtBR(c.brutoUSG)}, só referência).</li>
+      ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor de HM na regra: não pagos.</li>` : ''}
+      <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>` : null;
   const r = await dialogo(`Memória de cálculo — ${x.cod} - ${x.nome}`, `<span class="dlg-largo" hidden></span><div class="grid2"><div><h4 style="margin:0 0 4px">Texto do e-mail</h4><pre class="memoria-v3">${esc(texto)}</pre></div>
-    <div><h4 style="margin:0 0 4px">De onde vem cada número</h4><ul class="small">
+    <div><h4 style="margin:0 0 4px">De onde vem cada número</h4><ul class="small">${origem || `
       <li><b>Exames USG:</b> soma da quantidade dos procedimentos de USG e Doppler do médico na V3 (${c.exames}).</li>
       <li><b>USG (bruto):</b> soma do Vl Total dessas linhas (R$ ${fmtBR(c.brutoUSG)}).</li>
       <li><b>HM Unimed:</b> ${c.hm.qtd} HM de USG/Doppler do convênio Unimed (R$ ${fmtBR(c.hm.valor)})${c.hmNaBase ? ', somados ao faturamento da USG' : c.forma === 'por-laudo' && x.p?.regras?.v3regra?.hm === 'valor-laudo' ? ', pagos como laudo de USG' : ', não pagos pela regra'}.</li>
       ${c.forma === 'faixa-liquido' ? `<li><b>Faixa:</b> ${c.exames} exames → ${c.faixa ? `${fmtBR(c.pct).replace(',00', '')}% (${esc(rotuloFaixaV3(c.faixa))})` : 'abaixo da primeira faixa'}.</li>` : ''}
       ${c.outros.map(o => `<li><b>${esc(o.nome)}:</b> ${o.qtd} exame(s), R$ ${fmtBR(o.bruto)} bruto → R$ ${fmtBR(o.valor)}.</li>`).join('')}
       <li>Calculado sem arredondar no meio; arredonda só no final.</li>
-      <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li></ul>
+      <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>`}</ul>
       ${exc.length ? `<h4 style="margin:8px 0 4px">HM a excluir (${c.hmExcluir.qtd} · R$ ${fmtBR(c.hmExcluir.valor)})</h4><ul class="small">${exc.slice(0, 12).map(([k, n]) => `<li>${esc(k)} — ${n}</li>`).join('')}${exc.length > 12 ? `<li>… e mais ${exc.length - 12}</li>` : ''}</ul>` : ''}
       ${c.semRegra.size ? `<h4 style="margin:8px 0 4px">Fora do cálculo (sem regra)</h4><ul class="small">${[...c.semRegra].map(([k, e]) => `<li>${esc(k)} — ${e.qtd} · R$ ${fmtBR(e.valor)}</li>`).join('')}</ul>` : ''}</div></div>`,
     [['', 'Fechar', 'sec'], ['copiar', 'Copiar texto do e-mail']]);

@@ -587,3 +587,10 @@ Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume�
 - **NF complementar na exportação: um bloco por categoria** (e por unidade/CNPJ), com QUANTIDADE e VALOR UNITÁRIO quando houver e total com fórmula. Substitui o bloco com uma coluna por categoria da F28.
 - **Atalho «+ Cadastrar» nos médicos do Apolo sem vínculo** (Bases → Prestadores e regras): cadastra um novo prestador com o código do MV (médico ou residente) ou liga o nome a um prestador já cadastrado como alias validado (RN-208). Nomes parecidos no cadastro aparecem só como dica para conferir; nada é ligado sozinho.
 - **Regras do prestador:** «Recebe repasse de IMG» e «Médico V3 (Curitiba)» viraram cartões com explicação, em vez de caixas soltas.
+
+## V3 — dois modos de regra e lista só da V3 (03/11/2026, v2.0.0-alpha.14)
+- Pedido: «na V3 só o Dr. Ian recebe seguindo essas regras; para outros prestadores são valores fixos». A regra de cada médico V3 agora tem dois modos:
+  - **Valor fixo por laudo** (padrão para regra nova): um valor por **grupo de procedimento do MV**, escolhido numa lista (grupos dos relatórios do MV, das rodadas e do Power BI) mais o grupo especial «USG (inclui Doppler)». Cada grupo tem «R$ por laudo» e «R$ por HM Unimed». Ex.: Dr. Alexandre Romanus — USG R$ 33,00 o laudo e R$ 33,00 o HM Unimed; ressonância R$ 45,00. Só o HM de USG/Doppler Unimed é pago, pelo valor de HM do grupo de USG.
+  - **Percentual do faturamento (como o Dr. Ian):** a regra que já existia. Os «outros grupos» também passaram a ser escolhidos na lista de grupos do MV.
+- **Lista de prestadores:** médico marcado como V3 que **só** atua na V3 (sem faixa de USG, IMG ou BOARD do SRA) sai da lista geral e fica só em «Médicos V3». Quem atua também nas outras unidades continua na lista geral e aparece em «Médicos V3» com «V3 e outras unidades». O cartão V3 ganhou aliases do Apolo e «+ Alias».
+- **Atalho do Apolo:** o tipo «Médico V3 (Curitiba)» cadastra o médico já na V3 e abre a regra.

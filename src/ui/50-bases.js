@@ -23,9 +23,10 @@ RENDER.bases = () => {
   ${cardFaixasUSG()}${cardParametrosFechamento()}
 
   <div class="card" data-sub="prestadores"><h2>Prestadores</h2><p class="lead">O par código ↔ nome vem do cabeçalho de cada relatório do MV carregado. O médico do Apolo só é ligado a um código por nome idêntico (após normalizar caixa e acentos) ou por <strong>alias validado</strong> com responsável (RN-208).</p>
-    <div class="tw"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases do Apolo</th><th>Regras de repasse</th><th>Não realiza repasse</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.prestadores.length ? S.cfg.prestadores.map((p, i) => `<tr>
+    <div class="tw"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases do Apolo</th><th>Regras de repasse</th><th>Não realiza repasse</th><th>Origem</th><th></th></tr></thead><tbody>${S.cfg.prestadores.length ? S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => !soV3(p)).map(([p, i]) => `<tr>
       <td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td><td>${(p.aliases || []).map((a, j) => `<span class="badge ${a.status === 'validado' ? 'ok' : 'warn'}" title="${esc(a.responsavel || '')}">${esc(a.nome)} <a href="#" data-arm="${i}:${j}" title="remover">✕</a></span>`).join(' ') || '<span class="muted small">—</span>'}</td>
       <td class="small">${resumoRegras(p)}</td><td><input type="checkbox" data-nr="${i}"${p.naoRealizaRepasse ? ' checked' : ''}></td><td class="small muted">${esc(p.origem || '')}</td><td style="white-space:nowrap"><button class="sec mini" data-regras="${i}">Regras…</button> <button class="sec mini" data-alias="${i}">+ Alias</button></td></tr>`).join('') : '<tr><td colspan="7" class="muted">Carregue um relatório do MV para registrar o prestador do cabeçalho, ou adicione manualmente.</td></tr>'}</tbody></table></div>
+    ${S.cfg.prestadores.some(soV3) ? `<p class="small muted">${S.cfg.prestadores.filter(soV3).length} médico(s) só da V3 ficam em «Médicos V3 (Curitiba)», mais abaixo. Quem atua também nas outras unidades continua nesta lista.</p>` : ''}
     <div class="acoes"><button id="prAdd" class="sec">+ Prestador manual</button><button id="prCtrl" class="sec">Importar regras da planilha de controle (.xlsx)</button><input type="file" id="prCtrlArq" accept=".xlsx" hidden></div>
     <p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
     ${S.apolo ? `<details id="semVinc" style="margin-top:12px"${BS.semVincAberto ? ' open' : ''}><summary>Médicos do Apolo sem vínculo com código de prestador (${semVinculo.length} de ${medApolo.length})</summary><p class="small muted">Nenhum vínculo é criado automaticamente. Use «+ Cadastrar» para incluir o médico ou residente com o código do MV, ou para ligar o nome a um prestador já cadastrado.</p>
@@ -158,7 +159,7 @@ async function cadastrarMedicoApolo(nome, laudos) {
       <label class="small"><input type="radio" name="modo" value="alias"${par.length ? ' checked' : ''}> Ligar a um prestador já cadastrado (mesmo médico, nome diferente no MV)</label></div>
     <div data-modo="novo"${par.length ? ' hidden' : ''}><div class="grid2">
       <label class="campo">Código do prestador no MV *<input type="text" name="cod" inputmode="numeric"></label>
-      <label class="campo">Tipo<select name="tipo">${opcoes([['medico', 'Médico'], ['residente', 'Residente']], 'medico')}</select></label></div>
+      <label class="campo">Tipo<select name="tipo">${opcoes([['medico', 'Médico'], ['residente', 'Residente'], ['v3', 'Médico V3 (Curitiba)']], 'medico')}</select></label></div>
       <label class="campo">Nome como no MV<input type="text" name="nomeMV" value="${esc(nome.toUpperCase())}"><span class="small muted">Se for diferente do Apolo, o nome do Apolo fica como alias validado.</span></label></div>
     <div data-modo="alias"${par.length ? '' : ' hidden'}>
       ${campoBusca({ nome: 'prestador', rotulo: 'Prestador do cadastro', fonte: 'prestador', valor: par[0]?.nomeMV || '', cod: par[0]?.cod || '', preencheCod: 'codAlias' })}<input type="hidden" name="codAlias" value="${esc(par[0]?.cod || '')}">
@@ -173,11 +174,13 @@ async function cadastrarMedicoApolo(nome, laudos) {
     const cod = c.cod.trim(), nomeMV = (c.nomeMV || nome).trim();
     if (!cod) return avisar('Informe o código do prestador no MV.', 'warn');
     if (S.cfg.prestadores.some(p => String(p.cod) === cod)) return avisar(`Já existe prestador com o código ${cod}. Use «Ligar a um prestador já cadastrado».`, 'warn');
-    const p = { cod, nomeMV, aliases: [], naoRealizaRepasse: false, origem: `médico do Apolo (${op})`, em: agoraISO(), regras: { ...regrasPrestadorVazias(), tipo: c.tipo } };
+    const v3 = c.tipo === 'v3';
+    const p = { cod, nomeMV, aliases: [], naoRealizaRepasse: false, origem: `médico do Apolo (${op})`, em: agoraISO(), regras: { ...regrasPrestadorVazias(), tipo: v3 ? 'medico' : c.tipo, v3 } };
     if (norm(nomeMV) !== norm(nome)) p.aliases.push({ nome, status: 'validado', responsavel: op, em: agoraISO(), motivo: 'nome do Apolo no cadastro do prestador', origem: 'cadastro pelo Apolo', competencia: S.comp });
     S.cfg.prestadores.push(p);
-    salvarCfg(`${c.tipo === 'residente' ? 'Residente' : 'Médico'} ${cod} - ${nomeMV} cadastrado a partir do Apolo.`, 'prestadores');
-    avisar(`${cod} - ${nomeMV} cadastrado. As regras de repasse ficam em «Regras…».`, 'ok');
+    salvarCfg(`${c.tipo === 'residente' ? 'Residente' : v3 ? 'Médico V3' : 'Médico'} ${cod} - ${nomeMV} cadastrado a partir do Apolo.`, 'prestadores');
+    avisar(`${cod} - ${nomeMV} cadastrado${v3 ? ' na V3. Cadastre agora a regra dele' : '. As regras de repasse ficam em «Regras…»'}.`, 'ok');
+    if (v3) { BS.semVincAberto = true; await editarRegraV3(p); }
   } else {
     const p = S.cfg.prestadores.find(x => String(x.cod) === String(c.codAlias || c.prestadorCod || '').trim());
     if (!p) return avisar('Escolha o prestador do cadastro na lista.', 'warn');
