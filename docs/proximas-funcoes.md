@@ -354,3 +354,16 @@ Pedido e prévia aprovada em 01/11/2026.
   No celular, um embaixo do outro.
 - **O resto da página não muda:** passos «Preparar o repasse», lista de relatórios do MV, atalhos para Conferência e Correção, painel da competência.
 - **A decidir na execução:** o passo 3 da lista «Preparar o repasse» (equivalências validadas) continua como indicador, com link para a aba Equivalências.
+
+## SOL-F27 — Fechamento: tabela «quebrando» ao rolar (nomes por cima do cabeçalho) — A FAZER HOJE
+- **Sintoma** (print de 03/11, aba Repasse IMG): ao rolar a tabela para baixo, os nomes das primeiras linhas (Amanda, Gustavo) aparecem **por cima do cabeçalho**, cobrindo «Prestador».
+- **Causa:** a tabela tem duas fixações:
+  - o cabeçalho fica parado ao rolar para baixo (`th` com `position:sticky; top:0; z-index:1`);
+  - a coluna do prestador fica parada ao rolar para o lado (`.fh-nome` com `position:sticky; left:0; z-index:1`).
+
+  Com o mesmo nível de camada, a célula do nome, que vem depois no HTML, é desenhada por cima do cabeçalho.
+- **Ajuste:**
+  - cabeçalho da tabela do Fechamento acima das células (`z-index:2`);
+  - cabeçalho da coluna do prestador acima de tudo (`z-index:3`), para ficar parado nos dois sentidos;
+  - a linha da faixa (USG), que também fica parada à esquerda, com fundo próprio.
+- **Revisar junto:** as tabelas de USG, IMG, V3 e Produção, no computador e no celular, com rolagem para baixo e para o lado.
