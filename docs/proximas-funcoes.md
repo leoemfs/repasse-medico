@@ -580,3 +580,8 @@ Prévia aprovada em 03/11/2026. Resposta do usuário: «doppler conta no volume�
 - **Alertas** no cartão «Descontos parcelados do mês»: última parcela; prestador sem valores (a parcela não é descontada; botão «Levar para o próximo mês», que empurra as seguintes um mês, com «desfazer»); desconto maior que o repasse.
 - **Exportação:** a observação sai nas OBSERVAÇÕES («DESCONTO … R$ … ADIANTAMENTO · PARCELA 7/10»).
 - **Pendente de confirmação** (assumido como na prévia): densitometria somada depois do percentual, fora do imposto; «USG bruto» com todos os convênios; parcela sem valores só passa para o mês seguinte quando o usuário clica em «Levar para o próximo mês».
+
+## Ajustes de 03/11/2026 (pedido com prints)
+- **Avisos recolhíveis no Fechamento** (USG, IMG e Curitiba): botão «⚠ N avisos»; clicar no botão ou na linha abre a lista embaixo, como o detalhe da Conferência, e clicar de novo recolhe.
+- **«Exportar competência»** sem «(3 abas)».
+- **NF complementar na exportação: um bloco por categoria** (e por unidade/CNPJ), com QUANTIDADE e VALOR UNITÁRIO quando houver e total com fórmula. Substitui o bloco com uma coluna por categoria da F28.

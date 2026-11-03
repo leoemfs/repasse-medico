@@ -1,5 +1,5 @@
 // Teste da aba Fechamento: valores da última rodada com aceite, situação, ajustes do mês,
-// avisos de regra, «Copiar prévia», exportação em 3 abas + indicadores e evidência no Fluxo.
+// avisos de regra (recolhíveis), «Copiar prévia», exportação em 4 abas (NF complementar por categoria) + indicadores e evidência no Fluxo.
 import { createRequire } from 'module';
 import { execFileSync } from 'child_process';
 import fs from 'fs';
@@ -20,6 +20,9 @@ const S = expr => p.evaluate(expr);
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(200); };
 const abrirFech = async (sub = 'usg') => { await p.goto(html + '#fechamento'); await p.waitForSelector('[data-fsub]'); await p.click(`[data-fsub="${sub}"]`); await p.waitForTimeout(250); };
 const linhaPrest = cod => p.locator(`#fhCorpo tr:has(td:text-is("${cod}"))`).first();
+// Linha do prestador + linha de detalhe dos avisos (recolhida por padrão).
+const detPrest = cod => p.locator(`#fhCorpo tr.fh-det[data-det$="|${cod}"]`).first();
+const comAvisos = async cod => (await linhaPrest(cod).textContent()) + ' ' + ((await detPrest(cod).count()) ? await detPrest(cod).textContent() : '');
 
 // Regras do cadastro (planilha de controle) e fluxo da competência iniciado.
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="prestadores"]');
@@ -44,15 +47,26 @@ await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.wai
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
 await p.goto(html + '#conferencia'); await p.waitForSelector('#cfRodar'); await p.selectOption('#cfUn', '1'); await p.click('#cfRodar'); await p.waitForSelector('#cfTab table');
 await abrirFech();
-const l15 = await linhaPrest('15').textContent();
+const l15 = await comAvisos('15');
 ok(/Verificar/.test(l15) && /4\.926,59/.test(l15) && /sem aceite na\(s\) unidade\(s\) 1/.test(l15), 'rodada sem aceite: valor 4.926,59 (igual ao PDF) como prévia e situação «Verificar»');
+
+// Avisos recolhidos: botão com a contagem; clicar abre o detalhe e clicar de novo fecha.
+const btAv = linhaPrest('15').locator('[data-avisos]');
+ok(/⚠ \d+ avisos?/.test(await btAv.textContent()) && await detPrest('15').isHidden(), `avisos recolhidos por padrão (${(await btAv.textContent()).trim()})`);
+await btAv.click(); await p.waitForTimeout(150);
+ok(await detPrest('15').isVisible() && /sem aceite na\(s\) unidade\(s\) 1/.test(await detPrest('15').textContent()), 'clicar abre a lista de avisos embaixo da linha');
+await p.screenshot({ path: out + 'fechamento_avisos.png' });
+await btAv.click(); await p.waitForTimeout(150);
+ok(await detPrest('15').isHidden(), 'clicar de novo recolhe');
+await linhaPrest('15').locator('td.fh-nome').click(); await p.waitForTimeout(150);
+ok(await detPrest('15').isVisible(), 'clicar na linha também abre'); await linhaPrest('15').locator('td.fh-nome').click();
 
 // 3) Aceite → «Conferido · a enviar»; exportação final.
 await p.goto(html + '#rodadas'); await p.waitForSelector('[data-ac]'); await p.click('[data-ac]'); await p.waitForSelector('#dlg[open]');
 await p.fill('#dlgCorpo input[name=obs]', 'pendências por equivalência ainda não validada'); await okDlg();
 await abrirFech();
 ok(/Conferido/.test(await linhaPrest('15').textContent()) && await p.isVisible('text=versão final'), 'com aceite: «Conferido · a enviar» e exportação final');
-ok(!/linha\(s\) fora de/.test(await linhaPrest('15').textContent()), 'percentual de USG do relatório bate com a faixa geral (44% na unidade 1)');
+ok(!/linha\(s\) fora de/.test(await comAvisos('15')), 'percentual de USG do relatório bate com a faixa geral (44% na unidade 1)');
 
 // 4) Ajustes do mês: plantão e desconto com observação.
 await linhaPrest('15').locator('[data-aj$="|plantao"]').fill('725'); await linhaPrest('15').locator('[data-aj$="|plantao"]').dispatchEvent('change'); await p.waitForTimeout(250);
@@ -88,6 +102,13 @@ await p.click('[data-nf-nova="img"]'); await p.waitForSelector('#dlg[open]');
 await p.fill('#dlgCorpo [name="cod"]', '5'); await p.fill('#dlgCorpo [name="categoria"]', 'Reajuste nova'); await p.fill('#dlgCorpo [name="valor"]', '300');
 await p.click('#dlgBotoes button[value=ok]'); await p.waitForTimeout(300);
 ok(/unidade\/CNPJ/.test(await p.textContent('#aviso')) && await S(() => window.__RM.S.compReg.itens['2026-10'].fechamento.nfs.length) === 1, 'CNPJ de emissão obrigatório');
+// Segunda categoria (Laudos PET-CT) para conferir a exportação por categoria.
+await p.click('#dlgBotoes button[value=""]').catch(() => {}); await p.waitForTimeout(150);
+await p.click('[data-nf-nova="img"]'); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="cod"]', '5'); await p.fill('#dlgCorpo [name="prestador"]', 'GUSTAVO ANDRADE DE MARGALHO'); await p.fill('#dlgCorpo [name="categoria"]', 'Laudos PET-CT');
+await p.selectOption('#dlgCorpo [name="unidade"]', '17'); await p.fill('#dlgCorpo [name="valor"]', '1500');
+await p.click('#dlgBotoes button[value=ok]'); await p.waitForTimeout(300);
+ok(await S(() => window.__RM.S.compReg.itens['2026-10'].fechamento.nfs.length) === 2, 'NF de Laudos PET-CT incluída');
 // Curitiba (V3): sub-aba própria com os médicos V3 e NF complementar.
 await abrirFech('curitiba');
 ok(/Gilson/i.test(await p.textContent('#fhCorpo')) && !!(await p.$('[data-nf-nova="curitiba"]')), 'sub-aba Curitiba (V3) com os médicos V3 e NF complementar');
@@ -112,6 +133,14 @@ print(json.dumps({'abas':wb.sheetnames,'linha':[v for v in linha if v is not Non
 ok(JSON.stringify(x.abas) === JSON.stringify(['REPASSE USG 15-10-2026', 'REPASSE IMG 30-10-2026', 'REPASSE CURITIBA 30-10-2026', 'PRODUÇÃO USG CLASSE 10-2026']), `abas: ${x.abas.join(', ')}`);
 ok(x.mesc.includes('A1:M1') && x.mesc.includes('A3:M3') && x.mesc.includes('A4:B4') && x.mesc.includes('K4:K6') && x.mesc.includes('I5:I6') && x.fmt.includes('R$') && x.zoom === 85, `layout do modelo: mesclagens, formato contábil R$ e zoom 85% (${x.mesc.slice(0, 6).join(' ')})`);
 ok(x.linha.includes(4926.59) && x.linha.includes(725) && x.form.length === 2 && x.leg, `linha do prestador 15 com valor, plantão e fórmulas de total (${JSON.stringify(x.linha.slice(0, 6))})`);
+const nfx = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
+wb=openpyxl.load_workbook(sys.argv[1]); w=wb.worksheets[1]
+rows=[[c.value for c in r] for r in w.iter_rows()]
+tit=[v for r in rows for v in r if isinstance(v,str) and v.startswith('NF COMPLEMENTAR')]
+hen=[[v for v in r if v not in (None,'')] for r in rows if 10175 in r]
+print(json.dumps({'tit':tit,'hen':hen}))`, arq]).toString());
+ok(nfx.tit.length === 2 && nfx.tit.some(t => /^NF COMPLEMENTAR — CURSO CETRUS — 17- /.test(t)) && nfx.tit.some(t => /^NF COMPLEMENTAR — LAUDOS PET-CT — 17- /.test(t)), `NF complementar exportada em um bloco por categoria (${nfx.tit.join(' | ')})`);
+ok(nfx.hen.at(-1)?.[0] === 10175 && nfx.hen.at(-1)?.[2] === 4 && nfx.hen.at(-1)?.[3] === 1000 && /^=E\d+\*F\d+$/.test(nfx.hen.at(-1)?.[4]), `Curso Cetrus: quantidade 4 × R$ 1.000 com fórmula (${JSON.stringify(nfx.hen.at(-1))})`);
 const [dl2] = await Promise.all([p.waitForEvent('download'), p.click('#fhInd')]);
 ok(/^Indicadores_fechamento_10-2026/.test(dl2.suggestedFilename()), 'indicadores exportados à parte');
 // Evidência no Fluxo (não conclui a etapa).
@@ -121,7 +150,7 @@ ok(ev === '1,ni', `evidência registrada na etapa de envio de USG sem concluí-l
 // 9) Variação × competência anterior: rodada de 09/2026 com metade do valor.
 await S(() => { const r = window.__RM.S.rodadas.at(-1), c = JSON.parse(JSON.stringify(r)); c.id = 'rodant'; c.chaveCompetencia = '2026-09'; c.em = '2026-09-20T10:00:00Z'; c.linhas.forEach(l => { l.vlRepasse = l.vlRepasse / 2; }); window.__RM.S.rodadas.push(c); return new Promise(res => { const rq = indexedDB.open('repasse-medico-v2', 1); rq.onsuccess = () => { const tx = rq.result.transaction('rodadas', 'readwrite'); tx.objectStore('rodadas').put(c); tx.oncomplete = () => res(); }; }); });
 await abrirFech();
-ok(/variação de \+/.test(await linhaPrest('15').textContent()), 'aviso de variação acima de 30% contra a competência anterior');
+ok(/variação de \+/.test(await comAvisos('15')), 'aviso de variação acima de 30% contra a competência anterior');
 // 10) Situação com ação manual (F32).
 const menu = async () => { await linhaPrest('15').locator('[data-sit]').click(); await p.waitForSelector('#menuSit'); };
 await menu();

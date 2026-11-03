@@ -34,7 +34,7 @@ RENDER.fechamento = async () => {
   const lista = FH.sub === 'img' ? f.img : FH.sub === 'curitiba' ? f.curitiba : f.usg;
   const cont = k => lista.filter(x => x.situacao === k).length;
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
-    <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button id="fhExp">Exportar competência (3 abas)</button></div></div>
+    <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button id="fhExp">Exportar competência</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
@@ -50,7 +50,11 @@ RENDER.fechamento = async () => {
 const celValor = v => v === undefined ? '' : fmtBR(v);
 const inputAjuste = (tipo, x, campo, largura = 80) => `<input type="${campo === 'obs' ? 'text' : 'number'}" step="0.01" data-aj="${tipo}|${x.cod}|${campo}" value="${esc(campo === 'obs' ? x.obs : (x[campo] || ''))}" style="width:${largura}px" aria-label="${campo}">`
   + (campo === 'descontos' && x.temValores && (x.parcelas || []).length ? ` <span class="badge ${x.descontosManual ? 'warn' : 'info'}" title="${esc(x.parcelas.map(p => p.obs).join('; '))}${x.descontosManual ? ` · automático seria R$ ${fmtBR(x.descontosAuto)}; apague o valor para voltar` : ''}">${x.descontosManual ? 'manual' : 'auto'}</span>` : '');
-const avisosHtml = x => x.avisos.length ? `<span class="fh-aviso" title="${esc(x.avisos.join('\n'))}">${esc(x.avisos.join(' · '))}</span>` : '';
+// Avisos recolhidos (como na Conferência): o botão mostra quantos; clicar abre a linha de detalhe e clicar de novo fecha.
+FH.abertos = FH.abertos || new Set();
+const chaveAviso = x => `${x.tipo}|${x.cod}`;
+const avisosHtml = x => x.avisos.length ? `<button type="button" class="fh-avisos-bt${FH.abertos.has(chaveAviso(x)) ? ' aberto' : ''}" data-avisos="${esc(chaveAviso(x))}" aria-expanded="${FH.abertos.has(chaveAviso(x))}" title="Mostrar ou esconder os avisos">⚠ ${x.avisos.length} aviso${x.avisos.length > 1 ? 's' : ''} <span class="seta">▸</span></button>` : '';
+const detAvisos = x => x.avisos.length ? `<tr class="detalhe fh-det" data-det="${esc(chaveAviso(x))}"${FH.abertos.has(chaveAviso(x)) ? '' : ' hidden'}><td colspan="40"><div class="fh-det-corpo"><b>Avisos de ${esc(x.nome)}</b><ul>${x.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div></td></tr>` : '';
 
 function desenharUSG(corpo, f, mk) {
   const un = S.cfg.unidades.filter(u => u.pctUSG);
@@ -62,7 +66,7 @@ function desenharUSG(corpo, f, mk) {
       return `<tr class="fh-faixa"><td colspan="3">${esc(fa?.nome || 'Sem faixa cadastrada (Bases → Prestadores e regras)')}</td>${un.map(u => { const p = fa ? pctUSGEsperado(S.cfg, { regras: { faixaUSG: fx, pctUSGUnidade: {} } }, u.cod) : null; return `<td class="n fh-pct">${p === null ? '' : r2(p * 100) + '%'}</td>`; }).join('')}<td colspan="8"></td></tr>` +
         l.map(x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'usg')}</td>${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}
           <td class="n">${x.board ? fmtBR(x.board) : ''}</td><td class="n">${inputAjuste('usg', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('usg', x, 'descontos')}</td><td>${inputAjuste('usg', x, 'obs', 160)}</td>
-          <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="usg|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`).join(''); }).join('')}
+          <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="usg|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>${detAvisos(x)}`).join(''); }).join('')}
     <tr class="fh-total"><td></td><td>TOTAL USG</td><td></td>${un.map(u => `<td class="n">${fmtBR(f.usg.reduce((s, x) => s + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.board, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.plantao, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.total, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(f.usg.reduce((s, x) => s + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr>
     </tbody></table></div>${f.usg.length ? '' : '<p class="muted">Nenhum prestador de USG: cadastre as faixas em Bases → Prestadores e regras (ou importe a planilha de controle) e rode as conferências dos relatórios de USG.</p>'}
     ${cartaoDescontosFech(f, 'usg')}${cartaoNF(f, 'usg')}
@@ -77,9 +81,9 @@ function desenharIMG(corpo, f, mk, modo) {
   const un = S.cfg.unidades.filter(u => u.cnpj && (v3 ? (u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)) : (u.pctUSG || u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)))).sort((a, b) => +a.cod - +b.cod);
   const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, modo)}</td>
     ${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}<td class="n">${inputAjuste(x.tipo, x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste(x.tipo, x, 'descontos')}</td><td>${inputAjuste(x.tipo, x, 'obs', 160)}</td>
-    <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="${modo}|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>`;
+    <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="${modo}|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>${detAvisos(x)}`;
   const cab = `<thead><tr><th class="n">Produção USG</th><th>Classe</th><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th>${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>`;
-  corpo.innerHTML = `${v3 ? '<p class="small muted">Só os médicos da V3 (Curitiba). As regras próprias da V3 — faixas por volume, impostos e HM Unimed de USG e Doppler — entram com a SOL-F30; por enquanto os valores vêm dos relatórios do MV.</p>' : ''}
+  corpo.innerHTML = `
     <div class="tw fh-tab"><table>${cab}<tbody><tr class="fh-cnpj"><td colspan="5">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="6"></td></tr>${lista.map(linha).join('')}</tbody></table></div>
     ${lista.length ? '' : `<p class="muted">${v3 ? 'Nenhum médico da V3: marque «Médico V3» nas regras do prestador (Bases → Prestadores e regras).' : 'Nenhum prestador de IMG: marque «Recebe repasse de IMG» em Bases → Prestadores e regras (ou importe a planilha de controle).'}</p>`}
     ${cartaoDescontosFech(f, modo)}${cartaoNF(f, modo)}
@@ -102,7 +106,7 @@ function desenharCuritiba(corpo, f, mk) {
     ${un.map(u => `<td class="n">${ehUnidadeV3(S.cfg, u.cod) && x.v3 ? `<b>${celValor(x.unidades[u.cod])}</b>` : celValor(x.unidades[u.cod])}</td>`).join('')}
     <td class="n">${inputAjuste('curitiba', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('curitiba', x, 'descontos')}</td><td>${inputAjuste('curitiba', x, 'obs', 160)}</td>
     <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td>
-    <td style="white-space:nowrap">${x.v3 ? `<button class="sec mini" data-memoria="${esc(x.cod)}">Memória de cálculo</button> ` : ''}${x.temValores ? `<button class="sec mini" data-copiar="curitiba|${esc(x.cod)}">${x.v3 ? 'Copiar e-mail' : 'Copiar prévia'}</button>` : ''}</td></tr>`;
+    <td style="white-space:nowrap">${x.v3 ? `<button class="sec mini" data-memoria="${esc(x.cod)}">Memória de cálculo</button> ` : ''}${x.temValores ? `<button class="sec mini" data-copiar="curitiba|${esc(x.cod)}">${x.v3 ? 'Copiar e-mail' : 'Copiar prévia'}</button>` : ''}</td></tr>${detAvisos(x)}`;
   corpo.innerHTML = `<p class="small muted">Só os médicos da V3 (Curitiba). A unidade ${un.filter(u => ehUnidadeV3(S.cfg, u.cod)).map(u => esc(u.cod)).join(', ') || '5'} é calculada pela regra de cada médico (Bases → Prestadores → Médicos V3): Doppler conta como USG, HM só de USG/Doppler Unimed. Sem regra, vale o valor do relatório do MV. Classe A/B/C/D não se aplica.</p>
     <div class="tw fh-tab"><table><thead><tr><th>Cód.</th><th class="fh-nome">Médico V3</th><th>Situação</th><th class="n">Exames USG</th><th class="n">USG (bruto)</th><th class="n">HM Unimed</th><th class="n">Outros</th><th class="n">Líquido</th><th class="n">%</th>
       ${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}${ehUnidadeV3(S.cfg, u.cod) ? ' · total da NF' : ''}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>
@@ -223,6 +227,18 @@ function ligarFech(corpo, f, mk) {
   corpo.querySelectorAll('[data-copiar]').forEach(b => b.onclick = () => {
     const [modo, cod] = b.dataset.copiar.split('|'), x = listaFech(f, modo).find(y => y.cod === cod);
     copiarTexto(textoPreviaPrestador(x, S.cfg, S.comp, modo === 'usg' ? mk.pagUSG : modo === 'curitiba' ? mk.pagCuritiba : mk.pagIMG, f.nfs.filter(n => n.tipo === modo)), `Prévia de ${x.nome}`);
+  });
+  // Avisos: abrir e fechar sem redesenhar a tabela (clique no botão ou na linha).
+  const alternar = k => {
+    const det = corpo.querySelector(`tr.fh-det[data-det="${CSS.escape(k)}"]`), bt = corpo.querySelector(`[data-avisos="${CSS.escape(k)}"]`); if (!det) return;
+    det.hidden = !det.hidden; FH.abertos[det.hidden ? 'delete' : 'add'](k);
+    if (bt) { bt.classList.toggle('aberto', !det.hidden); bt.setAttribute('aria-expanded', String(!det.hidden)); }
+  };
+  corpo.querySelectorAll('tr.fh-det').forEach(tr => { tr.cells[0].colSpan = tr.closest('table').tHead.rows[0].cells.length; });
+  corpo.querySelectorAll('[data-avisos]').forEach(b => {
+    b.onclick = e => { e.stopPropagation(); alternar(b.dataset.avisos); };
+    const tr = b.closest('tr'); tr.classList.add('clicavel');
+    tr.onclick = e => { if (!e.target.closest('input,button,select,a,textarea')) alternar(b.dataset.avisos); };
   });
   corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
   ligarDescontos(corpo, () => RENDER.fechamento());

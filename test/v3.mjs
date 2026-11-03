@@ -87,7 +87,7 @@ await p.goto(html + '#fechamento'); await p.waitForSelector('[data-fsub]'); awai
 const linha = p.locator(`#fhCorpo tr:has(td:text-is("${codV3}"))`).first();
 const txt = await linha.textContent();
 ok(/1\.539/.test(txt) && /93\.838,16/.test(txt) && /21\.907,88/.test(txt) && /105\.155,28/.test(txt) && /70%/.test(txt) && /73\.608,69/.test(txt), 'linha do médico: exames, bruto, HM, líquido, 70% e total da NF 73.608,69');
-ok(/2 HM a excluir/.test(txt), 'aviso dos HM a excluir');
+ok(/2 HM a excluir/.test(await p.locator(`#fhCorpo tr.fh-det[data-det="curitiba|${codV3}"]`).textContent()), 'aviso dos HM a excluir (na linha de avisos)');
 ok(/Sem valores/.test(await p.locator('#fhCorpo tr:has(td:text-is("9"))').first().textContent()), 'médico V3 sem relatório: «Sem valores»');
 await p.screenshot({ path: out + 'v3_fechamento.png' });
 await linha.locator('[data-memoria]').click(); await p.waitForSelector('#dlg[open]');

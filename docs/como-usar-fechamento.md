@@ -59,6 +59,10 @@ A classe de quem não tem classe fixa depende da produção de USG: rode e aceit
 
 O Doppler sempre conta como USG: entra no volume de exames e no faturamento de USG.
 
+### Avisos e exportação
+- A coluna **Avisos** mostra só um botão («⚠ 3 avisos»). Clique nele ou na linha para abrir a lista embaixo do prestador; clique de novo para recolher.
+- O botão agora se chama **Exportar competência**. Na planilha, cada categoria de NF complementar (Curso Cetrus, Laudos PET-CT…) sai num bloco próprio, por unidade/CNPJ de emissão. Quando há quantidade, o bloco traz QUANTIDADE × VALOR UNITÁRIO com fórmula.
+
 ### Descontos parcelados
 1. Em **Bases → Prestadores e regras → Descontos parcelados**, clique em **+ Desconto**. Informe prestador, motivo, valor da parcela, número de parcelas (vazio para recorrente, como pensão), a competência da primeira parcela e em qual fechamento entra.
 2. No Fechamento, a parcela do mês já aparece em DESCONTOS com o selo «auto» e a observação «parcela 7/10».

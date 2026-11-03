@@ -84,7 +84,7 @@ ok(await S(() => window.__RM.t.parcelaDoMes(window.__RM.S.cfg.descontos.find(x =
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="prestadores"]');
 await novo({ busca: 'marcelo miyazaki', motivo: 'Adiantamento', valor: 4000, parcelas: 2, inicio: '2026-10', tipo: 'usg' });
 await abrir('usg');
-ok(/maior que o repasse do mês/.test(await p.textContent('.desc-cartao')) && /maior que o repasse/.test(await linha15().textContent()), 'alerta de desconto maior que o repasse (5.700 > 5.000)');
+ok(/maior que o repasse do mês/.test(await p.textContent('.desc-cartao')) && /maior que o repasse/.test(await p.locator('#fhCorpo tr.fh-det[data-det="usg|15"]').textContent()), 'alerta de desconto maior que o repasse (5.700 > 5.000)');
 // Exportação: observação do desconto na planilha.
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#fhExp')]);
 const arq = out + 'descontos_fechamento.xlsx'; await dl.saveAs(arq);

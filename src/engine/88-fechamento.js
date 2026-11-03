@@ -262,23 +262,30 @@ function xlsxFechamento(f, cfg, meta = {}) {
   const sit = (x, base) => { const s = SITUACAO_FECH[x.situacao]; return x.situacao === 'sem' && !meta.corSemValores ? { ...base, fc: '000000' } : { ...base, fill: s.cor, fc: s.fc }; };
   const unNome = u => `${u.cod}- ${u.nome}`;
   const topo = (titulo, ultima, M) => { M.push(`A1:${col(ultima)}1`); return [[{ v: f.previa ? `PRÉVIA — ${f.semAceite} prestador(es) sem aceite. Valores sujeitos a alteração.` : titulo, st: f.previa ? E.aviso : { ...E.aviso, fc: '1F4E78' } }], []]; };
-  // NF complementar: um bloco por unidade/CNPJ de emissão, uma coluna por categoria (como no modelo).
+  // NF complementar: um bloco por categoria (e por unidade/CNPJ de emissão). Com quantidade, mostra
+  // QUANTIDADE × VALOR UNITÁRIO; o total de cada médico é o valor da NF daquela categoria.
   const blocosNF = (L, M, A, lista, c0) => {
-    const porUnidade = new Map();
-    for (const n of lista) (porUnidade.get(n.unidade) || porUnidade.set(n.unidade, []).get(n.unidade)).push(n);
-    for (const [uc, nfs] of porUnidade) {
-      const u = unidadePorCod(cfg, uc), cats = [...new Set(nfs.map(n => n.categoria))], pad = Array(c0).fill(''), ult = c0 + 2 + cats.length;
+    const grupos = new Map();
+    for (const n of lista) { const k = `${norm(n.categoria)}|${n.unidade}`; (grupos.get(k) || grupos.set(k, []).get(k)).push(n); }
+    for (const nfs of grupos.values()) {
+      const u = unidadePorCod(cfg, nfs[0].unidade), cat = nfs[0].categoria, comQtd = nfs.some(n => +n.quantidade > 0 && +n.valorUnitario > 0);
+      const pad = Array(c0).fill(''), ult = c0 + 2 + (comQtd ? 2 : 0);
       L.push([]); let r = L.length + 1;
-      L.push([...pad, { v: `NF COMPLEMENTAR ${u ? `${u.cod}- ${u.nome} ${u.cnpj || ''}` : ''}`.trim(), st: E.titulo }, ...Array(ult - c0).fill({ v: '', st: E.titulo })]); M.push(`${col(c0)}${r}:${col(ult)}${r}`);
+      L.push([...pad, { v: `NF COMPLEMENTAR — ${String(cat).toUpperCase()} — ${u ? `${u.cod}- ${u.nome} ${u.cnpj || ''}` : ''}`.trim(), st: E.titulo }, ...Array(ult - c0).fill({ v: '', st: E.titulo })]); M.push(`${col(c0)}${r}:${col(ult)}${r}`);
       r = L.length + 1;
-      L.push([...pad, { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, ...cats.map(c => ({ v: c.toUpperCase(), st: E.cab })), { v: 'TOTAL PARA EMISSÃO DE NF COMPLEMENTAR', st: E.cab }], [...pad, ...Array(ult - c0 + 1).fill({ v: '', st: E.cab })]);
-      M.push(`${col(c0)}${r}:${col(c0 + 1)}${r + 1}`, ...[...cats.map((_, k) => c0 + 2 + k), ult].map(c => `${col(c)}${r}:${col(c)}${r + 1}`)); A[r] = 26.25; A[r + 1] = 26.25;
+      L.push([...pad, { v: 'MÉDICOS', st: E.cab }, { v: '', st: E.cab }, ...(comQtd ? [{ v: 'QUANTIDADE', st: E.cab }, { v: 'VALOR UNITÁRIO', st: E.cab }] : []), { v: `TOTAL PARA EMISSÃO DE NF — ${String(cat).toUpperCase()}`, st: E.cab }]);
+      M.push(`${col(c0)}${r}:${col(c0 + 1)}${r}`); A[r] = 30;
+      // Um médico por linha (lançamentos do mesmo médico na mesma categoria somam).
       const porPrest = new Map();
-      for (const n of nfs) { const k = n.cod || norm(n.nome), e = porPrest.get(k) || { cod: n.cod, nome: n.nome, v: {} }; e.v[n.categoria] = r2((e.v[n.categoria] || 0) + valorNF(n)); porPrest.set(k, e); }
+      for (const n of nfs) { const k = n.cod || norm(n.nome), e = porPrest.get(k) || { cod: n.cod, nome: n.nome, qtd: 0, vu: +n.valorUnitario || 0, v: 0, misto: false }; e.qtd += +n.quantidade || 0; if ((+n.valorUnitario || 0) !== e.vu) e.misto = true; e.v = r2(e.v + valorNF(n)); porPrest.set(k, e); }
+      const ini = L.length + 1;
       for (const e of porPrest.values()) {
-        const n = L.length + 1;
-        L.push([...pad, { v: +e.cod || e.cod, st: E.centro }, { v: e.nome, st: E.texto }, ...cats.map(c => ({ v: e.v[c] ?? '', st: E.valor })), { v: r2(Object.values(e.v).reduce((s2, x) => s2 + x, 0)), f: `SUM(${col(c0 + 2)}${n}:${col(ult - 1)}${n})`, st: E.valorB }]);
+        const n = L.length + 1, formula = comQtd && e.qtd > 0 && !e.misto;
+        L.push([...pad, { v: +e.cod || e.cod, st: E.centro }, { v: e.nome, st: E.texto },
+          ...(comQtd ? [{ v: e.qtd || '', st: E.centro }, { v: e.qtd && !e.misto ? e.vu : '', st: E.valor }] : []),
+          { v: e.v, ...(formula ? { f: `${col(c0 + 2)}${n}*${col(c0 + 3)}${n}` } : {}), st: E.valorB }]);
       }
+      if (porPrest.size > 1) { const n = L.length + 1; L.push([...pad, { v: '', st: E.centroB }, { v: 'TOTAL', st: { ...E.texto, b: true } }, ...(comQtd ? [{ v: '', st: E.centro }, { v: '', st: E.centro }] : []), { v: r2(nfs.reduce((s2, x) => s2 + valorNF(x), 0)), f: `SUM(${col(ult)}${ini}:${col(ult)}${n - 1})`, st: E.valorB }]); }
     }
   };
   const legenda = (L, c) => { L.push([], []); const pad = Array(c).fill(''); L.push([...pad, { v: 'LEGENDA', st: E.rotulo }]); for (const s of Object.values(SITUACAO_FECH)) L.push([...pad, { v: s.nome, st: { ...E.rotulo, fill: s.cor, fc: s.fc } }]); };
