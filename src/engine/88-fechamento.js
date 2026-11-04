@@ -162,7 +162,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
         let div = 0, semRegra = new Map();
         for (const l of r.linhas) {
           if (l.tipoItem && l.tipoItem !== 'procedimento') continue;
-          const v = valorEsperadoIMG(cfg, x.p, x.classe, l);
+          const v = valorEsperadoIMG(cfg, x.p, x.classe, l, unidade);
           if (v.motivo) semRegra.set(v.motivo, (semRegra.get(v.motivo) || 0) + 1);
           else if (Math.abs(v.esperado - l.vlRepasse) > tol.toleranciaValor) div++;
         }

@@ -66,12 +66,16 @@ ok(P['PACIENTE PUNHO UNIMED'].some(x => x === `${ART}:so-faturamento+eq-divergen
 ok(P['PACIENTE PUNHO PART'].every(x => /conferido\+composta$/.test(x)), 'punho com Doppler (particular): título reconhecido pelas palavras; articular + Doppler conferidos');
 ok(P['PACIENTE TIREOIDE UNIMED'].every(x => /conferido\+composta$/.test(x)), 'regra no formato antigo continua valendo (tireoide UNIMED: só o Doppler)');
 
-// 3) Fusão de imagem por percentual do valor faturado.
-const fus = await p.evaluate(() => { const { S: E, t } = window.__RM; const e = E.cfg.classes.equivalentes.find(x => x.nome === 'Fusão de imagem'); e.pct = 30; e.valor = 0;
-  return t.valorEsperadoIMG(E.cfg, null, 'A', { grupo: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', desc: 'FUSAO DE IMAGEM', vlTotal: 500, quant: 1, convenio: 'X' }); });
-ok(fus.esperado === 150 && /30% do valor faturado/.test(fus.explicacao), `fusão de imagem: 30% de R$ 500,00 = ${fus.esperado} (${fus.explicacao})`);
+// 3) Fusão de imagem: percentual da unidade onde foi feita (padrão) ou % fixo do valor faturado.
+const fus = await p.evaluate(() => { const { S: E, t } = window.__RM, e = E.cfg.classes.equivalentes.find(x => x.nome === 'Fusão de imagem'), l = { grupo: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', desc: 'FUSAO DE IMAGEM', vlTotal: 500, quant: 1, convenio: 'X' };
+  const un1 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '1'), un17 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '17'), un5 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '5');
+  e.pctUnidade = false; e.pct = 30; const fixo = t.valorEsperadoIMG(E.cfg, null, 'A', l, '1'); e.pctUnidade = true; e.pct = 0;
+  return { padrao: !!e.pctUnidade && !e.valor, un1, un17, un5, fixo }; });
+ok(fus.padrao && fus.un1.esperado === 220 && fus.un17.esperado === 210 && /44% da unidade 1/.test(fus.un1.explicacao), `fusão de imagem: % da unidade — unidade 1 (44%) R$ ${fus.un1.esperado}, unidade 17 (42%) R$ ${fus.un17.esperado} (${fus.un1.explicacao})`);
+ok(/unidade 5 sem percentual/.test(fus.un5.motivo || ''), `unidade sem percentual cadastrado vira aviso (${fus.un5.motivo})`);
+ok(fus.fixo.esperado === 150 && /30% do valor faturado/.test(fus.fixo.explicacao), `% fixo continua possível: 30% de R$ 500,00 = ${fus.fixo.esperado}`);
 await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="classes"]');
-ok(await p.isVisible('[data-eqv][data-c="pct"]'), 'Bases → Classes: coluna «Ou % do valor faturado» nos procedimentos equivalentes');
+ok(await p.isVisible('[data-eqv][data-c="pct"]') && await p.$eval('tr:has([value="Fusão de imagem"]) [data-c="pctUnidade"]', i => i.checked), 'Bases → Classes: colunas «Ou % do valor faturado» e «Ou % da unidade» (fusão marcada)');
 
 // 4) Lista: as regras aparecem com composição e exceções.
 await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');

@@ -40,11 +40,12 @@ function cardClasses() {
     <p class="lead">A classe sai da produção bruta de USG do prestador (Vl Total dos relatórios de USG, todas as unidades) na produção da competência. Classe fixa no cadastro do prestador vale por cima. A ferramenta usa a tabela só para conferir o valor de cada laudo do relatório do IMG e avisar quando não bate.</p>
     <div class="grid4">${c.cortes.map((x, i) => `<label class="campo">Classe ${esc(x.classe)}: produção acima de (R$)<input type="number" step="0.01" data-corte="${i}" value="${x.acima}"></label>`).join('')}<div class="campo">Classe D<span class="small">até o último corte ou sem produção</span></div></div>
     <div class="grid2" style="margin-top:8px">${tab('convenio', 'Convênios e particulares')}${tab('sus', 'SUS')}</div>
-    <h3 style="margin-top:12px">Procedimentos equivalentes <span class="muted small">paga por nº de exames da tabela, por valor fixo ou por % do valor faturado da linha (vale o primeiro preenchido: % → valor fixo → nº de exames)</span></h3>
-    <div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th>Ou % do valor faturado</th><th></th></tr></thead><tbody>${c.equivalentes.map((e, i) => `<tr>
+    <h3 style="margin-top:12px">Procedimentos equivalentes <span class="muted small">paga por nº de exames da tabela, por valor fixo ou por % do valor faturado da linha (vale o primeiro preenchido: % da unidade → % fixo → valor fixo → nº de exames)</span></h3>
+    <div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th>Ou % do valor faturado</th><th>Ou % da unidade</th><th></th></tr></thead><tbody>${c.equivalentes.map((e, i) => `<tr>
       <td><input type="text" data-eqv="${i}" data-c="nome" value="${esc(e.nome)}"></td><td><input type="text" data-eqv="${i}" data-c="padrao" value="${esc(e.padrao)}"></td>
       <td><select data-eqv="${i}" data-c="exame"><option value="">—</option>${opcoes(Object.entries(EXAMES_IMG), e.exame || '')}</select></td>
       <td><input type="number" step="0.5" data-eqv="${i}" data-c="fator" value="${e.fator || ''}" style="width:70px"></td><td><input type="number" step="0.01" data-eqv="${i}" data-c="valor" value="${e.valor || ''}" style="width:90px"></td><td><input type="number" step="0.01" min="0" max="100" data-eqv="${i}" data-c="pct" value="${e.pct || ''}" style="width:80px" aria-label="Percentual do valor faturado"></td>
+      <td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input type="checkbox" data-eqv="${i}" data-c="pctUnidade"${e.pctUnidade ? ' checked' : ''}> da unidade</label></td>
       <td><button class="perigo mini" data-eqvrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="clsSalvar">Salvar classes e valores</button><button id="clsEqvAdd" class="sec">+ Equivalente</button><button id="clsPad" class="sec">Restaurar tabela 2026</button></div></div>`;
 }
@@ -90,7 +91,7 @@ function ligarRegras(pg) {
   // Classes e valores
   pg.querySelectorAll('[data-corte]').forEach(inp => inp.onchange = () => { S.cfg.classes.cortes[+inp.dataset.corte].acima = +inp.value || 0; });
   pg.querySelectorAll('[data-val]').forEach(inp => inp.onchange = () => { const [k, ex, col] = inp.dataset.val.split('|'); S.cfg.classes.valores[k][ex][col] = inp.value === '' ? null : +inp.value; });
-  pg.querySelectorAll('[data-eqv]').forEach(inp => inp.onchange = () => { const e = S.cfg.classes.equivalentes[+inp.dataset.eqv], c = inp.dataset.c; e[c] = ['fator', 'valor', 'pct'].includes(c) ? (inp.value === '' ? 0 : +inp.value) : inp.value.trim(); });
+  pg.querySelectorAll('[data-eqv]').forEach(inp => inp.onchange = () => { const e = S.cfg.classes.equivalentes[+inp.dataset.eqv], c = inp.dataset.c; e[c] = c === 'pctUnidade' ? inp.checked : ['fator', 'valor', 'pct'].includes(c) ? (inp.value === '' ? 0 : +inp.value) : inp.value.trim(); });
   pg.querySelectorAll('[data-eqvrm]').forEach(b => b.onclick = () => { S.cfg.classes.equivalentes.splice(+b.dataset.eqvrm, 1); RENDER.bases(); });
   $('clsEqvAdd').onclick = () => { S.cfg.classes.equivalentes.push({ nome: 'Novo equivalente', padrao: '', exame: 'TOMO', fator: 1 }); RENDER.bases(); };
   $('clsPad').onclick = async () => { if (await confirmar('Restaurar a tabela de 2026?', 'Cortes, valores e equivalentes voltam ao padrão da planilha de regras de classe.', 'Restaurar')) { S.cfg.classes = classesPadrao(); salvarCfg('Classes e valores do IMG restaurados (2026).', 'regras'); RENDER.bases(); } };

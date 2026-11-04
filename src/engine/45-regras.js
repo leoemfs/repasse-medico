@@ -43,7 +43,7 @@ function classesPadrao() {
       { nome: 'Infiltração tomografia', padrao: 'INFILTRA.*(TOMO|TC)', exame: 'TOMO', fator: 1.5 },
       { nome: 'Infiltração ressonância', padrao: 'INFILTRA.*(R+ESSO|RM)', exame: 'RESSO', fator: 1.5 },
       { nome: 'Perfusão', padrao: 'PERFUSAO', valor: 250 },
-      { nome: 'Fusão de imagem', padrao: 'FUSAO', valor: 250 }
+      { nome: 'Fusão de imagem', padrao: 'FUSAO', pctUnidade: true }
     ]
   };
 }
@@ -67,6 +67,8 @@ function migrarRegras(c) {
   }
   if (!Array.isArray(c.faixasUSG)) { c.faixasUSG = clone(FAIXAS_USG_PADRAO); mudou = true; }
   if (!c.classes) { c.classes = classesPadrao(); mudou = true; }
+  // 04/11/2026: a fusão de imagem passa a valer o percentual da unidade (antes R$ 250,00 fixo). Migra uma vez.
+  if (c.classes && !c.classes.fusaoPctUnidade) { const f = (c.classes.equivalentes || []).find(e => e.padrao === 'FUSAO'); if (f && !f.pct) { f.pctUnidade = true; f.valor = 0; } c.classes.fusaoPctUnidade = true; mudou = true; }
   if (!Array.isArray(c.convenios)) { c.convenios = []; mudou = true; }
   if (!c.fechamento) { c.fechamento = clone(FECHAMENTO_PADRAO); mudou = true; }
   if (!Array.isArray(c.fechamento.categoriasNF)) { c.fechamento.categoriasNF = clone(CATEGORIAS_NF_PADRAO); mudou = true; }
@@ -112,16 +114,22 @@ function registrarConvenios(cfg, lista, origem) {
 const GRUPO_EXAME = [[/RADIOLOG|RAIO/, 'RX'], [/MAMOGRAF/, 'MAMO'], [/DENSITOMETR/, 'DENSITO'], [/TOMOGRAF/, 'TOMO'], [/RESSONANC/, 'RESSO']];
 function exameDaLinha(classes, grupo, desc) {
   const d = norm(desc);
-  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, pct: +e.pct || 0, equivalente: e.nome }; }
+  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, pct: +e.pct || 0, pctUnidade: !!e.pctUnidade, equivalente: e.nome }; }
   const g = norm(grupo);
   const ex = (GRUPO_EXAME.find(([re]) => re.test(g)) || [])[1];
   return ex ? { exame: ex, fator: 1, valorFixo: 0, equivalente: '' } : null;
 }
 // Devolve {esperado, explicacao} ou {motivo} quando não há regra (o aviso diz o que falta).
-function valorEsperadoIMG(cfg, p, classe, linha) {
+function valorEsperadoIMG(cfg, p, classe, linha, unidadeCod) {
   const ex = exameDaLinha(cfg.classes, linha.grupo, linha.desc);
   if (!ex) return { motivo: 'exame sem regra de valor' };
   const q = +linha.quant || 1;
+  // Percentual da unidade onde foi realizado (ex.: fusão de imagem): o mesmo percentual geral de repasse da unidade.
+  if (ex.pctUnidade) {
+    const u = unidadeCod != null ? unidadePorCod(cfg, unidadeCod) : null, pu = +u?.pctUSG?.medico;
+    if (!pu) return { motivo: unidadeCod != null ? `${ex.equivalente}: unidade ${unidadeCod} sem percentual cadastrado em Bases` : `${ex.equivalente}: unidade não informada` };
+    return { esperado: r2((+linha.vlTotal || 0) * pu), explicacao: `${ex.equivalente}: ${fmtPct(pu * 100)}% da unidade ${unidadeCod} sobre o valor faturado (R$ ${fmtBR(linha.vlTotal)})` };
+  }
   // Percentual sobre o valor faturado da linha (ex.: fusão de imagem, a partir de 2026).
   if (ex.pct) return { esperado: r2((+linha.vlTotal || 0) * ex.pct / 100), explicacao: `${ex.equivalente}: ${fmtPct(ex.pct)}% do valor faturado (R$ ${fmtBR(linha.vlTotal)})` };
   if (ex.valorFixo) return { esperado: r2(ex.valorFixo * q), explicacao: `${ex.equivalente}: R$ ${fmtBR(ex.valorFixo)} fixo` };
