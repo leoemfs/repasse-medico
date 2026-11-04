@@ -148,7 +148,7 @@ const ev = await S(() => { const t = window.__RM.S.fluxo.competencias['2026-10']
 ok(ev === '1,ni', `evidência registrada na etapa de envio de USG sem concluí-la (${ev})`);
 
 // 9) Variação × competência anterior: rodada de 09/2026 com metade do valor.
-await S(() => { const r = window.__RM.S.rodadas.at(-1), c = JSON.parse(JSON.stringify(r)); c.id = 'rodant'; c.chaveCompetencia = '2026-09'; c.em = '2026-09-20T10:00:00Z'; c.linhas.forEach(l => { l.vlRepasse = l.vlRepasse / 2; }); window.__RM.S.rodadas.push(c); return new Promise(res => { const rq = indexedDB.open('repasse-medico-v2', 1); rq.onsuccess = () => { const tx = rq.result.transaction('rodadas', 'readwrite'); tx.objectStore('rodadas').put(c); tx.oncomplete = () => res(); }; }); });
+await S(() => { const r = window.__RM.S.rodadas.at(-1), c = JSON.parse(JSON.stringify(r)); c.id = 'rodant'; c.chaveCompetencia = '2026-09'; c.em = '2026-09-20T10:00:00Z'; c.linhas.forEach(l => { l.vlRepasse = l.vlRepasse / 2; }); window.__RM.S.rodadas.push(c); return window.__RM.t.dbGravar(c); });
 await abrirFech();
 ok(/variação de \+/.test(await comAvisos('15')), 'aviso de variação acima de 30% contra a competência anterior');
 // 10) Situação com ação manual (F32).
