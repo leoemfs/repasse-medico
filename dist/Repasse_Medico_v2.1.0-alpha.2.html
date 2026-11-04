@@ -276,6 +276,10 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .sug-fx{display:block;margin-top:3px;font-size:11.5px;color:var(--info)}.sug-fx button{margin-left:4px;padding:1px 8px;font-size:11px}
 .pbi-resumo{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.pbi-resumo .marc{cursor:default}
 .guardada{margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.tag-cp{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:1px;background:var(--bg)}
+.item-cp{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
+.item-cp .alt-cp{width:100%;margin-top:-4px}.sim-cp{background:var(--okbg);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
+@media (max-width:700px){.item-cp{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -1151,7 +1155,7 @@ function registrarConvenios(cfg, lista, origem) {
 const GRUPO_EXAME = [[/RADIOLOG|RAIO/, 'RX'], [/MAMOGRAF/, 'MAMO'], [/DENSITOMETR/, 'DENSITO'], [/TOMOGRAF/, 'TOMO'], [/RESSONANC/, 'RESSO']];
 function exameDaLinha(classes, grupo, desc) {
   const d = norm(desc);
-  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, equivalente: e.nome }; }
+  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, pct: +e.pct || 0, equivalente: e.nome }; }
   const g = norm(grupo);
   const ex = (GRUPO_EXAME.find(([re]) => re.test(g)) || [])[1];
   return ex ? { exame: ex, fator: 1, valorFixo: 0, equivalente: '' } : null;
@@ -1161,6 +1165,8 @@ function valorEsperadoIMG(cfg, p, classe, linha) {
   const ex = exameDaLinha(cfg.classes, linha.grupo, linha.desc);
   if (!ex) return { motivo: 'exame sem regra de valor' };
   const q = +linha.quant || 1;
+  // Percentual sobre o valor faturado da linha (ex.: fusão de imagem, a partir de 2026).
+  if (ex.pct) return { esperado: r2((+linha.vlTotal || 0) * ex.pct / 100), explicacao: `${ex.equivalente}: ${fmtPct(ex.pct)}% do valor faturado (R$ ${fmtBR(linha.vlTotal)})` };
   if (ex.valorFixo) return { esperado: r2(ex.valorFixo * q), explicacao: `${ex.equivalente}: R$ ${fmtBR(ex.valorFixo)} fixo` };
   const tipoConv = tipoConvenio(cfg, linha.convenio);
   if (!tipoConv) return { motivo: 'convênio sem tipo (SUS, Convênio ou Particular)' };
@@ -1545,19 +1551,49 @@ function eqVazia() {
   return { schema: SCHEMA_EQ, versaoSchema: 1, revisao: 0, atualizadoEm: agoraISO(), itens: [], compostas: [], catalogoTitulos: [], catalogoTUSS: [] };
 }
 
-/* ---------- Regras compostas e por convênio (SOL-F5) ----------
- * Um título do laudo pode corresponder a MAIS DE UM código na conta, e isso pode variar por convênio.
- * Ex.: «USG DE OMBRO COM DOPPLER» = articular + doppler; na UNIMED, só o doppler.
- * {id, titulo, codigos:[...], porConvenio:[{convenio:'UNIMED', codigos:[...]}], escopo, status, responsavel,
- *  validadoEm, justificativa, historico}. Só regra VALIDADA vale na conferência. */
+/* ---------- Regras compostas e por convênio (SOL-F5, v2 de 04/11/2026) ----------
+ * Um exame laudado no Apolo pode corresponder a MAIS DE UM procedimento na conta do MV.
+ * Regra: {id, nome, titulos:[...], palavras:{todas:[...], umaDe:[...]}, itens:[{rotulo, codigos:[principal,
+ *   alternativas...], qtd, excecoes:[{convenio:'UNIMED', tipo:'nao-exigido'|'quantidade', qtd}]}], escopo, status,
+ *   responsavel, validadoEm, justificativa, historico}.
+ * - Vários títulos do Apolo, ou títulos por palavras (ex.: contém DOPPLER e um de ARTICULAR, PUNHO, OMBRO…).
+ * - Quantidade por procedimento: o mesmo código lançado 2 vezes (ex.: Doppler das duas mamas).
+ * - Alternativas na mesma posição (qualquer um dos códigos).
+ * - Excludente de convênio: «não exigido» ou outra quantidade naquele convênio (ex.: UNIMED paga só o Doppler).
+ * Só regra VALIDADA vale na conferência. A versão antiga {titulo, codigos, porConvenio} é lida como v2. */
 function novaComposta(campos) {
-  return { id: novoId('cmp'), titulo: '', codigos: [], porConvenio: [], escopo: { unidade: '*', modalidade: '*' }, status: 'pendente', responsavel: '', validadoEm: '', justificativa: '', historico: [], ...campos };
+  return { id: novoId('cmp'), nome: '', titulos: [], palavras: null, itens: [], escopo: { unidade: '*', modalidade: '*' }, status: 'pendente', responsavel: '', validadoEm: '', justificativa: '', historico: [], ...campos };
 }
-// Códigos esperados para o convênio da linha (a primeira variação cujo texto está no nome do convênio).
-function codigosDaComposta(c, convenio = '') {
-  const n = norm(convenio || ''), v = (c.porConvenio || []).find(x => x.convenio && n.includes(norm(x.convenio)));
-  return v ? v.codigos : c.codigos;
+function regraComposta(c) {
+  if (Array.isArray(c.itens) && c.itens.length) return c;
+  const itens = (c.codigos || []).map(cod => ({ rotulo: '', codigos: [cod], qtd: 1, excecoes: [] }));
+  for (const v of c.porConvenio || []) {
+    for (const it of itens) if (!v.codigos.includes(it.codigos[0])) it.excecoes.push({ convenio: v.convenio, tipo: 'nao-exigido', qtd: 0 });
+    for (const cod of v.codigos) if (!itens.some(i => i.codigos.includes(cod))) itens.push({ rotulo: '', codigos: [cod], qtd: 0, excecoes: [{ convenio: v.convenio, tipo: 'quantidade', qtd: 1 }] });
+  }
+  return { ...c, nome: c.nome || c.titulo || '', titulos: c.titulos || (c.titulo ? [c.titulo] : []), palavras: c.palavras || null, itens };
 }
+const nomeComposta = c => { const r = regraComposta(c); return r.nome || r.titulos[0] || 'regra composta'; };
+// Quantidade exigida de um procedimento no convênio da linha (exceção cujo texto está no nome do convênio).
+function qtdNoConvenio(it, convenio = '') {
+  const n = norm(convenio || ''), e = (it.excecoes || []).find(x => x.convenio && n.includes(norm(x.convenio)));
+  return e ? (e.tipo === 'nao-exigido' ? 0 : (+e.qtd || 0)) : (+it.qtd || 0);
+}
+function esperadosDaComposta(c, convenio = '') {
+  return regraComposta(c).itens.map((it, i) => ({ i, codigos: it.codigos, rotulo: it.rotulo || it.codigos[0], qtd: qtdNoConvenio(it, convenio), qtdGeral: +it.qtd || 0 }));
+}
+const textoEsperados = esp => esp.filter(e => e.qtd > 0).map(e => `${e.rotulo}${e.qtd > 1 ? ` ×${e.qtd}` : ''}`).join(' + ');
+// O título do laudo é reconhecido pela regra: pela lista de títulos ou pelas palavras.
+function compostaCasaTitulo(c, titulo) {
+  const r = regraComposta(c), kt = chaveTitulo(titulo);
+  if (r.titulos.some(t => chaveTitulo(t) === kt)) return 2;
+  const p = r.palavras || {}, todas = (p.todas || []).filter(Boolean), umaDe = (p.umaDe || []).filter(Boolean);
+  if (!todas.length && !umaDe.length) return 0;
+  const t = norm(titulo);
+  return todas.every(w => t.includes(norm(w))) && (!umaDe.length || umaDe.some(w => t.includes(norm(w)))) ? 1 : 0;
+}
+// Código usado pela regra (para a conferência apontar quem sustentou e o que sobra).
+const codigosDaRegra = c => [...new Set(regraComposta(c).itens.flatMap(i => i.codigos))];
 function alterarStatusComposta(base, id, novoStatus, responsavel, motivo = '', competencia = '') {
   if (!responsavel) throw new Error('Informe o responsável antes de validar regras compostas.');
   const c = (base.compostas || []).find(x => x.id === id); if (!c || c.status === novoStatus) return 0;
@@ -1634,7 +1670,7 @@ async function importarPlanilhaEquivalencias(bytes, nomeArquivo) {
 function mesclarEquivalencias(base, novos, { catalogoTitulos = [], catalogoTUSS = [], compostas = [] } = {}) {
   // Regras compostas (SOL-F5): entram as de título e escopo ainda não cadastrados.
   base.compostas = base.compostas || [];
-  const kc = c => `${chaveTitulo(c.titulo)}|${c.escopo?.unidade || '*'}`, temC = new Set(base.compostas.map(kc));
+  const kc = c => `${norm(nomeComposta(c))}|${c.escopo?.unidade || '*'}`, temC = new Set(base.compostas.map(kc));
   for (const c of compostas) if (!temC.has(kc(c))) { base.compostas.push({ ...c, historico: c.historico || [] }); temC.add(kc(c)); }
   const k = e => `${e.codigo}|${chaveTitulo(e.titulo)}|${e.escopo?.unidade || '*'}|${e.escopo?.modalidade || '*'}`;
   const existentes = new Map(base.itens.map(e => [k(e), e]));
@@ -1674,18 +1710,15 @@ const escopoCobre = (escopo, unidade, modalidade) =>
 /* Índice de consulta para os motores. Para cada chave de título: relações por código.
  * Conflito = o mesmo título validado para dois ou mais códigos em escopos que se sobrepõem. */
 function indiceEquivalencias(base) {
-  const porTitulo = new Map(), porCodigo = new Map(), compostas = new Map();
-  for (const c of base.compostas || []) {
-    if (c.status !== 'validada') continue;
-    const kt = chaveTitulo(c.titulo); if (kt) (compostas.get(kt) || compostas.set(kt, []).get(kt)).push(c);
-  }
+  const porTitulo = new Map(), porCodigo = new Map();
+  const compostas = (base.compostas || []).filter(c => c.status === 'validada').map(regraComposta), cacheComp = new Map();
   for (const e of base.itens) {
     if (e.status === 'desativada') continue;
     const kt = chaveTitulo(e.titulo); if (!kt) continue;
     (porTitulo.get(kt) || porTitulo.set(kt, []).get(kt)).push(e);
     (porCodigo.get(e.codigo) || porCodigo.set(e.codigo, []).get(e.codigo)).push(e);
   }
-  return { porTitulo, porCodigo, compostas, revisao: base.revisao };
+  return { porTitulo, porCodigo, compostas, cacheComp, revisao: base.revisao };
 }
 
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
@@ -1693,12 +1726,23 @@ function indiceEquivalencias(base) {
 function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
   const kt = chaveTitulo(titulo);
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
-  // Regra composta validada para o título: vale por cima das relações simples (SOL-F5).
-  const comp = (idx.compostas?.get(kt) || []).find(c => escopoCobre(c.escopo, unidade, modalidade));
+  // Regra composta validada para o título: vale por cima das relações simples (SOL-F5). Título da lista
+  // antes de título por palavras.
+  const ck = `${kt}|${unidade}|${modalidade}`;
+  let comp = idx.cacheComp?.get(ck);
+  if (comp === undefined) {
+    let melhor = null, nota = 0;
+    for (const c of idx.compostas || []) { if (!escopoCobre(c.escopo, unidade, modalidade)) continue; const n = compostaCasaTitulo(c, titulo); if (n > nota) { nota = n; melhor = c; } }
+    comp = melhor; idx.cacheComp?.set(ck, comp);
+  }
   if (comp) {
-    const esperados = codigosDaComposta(comp, convenio), porConv = esperados !== comp.codigos;
-    if (esperados.includes(codigo)) return { estado: 'validada', composta: comp, esperados, motivo: `Regra composta validada: «${titulo}» = ${esperados.join(' + ')}${porConv ? ` (convênio ${convenio})` : ''} (${comp.responsavel || 'sem responsável'})` };
-    return { estado: 'divergente', composta: comp, esperados, sobra: true, motivo: `Regra composta: ${porConv ? `no convênio ${convenio}, ` : ''}«${titulo}» = ${esperados.join(' + ')}; o código ${codigo} não faz parte` };
+    const esp = esperadosDaComposta(comp, convenio), porConv = esp.some(e => e.qtd !== e.qtdGeral), nome = nomeComposta(comp);
+    const item = esp.find(e => e.qtd > 0 && e.codigos.includes(codigo));
+    if (item) return { estado: 'validada', composta: comp, esperados: esp, itemIdx: item.i, motivo: `Regra composta «${nome}» validada: «${titulo}» = ${textoEsperados(esp)}${porConv ? ` (convênio ${convenio})` : ''} (${comp.responsavel || 'sem responsável'})` };
+    const dispensado = esp.find(e => e.qtd === 0 && e.codigos.includes(codigo));
+    return { estado: 'divergente', composta: comp, esperados: esp, sobra: true, motivo: dispensado
+      ? `Regra composta «${nome}»: no convênio ${convenio}, ${dispensado.rotulo} não é exigido (excludente do convênio); o código ${codigo} não deveria estar na conta`
+      : `Regra composta «${nome}»: «${titulo}» = ${textoEsperados(esp)}; o código ${codigo} não faz parte` };
   }
   const doTitulo = (idx.porTitulo.get(kt) || []).filter(e => escopoCobre(e.escopo, unidade, modalidade));
   const valTitulo = doTitulo.filter(e => e.status === 'validada');
@@ -1814,6 +1858,19 @@ function validarParesEmLote(eqBase, pares, responsavel, motivo, competencia) {
   return n;
 }
 
+/* Efetividade das regras compostas na competência (pedido de 04/11/2026): a partir das últimas rodadas,
+ * quantas linhas e contas cada regra sustentou, quantas ficaram com composição incompleta e quantas sobraram. */
+function efetividadeCompostas(rodadas, chave) {
+  const m = new Map(), pegar = id => m.get(id) || m.set(id, { linhas: 0, contas: new Set(), falta: 0, sobra: 0, exemplos: [] }).get(id);
+  for (const r of ultimasRodadasConferencia(rodadas, chave)) for (const l of r.linhas) {
+    const [, conta, atend] = String(l.kd || '').split('|');
+    if (l.composta) { const e = pegar(l.composta); if (l.estado === 'conferido' || l.estado === 'ressalva') { e.linhas++; e.contas.add(`${r.prestadorCod}|${conta}|${atend}`); if (l.compostaFalta) e.falta++; }
+      if (e.exemplos.length < 8) e.exemplos.push({ prestador: `${r.prestadorCod} - ${r.prestadorNome}`, unidade: r.unidadeCod, data: l.data, conta, atendimento: atend, codigo: l.codigo, desc: l.desc, estado: l.estado, falta: !!l.compostaFalta }); }
+    if (l.compostaSobra) pegar(l.compostaSobra).sobra++;
+  }
+  return m;
+}
+
 /* ---- src/engine/60-conferencia.js ---- */
 /* ============================================================
  * Motor de conferência cruzada MV × Apolo
@@ -1909,17 +1966,18 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // 2) Pareamento um-para-um por faixa: a faixa mais segura escolhe primeiro.
   const usado = new Map();   // laudo.i → b (primeira linha)
   // Regra composta (SOL-F5): o mesmo laudo sustenta uma linha por código esperado da composição.
-  const compostoUsos = new Map();   // laudo.i → { id, esperados, codes:Set, bs:[] }
-  const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i); return !!(c.proc.composta && u && u.id === c.proc.composta.id && !u.codes.has(b.r.codigo) && u.codes.size < u.esperados.length); };
+  // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
+  const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
+  const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
   for (let t = 1; t <= 6; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
     for (const { b, c } of fila) {
       if (b.par) continue;
-      if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.codes.add(b.r.codigo); u.bs.push(b); continue; }
+      if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.usos[c.proc.itemIdx] = (u.usos[c.proc.itemIdx] || 0) + 1; u.bs.push(b); continue; }
       b.par = c; usado.set(c.l.i, b);
-      if (c.proc.composta) compostoUsos.set(c.l.i, { id: c.proc.composta.id, esperados: c.proc.esperados, codes: new Set([b.r.codigo]), bs: [b] });
+      if (c.proc.composta) { const usos = []; usos[c.proc.itemIdx] = 1; compostoUsos.set(c.l.i, { id: c.proc.composta.id, esperados: c.proc.esperados, usos, bs: [b] }); }
     }
   }
 
@@ -1968,9 +2026,10 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
       if (p.proc.composta) {
         marc.add('composta');
-        const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(c => !u.codes.has(c)) : [];
+        const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(e => e.qtd > (u.usos[e.i] || 0)) : [];
+        out.composta = p.proc.composta.id;
         motivos.push(`${p.proc.motivo}.${falta.length ? '' : ' Composição completa no MV.'}`);
-        if (falta.length) { marc.add('composta-falta'); motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${u.esperados.join(' + ')}; falta ${falta.join(', ')} no MV.`); }
+        if (falta.length) { marc.add('composta-falta'); out.compostaFalta = true; motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${textoEsperados(u.esperados)}; falta ${falta.map(e => `${e.rotulo} (esperado ×${e.qtd}, lançado ×${u.usos[e.i] || 0})`).join(', ')} no MV.`); }
       }
       const bloqueio = p.tier >= 3 || marc.has('ambiguo') || marc.has('outro-medico');
       out.status = bloqueio ? 'pendente' : (p.tier === 2 || marc.has('convenio-divergente') || marc.has('id-duplo') || marc.has('composta-falta')) ? 'ressalva' : 'conferido';
@@ -1979,7 +2038,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       out.status = 'so-faturamento';
       // Regra composta: código que não faz parte da composição para o convênio (ex.: articular na UNIMED).
       const sobra = (b.cands || []).find(c => c.proc.sobra);
-      if (sobra) { marc.add('eq-divergente'); motivos.push(`${sobra.proc.motivo}: cobrança sem sustentação no laudo «${sobra.l.titulo}».`); }
+      if (sobra) { marc.add('eq-divergente'); out.compostaSobra = sobra.proc.composta.id; motivos.push(`${sobra.proc.motivo}: cobrança sem sustentação no laudo «${sobra.l.titulo}».`); }
       const irmao = (b.cands || []).find(c => usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && c.tier <= 4);
       if (irmao) { marc.add('possivel-bilateral'); motivos.push(`Há laudo compatível («${irmao.l.titulo}») já associado a outra linha do mesmo código: verificar cobrança por lado ou duplicidade.`); }
       else if (b.cands && b.cands.length) motivos.push(`Laudos do paciente existem, mas já estão associados a outras linhas (${b.cands.length} candidato(s)).`);
@@ -2185,10 +2244,11 @@ function compararRodadas(ant, atual) {
  * conferida com a equivalência validada (mesmo paciente, mesma data, sem outro bloqueio). Sem paciente. */
 const EQ_TRAVA = ['pendente', 'sem-cadastro', 'conflito'];
 function infoEquivalencia(x) {
-  if (!x.par || !x.r) return {};
+  const comp = { ...(x.composta ? { composta: x.composta } : {}), ...(x.compostaFalta ? { compostaFalta: true } : {}), ...(x.compostaSobra ? { compostaSobra: x.compostaSobra } : {}) };
+  if (!x.par || !x.r) return comp;
   const est = x.par.proc?.estado || '', m = x.marcadores || new Set();
   const outros = ['ambiguo', 'outro-medico', 'data-divergente', 'nome-semelhante', 'convenio-divergente', 'id-duplo'].some(k => m.has(k));
-  return { titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
+  return { ...comp, titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
 }
 
 /* Aceite (SOL-F11): o mesmo registro feito em Rodadas ou na Conferência. Desfazer guarda o histórico. */
@@ -6159,72 +6219,173 @@ async function desfazerConflito(c) {
 
 /* ---- src/ui/41-compostas.js ---- */
 /* ============================================================
- * Equivalências → regras compostas e por convênio (SOL-F5)
- * Um laudo pode sustentar mais de uma linha do MV (ex.: articular + doppler), e o conjunto de códigos
- * pode mudar por convênio (ex.: UNIMED = só doppler). Só regra validada, com responsável, vale.
+ * Equivalências → regras compostas e por convênio (SOL-F5, v2 de 04/11/2026)
+ * Um exame laudado no Apolo pode corresponder a vários procedimentos na conta do MV. A lista mostra a
+ * efetividade de cada regra na competência (contas que ela sustentou), e o cadastro usa a busca da base.
+ * Só regra validada, com responsável, vale na conferência.
  * ============================================================ */
+const CP = { simulacoes: new Map() };   // id da regra → último resultado da simulação (só nesta sessão)
+const MAX_ITENS_CP = 6;
+function descricaoItem(it) {
+  const tuss = S.eq.catalogoTUSS || [], d = c => tuss.find(t => String(t.codigo) === String(c))?.desc || '';
+  return `${esc(it.rotulo || d(it.codigos[0]) || it.codigos[0])}${it.qtd !== 1 ? ` <b>×${it.qtd}</b>` : ''}<small class="nc-det">${it.codigos.map(esc).join(' ou ')}</small>`;
+}
 function cardCompostas() {
-  const l = S.eq.compostas || [];
-  return `<div class="card" id="cardCompostas"><h2>Regras compostas e por convênio <span class="muted small">${l.filter(c => c.status === 'validada').length} validada(s) · ${l.filter(c => c.status === 'pendente').length} pendente(s)</span></h2>
-    <p class="lead">Quando um laudo corresponde a <b>mais de um código</b> na conta. Ex.: «USG DE OMBRO COM DOPPLER» = articular + doppler; na UNIMED, só o doppler. A regra composta vale por cima das relações simples do mesmo título: a conferência aceita um laudo para cada código esperado e aponta o código que falta ou que sobra.</p>
-    ${l.length ? `<div class="tw"><table><thead><tr><th>Título do Apolo</th><th>Códigos esperados</th><th>Por convênio</th><th>Escopo</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
-      <td>${esc(c.titulo)}</td><td>${c.codigos.map(esc).join(' + ')}</td><td class="small">${(c.porConvenio || []).map(v => `${esc(v.convenio)}: ${v.codigos.map(esc).join(' + ')}`).join('<br>') || '<span class="muted">—</span>'}</td>
-      <td class="small">${c.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + esc(c.escopo.unidade)}</td>
+  const l = (S.eq.compostas || []).map(regraComposta), ef = efetividadeCompostas(S.rodadas || [], S.comp);
+  const efet = c => {
+    const e = ef.get(c.id), sim = CP.simulacoes.get(c.id);
+    if (c.status === 'validada' && e) return `<b>${e.contas.size} conta(s)</b><small class="nc-det">${e.linhas} linha(s) conferida(s)${e.falta ? ` · ${e.falta} faltando` : ''}${e.sobra ? ` · ${e.sobra} sobrando` : ''}</small><button class="sec mini" data-cmpex="${c.id}">exemplos</button>`;
+    if (sim) return `<span class="muted small">simulação:</span> <b>${sim.contas} conta(s)</b><small class="nc-det">${sim.linhas} linha(s)${sim.falta ? ` · ${sim.falta} faltando` : ''}${sim.sobra ? ` · ${sim.sobra} sobrando` : ''}</small>`;
+    return `<button class="sec mini" data-cmpsim="${c.id}">Simular</button>`;
+  };
+  return `<div class="card" id="cardCompostas"><h2>Regras compostas e por convênio <span class="muted small">${l.filter(c => c.status === 'validada').length} validada(s) · ${l.filter(c => c.status === 'pendente').length} pendente(s) · efetividade na competência ${rotuloCompetencia(S.comp)}</span></h2>
+    <p class="lead">Quando um exame laudado corresponde a <b>vários procedimentos</b> na conta (ex.: TC abdome total = abdome superior + inferior; USG de mamas com Doppler = mamas + Doppler ×2; na UNIMED, só um Doppler). A conferência aceita um laudo para cada procedimento esperado e aponta o que falta ou sobra. «Nesta competência» conta o que a regra sustentou na última rodada de cada relatório.</p>
+    ${l.length ? `<div class="tw"><table><thead><tr><th>Regra</th><th>Títulos do Apolo</th><th>Composição no MV</th><th>Exceções por convênio</th><th class="n">Nesta competência</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
+      <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}</td>
+      <td class="small">${c.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}${c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? ` <span class="tag-cp">contém ${esc((c.palavras.todas || []).join(' + '))}${(c.palavras.umaDe || []).length ? ` e um de ${esc(c.palavras.umaDe.join(' · '))}` : ''}</span>` : ''}</td>
+      <td class="small">${c.itens.map(descricaoItem).join('<span class="muted"> + </span>')}</td>
+      <td class="small">${c.itens.flatMap(it => (it.excecoes || []).map(e => `<span class="badge info">${esc(e.convenio)}</span> ${esc(it.rotulo || it.codigos[0])}: ${e.tipo === 'nao-exigido' ? '<b>não exigido</b>' : `<b>×${e.qtd}</b>`}`)).join('<br>') || '<span class="muted">—</span>'}</td>
+      <td class="n small">${efet(c)}</td>
       <td><span class="badge ${c.status === 'validada' ? 'ok' : c.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[c.status])}</span>${c.responsavel ? `<small class="nc-det">${esc(c.responsavel)} · ${new Date(c.validadoEm).toLocaleDateString('pt-BR')}</small>` : ''}</td>
-      <td style="white-space:nowrap">${c.status !== 'validada' ? `<button class="mini" data-cmpval="${c.id}">Validar</button> ` : ''}<button class="sec mini" data-cmped="${c.id}">✎</button> ${c.status !== 'desativada' ? `<button class="perigo mini" data-cmpdes="${c.id}" title="Desativar">✕</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma regra composta ainda.</p>'}
-    <div class="acoes"><button class="sec" id="cmpNova">+ Regra composta</button></div></div>`;
+      <td style="white-space:nowrap">${c.status !== 'validada' ? `<button class="mini" data-cmpval="${c.id}">Validar</button> ` : ''}<button class="sec mini" data-cmped="${c.id}" aria-label="Editar">✎</button> ${c.status !== 'desativada' ? `<button class="perigo mini" data-cmpdes="${c.id}" title="Desativar">✕</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma regra composta ainda.</p>'}
+    <div class="acoes"><button class="sec" id="cmpNova">+ Regra composta</button><span class="small muted">A simulação refaz as conferências da competência com os PDFs e o Apolo carregados nesta sessão.</span></div></div>`;
 }
 function ligarCompostas(raiz) {
   if (!raiz.querySelector('#cardCompostas')) return;
   $('cmpNova').onclick = () => editarComposta(null);
   raiz.querySelectorAll('[data-cmped]').forEach(b => b.onclick = () => editarComposta(b.dataset.cmped));
+  raiz.querySelectorAll('[data-cmpsim]').forEach(b => b.onclick = async () => {
+    const c = S.eq.compostas.find(x => x.id === b.dataset.cmpsim); b.disabled = true; b.textContent = 'Simulando…';
+    const r = await simularComposta(regraComposta(c)); if (!r) { b.disabled = false; b.textContent = 'Simular'; return; }
+    CP.simulacoes.set(c.id, r); RENDER.equivalencias();
+  });
+  raiz.querySelectorAll('[data-cmpex]').forEach(b => b.onclick = () => {
+    const c = S.eq.compostas.find(x => x.id === b.dataset.cmpex), e = efetividadeCompostas(S.rodadas || [], S.comp).get(c.id);
+    dialogo(`Exemplos — ${nomeComposta(c)}`, listaExemplosCP(e?.exemplos || []), [['ok', 'Fechar']]);
+  });
   const mudar = async (id, status, rotulo) => {
     const op = await exigirOperador(); if (!op) return;
-    const c = S.eq.compostas.find(x => x.id === id);
-    const r = await dialogo(`${rotulo} regra composta`, `<p class="small">«${esc(c.titulo)}» = ${c.codigos.map(esc).join(' + ')}${(c.porConvenio || []).map(v => ` · ${esc(v.convenio)}: ${v.codigos.map(esc).join(' + ')}`).join('')}</p><p class="small">Responsável: <b>${esc(op)}</b>.</p><label class="campo">Justificativa${status === 'validada' ? '' : ' (obrigatória)'}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
+    const c = regraComposta(S.eq.compostas.find(x => x.id === id));
+    const r = await dialogo(`${rotulo} regra composta`, `<p class="small"><b>${esc(nomeComposta(c))}</b>: ${c.itens.map(it => esc(it.rotulo || it.codigos[0]) + (it.qtd !== 1 ? ` ×${it.qtd}` : '')).join(' + ')}</p><p class="small">Responsável: <b>${esc(op)}</b>.</p><label class="campo">Justificativa${status === 'validada' ? '' : ' (obrigatória)'}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
     if (r.botao !== 'ok') return;
     if (status !== 'validada' && !r.campos.motivo.trim()) return avisar('Informe a justificativa.', 'warn');
     alterarStatusComposta(S.eq, id, status, op, r.campos.motivo.trim(), S.comp);
-    salvarEq(`Regra composta «${c.titulo}» ${status === 'validada' ? 'validada' : 'desativada'}. Rode a conferência de novo para aplicar.`); RENDER.equivalencias();
+    salvarEq(`Regra composta «${nomeComposta(c)}» ${status === 'validada' ? 'validada' : 'desativada'}. Rode a conferência de novo para aplicar.`); RENDER.equivalencias();
   };
   raiz.querySelectorAll('[data-cmpval]').forEach(b => b.onclick = () => mudar(b.dataset.cmpval, 'validada', 'Validar'));
   raiz.querySelectorAll('[data-cmpdes]').forEach(b => b.onclick = () => mudar(b.dataset.cmpdes, 'desativada', 'Desativar'));
 }
+const listaExemplosCP = ex => ex.length ? `<ul class="small">${ex.map(x => `<li>${esc(x.prestador)} · unidade ${esc(x.unidade)} · ${x.data ? fmtData(paraData(x.data)) : 'sem data'} · conta ${esc(x.conta || '—')} / atendimento ${esc(x.atendimento || '—')} · ${esc(x.codigo)} ${esc(x.desc || '')}${x.falta ? ' · <b>composição incompleta</b>' : ''}</li>`).join('')}</ul>` : '<p class="muted small">Sem exemplos nesta competência.</p>';
+
+/* Simulação: refaz, em memória, a última conferência de cada relatório carregado com a regra valendo,
+ * e conta o que ela sustenta. Não grava rodadas nem muda nada. */
+async function simularComposta(regra) {
+  if (!S.apolo) { avisar('Carregue a planilha de laudos do Apolo no Início para simular.', 'warn'); return null; }
+  S.rodadas = await dbTodas();
+  const eqTemp = { ...S.eq, compostas: [...(S.eq.compostas || []).filter(c => c.id !== regra.id), { ...regra, status: 'validada' }] };
+  const r = { contas: 0, linhas: 0, falta: 0, sobra: 0, relatorios: 0, semRodada: 0, exemplos: [] }, contas = new Set();
+  for (const x of S.relatorios) {
+    if ((x.finalidade || finalidadePadrao(x.rel)) === 'correcao') continue;
+    const rod = ultimaRodadaDoRelatorio(x, 'conferencia', S.comp);
+    if (!rod) { r.semRodada++; continue; }
+    const medSel = rod.parametros?.medico || '@prest', medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
+    const res = conferirCruzado(x.rel, S.apolo, S.cfg, eqTemp, { unidadeCod: rod.unidadeCod, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos });
+    r.relatorios++;
+    for (const l of res.linhas) {
+      if (l.composta === regra.id && (l.status === 'conferido' || l.status === 'ressalva')) {
+        r.linhas++; contas.add(`${x.rel.cab.prestadorCod}|${l.r.conta}|${l.r.atendimento}`); if (l.compostaFalta) r.falta++;
+        if (r.exemplos.length < 8) r.exemplos.push({ prestador: `${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}`, unidade: rod.unidadeCod, data: isoDia(l.r.data), conta: l.r.conta, atendimento: l.r.atendimento, codigo: l.r.codigo, desc: l.r.procDesc, falta: !!l.compostaFalta });
+      }
+      if (l.compostaSobra === regra.id) r.sobra++;
+    }
+    await new Promise(ok => setTimeout(ok, 0));
+  }
+  r.contas = contas.size;
+  if (!r.relatorios) avisar('Nenhuma conferência desta competência com o PDF carregado: rode as conferências ou carregue os PDFs para simular.', 'warn');
+  return r;
+}
+
 const lerCodigos = t => [...new Set(String(t || '').split(/[\s,;+]+/).map(x => x.replace(/\D/g, '')).filter(x => x.length >= 5))];
-async function editarComposta(id) {
+const lerPalavras = t => String(t || '').split(/[,;·]+/).map(x => x.trim().toUpperCase()).filter(Boolean);
+// Lê o formulário do diálogo para uma regra (sem gravar).
+function regraDoFormulario(k, base) {
+  const itens = [];
+  for (let i = 0; i < MAX_ITENS_CP; i++) {
+    const codigos = [...lerCodigos(k['cod' + i]), ...lerCodigos(k['alt' + i])].filter((c, j, a) => a.indexOf(c) === j);
+    if (!codigos.length) continue;
+    const exc = (k['excConv' + i] || '').trim() && k['excTipo' + i] ? [{ convenio: k['excConv' + i].trim().toUpperCase(), tipo: k['excTipo' + i], qtd: k['excTipo' + i] === 'quantidade' ? Math.max(0, +k['excQtd' + i] || 0) : 0 }] : [];
+    itens.push({ rotulo: (k['rot' + i] || '').trim(), codigos, qtd: Math.max(0, Math.round(+k['qtd' + i] || 1)), excecoes: exc });
+  }
+  const titulos = String(k.titulos || '').split('\n').map(t => t.trim()).filter(Boolean);
+  const palavras = { todas: lerPalavras(k.palTodas), umaDe: lerPalavras(k.palUmaDe) };
+  return { ...base, nome: (k.nome || '').trim(), titulos, palavras: palavras.todas.length || palavras.umaDe.length ? palavras : null, itens, escopo: { unidade: k.unidade || '*', modalidade: '*' }, justificativa: (k.just || '').trim() };
+}
+function validarRegraComposta(c, outras) {
+  const e = [];
+  if (!c.nome) e.push('dê um nome à regra');
+  if (!c.titulos.length && !c.palavras) e.push('informe ao menos um título do Apolo ou as palavras do título');
+  if (!c.itens.length) e.push('inclua os procedimentos da conta');
+  const soma = c.itens.reduce((s, it) => s + it.qtd, 0);
+  if (soma < 2 && !c.itens.some(it => it.excecoes.length)) e.push('a composição precisa de 2 ou mais procedimentos (ou quantidade 2), ou de uma exceção por convênio; para um código só, use a relação simples');
+  const dup = outras.find(o => o.status !== 'desativada' && o.escopo.unidade === c.escopo.unidade && c.titulos.some(t => o.titulos.some(u => chaveTitulo(u) === chaveTitulo(t))));
+  if (dup) e.push(`o título já está na regra «${nomeComposta(dup)}»`);
+  return e;
+}
+async function editarComposta(id, rascunho = null, sim = null) {
   const op = await exigirOperador(); if (!op) return;
   S.eq.compostas = S.eq.compostas || [];
   const atual = id ? S.eq.compostas.find(x => x.id === id) : null;
-  const c = atual || novaComposta({});
-  const conv = [...(c.porConvenio || [])]; while (conv.length < 3) conv.push({ convenio: '', codigos: [] });
-  const r = await dialogo(`${atual ? 'Editar' : 'Nova'} regra composta`, `
-    ${campoBusca({ nome: 'titulo', rotulo: 'Título do laudo no Apolo (exatamente como aparece)', fonte: 'titulo', valor: c.titulo, livre: true })}
-    <label class="campo">Códigos esperados na conta (TUSS, separados por vírgula)<input type="text" name="codigos" value="${esc(c.codigos.join(', '))}" placeholder="ex.: 40901220, 40901386"><span class="small muted">No geral: todos os códigos que o laudo sustenta (ex.: articular + doppler).</span></label>
-    <h4 style="margin:8px 0 4px">Por convênio <span class="muted small">(texto no nome do convênio → códigos esperados naquele convênio)</span></h4>
-    <div class="tw"><table><thead><tr><th>Convênio contém</th><th>Códigos esperados</th></tr></thead><tbody>${conv.slice(0, 3).map((v, k) => `<tr><td><input type="text" name="cv${k}" value="${esc(v.convenio)}" placeholder="${k ? '' : 'ex.: UNIMED'}"></td><td><input type="text" name="cvc${k}" value="${esc((v.codigos || []).join(', '))}" placeholder="${k ? '' : 'ex.: 40901386'}"></td></tr>`).join('')}</tbody></table></div>
-    <div class="grid2"><label class="campo">Unidade<select name="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), c.escopo.unidade)}</select></label>
-      <label class="campo">Justificativa<input type="text" name="just" value="${esc(c.justificativa || '')}"></label></div>
-    ${atual ? '' : `<label class="small"><input type="checkbox" name="validar"> já validar (responsável: ${esc(op)})</label>`}
-    <p class="small muted">Editar uma regra validada volta ela para pendente: valide de novo para valer.</p>`, [['', 'Cancelar', 'sec'], ['ok', atual ? 'Salvar' : 'Cadastrar']]);
-  if (r.botao !== 'ok') return;
-  const k = r.campos, titulo = (k.titulo || '').trim(), codigos = lerCodigos(k.codigos);
-  const porConvenio = [0, 1, 2].map(i => ({ convenio: (k['cv' + i] || '').trim().toUpperCase(), codigos: lerCodigos(k['cvc' + i]) })).filter(v => v.convenio && v.codigos.length);
-  if (!titulo || codigos.length < 1) return avisar('Informe o título e ao menos um código (para um código só, use a relação simples).', 'warn');
-  if (codigos.length < 2 && !porConvenio.length) return avisar('Regra composta precisa de dois ou mais códigos, ou de uma variação por convênio.', 'warn');
-  const outra = S.eq.compostas.find(x => x !== atual && x.status !== 'desativada' && chaveTitulo(x.titulo) === chaveTitulo(titulo) && x.escopo.unidade === k.unidade);
-  if (outra) return avisar('Já existe regra composta para esse título nesse escopo: edite a existente.', 'warn');
-  const dados = { titulo, codigos, porConvenio, escopo: { unidade: k.unidade, modalidade: '*' }, justificativa: k.just.trim() };
-  if (atual) {
-    const mudou = JSON.stringify([atual.titulo, atual.codigos, atual.porConvenio, atual.escopo]) !== JSON.stringify([dados.titulo, dados.codigos, dados.porConvenio, dados.escopo]);
-    Object.assign(atual, dados);
-    if (mudou && atual.status === 'validada') { atual.historico.push({ em: agoraISO(), por: op, de: 'validada', para: 'pendente', motivo: 'regra editada', competencia: S.comp }); atual.status = 'pendente'; }
-  } else {
-    const nova = novaComposta({ ...dados, origem: `cadastro manual (${op})` });
-    S.eq.compostas.push(nova);
-    if (k.validar) alterarStatusComposta(S.eq, nova.id, 'validada', op, dados.justificativa || 'cadastro manual', S.comp);
+  const c = rascunho || (atual ? regraComposta(atual) : novaComposta({ itens: [] }));
+  const itens = [...c.itens]; while (itens.length < 3) itens.push({ rotulo: '', codigos: [], qtd: 1, excecoes: [] });
+  const linhaItem = (it, i) => { const ex = (it.excecoes || [])[0] || {}; return `<div class="item-cp">
+    <div>${campoBusca({ nome: 'cod' + i, rotulo: `Procedimento ${i + 1} (busca TUSS)`, fonte: 'tuss', valor: it.codigos[0] || '', valorCodigo: true, livre: true })}
+      ${campoBusca({ nome: 'altBusca' + i, rotulo: 'Alternativas na mesma posição (opcional)', fonte: 'tuss', valorCodigo: true, livre: true })}<input type="text" name="alt${i}" value="${esc(it.codigos.slice(1).join(', '))}" placeholder="códigos aceitos no lugar deste" class="alt-cp"></div>
+    <div><label class="campo">Nome curto<input type="text" name="rot${i}" value="${esc(it.rotulo || '')}" placeholder="ex.: Doppler"></label><label class="campo">Qtd.<input type="number" min="0" step="1" name="qtd${i}" value="${it.qtd ?? 1}" style="max-width:80px"></label></div>
+    <div>${campoBusca({ nome: 'excConv' + i, rotulo: 'Exceção: convênio contém', fonte: 'convenio', valor: ex.convenio || '', livre: true })}
+      <label class="campo">No convênio<select name="excTipo${i}">${opcoes([['', '— sem exceção —'], ['nao-exigido', 'não exigido (excludente)'], ['quantidade', 'outra quantidade']], ex.tipo || '')}</select></label>
+      <label class="campo">Qtd. no convênio<input type="number" min="0" step="1" name="excQtd${i}" value="${ex.tipo === 'quantidade' ? ex.qtd : ''}" style="max-width:80px"></label></div></div>`; };
+  const pr = dialogo(`${atual ? 'Editar' : 'Nova'} regra composta`, `<span class="dlg-largo" hidden></span>
+    ${sim ? `<div class="sim-cp"><b>Simulação nesta competência:</b> sustenta <b>${sim.contas} conta(s) (${sim.linhas} linha(s))</b> · ${sim.falta} com composição incompleta · ${sim.sobra} sobrando · ${sim.relatorios} relatório(s) refeito(s)${sim.semRodada ? `, ${sim.semRodada} sem conferência` : ''}.${sim.exemplos.length ? `<details><summary class="small">ver exemplos</summary>${listaExemplosCP(sim.exemplos)}</details>` : ''}</div>` : ''}
+    <div class="grid2"><label class="campo">Nome da regra *<input type="text" name="nome" value="${esc(c.nome || '')}" placeholder="ex.: USG mamas + Doppler"></label>
+      <label class="campo">Unidade<select name="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), c.escopo?.unidade || '*')}</select></label></div>
+    <h4 style="margin:8px 0 4px">Títulos do Apolo que a regra reconhece</h4>
+    <div class="grid2"><div>${campoBusca({ nome: 'tituloBusca', rotulo: '+ Título (busca nos títulos do Apolo)', fonte: 'titulo', livre: true, dica: 'escolher acrescenta à lista abaixo' })}
+      <label class="campo">Títulos (um por linha)<textarea name="titulos" rows="3">${esc(c.titulos.join('\n'))}</textarea></label></div>
+      <div><label class="campo">Ou por palavras: o título contém todas estas<input type="text" name="palTodas" value="${esc((c.palavras?.todas || []).join(', '))}" placeholder="ex.: DOPPLER"></label>
+      <label class="campo">e pelo menos uma destas (opcional)<input type="text" name="palUmaDe" value="${esc((c.palavras?.umaDe || []).join(', '))}" placeholder="ex.: ARTICULAR, PUNHO, OMBRO, JOELHO"></label><span class="small muted">Para variações de nome. Separe por vírgula.</span></div></div>
+    <h4 style="margin:10px 0 4px">Composição na conta do MV</h4>
+    <div class="itens-cp">${itens.slice(0, MAX_ITENS_CP).map(linhaItem).join('')}</div>
+    ${itens.length < MAX_ITENS_CP ? '<p class="small muted">Precisa de mais procedimentos? Salve e edite de novo: aparecem mais linhas.</p>' : ''}
+    <label class="campo">Justificativa<input type="text" name="just" value="${esc(c.justificativa || '')}"></label>
+    <p class="small muted">Excludente de convênio: o convênio não remunera aquele procedimento nessa combinação. O texto do convênio vale para todos que o contêm («UNIMED» pega UNIMED CURITIBA, UNIMED LONDRINA…). Editar uma regra validada volta ela para pendente.</p>`,
+    [['', 'Cancelar', 'sec'], ['simular', 'Simular nesta competência', 'sec'], ['pendente', 'Salvar pendente', 'sec'], ['ok', 'Salvar e validar']]);
+  const corpo = $('dlgCorpo');
+  corpo.querySelector('[name="tituloBusca"]').addEventListener('busca-escolha', e => { const t = corpo.querySelector('[name="titulos"]'), v = (e.detail?.nome || '').trim(); if (v && !t.value.split('\n').map(x => x.trim()).includes(v)) t.value = (t.value.trim() ? t.value.trim() + '\n' : '') + v; e.target.value = ''; });
+  for (let i = 0; i < MAX_ITENS_CP; i++) { const b = corpo.querySelector(`[name="altBusca${i}"]`); if (b) b.addEventListener('busca-escolha', e => { const a = corpo.querySelector(`[name="alt${i}"]`), v = (e.detail?.cod || e.target.value || '').replace(/\D/g, ''); if (v && !lerCodigos(a.value).includes(v)) a.value = [...lerCodigos(a.value), v].join(', '); e.target.value = ''; }); }
+  const r = await pr;
+  if (!r.botao) return;
+  const nova = regraDoFormulario(r.campos, atual ? regraComposta(atual) : novaComposta({}));
+  if (r.botao === 'simular') {
+    if (!nova.itens.length) { avisar('Inclua os procedimentos para simular.', 'warn'); return editarComposta(id, nova); }
+    avisar('Simulando nas conferências da competência…', 'info');
+    const s = await simularComposta(nova); if (s && atual) CP.simulacoes.set(atual.id, s);
+    return editarComposta(id, nova, s);
   }
+  const erros = validarRegraComposta(nova, (S.eq.compostas || []).filter(x => x !== atual).map(regraComposta));
+  if (erros.length) { avisar('Regra não gravada: ' + erros.join('; ') + '.', 'warn'); return editarComposta(id, nova, sim); }
+  const dados = { nome: nova.nome, titulos: nova.titulos, palavras: nova.palavras, itens: nova.itens, escopo: nova.escopo, justificativa: nova.justificativa };
+  let alvo;
+  if (atual) {
+    const antes = JSON.stringify(regraComposta(atual).itens) + JSON.stringify([regraComposta(atual).titulos, atual.palavras || null, atual.escopo]);
+    for (const k of ['titulo', 'codigos', 'porConvenio']) delete atual[k];
+    Object.assign(atual, dados); alvo = atual;
+    const mudou = antes !== JSON.stringify(atual.itens) + JSON.stringify([atual.titulos, atual.palavras, atual.escopo]);
+    if (mudou && atual.status === 'validada' && r.botao !== 'ok') { atual.historico.push({ em: agoraISO(), por: op, de: 'validada', para: 'pendente', motivo: 'regra editada', competencia: S.comp }); atual.status = 'pendente'; }
+  } else { alvo = novaComposta({ ...dados, origem: `cadastro manual (${op})` }); S.eq.compostas.push(alvo); }
+  if (r.botao === 'ok') alterarStatusComposta(S.eq, alvo.id, 'validada', op, dados.justificativa || 'cadastro da regra composta', S.comp);
+  if (sim) CP.simulacoes.set(alvo.id, sim);
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
-  salvarEq(`Regra composta «${titulo}» ${atual ? 'atualizada' : 'cadastrada'}.`); RENDER.equivalencias();
+  salvarEq(`Regra composta «${dados.nome}» ${atual ? 'atualizada' : 'cadastrada'}${r.botao === 'ok' ? ' e validada' : ''}. Rode as conferências de novo para aplicar.`); RENDER.equivalencias();
 }
 
 /* ---- src/ui/42-destrava.js ---- */
@@ -6547,11 +6708,11 @@ function cardClasses() {
     <p class="lead">A classe sai da produção bruta de USG do prestador (Vl Total dos relatórios de USG, todas as unidades) na produção da competência. Classe fixa no cadastro do prestador vale por cima. A ferramenta usa a tabela só para conferir o valor de cada laudo do relatório do IMG e avisar quando não bate.</p>
     <div class="grid4">${c.cortes.map((x, i) => `<label class="campo">Classe ${esc(x.classe)}: produção acima de (R$)<input type="number" step="0.01" data-corte="${i}" value="${x.acima}"></label>`).join('')}<div class="campo">Classe D<span class="small">até o último corte ou sem produção</span></div></div>
     <div class="grid2" style="margin-top:8px">${tab('convenio', 'Convênios e particulares')}${tab('sus', 'SUS')}</div>
-    <h3 style="margin-top:12px">Procedimentos equivalentes</h3>
-    <div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th></th></tr></thead><tbody>${c.equivalentes.map((e, i) => `<tr>
+    <h3 style="margin-top:12px">Procedimentos equivalentes <span class="muted small">paga por nº de exames da tabela, por valor fixo ou por % do valor faturado da linha (vale o primeiro preenchido: % → valor fixo → nº de exames)</span></h3>
+    <div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th>Ou % do valor faturado</th><th></th></tr></thead><tbody>${c.equivalentes.map((e, i) => `<tr>
       <td><input type="text" data-eqv="${i}" data-c="nome" value="${esc(e.nome)}"></td><td><input type="text" data-eqv="${i}" data-c="padrao" value="${esc(e.padrao)}"></td>
       <td><select data-eqv="${i}" data-c="exame"><option value="">—</option>${opcoes(Object.entries(EXAMES_IMG), e.exame || '')}</select></td>
-      <td><input type="number" step="0.5" data-eqv="${i}" data-c="fator" value="${e.fator || ''}" style="width:70px"></td><td><input type="number" step="0.01" data-eqv="${i}" data-c="valor" value="${e.valor || ''}" style="width:90px"></td>
+      <td><input type="number" step="0.5" data-eqv="${i}" data-c="fator" value="${e.fator || ''}" style="width:70px"></td><td><input type="number" step="0.01" data-eqv="${i}" data-c="valor" value="${e.valor || ''}" style="width:90px"></td><td><input type="number" step="0.01" min="0" max="100" data-eqv="${i}" data-c="pct" value="${e.pct || ''}" style="width:80px" aria-label="Percentual do valor faturado"></td>
       <td><button class="perigo mini" data-eqvrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="clsSalvar">Salvar classes e valores</button><button id="clsEqvAdd" class="sec">+ Equivalente</button><button id="clsPad" class="sec">Restaurar tabela 2026</button></div></div>`;
 }
@@ -6597,7 +6758,7 @@ function ligarRegras(pg) {
   // Classes e valores
   pg.querySelectorAll('[data-corte]').forEach(inp => inp.onchange = () => { S.cfg.classes.cortes[+inp.dataset.corte].acima = +inp.value || 0; });
   pg.querySelectorAll('[data-val]').forEach(inp => inp.onchange = () => { const [k, ex, col] = inp.dataset.val.split('|'); S.cfg.classes.valores[k][ex][col] = inp.value === '' ? null : +inp.value; });
-  pg.querySelectorAll('[data-eqv]').forEach(inp => inp.onchange = () => { const e = S.cfg.classes.equivalentes[+inp.dataset.eqv], c = inp.dataset.c; e[c] = ['fator', 'valor'].includes(c) ? (inp.value === '' ? 0 : +inp.value) : inp.value.trim(); });
+  pg.querySelectorAll('[data-eqv]').forEach(inp => inp.onchange = () => { const e = S.cfg.classes.equivalentes[+inp.dataset.eqv], c = inp.dataset.c; e[c] = ['fator', 'valor', 'pct'].includes(c) ? (inp.value === '' ? 0 : +inp.value) : inp.value.trim(); });
   pg.querySelectorAll('[data-eqvrm]').forEach(b => b.onclick = () => { S.cfg.classes.equivalentes.splice(+b.dataset.eqvrm, 1); RENDER.bases(); });
   $('clsEqvAdd').onclick = () => { S.cfg.classes.equivalentes.push({ nome: 'Novo equivalente', padrao: '', exame: 'TOMO', fator: 1 }); RENDER.bases(); };
   $('clsPad').onclick = async () => { if (await confirmar('Restaurar a tabela de 2026?', 'Cortes, valores e equivalentes voltam ao padrão da planilha de regras de classe.', 'Restaurar')) { S.cfg.classes = classesPadrao(); salvarCfg('Classes e valores do IMG restaurados (2026).', 'regras'); RENDER.bases(); } };
@@ -7145,7 +7306,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas } };   // usado pelos testes automatizados
 })();
 
 </script>

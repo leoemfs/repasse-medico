@@ -92,17 +92,18 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // 2) Pareamento um-para-um por faixa: a faixa mais segura escolhe primeiro.
   const usado = new Map();   // laudo.i → b (primeira linha)
   // Regra composta (SOL-F5): o mesmo laudo sustenta uma linha por código esperado da composição.
-  const compostoUsos = new Map();   // laudo.i → { id, esperados, codes:Set, bs:[] }
-  const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i); return !!(c.proc.composta && u && u.id === c.proc.composta.id && !u.codes.has(b.r.codigo) && u.codes.size < u.esperados.length); };
+  // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
+  const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
+  const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
   for (let t = 1; t <= 6; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
     for (const { b, c } of fila) {
       if (b.par) continue;
-      if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.codes.add(b.r.codigo); u.bs.push(b); continue; }
+      if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.usos[c.proc.itemIdx] = (u.usos[c.proc.itemIdx] || 0) + 1; u.bs.push(b); continue; }
       b.par = c; usado.set(c.l.i, b);
-      if (c.proc.composta) compostoUsos.set(c.l.i, { id: c.proc.composta.id, esperados: c.proc.esperados, codes: new Set([b.r.codigo]), bs: [b] });
+      if (c.proc.composta) { const usos = []; usos[c.proc.itemIdx] = 1; compostoUsos.set(c.l.i, { id: c.proc.composta.id, esperados: c.proc.esperados, usos, bs: [b] }); }
     }
   }
 
@@ -151,9 +152,10 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
       if (p.proc.composta) {
         marc.add('composta');
-        const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(c => !u.codes.has(c)) : [];
+        const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(e => e.qtd > (u.usos[e.i] || 0)) : [];
+        out.composta = p.proc.composta.id;
         motivos.push(`${p.proc.motivo}.${falta.length ? '' : ' Composição completa no MV.'}`);
-        if (falta.length) { marc.add('composta-falta'); motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${u.esperados.join(' + ')}; falta ${falta.join(', ')} no MV.`); }
+        if (falta.length) { marc.add('composta-falta'); out.compostaFalta = true; motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${textoEsperados(u.esperados)}; falta ${falta.map(e => `${e.rotulo} (esperado ×${e.qtd}, lançado ×${u.usos[e.i] || 0})`).join(', ')} no MV.`); }
       }
       const bloqueio = p.tier >= 3 || marc.has('ambiguo') || marc.has('outro-medico');
       out.status = bloqueio ? 'pendente' : (p.tier === 2 || marc.has('convenio-divergente') || marc.has('id-duplo') || marc.has('composta-falta')) ? 'ressalva' : 'conferido';
@@ -162,7 +164,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       out.status = 'so-faturamento';
       // Regra composta: código que não faz parte da composição para o convênio (ex.: articular na UNIMED).
       const sobra = (b.cands || []).find(c => c.proc.sobra);
-      if (sobra) { marc.add('eq-divergente'); motivos.push(`${sobra.proc.motivo}: cobrança sem sustentação no laudo «${sobra.l.titulo}».`); }
+      if (sobra) { marc.add('eq-divergente'); out.compostaSobra = sobra.proc.composta.id; motivos.push(`${sobra.proc.motivo}: cobrança sem sustentação no laudo «${sobra.l.titulo}».`); }
       const irmao = (b.cands || []).find(c => usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && c.tier <= 4);
       if (irmao) { marc.add('possivel-bilateral'); motivos.push(`Há laudo compatível («${irmao.l.titulo}») já associado a outra linha do mesmo código: verificar cobrança por lado ou duplicidade.`); }
       else if (b.cands && b.cands.length) motivos.push(`Laudos do paciente existem, mas já estão associados a outras linhas (${b.cands.length} candidato(s)).`);

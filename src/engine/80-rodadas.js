@@ -45,10 +45,11 @@ function compararRodadas(ant, atual) {
  * conferida com a equivalência validada (mesmo paciente, mesma data, sem outro bloqueio). Sem paciente. */
 const EQ_TRAVA = ['pendente', 'sem-cadastro', 'conflito'];
 function infoEquivalencia(x) {
-  if (!x.par || !x.r) return {};
+  const comp = { ...(x.composta ? { composta: x.composta } : {}), ...(x.compostaFalta ? { compostaFalta: true } : {}), ...(x.compostaSobra ? { compostaSobra: x.compostaSobra } : {}) };
+  if (!x.par || !x.r) return comp;
   const est = x.par.proc?.estado || '', m = x.marcadores || new Set();
   const outros = ['ambiguo', 'outro-medico', 'data-divergente', 'nome-semelhante', 'convenio-divergente', 'id-duplo'].some(k => m.has(k));
-  return { titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
+  return { ...comp, titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
 }
 
 /* Aceite (SOL-F11): o mesmo registro feito em Rodadas ou na Conferência. Desfazer guarda o histórico. */

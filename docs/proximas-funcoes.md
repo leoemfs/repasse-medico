@@ -659,3 +659,15 @@ Pedido: «quando eu adiciono a planilha de laudos e a do Power BI elas não perm
 - **Troca de competência:** as planilhas guardadas da competência escolhida entram no lugar das da sessão.
 - **Privacidade:** guarda-se o que a ferramenta leu, não o arquivo original. O **CPF do Power BI nunca é lido nem guardado**. Como há nomes de pacientes, as planilhas guardadas seguem a retenção das NCs (60 dias) e saem sozinhas depois.
 - Os PDFs do MV continuam só na sessão.
+
+## Regras compostas v2 (04/11/2026, v2.1.0-alpha.3)
+Pedido: anotações «Melhorias e ajustes – Equivalências TUSS e Regras Compostas» (04/11/2026). Prévia aprovada: «aprovado, mesmo código duas vezes, percentual eu confirmo depois».
+- **Cadastro com busca:** o título do laudo e cada código são procurados nos catálogos (Apolo e MV), com a descrição ao lado. Uma regra pode ter **vários títulos** (variações: «USG de mamas com Doppler», «Ultrassonografia das mamas com Doppler colorido»…) ou **palavras** («contém DOPPLER e um de PUNHO · OMBRO · JOELHO…»), para não cadastrar cada lado e cada articulação.
+- **Composição por item:** cada item tem um rótulo, um código (ou alternativas) e a **quantidade** — o mesmo código pode ser esperado duas vezes (mamas: Doppler ×2).
+- **Exceção por convênio (excludente):** por item, «não exigido» (UNIMED: punho/tireoide só com o Doppler) ou «quantidade diferente» (UNIMED: mamas com Doppler ×1). O código que vier a mais para aquele convênio aparece como **sobra** («Procedimento diverge», com o motivo da exceção).
+- **Falta com quantidade:** «Composição incompleta — falta Doppler (esperado ×2, lançado ×1)».
+- **Efetividade real:** a lista mostra, para cada regra, quantas contas e linhas ela conferiu nesta competência, quantas ficaram incompletas e quantas sobras, com exemplos. Antes de validar, «Simular nesta competência» mostra o mesmo cálculo sem gravar nada.
+- **Simulação × conferência:** a simulação usa a regra + as já validadas. Regras que dividem o mesmo código (o Doppler 40901386 está em mamas, tireoide e articular) disputam o mesmo lançamento; por isso a soma das simulações feitas uma a uma, antes de validar, pode diferir um pouco do resultado com todas validadas. Simulada depois de validada, a regra bate exatamente com a conferência.
+- **Regras no formato antigo** (título → códigos, com variação por convênio) continuam valendo, convertidas na leitura.
+- **Fusão de imagem por percentual:** Bases → Classes → procedimentos equivalentes ganhou «Ou % do valor faturado». Preenchido, o esperado é esse percentual do valor faturado da linha. **O percentual ainda não foi informado:** a Fusão continua em R$ 250,00 até você confirmar.
+- **Competência 10/2026 real** (`test/compostas_comp10.mjs`): com as 5 regras das anotações validadas (TC abdome total, RM abdome total, USG mamas + Doppler, tireoide com Doppler, USG articular + Doppler), a cobertura de equivalências foi de 0% para 9,4% (304 de 3.219 linhas). TC abdome total sozinha conferiu 123 contas (244 linhas).

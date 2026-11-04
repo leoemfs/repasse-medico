@@ -112,7 +112,7 @@ function registrarConvenios(cfg, lista, origem) {
 const GRUPO_EXAME = [[/RADIOLOG|RAIO/, 'RX'], [/MAMOGRAF/, 'MAMO'], [/DENSITOMETR/, 'DENSITO'], [/TOMOGRAF/, 'TOMO'], [/RESSONANC/, 'RESSO']];
 function exameDaLinha(classes, grupo, desc) {
   const d = norm(desc);
-  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, equivalente: e.nome }; }
+  for (const e of classes.equivalentes || []) { let re; try { re = new RegExp(e.padrao); } catch (x) { continue; } if (re.test(d)) return { exame: e.exame || '', fator: e.fator || 1, valorFixo: e.valor || 0, pct: +e.pct || 0, equivalente: e.nome }; }
   const g = norm(grupo);
   const ex = (GRUPO_EXAME.find(([re]) => re.test(g)) || [])[1];
   return ex ? { exame: ex, fator: 1, valorFixo: 0, equivalente: '' } : null;
@@ -122,6 +122,8 @@ function valorEsperadoIMG(cfg, p, classe, linha) {
   const ex = exameDaLinha(cfg.classes, linha.grupo, linha.desc);
   if (!ex) return { motivo: 'exame sem regra de valor' };
   const q = +linha.quant || 1;
+  // Percentual sobre o valor faturado da linha (ex.: fusão de imagem, a partir de 2026).
+  if (ex.pct) return { esperado: r2((+linha.vlTotal || 0) * ex.pct / 100), explicacao: `${ex.equivalente}: ${fmtPct(ex.pct)}% do valor faturado (R$ ${fmtBR(linha.vlTotal)})` };
   if (ex.valorFixo) return { esperado: r2(ex.valorFixo * q), explicacao: `${ex.equivalente}: R$ ${fmtBR(ex.valorFixo)} fixo` };
   const tipoConv = tipoConvenio(cfg, linha.convenio);
   if (!tipoConv) return { motivo: 'convênio sem tipo (SUS, Convênio ou Particular)' };

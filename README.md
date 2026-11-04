@@ -36,7 +36,8 @@ node test/v3.mjs                # regras da V3 (Curitiba): cálculo, e-mail, fec
 node test/descontos.mjs         # descontos parcelados: parcela automática, alertas, adiar e exportação
 node test/aceite_cobertura.mjs  # aceite na Conferência (F11) e cobertura/validação em lote (F15)
 node test/fluxo_dados.mjs       # candidatos a NC guardados (F17) e Fluxo ligado aos dados (F14, F13, F16)
-node test/compostas.mjs         # regras compostas e por convênio (F5)
+node test/compostas.mjs         # regras compostas e por convênio (F5 v2: títulos, palavras, quantidade, exceção por convênio, fusão por %)
+node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
 node test/competencia10.mjs     # competência 10/2026 inteira com os arquivos reais (dados/comp_10-2026)

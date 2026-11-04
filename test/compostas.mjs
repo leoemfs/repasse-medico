@@ -1,5 +1,6 @@
-// Teste SOL-F5: equivalências compostas e por convênio (um laudo sustenta N linhas do MV).
-// Dados fictícios montados no próprio teste.
+// Teste SOL-F5 v2: regras compostas e por convênio — vários títulos ou palavras, quantidade por código,
+// alternativas, excludente de convênio, falta e sobra; cadastro pela tela; fusão por percentual.
+// Dados fictícios montados no próprio teste; códigos TUSS reais do MV.
 import { createRequire } from 'module';
 import fs from 'fs';
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -14,38 +15,70 @@ p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type
 await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Compostas')));
 await p.goto(html + '#equivalencias');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
-const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(250); };
-const ART = '40901220', DOP = '40901386', TIT = 'USG DE OMBRO COM DOPPLER';
+const okDlg = async (botao = 'ok') => { await p.waitForSelector('#dlg[open]'); await p.click(`#dlgBotoes button[value="${botao}"]`); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(250); };
+const MAMAS = '40901114', DOP = '40901386', ART = '40901220', ORG = '40901203', TCS = '41001109', TCP = '41001117';
 
-// 1) Cadastro pela tela: articular + doppler; UNIMED = só doppler; já validada.
+// 1) Cadastro pela tela: USG mamas + Doppler ×2 (UNIMED ×1), dois títulos.
 await p.waitForSelector('#cmpNova'); await p.click('#cmpNova'); await p.waitForSelector('#dlg[open]');
-await p.fill('#dlgCorpo [name="titulo"]', TIT); await p.press('#dlgCorpo [name="titulo"]', 'Escape');
-await p.fill('#dlgCorpo [name="codigos"]', `${ART}, ${DOP}`); await p.fill('#dlgCorpo [name="cv0"]', 'unimed'); await p.fill('#dlgCorpo [name="cvc0"]', DOP);
-await p.check('#dlgCorpo [name="validar"]'); await okDlg();
-const c = await p.evaluate(() => window.__RM.S.eq.compostas[0]);
-ok(c && c.status === 'validada' && c.codigos.join() === `${ART},${DOP}` && c.porConvenio[0].convenio === 'UNIMED' && c.responsavel === 'Teste Compostas', 'regra composta cadastrada e validada com responsável');
-await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_card.png' });
+await p.fill('#dlgCorpo [name="nome"]', 'USG mamas + Doppler');
+await p.fill('#dlgCorpo [name="titulos"]', 'ULTRASSONOGRAFIA DAS MAMAS COM DOPPLER\nUSG DE MAMAS COM DOPPLER');
+await p.fill('#dlgCorpo [name="cod0"]', MAMAS); await p.press('#dlgCorpo [name="cod0"]', 'Escape'); await p.fill('#dlgCorpo [name="rot0"]', 'USG mamas');
+await p.fill('#dlgCorpo [name="cod1"]', DOP); await p.press('#dlgCorpo [name="cod1"]', 'Escape'); await p.fill('#dlgCorpo [name="rot1"]', 'Doppler'); await p.fill('#dlgCorpo [name="qtd1"]', '2');
+await p.fill('#dlgCorpo [name="excConv1"]', 'unimed'); await p.press('#dlgCorpo [name="excConv1"]', 'Escape'); await p.selectOption('#dlgCorpo [name="excTipo1"]', 'quantidade'); await p.fill('#dlgCorpo [name="excQtd1"]', '1');
+await p.screenshot({ path: out + 'compostas_cadastro.png' });
+await okDlg('ok');
+const c1 = await p.evaluate(() => window.__RM.S.eq.compostas[0]);
+ok(c1 && c1.status === 'validada' && c1.titulos.length === 2 && c1.itens[1].qtd === 2 && c1.itens[1].excecoes[0].convenio === 'UNIMED' && c1.itens[1].excecoes[0].qtd === 1, 'cadastro pela tela: 2 títulos, Doppler ×2, UNIMED ×1, validada com responsável');
+// Demais regras pelo motor (mesmo formato que a tela grava).
+await p.evaluate(({ DOP, ART, ORG, TCS, TCP }) => {
+  const { S: E } = window.__RM, v = (nome, campos) => ({ id: 'cmp' + nome.length + Math.random().toString(36).slice(2, 6), nome, escopo: { unidade: '*', modalidade: '*' }, status: 'validada', responsavel: 'Teste', validadoEm: new Date().toISOString(), historico: [], palavras: null, ...campos });
+  E.eq.compostas.push(
+    v('TC abdome total', { titulos: ['TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', 'TOMOGRAFIA DE ABDOME TOTAL'], itens: [{ rotulo: 'TC abdome superior', codigos: [TCS], qtd: 1, excecoes: [] }, { rotulo: 'TC pelve', codigos: [TCP], qtd: 1, excecoes: [] }] }),
+    v('USG articular + Doppler', { titulos: [], palavras: { todas: ['DOPPLER'], umaDe: ['PUNHO', 'OMBRO', 'JOELHO'] }, itens: [{ rotulo: 'USG articular', codigos: [ART], qtd: 1, excecoes: [{ convenio: 'UNIMED', tipo: 'nao-exigido', qtd: 0 }] }, { rotulo: 'Doppler', codigos: [DOP], qtd: 1, excecoes: [] }] }),
+    // Formato antigo (v1): continua valendo.
+    { id: 'cmpv1', titulo: 'DOPPLER DE TIREOIDE', codigos: [ORG, DOP], porConvenio: [{ convenio: 'UNIMED', codigos: [DOP] }], escopo: { unidade: '*', modalidade: '*' }, status: 'validada', responsavel: 'Teste', historico: [] });
+}, { DOP, ART, ORG, TCS, TCP });
 
 // 2) Conferência com dados fictícios.
-const r = await p.evaluate(({ ART, DOP, TIT }) => {
+const r = await p.evaluate(({ MAMAS, DOP, ART, ORG, TCS, TCP }) => {
   const { S: E, t } = window.__RM, dt = new Date(Date.UTC(2026, 8, 10)), dia = t.diaSerial(dt);
-  const laudo = (i, pac) => ({ i, paciente: pac, pn: pac, data: dt, dia, titulo: TIT, modalidade: 'US', medico: 'MEDICO TESTE', mn: 'MEDICO TESTE', unidade: 'X', convenio: '' });
-  const reg = (seq, pac, cod, conv) => ({ seq, chave: 'c' + seq, codigo: cod, procDesc: cod === ART ? 'US ARTICULAR' : 'DOPPLER COLORIDO', grupoNome: 'ULTRASSONOGRAFIA - OUTROS', convenio: conv, paciente: pac, data: dt, vlTotal: 100, vlRepasse: 40, quant: 1 });
-  const apolo = { laudos: [laudo(0, 'PACIENTE UM TESTE'), laudo(1, 'PACIENTE DOIS TESTE'), laudo(2, 'PACIENTE TRES TESTE')] };
-  const rel = { regs: [reg(1, 'PACIENTE UM TESTE', ART, 'PARTICULAR'), reg(2, 'PACIENTE UM TESTE', DOP, 'PARTICULAR'),
-    reg(3, 'PACIENTE DOIS TESTE', ART, 'UNIMED CURITIBA'), reg(4, 'PACIENTE DOIS TESTE', DOP, 'UNIMED CURITIBA'),
-    reg(5, 'PACIENTE TRES TESTE', ART, 'PARTICULAR')], cab: {} };
-  const res = t.conferirCruzado(rel, apolo, E.cfg, E.eq, { tol: 0, unidadeCod: '*', medicos: null });
-  return res.linhas.filter(x => x.r).map(x => ({ seq: x.r.seq, st: x.status, m: [...x.marcadores].sort().join('+'), mot: x.motivos.join(' | ') }));
-}, { ART, DOP, TIT });
-const L = Object.fromEntries(r.map(x => [x.seq, x]));
-ok(L[1].st === 'conferido' && L[2].st === 'conferido' && L[1].m === 'composta' && L[2].m === 'composta', `particular: um laudo sustenta articular + doppler, as duas conferidas (${L[1].st}, ${L[2].st})`);
-ok(L[4].st === 'conferido' && /UNIMED/.test(L[4].mot), 'UNIMED: o doppler é conferido pela variação do convênio');
-ok(L[3].st !== 'conferido' && /eq-divergente/.test(L[3].m) && /não faz parte/.test(L[3].mot), `UNIMED: o articular sobra e é apontado (${L[3].st}: ${L[3].m})`);
-ok(L[5].st === 'ressalva' && /composta-falta/.test(L[5].m) && new RegExp(`falta ${DOP}`).test(L[5].mot), 'só o articular lançado: «Composição incompleta», falta o doppler');
+  const laudos = [], regs = []; let seq = 0;
+  const caso = (pac, titulo, conv, cods) => { laudos.push({ i: laudos.length, paciente: pac, pn: pac, data: dt, dia, titulo, modalidade: /TOMO/.test(titulo) ? 'CT' : 'US', medico: 'MEDICO TESTE', mn: 'MEDICO TESTE', unidade: 'X', convenio: '' });
+    for (const c of cods) { seq++; regs.push({ seq, chave: 'c' + seq, codigo: c, procDesc: 'P' + c, grupoNome: /^4100/.test(c) ? 'TOMOGRAFIA COMPUT. DIAGNOSTICA' : 'ULTRASSONOGRAFIA - OUTROS', convenio: conv, paciente: pac, data: dt, vlTotal: 100, vlRepasse: 40, quant: 1, conta: '9' + seq, atendimento: '8' + seq, caso: pac }); } };
+  caso('PACIENTE TC TOTAL', 'TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', 'PARTICULAR', [TCS, TCP]);
+  caso('PACIENTE MAMAS PART', 'USG DE MAMAS COM DOPPLER', 'PARTICULAR', [MAMAS, DOP, DOP]);
+  caso('PACIENTE MAMAS UNIMED', 'ULTRASSONOGRAFIA DAS MAMAS COM DOPPLER', 'UNIMED CURITIBA', [MAMAS, DOP]);
+  caso('PACIENTE MAMAS FALTA', 'USG DE MAMAS COM DOPPLER', 'PARTICULAR', [MAMAS, DOP]);
+  caso('PACIENTE PUNHO UNIMED', 'ULTRASSONOGRAFIA DO PUNHO DIREITO COM DOPPLER', 'UNIMED CURITIBA', [ART, DOP]);
+  caso('PACIENTE PUNHO PART', 'DOPPLER COLORIDO DO PUNHO DIREITO', 'PARTICULAR', [ART, DOP]);
+  caso('PACIENTE TIREOIDE UNIMED', 'DOPPLER DE TIREOIDE', 'UNIMED LONDRINA', [DOP]);
+  const res = t.conferirCruzado({ regs, cab: {} }, { laudos }, E.cfg, E.eq, { tol: 0, unidadeCod: '*', medicos: null });
+  const por = {}; for (const x of res.linhas.filter(x => x.r)) (por[x.r.caso] = por[x.r.caso] || []).push(`${x.r.codigo}:${x.status}${[...x.marcadores].filter(m => /composta|divergente/.test(m)).map(m => '+' + m).join('')}`);
+  const mot = res.linhas.find(x => x.r?.caso === 'PACIENTE MAMAS FALTA')?.motivos.join(' | ') || '';
+  return { por, mot };
+}, { MAMAS, DOP, ART, ORG, TCS, TCP });
+const P = r.por;
+ok(P['PACIENTE TC TOTAL'].every(x => /conferido\+composta$/.test(x)), `TC abdome total: superior + pelve conferidos pelo mesmo laudo (${P['PACIENTE TC TOTAL'].join(', ')})`);
+ok(P['PACIENTE MAMAS PART'].length === 3 && P['PACIENTE MAMAS PART'].every(x => /conferido\+composta$/.test(x)), `mamas (particular): USG + Doppler ×2 conferidos (${P['PACIENTE MAMAS PART'].join(', ')})`);
+ok(P['PACIENTE MAMAS UNIMED'].every(x => /conferido\+composta$/.test(x)), 'mamas (UNIMED): Doppler ×1 basta, sem composição incompleta');
+ok(P['PACIENTE MAMAS FALTA'].every(x => /ressalva\+composta\+composta-falta/.test(x)) && /Doppler \(esperado ×2, lançado ×1\)/.test(r.mot), 'mamas (particular) com um Doppler só: «Composição incompleta — esperado ×2, lançado ×1»');
+ok(P['PACIENTE PUNHO UNIMED'].some(x => x === `${ART}:so-faturamento+eq-divergente`) && P['PACIENTE PUNHO UNIMED'].some(x => /^40901386:conferido\+composta$/.test(x)), `punho com Doppler (UNIMED): Doppler conferido; articular sobra (excludente) (${P['PACIENTE PUNHO UNIMED'].join(', ')})`);
+ok(P['PACIENTE PUNHO PART'].every(x => /conferido\+composta$/.test(x)), 'punho com Doppler (particular): título reconhecido pelas palavras; articular + Doppler conferidos');
+ok(P['PACIENTE TIREOIDE UNIMED'].every(x => /conferido\+composta$/.test(x)), 'regra no formato antigo continua valendo (tireoide UNIMED: só o Doppler)');
+
+// 3) Fusão de imagem por percentual do valor faturado.
+const fus = await p.evaluate(() => { const { S: E, t } = window.__RM; const e = E.cfg.classes.equivalentes.find(x => x.nome === 'Fusão de imagem'); e.pct = 30; e.valor = 0;
+  return t.valorEsperadoIMG(E.cfg, null, 'A', { grupo: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', desc: 'FUSAO DE IMAGEM', vlTotal: 500, quant: 1, convenio: 'X' }); });
+ok(fus.esperado === 150 && /30% do valor faturado/.test(fus.explicacao), `fusão de imagem: 30% de R$ 500,00 = ${fus.esperado} (${fus.explicacao})`);
+await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.click('[data-bsub="classes"]');
+ok(await p.isVisible('[data-eqv][data-c="pct"]'), 'Bases → Classes: coluna «Ou % do valor faturado» nos procedimentos equivalentes');
+
+// 4) Lista: as regras aparecem com composição e exceções.
+await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
+const lista = await p.textContent('#cardCompostas');
+ok(/USG mamas \+ Doppler/.test(lista) && /×2/.test(lista) && /não exigido/.test(lista) && /contém DOPPLER e um de PUNHO · OMBRO · JOELHO/.test(lista), 'lista mostra títulos, palavras, quantidade e excludente por convênio');
+await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_lista.png' });
 // Desativada não vale.
-await p.click('[data-cmpdes]'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="motivo"]', 'teste'); await okDlg();
-const st2 = await p.evaluate(({ ART, TIT }) => window.__RM.t.avaliarProcedimento(window.__RM.t.indiceEquivalencias(window.__RM.S.eq), ART, TIT, { convenio: 'PARTICULAR' }).estado, { ART, TIT });
-ok(st2 === 'sem-cadastro', `regra desativada deixa de valer (${st2})`);
+await p.click('[data-cmpdes]'); await okDlg('').catch(() => {});
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

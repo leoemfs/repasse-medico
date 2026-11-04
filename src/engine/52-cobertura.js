@@ -75,3 +75,16 @@ function validarParesEmLote(eqBase, pares, responsavel, motivo, competencia) {
   }
   return n;
 }
+
+/* Efetividade das regras compostas na competência (pedido de 04/11/2026): a partir das últimas rodadas,
+ * quantas linhas e contas cada regra sustentou, quantas ficaram com composição incompleta e quantas sobraram. */
+function efetividadeCompostas(rodadas, chave) {
+  const m = new Map(), pegar = id => m.get(id) || m.set(id, { linhas: 0, contas: new Set(), falta: 0, sobra: 0, exemplos: [] }).get(id);
+  for (const r of ultimasRodadasConferencia(rodadas, chave)) for (const l of r.linhas) {
+    const [, conta, atend] = String(l.kd || '').split('|');
+    if (l.composta) { const e = pegar(l.composta); if (l.estado === 'conferido' || l.estado === 'ressalva') { e.linhas++; e.contas.add(`${r.prestadorCod}|${conta}|${atend}`); if (l.compostaFalta) e.falta++; }
+      if (e.exemplos.length < 8) e.exemplos.push({ prestador: `${r.prestadorCod} - ${r.prestadorNome}`, unidade: r.unidadeCod, data: l.data, conta, atendimento: atend, codigo: l.codigo, desc: l.desc, estado: l.estado, falta: !!l.compostaFalta }); }
+    if (l.compostaSobra) pegar(l.compostaSobra).sobra++;
+  }
+  return m;
+}

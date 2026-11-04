@@ -19,6 +19,9 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
   A situação vira a natureza sugerida da NC. O responsável sugerido é quem fechou a conta. Conta e atendimento já vêm preenchidos.
 
+- **Regras compostas v2 (alpha.3):** vários títulos ou palavras por regra, quantidade por código (mamas: Doppler ×2), exceção por convênio (UNIMED: Doppler ×1 nas mamas; punho e tireoide só com o Doppler), busca no cadastro, simulação antes de validar e efetividade real na lista. Na competência 10/2026, as 5 regras levaram a cobertura de 0% para 9,4%.
+- **Fusão de imagem por percentual (alpha.3):** opção «% do valor faturado» em Bases → Classes. O percentual ainda aguarda confirmação; até lá, vale R$ 250,00.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 
