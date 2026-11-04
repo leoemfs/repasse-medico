@@ -650,3 +650,12 @@ Pedido: exportar a competência no padrão de pastas da rede. «Exportar compet�
 - `Controle da ferramenta/` — fluxo, rodadas e resumo (o antigo «pacote da competência»);
 - `LEIA-ME.txt` — o que entrou e o que faltou.
 A modalidade (USG ou IMG) sai da descrição do repasse e dos grupos do relatório. A unidade e os parâmetros vêm da última rodada de cada PDF. As planilhas de análise são refeitas na exportação, com a base de equivalências atual. Os arquivos originais só existem na memória da sessão: precisam estar carregados no Início.
+
+## Planilhas de laudos e do Power BI guardadas por competência (04/11/2026, v2.1.0-alpha.2)
+Pedido: «quando eu adiciono a planilha de laudos e a do Power BI elas não permanecem… quero que permaneça, mas opcional; o Power BI eu troco no meio do mês».
+- **Guardar:** ao carregar, a planilha fica guardada **neste navegador para a competência do topo**. Ao recarregar a página ou voltar para a competência, ela já está carregada («💾 Guardada nesta competência desde…»).
+- **Trocar:** basta carregar outra; a nova substitui a guardada (ex.: Power BI atualizado no meio do mês).
+- **Opcional:** cada cartão tem «guardar automaticamente quando eu carregar», separado para laudos e Power BI, e os botões «Remover da competência» e «Guardar nesta competência». Em «Limpar arquivos…», a opção «apagar também as planilhas guardadas».
+- **Troca de competência:** as planilhas guardadas da competência escolhida entram no lugar das da sessão.
+- **Privacidade:** guarda-se o que a ferramenta leu, não o arquivo original. O **CPF do Power BI nunca é lido nem guardado**. Como há nomes de pacientes, as planilhas guardadas seguem a retenção das NCs (60 dias) e saem sozinhas depois.
+- Os PDFs do MV continuam só na sessão.

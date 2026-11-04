@@ -20,10 +20,10 @@ RENDER.inicio = () => {
       <div class="estado" id="stMV">${r.length ? `${r.length} relatório(s) carregado(s).` : '<span class="muted">Nenhum PDF carregado.</span>'}</div></div>
     <div class="card fonte"><h3>Laudos do Apolo (.xlsx)</h3>
       <div class="dz" id="dzApolo">Clique ou arraste a planilha<small>Formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input id="inApolo" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stApolo">${a ? resumoApolo(a) : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
+      <div class="estado" id="stApolo">${a ? resumoApolo(a) + estadoGuardada('apolo', a) : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
     <div class="card fonte"><h3>Power BI (.xlsx) — opcional</h3>
       <div class="dz" id="dzPBI">Clique ou arraste a planilha do Power BI<small>Catálogo de unidades, grupos, procedimentos e códigos de prestador</small><input id="inPBI" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>` : '<span class="muted">Não carregado.</span>'}</div></div>
+      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>${estadoGuardada('pbi', S.pbi)}` : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Não carregado.</span>'}</div></div>
   </div>
   <div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do MV carregados</h2>${S.relatorios.length || S.apolo || S.pbi ? '<button class="sec" id="btLimpar">Limpar arquivos…</button>' : ''}</div><div id="listaMV"></div></div>
   <div class="grid2">
@@ -36,6 +36,7 @@ RENDER.inicio = () => {
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
   ligarPainelCompetencia();
   if ($('btLimpar')) $('btLimpar').onclick = limparArquivosSessao;
+  ligarPlanilhasGuardadas($('pag-inicio'));
   if ($('btPbiBase')) $('btPbiBase').onclick = atualizarBasePowerBI;
   desenharListaMV();
 };
@@ -163,6 +164,7 @@ async function carregarApolo(f) {
     const ap = await lerApolo(bytes, f.name, n => { const b = $('barApolo'); if (b) b.style.width = Math.min(95, n / 300) + '%'; });
     if (!await aceitarProducao(f.name, producaoDoArquivo(ap, () => ap.laudos.map(l => l.data)))) return RENDER.inicio();
     S.apolo = ap; S.apolo.hash = hashBytes(bytes); S.apolo.tamanho = f.size; Object.defineProperty(S.apolo, 'bytes', { value: bytes, enumerable: false });
+    await guardarPlanilha('apolo', S.apolo);
     const semUnidade = [...new Set(S.apolo.laudos.map(l => norm(l.unidade)))].filter(u => !S.cfg.unidades.some(x => (x.apolo || []).map(norm).includes(u)));
     avisar(`${f.name}: ${S.apolo.laudos.length} laudos lidos.${semUnidade.length ? ` ${semUnidade.length} unidade(s) do Apolo sem cadastro em Bases.` : ''}`, semUnidade.length ? 'warn' : 'ok');
   } catch (e) { S.apolo = null; avisar(`${f.name}: ${e.message}`, 'err'); }
@@ -176,7 +178,7 @@ async function carregarPBI(f) {
     const bytesPB = await lerArquivo(f), pb = await lerPowerBI(bytesPB, f.name);
     Object.defineProperty(pb, 'bytes', { value: bytesPB, enumerable: false });
     if (!await aceitarProducao(f.name, producaoDoArquivo(pb, () => pb.linhas.map(l => l.data)))) return RENDER.inicio();
-    S.pbi = pb; avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
+    S.pbi = pb; pb.tamanho = f.size; await guardarPlanilha('pbi', pb); avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
   }
   catch (e) { S.pbi = null; avisar(`${f.name}: ${e.message}`, 'err'); }
   RENDER.inicio();
@@ -225,8 +227,10 @@ async function limparArquivosSessao() {
   const r = await dialogo('Limpar arquivos da sessão', `<p class="small muted">Tira os arquivos da memória desta sessão. Rodadas, NCs, decisões e o fluxo continuam gravados.</p>
     <label class="opcao-conf"><input type="radio" name="oque" value="pdfs" checked> Só os PDFs do MV (${S.relatorios.length})</label>
     <label class="opcao-conf"><input type="radio" name="oque" value="bases"> Só Apolo e Power BI</label>
-    <label class="opcao-conf"><input type="radio" name="oque" value="tudo"> Tudo</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Limpar']]);
+    <label class="opcao-conf"><input type="radio" name="oque" value="tudo"> Tudo</label>
+    <label class="small" style="display:block;margin-top:8px"><input type="checkbox" name="apagarGuardadas"> apagar também as planilhas guardadas da competência ${rotuloCompetencia(S.comp)} (sem marcar, elas voltam ao recarregar a página)</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Limpar']]);
   if (r.botao !== 'ok') return;
+  if (r.campos.apagarGuardadas && r.campos.oque !== 'pdfs') for (const t of ['apolo', 'pbi']) await removerPlanilhaGuardada(t);
   limparSessao(r.campos.oque); avisar('Arquivos da sessão limpos.', 'ok'); RENDER.inicio();
 }
 // Na troca de competência: arquivos de outra produção podem ser limpos de uma vez.

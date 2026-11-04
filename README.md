@@ -38,6 +38,8 @@ node test/aceite_cobertura.mjs  # aceite na Conferência (F11) e cobertura/valid
 node test/fluxo_dados.mjs       # candidatos a NC guardados (F17) e Fluxo ligado aos dados (F14, F13, F16)
 node test/compostas.mjs         # regras compostas e por convênio (F5)
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
+node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
+node test/competencia10.mjs     # competência 10/2026 inteira com os arquivos reais (dados/comp_10-2026)
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 

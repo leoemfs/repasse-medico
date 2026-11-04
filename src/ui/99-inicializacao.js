@@ -14,10 +14,15 @@
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';
   await abrirDB(); S.rodadas = await dbTodas();
+  S.restaurando = true;   // o Início mostra «Restaurando…» até as planilhas guardadas voltarem
   window.addEventListener('hashchange', () => irPara(location.hash.slice(1)));
   irPara(location.hash.slice(1) || 'inicio');
   try {
     await carregarBibliotecas();
+    // Planilhas de laudos e do Power BI guardadas para a competência (pedido de 04/11/2026).
+    await aplicarRetencaoPlanilhas();
+    const nRest = await restaurarPlanilhasDaCompetencia(); S.restaurando = false;
+    if (nRest) irPara(location.hash.slice(1) || 'inicio', true); else if ((location.hash.slice(1) || 'inicio') === 'inicio') RENDER.inicio();
     const st = $('stInit'); st.className = 'badge ok'; st.textContent = 'Pronto · processamento local';
   } catch (e) {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';

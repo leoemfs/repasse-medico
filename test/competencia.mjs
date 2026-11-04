@@ -34,7 +34,7 @@ ok(!(await p.isVisible('#compGlobal')), 'Configurações sem seletor de competê
 await ir('inicio');
 await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 60000 });
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
-await p.waitForSelector('.painel-comp');
+await p.waitForSelector('.painel-comp'); await p.waitForSelector('#stApolo .guardada');
 const arqs = await p.$$eval('.painel-comp .grid3 > div:first-child .v', e => e.map(x => x.textContent));
 ok(arqs[0] === 'ok' && arqs[1] === 'ok' && !(await p.$('#pag-inicio .aviso-fixo')), `arquivos de produção 09/2026 conferem com a competência 10/2026 (${arqs.join(', ')})`);
 

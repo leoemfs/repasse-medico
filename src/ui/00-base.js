@@ -61,8 +61,9 @@ const DB = { db: null, ok: false };
 function abrirDB() {
   return new Promise(res => {
     try {
-      const rq = indexedDB.open('repasse-medico-v2', 1);
-      rq.onupgradeneeded = () => rq.result.createObjectStore('rodadas', { keyPath: 'id' });
+      // v2: «arquivos» guarda as planilhas de laudos e do Power BI por competência (já lidas, sem CPF).
+      const rq = indexedDB.open('repasse-medico-v2', 2);
+      rq.onupgradeneeded = () => { const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' }); };
       rq.onsuccess = () => { DB.db = rq.result; DB.ok = true; res(true); };
       rq.onerror = () => res(false);
     } catch (e) { res(false); }
@@ -154,7 +155,11 @@ function mudarCompetencia(chave) {
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
   atualizarNavFluxo();
   irPara(paginaAtual, true);
-  if (typeof oferecerLimpezaNaTroca === 'function') oferecerLimpezaNaTroca();
+  // Planilhas guardadas da nova competência entram no lugar das da sessão.
+  (typeof restaurarPlanilhasDaCompetencia === 'function' ? restaurarPlanilhasDaCompetencia() : Promise.resolve(0)).then(n => {
+    if (n) { irPara(paginaAtual, true); avisar(`Planilha(s) guardada(s) da competência ${rotuloCompetencia(chave)} carregada(s).`, 'ok'); }
+    if (typeof oferecerLimpezaNaTroca === 'function') oferecerLimpezaNaTroca();
+  });
 }
 const compFechada = (chave = S.comp) => competenciaFechada(S.compReg, chave);
 // Bloqueia alterações numa competência fechada; devolve verdadeiro se pode seguir.

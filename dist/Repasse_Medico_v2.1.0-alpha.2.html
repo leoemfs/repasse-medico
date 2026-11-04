@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.1</title>
+<title>Repasse Médico v2.1.0-alpha.2</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -275,13 +275,14 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .lote-dv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--infobg);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.lote-dv.vazio{opacity:.8}
 .sug-fx{display:block;margin-top:3px;font-size:11.5px;color:var(--info)}.sug-fx button{margin-left:4px;padding:1px 8px;font-size:11px}
 .pbi-resumo{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.pbi-resumo .marc{cursor:default}
+.guardada{margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.1 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.2 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -332,7 +333,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.1';
+const MOTOR_VERSAO = '2.1.0-alpha.2';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -3736,8 +3737,9 @@ const DB = { db: null, ok: false };
 function abrirDB() {
   return new Promise(res => {
     try {
-      const rq = indexedDB.open('repasse-medico-v2', 1);
-      rq.onupgradeneeded = () => rq.result.createObjectStore('rodadas', { keyPath: 'id' });
+      // v2: «arquivos» guarda as planilhas de laudos e do Power BI por competência (já lidas, sem CPF).
+      const rq = indexedDB.open('repasse-medico-v2', 2);
+      rq.onupgradeneeded = () => { const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' }); };
       rq.onsuccess = () => { DB.db = rq.result; DB.ok = true; res(true); };
       rq.onerror = () => res(false);
     } catch (e) { res(false); }
@@ -3829,7 +3831,11 @@ function mudarCompetencia(chave) {
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
   atualizarNavFluxo();
   irPara(paginaAtual, true);
-  if (typeof oferecerLimpezaNaTroca === 'function') oferecerLimpezaNaTroca();
+  // Planilhas guardadas da nova competência entram no lugar das da sessão.
+  (typeof restaurarPlanilhasDaCompetencia === 'function' ? restaurarPlanilhasDaCompetencia() : Promise.resolve(0)).then(n => {
+    if (n) { irPara(paginaAtual, true); avisar(`Planilha(s) guardada(s) da competência ${rotuloCompetencia(chave)} carregada(s).`, 'ok'); }
+    if (typeof oferecerLimpezaNaTroca === 'function') oferecerLimpezaNaTroca();
+  });
 }
 const compFechada = (chave = S.comp) => competenciaFechada(S.compReg, chave);
 // Bloqueia alterações numa competência fechada; devolve verdadeiro se pode seguir.
@@ -4027,6 +4033,89 @@ async function oferecerCadastro(fonte, nome) {
   return false;
 }
 
+/* ---- src/ui/08-planilhas-guardadas.js ---- */
+/* ============================================================
+ * Planilhas guardadas por competência (pedido de 04/11/2026)
+ * A planilha de laudos (Apolo) e a do Power BI ficam guardadas neste navegador para a competência:
+ * ao recarregar ou voltar, já estão carregadas. Guardar é opcional (padrão: sim) e trocar é só
+ * carregar outra (ex.: Power BI atualizado no meio do mês).
+ * Privacidade: guarda-se o que a ferramenta leu, não o arquivo original — o CPF do Power BI nunca é
+ * lido nem guardado. Têm nomes de pacientes: seguem a retenção das NCs (60 dias) e saem sozinhas depois.
+ * ============================================================ */
+const TIPOS_GUARDADOS = { apolo: 'planilha de laudos (Apolo)', pbi: 'planilha do Power BI' };
+const chaveGuardada = (tipo, comp = S.comp) => `${comp}|${tipo}`;
+const guardarPlanilhasAtivo = tipo => S.cfg.parametros.guardarPlanilhas?.[tipo] !== false;
+function dbArquivo(op, valor) {
+  if (!DB.ok || !DB.db.objectStoreNames.contains('arquivos')) return Promise.resolve(op === 'todas' ? [] : null);
+  return new Promise(res => {
+    const modo = op === 'get' || op === 'todas' ? 'readonly' : 'readwrite', tx = DB.db.transaction('arquivos', modo), st = tx.objectStore('arquivos');
+    const rq = op === 'get' ? st.get(valor) : op === 'todas' ? st.getAll() : op === 'put' ? st.put(valor) : st.delete(valor);
+    rq.onsuccess = () => res(op === 'get' || op === 'todas' ? (rq.result || (op === 'todas' ? [] : null)) : true);
+    rq.onerror = () => res(op === 'todas' ? [] : null);
+  });
+}
+// Cópia só com o que a ferramenta usa (sem bytes do arquivo original).
+function copiaParaGuardar(obj) { const c = {}; for (const k of Object.keys(obj)) c[k] = obj[k]; return c; }
+async function guardarPlanilha(tipo, obj) {
+  if (!guardarPlanilhasAtivo(tipo)) return false;
+  const reg = { id: chaveGuardada(tipo), comp: S.comp, tipo, nome: obj.nome, tamanho: obj.tamanho || 0, em: agoraISO(), por: S.operador || '', dados: copiaParaGuardar(obj) };
+  const ok = await dbArquivo('put', reg);
+  if (ok) obj.guardada = { em: reg.em, por: reg.por, comp: S.comp };
+  else avisar(`Não foi possível guardar a ${TIPOS_GUARDADOS[tipo]} neste navegador: ela fica só nesta sessão.`, 'warn');
+  return ok;
+}
+async function removerPlanilhaGuardada(tipo, comp = S.comp) {
+  await dbArquivo('del', chaveGuardada(tipo, comp));
+  const obj = tipo === 'apolo' ? S.apolo : S.pbi; if (obj?.guardada?.comp === comp) delete obj.guardada;
+}
+// Carrega as planilhas guardadas da competência do topo (troca as da sessão se forem de outra competência).
+async function restaurarPlanilhasDaCompetencia() {
+  let n = 0;
+  for (const tipo of Object.keys(TIPOS_GUARDADOS)) {
+    const atual = tipo === 'apolo' ? S.apolo : S.pbi;
+    if (atual?.guardada?.comp === S.comp) continue;
+    const reg = await dbArquivo('get', chaveGuardada(tipo));
+    if (!reg?.dados) continue;
+    const obj = reg.dados; obj.guardada = { em: reg.em, por: reg.por, comp: reg.comp };
+    if (tipo === 'apolo') S.apolo = obj; else S.pbi = obj;
+    n++;
+  }
+  return n;
+}
+// Retenção: planilhas guardadas há mais dias que o prazo das NCs saem do navegador.
+async function aplicarRetencaoPlanilhas() {
+  const dias = +S.cfg.parametros.retencaoNC || RETENCAO_NC_PADRAO, hoje = new Date();
+  let n = 0;
+  for (const r of await dbArquivo('todas')) if (idadeDias(r.em, hoje) > dias) { await dbArquivo('del', r.id); n++; }
+  return n;
+}
+// Linha de estado no cartão do Início: guardada desde quando, com as ações.
+function estadoGuardada(tipo, obj) {
+  if (!obj) return '';
+  const g = obj.guardada;
+  return `<div class="guardada small">${g ? `💾 Guardada nesta competência desde ${new Date(g.em).toLocaleString('pt-BR')}${g.por ? ` · ${esc(g.por)}` : ''}. Para trocar, carregue outra. <button class="sec mini" data-desguardar="${tipo}">Remover da competência</button>`
+    : `<span class="muted">Só nesta sessão (some ao recarregar).</span> <button class="sec mini" data-guardar="${tipo}">Guardar nesta competência</button>`}
+    <label class="small" style="display:block;margin-top:4px"><input type="checkbox" data-guardarauto="${tipo}"${guardarPlanilhasAtivo(tipo) ? ' checked' : ''}> guardar automaticamente quando eu carregar uma ${tipo === 'apolo' ? 'planilha de laudos' : 'planilha do Power BI'}</label></div>`;
+}
+function ligarPlanilhasGuardadas(raiz) {
+  raiz.querySelectorAll('[data-desguardar]').forEach(b => b.onclick = async () => {
+    const tipo = b.dataset.desguardar;
+    if (!await confirmar('Remover da competência?', `A ${TIPOS_GUARDADOS[tipo]} deixa de ficar guardada para ${rotuloCompetencia(S.comp)}. Ela continua carregada até você recarregar a página.`, 'Remover')) return;
+    await removerPlanilhaGuardada(tipo); avisar(`${TIPOS_GUARDADOS[tipo]} removida da competência ${rotuloCompetencia(S.comp)}.`, 'ok'); RENDER.inicio();
+  });
+  raiz.querySelectorAll('[data-guardar]').forEach(b => b.onclick = async () => {
+    const tipo = b.dataset.guardar, obj = tipo === 'apolo' ? S.apolo : S.pbi; if (!obj) return;
+    const ativo = S.cfg.parametros.guardarPlanilhas || {}; const antes = ativo[tipo];
+    S.cfg.parametros.guardarPlanilhas = { ...ativo, [tipo]: true };
+    if (await guardarPlanilha(tipo, obj)) avisar(`${TIPOS_GUARDADOS[tipo]} guardada para ${rotuloCompetencia(S.comp)}.`, 'ok');
+    S.cfg.parametros.guardarPlanilhas[tipo] = antes; RENDER.inicio();
+  });
+  raiz.querySelectorAll('[data-guardarauto]').forEach(ch => ch.onchange = () => {
+    S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
+    salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
+  });
+}
+
 /* ---- src/ui/10-inicio.js ---- */
 /* ============================================================
  * Início: arquivos da sessão (carregados uma vez, usados por todas as análises)
@@ -4050,10 +4139,10 @@ RENDER.inicio = () => {
       <div class="estado" id="stMV">${r.length ? `${r.length} relatório(s) carregado(s).` : '<span class="muted">Nenhum PDF carregado.</span>'}</div></div>
     <div class="card fonte"><h3>Laudos do Apolo (.xlsx)</h3>
       <div class="dz" id="dzApolo">Clique ou arraste a planilha<small>Formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input id="inApolo" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stApolo">${a ? resumoApolo(a) : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
+      <div class="estado" id="stApolo">${a ? resumoApolo(a) + estadoGuardada('apolo', a) : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
     <div class="card fonte"><h3>Power BI (.xlsx) — opcional</h3>
       <div class="dz" id="dzPBI">Clique ou arraste a planilha do Power BI<small>Catálogo de unidades, grupos, procedimentos e códigos de prestador</small><input id="inPBI" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>` : '<span class="muted">Não carregado.</span>'}</div></div>
+      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>${estadoGuardada('pbi', S.pbi)}` : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Não carregado.</span>'}</div></div>
   </div>
   <div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do MV carregados</h2>${S.relatorios.length || S.apolo || S.pbi ? '<button class="sec" id="btLimpar">Limpar arquivos…</button>' : ''}</div><div id="listaMV"></div></div>
   <div class="grid2">
@@ -4066,6 +4155,7 @@ RENDER.inicio = () => {
   document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
   ligarPainelCompetencia();
   if ($('btLimpar')) $('btLimpar').onclick = limparArquivosSessao;
+  ligarPlanilhasGuardadas($('pag-inicio'));
   if ($('btPbiBase')) $('btPbiBase').onclick = atualizarBasePowerBI;
   desenharListaMV();
 };
@@ -4193,6 +4283,7 @@ async function carregarApolo(f) {
     const ap = await lerApolo(bytes, f.name, n => { const b = $('barApolo'); if (b) b.style.width = Math.min(95, n / 300) + '%'; });
     if (!await aceitarProducao(f.name, producaoDoArquivo(ap, () => ap.laudos.map(l => l.data)))) return RENDER.inicio();
     S.apolo = ap; S.apolo.hash = hashBytes(bytes); S.apolo.tamanho = f.size; Object.defineProperty(S.apolo, 'bytes', { value: bytes, enumerable: false });
+    await guardarPlanilha('apolo', S.apolo);
     const semUnidade = [...new Set(S.apolo.laudos.map(l => norm(l.unidade)))].filter(u => !S.cfg.unidades.some(x => (x.apolo || []).map(norm).includes(u)));
     avisar(`${f.name}: ${S.apolo.laudos.length} laudos lidos.${semUnidade.length ? ` ${semUnidade.length} unidade(s) do Apolo sem cadastro em Bases.` : ''}`, semUnidade.length ? 'warn' : 'ok');
   } catch (e) { S.apolo = null; avisar(`${f.name}: ${e.message}`, 'err'); }
@@ -4206,7 +4297,7 @@ async function carregarPBI(f) {
     const bytesPB = await lerArquivo(f), pb = await lerPowerBI(bytesPB, f.name);
     Object.defineProperty(pb, 'bytes', { value: bytesPB, enumerable: false });
     if (!await aceitarProducao(f.name, producaoDoArquivo(pb, () => pb.linhas.map(l => l.data)))) return RENDER.inicio();
-    S.pbi = pb; avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
+    S.pbi = pb; pb.tamanho = f.size; await guardarPlanilha('pbi', pb); avisar(`${f.name}: ${S.pbi.linhas.length} linhas. Use «Atualizar base de dados com o Power BI» para trazer faturistas, convênios e procedimentos novos.`, 'ok');
   }
   catch (e) { S.pbi = null; avisar(`${f.name}: ${e.message}`, 'err'); }
   RENDER.inicio();
@@ -4255,8 +4346,10 @@ async function limparArquivosSessao() {
   const r = await dialogo('Limpar arquivos da sessão', `<p class="small muted">Tira os arquivos da memória desta sessão. Rodadas, NCs, decisões e o fluxo continuam gravados.</p>
     <label class="opcao-conf"><input type="radio" name="oque" value="pdfs" checked> Só os PDFs do MV (${S.relatorios.length})</label>
     <label class="opcao-conf"><input type="radio" name="oque" value="bases"> Só Apolo e Power BI</label>
-    <label class="opcao-conf"><input type="radio" name="oque" value="tudo"> Tudo</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Limpar']]);
+    <label class="opcao-conf"><input type="radio" name="oque" value="tudo"> Tudo</label>
+    <label class="small" style="display:block;margin-top:8px"><input type="checkbox" name="apagarGuardadas"> apagar também as planilhas guardadas da competência ${rotuloCompetencia(S.comp)} (sem marcar, elas voltam ao recarregar a página)</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Limpar']]);
   if (r.botao !== 'ok') return;
+  if (r.campos.apagarGuardadas && r.campos.oque !== 'pdfs') for (const t of ['apolo', 'pbi']) await removerPlanilhaGuardada(t);
   limparSessao(r.campos.oque); avisar('Arquivos da sessão limpos.', 'ok'); RENDER.inicio();
 }
 // Na troca de competência: arquivos de outra produção podem ser limpos de uma vez.
@@ -7038,10 +7131,15 @@ function aplicarTema() {
   $('operadorTopo').onclick = () => { S.operador = ''; exigirOperador(); };
   $('operadorTopo').style.cursor = 'pointer'; $('operadorTopo').title = 'Clique para trocar o operador';
   await abrirDB(); S.rodadas = await dbTodas();
+  S.restaurando = true;   // o Início mostra «Restaurando…» até as planilhas guardadas voltarem
   window.addEventListener('hashchange', () => irPara(location.hash.slice(1)));
   irPara(location.hash.slice(1) || 'inicio');
   try {
     await carregarBibliotecas();
+    // Planilhas de laudos e do Power BI guardadas para a competência (pedido de 04/11/2026).
+    await aplicarRetencaoPlanilhas();
+    const nRest = await restaurarPlanilhasDaCompetencia(); S.restaurando = false;
+    if (nRest) irPara(location.hash.slice(1) || 'inicio', true); else if ((location.hash.slice(1) || 'inicio') === 'inicio') RENDER.inicio();
     const st = $('stInit'); st.className = 'badge ok'; st.textContent = 'Pronto · processamento local';
   } catch (e) {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
