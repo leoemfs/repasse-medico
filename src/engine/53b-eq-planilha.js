@@ -8,7 +8,7 @@ function leituraRegraComposta(c0, descDe = () => '', curta = false) {
   const c = regraComposta(c0), qt = n => `${n}×`;
   const reconhece = c.titulos.length ? `Laudo com o título ${c.titulos.map(t => `«${t}»`).join(' ou ')}` : 'Laudo';
   const pal = c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? `${c.titulos.length ? ' ou com' : ' com'} título que contém ${(c.palavras.todas || []).join(' e ')}${(c.palavras.umaDe || []).length ? `${(c.palavras.todas || []).length ? ' e ' : ''}uma destas palavras: ${c.palavras.umaDe.join(', ')}` : ''}` : '';
-  const itens = c.itens.map(it => `${qt(it.qtd)} ${it.codigos.map(cd => `${cd}${descDe(cd) ? ` (${descDe(cd)})` : ''}`).join(' ou ')}${it.rotulo && !it.codigos.some(cd => descDe(cd)) ? ` [${it.rotulo}]` : ''}`);
+  const itens = c.itens.map(it => `${qt(it.qtd)} ${it.codigos.map(cd => `${cd}${descDe(cd) ? ` (${descDe(cd)})` : ''}`).join(' ou ')}${it.rotulo && !it.codigos.some(cd => descDe(cd)) && !it.codigos.includes(it.rotulo) && it.rotulo !== 'um dos códigos' ? ` [${it.rotulo}]` : ''}`);
   const esp = itens.length === 1 && c.itens[0].codigos.length > 1 ? `uma linha com qualquer um destes códigos: ${itens[0].replace(/^1× /, '')}` : itens.join(' e ');
   const exc = c.itens.flatMap(it => (it.excecoes || []).map(e => `No convênio ${e.convenio}, ${it.rotulo || it.codigos[0]} ${e.tipo === 'nao-exigido' ? 'não é exigido (se vier na conta, sobra)' : `é esperado ${qt(e.qtd)}`}.`));
   const unid = c.escopo?.unidade && c.escopo.unidade !== '*' ? ` Vale só na unidade ${c.escopo.unidade}.` : '';

@@ -36,6 +36,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Laudo do mesmo estudo (alpha.13):** o 2º laudo do mesmo exame (ex.: «Doppler de transvaginal» no dia da «USG transvaginal com Doppler») não aparece mais como faltante quando a regra composta já fechou; um clique inclui o título na regra.
 
+- **Cadastro de regra composta em 4 perguntas (alpha.16):** título do laudo → todos / um destes procedimentos → exceção por convênio → laudos do mesmo exame, com «Como vai funcionar» em português. Na lista, «⇄ Um ou outro / Juntos» troca o modo com um clique (alpha.15).
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

@@ -853,4 +853,13 @@ Pedido: «Não estou entendendo a configuração das regras compostas; coloque u
 Pedido: a regra do escroto («ULTRASSONOGRAFIA DO ESCROTO» ou «… DA BOLSA ESCROTAL») estava como 1× 40901204 **e** 1× 40901203; deveria ser 40901204 **ou** 40901203.
 - **Lista de regras compostas:** botão «⇄ Um ou outro» / «⇄ Juntos» em cada regra com mais de um código. Mostra «Hoje» e «Fica» em português, pede justificativa, mantém o status (validada continua validada) e grava a troca no histórico. Rodar as conferências de novo para aplicar.
 - **Cadastro da regra:** escolha «Juntos — a conta tem cada procedimento» / «Um ou outro — a conta tem um dos códigos» acima da composição; em «Um ou outro», os códigos preenchidos viram alternativas de uma linha só.
-- Próximo: tela de cadastro mais simples (pedido: «essa tela também está muito confusa») — prévia enviada.
+
+## Cadastro de regra composta em 4 perguntas (09/11/2026, v2.1.0-alpha.16) — prévia aprovada
+Pedido: «essa tela também está muito confusa, preciso que seja mais fácil de entender»; prévia aprovada.
+- **1. Quando o laudo do Apolo tiver o título…** títulos como etiquetas (busca acrescenta; ✕ tira). «Reconhecer por palavras do título» fica recolhido.
+- **2. …a conta do MV deve ter:** «Todos estes procedimentos» (juntos) ou «Um destes procedimentos» (um ou outro). Cada procedimento entra pela busca TUSS e aparece com o código e a descrição do MV; «vezes − n +» só no modo «todos»; ✕ tira. Regras antigas com alternativas dentro de um item continuam aparecendo («40901220 ou 40901221»).
+- **3. Exceção por convênio (opcional):** uma linha por exceção — «No convênio [UNIMED] o procedimento [Doppler] [não é cobrado / é cobrado N vez(es)]».
+- **4. Outros laudos do mesmo exame (opcional):** títulos que não cobram outra linha (mesmo paciente e dia).
+- **Como vai funcionar:** a regra em português, atualizada enquanto se preenche.
+- **Mais opções** (recolhido): nome (preenchido com o 1º título), unidade, justificativa. Saem «nome curto» (vem da descrição do MV, sem cortar palavra), «alternativas na mesma posição» e as três caixas fixas de procedimento.
+- Validação: «um destes» com um item e 2+ códigos é válido; Enter numa busca não fecha a tela. Descrição do código: catálogo das equivalências, catálogo TUSS geral ou o nome escolhido na busca.

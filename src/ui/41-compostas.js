@@ -120,48 +120,101 @@ function validarRegraComposta(c, outras) {
   if (!c.titulos.length && !c.palavras) e.push('informe ao menos um título do Apolo ou as palavras do título');
   if (!c.itens.length) e.push('inclua os procedimentos da conta');
   const soma = c.itens.reduce((s, it) => s + it.qtd, 0);
-  if (soma < 2 && !c.itens.some(it => it.excecoes.length)) e.push('a composição precisa de 2 ou mais procedimentos (ou quantidade 2), ou de uma exceção por convênio; para um código só, use a relação simples');
+  if (soma < 2 && !c.itens.some(it => it.excecoes.length) && !(c.itens.length === 1 && c.itens[0].codigos.length > 1)) e.push('a composição precisa de 2 ou mais procedimentos (ou quantidade 2), ou de uma exceção por convênio; para um código só, use a relação simples');
   const dup = outras.find(o => o.status !== 'desativada' && o.escopo.unidade === c.escopo.unidade && c.titulos.some(t => o.titulos.some(u => chaveTitulo(u) === chaveTitulo(t))));
   if (dup) e.push(`o título já está na regra «${nomeComposta(dup)}»`);
   return e;
+}
+/* Cadastro de regra composta em 4 perguntas (aprovado em 09/11/2026):
+ * 1) quando o laudo tiver o título… 2) a conta deve ter todos / um destes procedimentos 3) exceção por convênio
+ * 4) outros laudos do mesmo exame — e «Como vai funcionar» em português, atualizado enquanto se preenche. */
+function edDaRegra(c0) {
+  const c = regraComposta(c0), modo = modoComposta(c);
+  const procs = modo === 'ou' ? c.itens[0].codigos.map(cd => ({ codigos: [cd], qtd: 1, rotulo: '' })) : c.itens.map(it => ({ codigos: [...it.codigos], qtd: +it.qtd || 1, rotulo: it.rotulo || '' }));
+  const excs = c.itens.flatMap((it, i) => (it.excecoes || []).map(e => ({ convenio: e.convenio, item: modo === 'ou' ? 0 : i, tipo: e.tipo, qtd: +e.qtd || 0 })));
+  return { nome: c.nome || '', nomeAuto: !c.nome, unidade: c.escopo?.unidade || '*', just: c.justificativa || '', titulos: [...c.titulos], palTodas: (c.palavras?.todas || []).join(', '), palUmaDe: (c.palavras?.umaDe || []).join(', '), modo, procs, excs, mesmoEstudo: [...(c.titulosMesmoEstudo || [])] };
+}
+function regraDoEd(ED, base) {
+  // Nome curto do item: o que já tinha, ou a descrição do MV até « - » ou «(», sem cortar palavra.
+  const curto = d => { let t = String(d || '').split(/\s+-\s+|\s*\(/)[0].trim(); if (t.length > 40) t = t.slice(0, 40).replace(/\s+\S*$/, ''); return t; };
+  const rot = p => p.rotulo || curto(descTussUI(p.codigos[0]) || p.desc) || p.codigos[0];
+  const exc = i => ED.excs.filter(e => e.convenio.trim() && e.item === i).map(e => ({ convenio: e.convenio.trim().toUpperCase(), tipo: e.tipo, qtd: e.tipo === 'quantidade' ? Math.max(0, +e.qtd || 0) : 0 }));
+  const itens = ED.modo === 'ou' ? (ED.procs.length ? [{ rotulo: 'um dos códigos', codigos: [...new Set(ED.procs.flatMap(p => p.codigos))], qtd: 1, excecoes: exc(0) }] : [])
+    : ED.procs.map((p, i) => ({ rotulo: rot(p), codigos: p.codigos, qtd: Math.max(1, +p.qtd || 1), excecoes: exc(i) }));
+  const palavras = { todas: lerPalavras(ED.palTodas), umaDe: lerPalavras(ED.palUmaDe) };
+  const nome = ED.nome.trim() || (ED.titulos[0] ? ED.titulos[0].slice(0, 60) : '');
+  return { ...base, nome, titulos: [...ED.titulos], palavras: palavras.todas.length || palavras.umaDe.length ? palavras : null, itens, escopo: { unidade: ED.unidade || '*', modalidade: '*' }, justificativa: ED.just.trim(), titulosMesmoEstudo: [...ED.mesmoEstudo] };
 }
 async function editarComposta(id, rascunho = null, sim = null) {
   const op = await exigirOperador(); if (!op) return;
   S.eq.compostas = S.eq.compostas || [];
   const atual = id ? S.eq.compostas.find(x => x.id === id) : null;
-  const c = rascunho || (atual ? regraComposta(atual) : novaComposta({ itens: [] }));
-  const itens = [...c.itens]; while (itens.length < 3) itens.push({ rotulo: '', codigos: [], qtd: 1, excecoes: [] });
-  const linhaItem = (it, i) => { const ex = (it.excecoes || [])[0] || {}; return `<div class="item-cp">
-    <div>${campoBusca({ nome: 'cod' + i, rotulo: `Procedimento ${i + 1} (busca TUSS)`, fonte: 'tuss', valor: it.codigos[0] || '', valorCodigo: true, livre: true })}
-      ${campoBusca({ nome: 'altBusca' + i, rotulo: 'Alternativas na mesma posição (opcional)', fonte: 'tuss', valorCodigo: true, livre: true })}<input type="text" name="alt${i}" value="${esc(it.codigos.slice(1).join(', '))}" placeholder="códigos aceitos no lugar deste" class="alt-cp"></div>
-    <div><label class="campo">Nome curto<input type="text" name="rot${i}" value="${esc(it.rotulo || '')}" placeholder="ex.: Doppler"></label><label class="campo">Qtd.<input type="number" min="0" step="1" name="qtd${i}" value="${it.qtd ?? 1}" style="max-width:80px"></label></div>
-    <div>${campoBusca({ nome: 'excConv' + i, rotulo: 'Exceção: convênio contém', fonte: 'convenio', valor: ex.convenio || '', livre: true })}
-      <label class="campo">No convênio<select name="excTipo${i}">${opcoes([['', '— sem exceção —'], ['nao-exigido', 'não exigido (excludente)'], ['quantidade', 'outra quantidade']], ex.tipo || '')}</select></label>
-      <label class="campo">Qtd. no convênio<input type="number" min="0" step="1" name="excQtd${i}" value="${ex.tipo === 'quantidade' ? ex.qtd : ''}" style="max-width:80px"></label></div></div>`; };
+  const ED = edDaRegra(rascunho || (atual ? regraComposta(atual) : novaComposta({ itens: [] })));
+  const chip = (t, ac, i) => `<span class="cp-chip">${esc(t)}<button type="button" data-ed="${ac}" data-i="${i}" aria-label="Tirar">✕</button></span>`;
+  const desenharPassos = () => {
+    const procs = ED.procs.map((p, i) => `${ED.modo === 'ou' && i ? '<div class="cp-ou">ou</div>' : ''}<div class="cp-proc"><span><b>${esc(p.codigos.join(' ou '))}</b> · ${esc(p.codigos.map(descTussUI).filter(Boolean).join(' / ') || p.desc || (p.rotulo !== p.codigos[0] ? p.rotulo : '') || '')}</span>
+      ${ED.modo === 'juntos' ? `<span class="cp-qtd">vezes <button type="button" data-ed="menos" data-i="${i}">−</button><b>${p.qtd}</b><button type="button" data-ed="mais" data-i="${i}">+</button></span>` : '<span></span>'}<button type="button" class="cp-x" data-ed="tirarProc" data-i="${i}" aria-label="Tirar procedimento">✕</button></div>`).join('');
+    const excs = ED.excs.map((e, i) => `<div class="cp-exc">No convênio <input type="text" data-exc="convenio" data-i="${i}" value="${esc(e.convenio)}" placeholder="ex.: UNIMED" list="cpConv">
+      ${ED.modo === 'juntos' ? `o procedimento <select data-exc="item" data-i="${i}">${ED.procs.map((p, k) => `<option value="${k}"${k === e.item ? ' selected' : ''}>${esc(p.codigos.join(' ou '))} ${esc(descTussUI(p.codigos[0]).slice(0, 30))}</option>`).join('')}</select>` : 'o procedimento'}
+      <select data-exc="tipo" data-i="${i}"><option value="nao-exigido"${e.tipo === 'nao-exigido' ? ' selected' : ''}>não é cobrado</option><option value="quantidade"${e.tipo === 'quantidade' ? ' selected' : ''}>é cobrado</option></select>
+      ${e.tipo === 'quantidade' ? `<input type="number" min="0" data-exc="qtd" data-i="${i}" value="${e.qtd}" style="width:60px"> vez(es)` : ''}<button type="button" class="cp-x" data-ed="tirarExc" data-i="${i}" aria-label="Tirar exceção">✕</button></div>`).join('');
+    $('cpPassos').innerHTML = `
+      <div class="cp-passo"><div class="cp-n">1</div><div><h4>Quando o laudo do Apolo tiver o título…</h4>
+        <div class="cp-chips">${ED.titulos.map((t, i) => chip(t, 'tirarTitulo', i)).join('')}</div>
+        ${campoBusca({ nome: 'cpTitulo', rotulo: '', fonte: 'titulo', livre: true, dica: '' })}
+        <details class="cp-mais"${ED.palTodas || ED.palUmaDe ? ' open' : ''}><summary>Reconhecer por palavras do título (para muitas variações, ex.: «DOPPLER» + «PUNHO, OMBRO, JOELHO»)</summary>
+          <div class="grid2"><label class="campo">O título contém todas estas<input type="text" data-campo="palTodas" value="${esc(ED.palTodas)}" placeholder="ex.: DOPPLER"></label>
+          <label class="campo">e pelo menos uma destas (opcional)<input type="text" data-campo="palUmaDe" value="${esc(ED.palUmaDe)}" placeholder="ex.: PUNHO, OMBRO, JOELHO"></label></div><span class="small muted">Separe por vírgula.</span></details></div></div>
+      <div class="cp-passo"><div class="cp-n">2</div><div><h4>…a conta do MV deve ter:</h4>
+        <div class="cp-modo"><button type="button" class="${ED.modo === 'juntos' ? 'on' : ''}" data-ed="modo" data-i="juntos"><b>${ED.modo === 'juntos' ? '◉' : '○'} Todos estes procedimentos</b><small>juntos na mesma conta (ex.: transvaginal <b>e</b> Doppler)</small></button>
+          <button type="button" class="${ED.modo === 'ou' ? 'on' : ''}" data-ed="modo" data-i="ou"><b>${ED.modo === 'ou' ? '◉' : '○'} Um destes procedimentos</b><small>qualquer um confirma (ex.: bolsa escrotal <b>ou</b> órgãos superficiais)</small></button></div>
+        ${procs || '<p class="small muted">Nenhum procedimento ainda.</p>'}
+        ${campoBusca({ nome: 'cpProc', rotulo: '', fonte: 'tuss', valorCodigo: true, livre: true })}<span class="small muted">+ adicionar procedimento: digite o código ou o nome TUSS e escolha.</span></div></div>
+      <div class="cp-passo"><div class="cp-n">3</div><div><h4>Exceção por convênio <span class="muted small">(opcional)</span></h4>
+        ${excs}<button type="button" class="sec mini" data-ed="novaExc">+ adicionar exceção (ex.: na UNIMED o Doppler não é cobrado)</button>
+        <datalist id="cpConv">${(S.cfg.convenios || []).map(cv => `<option value="${esc(cv.nome || cv)}">`).join('')}</datalist></div></div>
+      <div class="cp-passo"><div class="cp-n">4</div><div><h4>Outros laudos do mesmo exame <span class="muted small">(opcional — não cobram outra linha)</span></h4>
+        <div class="cp-chips">${ED.mesmoEstudo.map((t, i) => chip(t, 'tirarMesmo', i)).join('')}</div>
+        ${campoBusca({ nome: 'cpMesmo', rotulo: '', fonte: 'titulo', livre: true })}</div></div>`;
+    ligarBuscas($('cpPassos'));
+    $('cpPassos').querySelector('[name="cpTitulo"]').addEventListener('busca-escolha', e => { const v = (e.detail?.nome || '').trim(); if (v && !ED.titulos.includes(v)) ED.titulos.push(v); redesenhar(); });
+    $('cpPassos').querySelector('[name="cpMesmo"]').addEventListener('busca-escolha', e => { const v = (e.detail?.nome || '').trim(); if (v && !ED.mesmoEstudo.includes(v)) ED.mesmoEstudo.push(v); redesenhar(); });
+    $('cpPassos').querySelector('[name="cpProc"]').addEventListener('busca-escolha', e => { const v = String(e.detail?.cod || e.target.value || '').replace(/\D/g, ''), nm = e.detail?.nome && e.detail.nome !== v ? e.detail.nome : ''; if (v.length >= 5 && !ED.procs.some(p => p.codigos.includes(v))) ED.procs.push({ codigos: [v], qtd: 1, rotulo: '', desc: nm }); redesenhar(); });
+    $('cpPassos').querySelectorAll('[data-campo]').forEach(i => i.oninput = () => { ED[i.dataset.campo] = i.value; atualizarComo(); });
+    $('cpPassos').querySelectorAll('[data-exc]').forEach(i => i.oninput = i.onchange = () => { const e = ED.excs[+i.dataset.i], k = i.dataset.exc; e[k] = k === 'item' || k === 'qtd' ? +i.value : i.value; if (k === 'tipo') redesenhar(); else atualizarComo(); });
+    $('cpPassos').querySelectorAll('[data-ed]').forEach(b => b.onclick = () => {
+      const i = b.dataset.i, a = b.dataset.ed;
+      if (a === 'tirarTitulo') ED.titulos.splice(+i, 1); else if (a === 'tirarMesmo') ED.mesmoEstudo.splice(+i, 1);
+      else if (a === 'tirarProc') { ED.procs.splice(+i, 1); ED.excs = ED.excs.filter(e => e.item !== +i).map(e => ({ ...e, item: e.item > +i ? e.item - 1 : e.item })); }
+      else if (a === 'mais') ED.procs[+i].qtd++; else if (a === 'menos') ED.procs[+i].qtd = Math.max(1, ED.procs[+i].qtd - 1);
+      else if (a === 'modo') { ED.modo = i; if (i === 'ou') ED.excs.forEach(e => { e.item = 0; }); }
+      else if (a === 'novaExc') ED.excs.push({ convenio: '', item: 0, tipo: 'nao-exigido', qtd: 0 });
+      else if (a === 'tirarExc') ED.excs.splice(+i, 1);
+      redesenhar();
+    });
+  };
+  const atualizarComo = () => {
+    const r = regraDoEd(ED, {}), ok = (r.titulos.length || r.palavras) && r.itens.length;
+    $('cpComo').innerHTML = ok ? `<b>Como vai funcionar:</b> ${esc(leituraRegraComposta(r, descTussUI))}` : '<b>Como vai funcionar:</b> <span class="muted">escolha o título do laudo (1) e os procedimentos da conta (2).</span>';
+    const n = $('dlgCorpo').querySelector('[data-campo="nome"]'); if (n && ED.nomeAuto) n.placeholder = r.nome || 'preenchido com o 1º título';
+  };
+  const redesenhar = () => { desenharPassos(); atualizarComo(); };
   const pr = dialogo(`${atual ? 'Editar' : 'Nova'} regra composta`, `<span class="dlg-largo" hidden></span>
-    ${sim ? `<div class="sim-cp"><b>Simulação nesta competência:</b> sustenta <b>${sim.contas} conta(s) (${sim.linhas} linha(s))</b> · ${sim.falta} com composição incompleta · ${sim.sobra} sobrando · ${sim.relatorios} relatório(s) refeito(s)${sim.semRodada ? `, ${sim.semRodada} sem conferência` : ''}.${sim.exemplos.length ? `<details><summary class="small">ver exemplos</summary>${listaExemplosCP(sim.exemplos)}</details>` : ''}</div>` : ''}
-    <div class="grid2"><label class="campo">Nome da regra *<input type="text" name="nome" value="${esc(c.nome || '')}" placeholder="ex.: USG mamas + Doppler"></label>
-      <label class="campo">Unidade<select name="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), c.escopo?.unidade || '*')}</select></label></div>
-    <h4 style="margin:8px 0 4px">Títulos do Apolo que a regra reconhece</h4>
-    <div class="grid2"><div>${campoBusca({ nome: 'tituloBusca', rotulo: '+ Título (busca nos títulos do Apolo)', fonte: 'titulo', livre: true, dica: 'escolher acrescenta à lista abaixo' })}
-      <label class="campo">Títulos (um por linha)<textarea name="titulos" rows="3">${esc(c.titulos.join('\n'))}</textarea></label></div>
-      <div><label class="campo">Ou por palavras: o título contém todas estas<input type="text" name="palTodas" value="${esc((c.palavras?.todas || []).join(', '))}" placeholder="ex.: DOPPLER"></label>
-      <label class="campo">e pelo menos uma destas (opcional)<input type="text" name="palUmaDe" value="${esc((c.palavras?.umaDe || []).join(', '))}" placeholder="ex.: ARTICULAR, PUNHO, OMBRO, JOELHO"></label><span class="small muted">Para variações de nome. Separe por vírgula.</span></div></div>
-    <h4 style="margin:10px 0 4px">Composição na conta do MV</h4>
-    <div class="modo-cp"><label><input type="radio" name="modo" value="juntos"${modoComposta(c) === 'juntos' ? ' checked' : ''}> <b>Juntos</b> — a conta tem <b>cada</b> procedimento abaixo (ex.: transvaginal <b>e</b> Doppler)</label>
-      <label><input type="radio" name="modo" value="ou"${modoComposta(c) === 'ou' ? ' checked' : ''}> <b>Um ou outro</b> — a conta tem <b>um</b> dos códigos abaixo (ex.: escroto = bolsa escrotal <b>ou</b> órgãos superficiais)</label>
-      <span class="small muted">Em «Um ou outro», todos os códigos preenchidos viram alternativas de uma linha só (quantidade 1, sem exceção por convênio).</span></div>
-    <div class="itens-cp">${itens.slice(0, MAX_ITENS_CP).map(linhaItem).join('')}</div>
-    ${itens.length < MAX_ITENS_CP ? '<p class="small muted">Precisa de mais procedimentos? Salve e edite de novo: aparecem mais linhas.</p>' : ''}
-    <label class="campo">Justificativa<input type="text" name="just" value="${esc(c.justificativa || '')}"></label>
-    <p class="small muted">Excludente de convênio: o convênio não remunera aquele procedimento nessa combinação. O texto do convênio vale para todos que o contêm («UNIMED» pega UNIMED CURITIBA, UNIMED LONDRINA…). Editar uma regra validada volta ela para pendente.</p>`,
+    ${sim ? `<div class="sim-cp"><b>Simulação nesta competência:</b> sustenta <b>${sim.contas} conta(s) (${sim.linhas} linha(s))</b> · ${sim.falta} com composição incompleta · ${sim.sobra} sobrando · ${sim.relatorios} relatório(s) refeito(s)${sim.semRodada ? ` · ${sim.semRodada} sem rodada` : ''}</div>` : ''}
+    <div id="cpPassos"></div><div class="cp-como" id="cpComo"></div>
+    <details class="cp-mais"><summary>Mais opções: nome da regra (preenchido sozinho), só numa unidade, justificativa</summary>
+      <div class="grid2"><label class="campo">Nome da regra<input type="text" data-campo="nome" value="${esc(ED.nomeAuto ? '' : ED.nome)}"></label>
+      <label class="campo">Unidade<select data-campo="unidade"><option value="*">Todas</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), ED.unidade)}</select></label></div>
+      <label class="campo">Justificativa<input type="text" data-campo="just" value="${esc(ED.just)}"></label>
+      <p class="small muted">O texto do convênio vale para todos que o contêm («UNIMED» pega UNIMED CURITIBA, UNIMED LONDRINA…). Editar uma regra validada volta ela para pendente, a não ser que você salve e valide.</p></details>`,
     [['', 'Cancelar', 'sec'], ['simular', 'Simular nesta competência', 'sec'], ['pendente', 'Salvar pendente', 'sec'], ['ok', 'Salvar e validar']]);
-  const corpo = $('dlgCorpo');
-  corpo.querySelector('[name="tituloBusca"]').addEventListener('busca-escolha', e => { const t = corpo.querySelector('[name="titulos"]'), v = (e.detail?.nome || '').trim(); if (v && !t.value.split('\n').map(x => x.trim()).includes(v)) t.value = (t.value.trim() ? t.value.trim() + '\n' : '') + v; e.target.value = ''; });
-  for (let i = 0; i < MAX_ITENS_CP; i++) { const b = corpo.querySelector(`[name="altBusca${i}"]`); if (b) b.addEventListener('busca-escolha', e => { const a = corpo.querySelector(`[name="alt${i}"]`), v = (e.detail?.cod || e.target.value || '').replace(/\D/g, ''); if (v && !lerCodigos(a.value).includes(v)) a.value = [...lerCodigos(a.value), v].join(', '); e.target.value = ''; }); }
+  redesenhar();
+  $('dlgCorpo').querySelectorAll('details.cp-mais [data-campo]').forEach(i => i.oninput = i.onchange = () => { ED[i.dataset.campo] = i.value; if (i.dataset.campo === 'nome') ED.nomeAuto = !i.value.trim(); atualizarComo(); });
+  // Enter numa busca não fecha o diálogo.
+  $('dlgCorpo').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('input')) e.preventDefault(); });
   const r = await pr;
   if (!r.botao) return;
-  const nova = regraDoFormulario(r.campos, atual ? regraComposta(atual) : novaComposta({}));
+  const nova = regraDoEd(ED, atual ? regraComposta(atual) : novaComposta({}));
   if (r.botao === 'simular') {
     if (!nova.itens.length) { avisar('Inclua os procedimentos para simular.', 'warn'); return editarComposta(id, nova); }
     avisar('Simulando nas conferências da competência…', 'info');
@@ -170,8 +223,7 @@ async function editarComposta(id, rascunho = null, sim = null) {
   }
   const erros = validarRegraComposta(nova, (S.eq.compostas || []).filter(x => x !== atual).map(regraComposta));
   if (erros.length) { avisar('Regra não gravada: ' + erros.join('; ') + '.', 'warn'); return editarComposta(id, nova, sim); }
-  const dados = { nome: nova.nome, titulos: nova.titulos, palavras: nova.palavras, itens: nova.itens, escopo: nova.escopo, justificativa: nova.justificativa };
-  if (atual?.titulosMesmoEstudo) dados.titulosMesmoEstudo = atual.titulosMesmoEstudo;
+  const dados = { nome: nova.nome, titulos: nova.titulos, palavras: nova.palavras, itens: nova.itens, escopo: nova.escopo, justificativa: nova.justificativa, titulosMesmoEstudo: nova.titulosMesmoEstudo };
   let alvo;
   if (atual) {
     const antes = JSON.stringify(regraComposta(atual).itens) + JSON.stringify([regraComposta(atual).titulos, atual.palavras || null, atual.escopo]);
@@ -189,5 +241,8 @@ async function editarComposta(id, rascunho = null, sim = null) {
 // Descrição do código TUSS (catálogo da base ou descrição do MV nas relações), para a leitura em português das regras.
 function descTussUI(cd) {
   const k = String(cd); if (!descTussUI.m || descTussUI.rev !== S.eq.revisao) { const m = new Map(); for (const t of S.eq.catalogoTUSS || []) m.set(String(t.codigo), t.desc || t.descricao || ''); for (const e of S.eq.itens || []) if (e.descMV && !m.has(e.codigo)) m.set(e.codigo, e.descMV); descTussUI.m = m; descTussUI.rev = S.eq.revisao; }
-  return descTussUI.m.get(k) || '';
+  if (descTussUI.m.has(k)) return descTussUI.m.get(k);
+  // Catálogo TUSS geral (base de dados, Power BI, relatórios carregados).
+  try { const it = catalogo('tuss', S.cfg, contextoCatalogo()).find(x => String(x.cod) === k); if (it?.nome) { descTussUI.m.set(k, it.nome); return it.nome; } } catch (e) { /* sem catálogo */ }
+  return '';
 }
