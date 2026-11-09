@@ -738,7 +738,7 @@ Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para 
 - As marcas da competência ficam neste navegador (`rm2.controleUnidades`), sem dado de paciente.
 - **Teste com a competência 10/2026 real** (`test/prestadores_unidade.mjs`): todo laudo da planilha cai em exatamente um prestador da sua unidade e grupo; unidade 17 · USG: 22 médicos laudaram; com o PDF e a conferência do prestador 15, a situação passa a «Conferido» e, com o aceite, a «Aceito». Na unidade 5, 7 médicos do Apolo aparecem «sem cadastro» na base de teste (entre eles o Dr. Ian, que precisa estar ligado ao código dele no MV).
 
-## SOL-F36 — Fluxo mensal sincronizado pela pasta da rede e divisão das unidades — prévia enviada (09/11/2026)
+## SOL-F36 — Fluxo mensal sincronizado pela pasta da rede e divisão das unidades — IMPLEMENTADA na v2.1.0-alpha.6 (09/11/2026)
 Pedido: «Uso junto de outro colaborador; dá para conectar o Fluxo mensal e sincronizar? Rede da empresa, os dois usam Edge, só o Fluxo por enquanto. Preciso saber se ele está fazendo a unidade 1 e eu faço outra.»
 - **Sincronização:** um arquivo por competência (`fluxo_comp_MM-AAAA.json`) numa pasta da rede escolhida uma vez em cada computador (File System Access do Edge; «permitir sempre»). Com o Fluxo aberto: confere o arquivo a cada 30 s e grava logo depois de cada mudança. Sem acesso à pasta: barra amarela, mudanças ficam no navegador e vão quando voltar.
 - **Mescla por etapa:** mudanças em etapas diferentes se juntam sozinhas; a mesma etapa alterada pelos dois desde a última sincronização pede escolha («ficar com a minha / com a da outra pessoa»), e as duas versões ficam no histórico.
@@ -748,3 +748,13 @@ Pedido: «Uso junto de outro colaborador; dá para conectar o Fluxo mensal e sin
 - **Vai para a pasta:** só o Fluxo mensal (etapas, status, datas, anotações, controle documental e quem assumiu cada unidade). Nada de paciente, PDF ou planilha.
 - **Fica para depois:** Bases, Equivalências, NCs e conferências continuam por navegador. O Fechamento da competência inteira continua vendo só os aceites de quem o abre; juntar as conferências dos dois é uma etapa seguinte.
 - Tamanho estimado: M.
+
+### SOL-F36 — implementação (v2.1.0-alpha.6, 09/11/2026)
+- **Pasta:** uma pasta da rede só para isso (ex.: `Repasse Médico\Fluxo compartilhado`), escolhida uma vez em cada computador em Fluxo → «Conectar à pasta da rede…». Não precisa separar por competência: a ferramenta cria um arquivo por competência (`fluxo_comp_MM-AAAA.json`) e usa o da competência do topo.
+- **Barra no topo do Fluxo:** Sincronizado (pasta, há quanto tempo conferiu, quem gravou por último) · Liberar acesso (o Edge pede a permissão por sessão, ou «permitir sempre») · Sem acesso à pasta (mudanças ficam no navegador e sobem quando voltar) · Resolver conflitos. Botões Atualizar agora, Trocar pasta, Desconectar.
+- **Quando sincroniza:** ao conectar, ao entrar no Fluxo, 0,8 s depois de cada mudança, e a cada 30 s com o navegador visível, se o arquivo mudou.
+- **Mescla:** por etapa, controle documental de cada prestador, classificação, marcos, anotações e divisão. A primeira sincronização de cada pessoa nunca gera conflito: etapas ficam com a mudança mais recente e o histórico das duas, e o controle documental junta o que estiver preenchido. Depois, a mesma etapa mudada pelos dois pede escolha; «Decidir depois» deixa a barra em «Resolver».
+- **Divisão do trabalho** (card no Fluxo): unidade × grupo (USG e IMG; Curitiba nas unidades V3). Assumir · Liberar · Concluir · Reabrir · «Assumir eu» (pede confirmação quando está com outra pessoa). Quem está com a unidade grava o resumo de Prestadores por unidade (faltam, a gerar, conferindo). «Últimas mudanças» lista quem fez o quê.
+- **Aviso:** em Prestadores por unidade e na Conferência (ao escolher unidade e relatório), «A unidade X está com Fulano» com «Continuar mesmo assim» (registrado na divisão).
+- **Prestadores por unidade:** a situação de quem tem rodada sem aceite passou a «Conferindo» (até o aceite), e o PDF carregado só conta como «relatório sem conferência» na unidade indicada no nome do arquivo (ex.: `_un17`), quando houver.
+- Teste: `test/fluxo_sync.mjs` (dois usuários com navegadores separados e uma pasta simulada em disco).

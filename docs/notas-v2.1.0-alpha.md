@@ -24,6 +24,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Prestadores por unidade (alpha.5, SOL-F35):** na Conferência, quem laudou na planilha de laudos × quem já tem relatório, conferência e aceite, por unidade (USG com Doppler, IMG e Curitiba pela regra V3). Lista «gerar no MV» em Excel ou impressa, avisos no Início, no Fechamento e no Fluxo.
 
+- **Fluxo compartilhado (alpha.6, SOL-F36):** o Fluxo mensal pode ficar numa pasta da rede e sincroniza entre as pessoas (Edge ou Chrome). Card «Divisão do trabalho»: quem assumiu cada unidade × grupo, com o que falta, e aviso ao entrar numa unidade de outra pessoa.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

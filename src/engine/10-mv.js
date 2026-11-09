@@ -139,6 +139,6 @@ function interpretarMV(linhas, arquivo) {
 
 // Sugestão de unidade pelo nome do arquivo (ex.: «..._unidade_1_...»). É só sugestão: o usuário confirma.
 function unidadeSugeridaPeloArquivo(nome) {
-  const m = norm(nome).match(/\bUNIDADE (\d+)\b/);
+  const m = norm(nome).match(/\bUNIDADE (\d+)\b/) || String(nome).toUpperCase().match(/(?:^|[^A-Z0-9])UN(?:IDADE)?[ _-]?(\d+)(?=[^0-9]|$)/);
   return m ? m[1] : '';
 }

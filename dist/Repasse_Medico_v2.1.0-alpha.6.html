@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.5</title>
+<title>Repasse Médico v2.1.0-alpha.6</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -294,13 +294,28 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
 .cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
 .fh-ctl{margin-bottom:8px}
+/* SOL-F36 — Fluxo sincronizado e divisão do trabalho */
+.sy-barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;border:1px solid var(--line)}
+.sy-barra.ok{background:var(--okbg);border-color:var(--ok)}.sy-barra.warn{background:var(--warnbg);border-color:var(--warn)}.sy-barra.off{background:var(--card)}
+.sy-barra code{font-size:12px;word-break:break-all}.sy-esp{flex:1}
+.sy-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}.sy-barra.ok .sy-dot{background:var(--ok)}.sy-barra.warn .sy-dot{background:var(--warn)}
+.sy-conf{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-direction:column;gap:4px}
+.dv-quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+.dv-cel{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.dv-cel small{color:var(--muted)}.dv-cel .acoes{margin-top:6px}
+.dv-cel.eu{border-color:var(--accent);background:var(--infobg)}.dv-cel.outro{border-color:#b89be0;background:#f4eefb}.dv-cel.ok{border-color:var(--ok);background:var(--okbg)}
+.dv-quem{font-weight:700}.dv-cel.outro .dv-quem{color:#5b3d99}
+.dv-feed{margin-top:10px;font-size:12.5px}.dv-feed summary{cursor:pointer;color:var(--muted);font-weight:600}.dv-feed div{padding:4px 0;border-bottom:1px solid var(--line)}
+.dv-aviso{border:1px solid #b89be0;background:#f4eefb;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:8px 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-cel.outro,:root:not([data-theme="light"]) .dv-aviso{background:#2a2140;border-color:#6b4fa0}:root:not([data-theme="light"]) .dv-cel.outro .dv-quem{color:#cdb6f2}}
+:root[data-theme="dark"] .dv-cel.outro,:root[data-theme="dark"] .dv-aviso{background:#2a2140;border-color:#6b4fa0}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.5 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.6 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -351,7 +366,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.5';
+const MOTOR_VERSAO = '2.1.0-alpha.6';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -606,7 +621,7 @@ function interpretarMV(linhas, arquivo) {
 
 // Sugestão de unidade pelo nome do arquivo (ex.: «..._unidade_1_...»). É só sugestão: o usuário confirma.
 function unidadeSugeridaPeloArquivo(nome) {
-  const m = norm(nome).match(/\bUNIDADE (\d+)\b/);
+  const m = norm(nome).match(/\bUNIDADE (\d+)\b/) || String(nome).toUpperCase().match(/(?:^|[^A-Z0-9])UN(?:IDADE)?[ _-]?(\d+)(?=[^0-9]|$)/);
   return m ? m[1] : '';
 }
 
@@ -1903,7 +1918,7 @@ function efetividadeCompostas(rodadas, chave) {
  * ============================================================ */
 const GRUPOS_CONTROLE = { usg: 'USG (com Doppler)', img: 'IMG (demais exames)', curitiba: 'Curitiba (V3)' };
 const SITUACAO_CONTROLE = {
-  gerar: ['err', 'Gerar no MV'], 'sem-conferencia': ['warn', 'Relatório sem conferência'], conferido: ['info', 'Conferido'],
+  gerar: ['err', 'Gerar no MV'], 'sem-conferencia': ['warn', 'Relatório sem conferência'], conferido: ['info', 'Conferindo'],   // há rodada, ainda sem aceite: continua «Conferindo» até o aceite
   aceito: ['ok', 'Aceito'], 'sem-laudo': ['warn', 'Relatório sem laudo'], 'sem-cadastro': ['warn', 'Sem cadastro'],
   conflito: ['err', 'Nome em dois cadastros'], fora: ['info', 'Fora do repasse'], verificado: ['info', 'Verificado']
 };
@@ -1964,7 +1979,8 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
     if (!it.rodada || r.em > it.rodada.em) it.rodada = r;
   }
   // 3) Situação de cada item.
-  const temSessao = (cod, g) => sessao.some(s => String(s.prestadorCod) === String(cod) && (g === 'curitiba' || s.tipo === g));
+  // PDF carregado: vale para a unidade sugerida pelo nome do arquivo; sem sugestão, para qualquer unidade.
+  const temSessao = (cod, g, un) => sessao.some(s => String(s.prestadorCod) === String(cod) && (g === 'curitiba' || s.tipo === g) && (!s.unidade || String(s.unidade) === String(un)));
   const resultado = [];
   for (const u of [...unidades.values()].sort((a, b) => +a.cod - +b.cod)) {
     const grupos = Object.values(u.grupos).map(G => {
@@ -1976,7 +1992,7 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
         else if (it.p?.naoRealizaRepasse) sit = 'fora';
         else if (!it.laudos && it.rodada) sit = 'sem-laudo';
         else if (it.rodada) sit = it.rodada.aceite ? 'aceito' : 'conferido';
-        else if (temSessao(it.cod, G.grupo)) sit = 'sem-conferencia';
+        else if (temSessao(it.cod, G.grupo, u.cod)) sit = 'sem-conferencia';
         else sit = 'gerar';
         const disp = marcas.dispensado?.[it.k];
         if (disp && (sit === 'sem-laudo' || sit === 'gerar')) sit = sit === 'sem-laudo' ? 'verificado' : 'fora';
@@ -2519,6 +2535,143 @@ function removerConsiderar(reg, chave, id) {
 // Linhas de uma rodada que continuam pendentes depois das decisões (para o aceite e o fechamento).
 const linhaResolvida = l => ['conferido', 'identificado'].includes(l.estado);
 const pendenciasDaRodada = (rodada, idx) => rodada.linhas.filter(l => !linhaResolvida(l) && !idx.has(l.kd) && !(l.kl && idx.has(l.kl)));
+
+/* ---- src/engine/85-fluxo-sync.js ---- */
+/* ============================================================
+ * SOL-F36 — Fluxo mensal compartilhado por arquivo numa pasta da rede.
+ * Mescla de três vias (minha versão × versão da pasta × última versão sincronizada), por etapa:
+ * o que só um mudou entra sozinho; a mesma etapa mudada pelos dois vira conflito para a pessoa escolher.
+ * Só o Fluxo vai para a pasta: etapas, status, datas, anotações, controle documental e divisão das unidades.
+ * ============================================================ */
+const SCHEMA_FLUXO_SYNC = 'repasse-medico/fluxo-sync';
+const SUBMAPAS_GRUPO = ['tarefas', 'documental', 'classificacao', 'matriz'];   // cada entrada é uma unidade da mescla
+const MAPAS_COMP = ['marcosManuais', 'divisao'];
+const LISTAS_COMP = ['anotacoes'];   // listas com id: une por id
+const json = v => v === undefined ? undefined : JSON.stringify(v);
+
+// Achata a competência em unidades da mescla: caminho → valor.
+function unidadesFluxo(comp) {
+  const m = new Map(); if (!comp) return m;
+  for (const [k, v] of Object.entries(comp)) {
+    if (k === 'grupos') {
+      for (const [g, gv] of Object.entries(v || {})) for (const [sk, sv] of Object.entries(gv || {})) {
+        if (SUBMAPAS_GRUPO.includes(sk) && sv && typeof sv === 'object' && !Array.isArray(sv)) { m.set(`grupos|${g}|${sk}|`, {}); for (const [ek, ev] of Object.entries(sv)) m.set(`grupos|${g}|${sk}|${ek}`, ev); }
+        else m.set(`grupos|${g}|${sk}`, sv);
+      }
+    } else if (MAPAS_COMP.includes(k) && v && typeof v === 'object') { m.set(`${k}|`, {}); for (const [ek, ev] of Object.entries(v)) m.set(`${k}|${ek}`, ev); }
+    else if (LISTAS_COMP.includes(k) && Array.isArray(v)) { m.set(`${k}|`, []); for (const it of v) m.set(`${k}|#${it.id}`, it); }
+    else m.set(k, v);
+  }
+  return m;
+}
+// Remonta a competência a partir das unidades (a ordem das listas segue a data).
+function montarFluxo(m) {
+  const c = {};
+  for (const [p, v] of [...m].sort((a, b) => a[0].split('|').length - b[0].split('|').length)) {
+    if (v === undefined) continue;
+    const ps = p.split('|');
+    if (ps[0] === 'grupos') {
+      const g = ((c.grupos ||= {})[ps[1]] ||= {});
+      if (ps.length === 3) g[ps[2]] = clone(v);
+      else if (ps[3] === '') g[ps[2]] = g[ps[2]] || {};
+      else (g[ps[2]] ||= {})[ps[3]] = clone(v);
+    } else if (MAPAS_COMP.includes(ps[0])) { if (ps[1] === '') c[ps[0]] = c[ps[0]] || {}; else (c[ps[0]] ||= {})[ps[1]] = clone(v); }
+    else if (LISTAS_COMP.includes(ps[0])) { if (ps[1] === '') c[ps[0]] = c[ps[0]] || []; else (c[ps[0]] ||= []).push(clone(v)); }
+    else c[p] = clone(v);
+  }
+  for (const k of LISTAS_COMP) if (c[k]) c[k].sort((a, b) => String(a.em || '').localeCompare(String(b.em || '')));
+  return c;
+}
+// Nome legível de uma unidade da mescla (para o diálogo de conflito).
+function rotuloUnidadeFluxo(comp, p) {
+  const ps = p.split('|');
+  if (ps[0] === 'grupos') {
+    const g = comp?.modelo?.grupos?.find(x => x.id === ps[1]), gn = g?.nome || ps[1];
+    if (ps[2] === 'tarefas') return `${gn}: ${g?.tarefas?.find(t => t.id === ps[3])?.nome || ps[3]}`;
+    if (ps[2] === 'documental') return `${gn}: controle documental de ${ps[3]}`;
+    if (ps[2] === 'classificacao') return `Classificação de ${ps[3]}`;
+    return `${gn}: ${ps.slice(2).join(' ')}`;
+  }
+  if (ps[0] === 'divisao') { const [un, gr] = ps[1].split(':'); return `Divisão: unidade ${un} · ${GRUPOS_CONTROLE?.[gr] || gr}`; }
+  if (ps[0] === 'anotacoes') return 'Anotação';
+  if (ps[0] === 'marcosManuais') return `Marco ${ps[1]}`;
+  return p;
+}
+// Resumo de um valor para o diálogo de conflito.
+function resumoValorFluxo(v) {
+  if (v === undefined) return 'apagado';
+  if (v && typeof v === 'object') {
+    if ('status' in v && STATUS_TAREFA?.[v.status]) return `${STATUS_TAREFA[v.status]}${v.obs ? ` · «${v.obs}»` : ''}${v.historico?.length ? ` (${v.historico.at(-1).por || '—'}, ${String(v.historico.at(-1).em || '').slice(11, 16)})` : ''}`;
+    if ('relatorio' in v || 'nfRecebida' in v) return [v.relatorio && `e-mail ${v.relatorio}`, v.nfRecebida && `NF recebida ${v.nfRecebida}`, v.nfFinanceiro && `NF ao Financeiro ${v.nfFinanceiro}`, v.pendencia && `pendência «${v.pendencia}»`].filter(Boolean).join(' · ') || 'sem marcações';
+    if ('status' in v && 'por' in v) return `${v.status} · ${v.por || '—'}`;
+  }
+  const t = typeof v === 'string' ? v : JSON.stringify(v); return t.length > 120 ? t.slice(0, 117) + '…' : t;
+}
+
+/* Mescla de três vias. local = minha versão; remoto = a da pasta; base = a última sincronizada (ou null).
+ * Devolve {comp, conflitos:[{p, rotulo, local, remoto}]}; no conflito, comp fica com a versão local até a escolha. */
+function mesclarFluxo(local, remoto, base) {
+  if (!remoto) return { comp: clone(local), conflitos: [] };
+  if (!local) return { comp: clone(remoto), conflitos: [] };
+  const L = unidadesFluxo(local), R = unidadesFluxo(remoto), B = unidadesFluxo(base);
+  const out = new Map(), conflitos = [];
+  for (const p of new Set([...L.keys(), ...R.keys(), ...B.keys()])) {
+    const l = L.get(p), r = R.get(p), b = B.get(p), jl = json(l), jr = json(r), jb = json(b);
+    if (jl === jr) { out.set(p, l); continue; }
+    if (jl === jb) { out.set(p, r); continue; }          // só a pasta mudou
+    if (jr === jb) { out.set(p, l); continue; }          // só eu mudei
+    if (!base) {
+      // Primeira sincronização (sem base): nada vira conflito.
+      if (l === undefined || r === undefined) { out.set(p, l ?? r); continue; }
+      if (p.split('|')[2] === 'tarefas' && l && r) {   // etapa: fica a de mudança mais recente, com o histórico das duas
+        const ul = l.historico?.at(-1)?.em || '', ur = r.historico?.at(-1)?.em || '', v = clone(ul > ur ? l : r), o = ul > ur ? r : l, vistos = new Set((v.historico || []).map(h => json(h)));
+        for (const h of o.historico || []) if (!vistos.has(json(h))) (v.historico ||= []).push(h);
+        (v.historico || []).sort((a, b) => String(a.em).localeCompare(String(b.em))); out.set(p, v); continue;
+      }
+      if (l && r && typeof l === 'object' && typeof r === 'object' && !Array.isArray(l)) {   // ex.: controle documental: junta o que estiver preenchido
+        const v = { ...l }; for (const [k, x] of Object.entries(r)) if (x !== '' && x != null) v[k] = x; out.set(p, v); continue;
+      }
+      out.set(p, r); continue;   // demais: fica a da pasta
+    }
+    out.set(p, l); conflitos.push({ p, rotulo: rotuloUnidadeFluxo(local, p), local: l, remoto: r });
+  }
+  return { comp: montarFluxo(out), conflitos };
+}
+// Aplica as escolhas ('local' | 'remoto') dos conflitos. Nas etapas, a escolhida leva o histórico das duas.
+function aplicarEscolhasFluxo(comp, conflitos, escolhas) {
+  const m = unidadesFluxo(comp);
+  conflitos.forEach((c, i) => {
+    const v = clone(escolhas[i] === 'remoto' ? c.remoto : c.local), outro = escolhas[i] === 'remoto' ? c.local : c.remoto;
+    if (v && Array.isArray(v.historico) && Array.isArray(outro?.historico)) {
+      const vistos = new Set(v.historico.map(h => json(h)));
+      for (const h of outro.historico) if (!vistos.has(json(h))) v.historico.push(h);
+      v.historico.sort((a, b) => String(a.em).localeCompare(String(b.em)));
+    }
+    m.set(c.p, v);
+  });
+  return montarFluxo(m);
+}
+
+/* ---------- Divisão do trabalho (unidade × grupo) ---------- */
+const chaveDivisao = (un, gr) => `${un}:${gr}`;
+function marcarDivisao(comp, un, gr, status, operador, extra = {}) {
+  comp.divisao = comp.divisao || {};
+  const k = chaveDivisao(un, gr), a = comp.divisao[k] || {};
+  comp.divisao[k] = { ...a, status, por: operador, em: agoraISO(), historico: [...(a.historico || []), { em: agoraISO(), por: operador, de: a.status || 'livre', para: status }].slice(-30), ...extra };
+  return comp.divisao[k];
+}
+// Últimas mudanças: histórico das etapas, divisão das unidades e anotações.
+function feedFluxo(comp, n = 12) {
+  const it = [];
+  for (const [g, gv] of Object.entries(comp?.grupos || {})) for (const [t, tv] of Object.entries(gv.tarefas || {})) for (const h of tv.historico || [])
+    it.push({ em: h.em, por: h.por, texto: `marcou «${rotuloUnidadeFluxo(comp, `grupos|${g}|tarefas|${t}`)}» como ${STATUS_TAREFA[h.para] || h.para}${h.campo ? ` (${h.campo})` : ''}` });
+  for (const [k, d] of Object.entries(comp?.divisao || {})) for (const h of d.historico || []) {
+    const [un, gr] = k.split(':'), alvo = `unidade ${un} · ${gr === 'curitiba' ? 'Curitiba' : gr.toUpperCase()}`;
+    it.push({ em: h.em, por: h.por, texto: h.para === 'assumida' ? `assumiu a ${alvo}` : h.para === 'concluida' ? `concluiu a ${alvo}` : h.para === 'livre' ? `liberou a ${alvo}` : `${h.para} · ${alvo}` });
+  }
+  for (const a of comp?.anotacoes || []) it.push({ em: a.em, por: a.por, texto: `anotou: «${String(a.texto).slice(0, 80)}»` });
+  return it.filter(x => x.em).sort((a, b) => String(b.em).localeCompare(String(a.em))).slice(0, n);
+}
 
 /* ---- src/engine/85-fluxo.js ---- */
 /* ============================================================
@@ -4964,7 +5117,7 @@ const marcasControle = () => { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; retu
 function gravarMarcasControle(m) { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; t[S.comp] = m; if (!gravarLocal(CHAVE_CONTROLE_UN, t)) avisar('Não foi possível gravar a marca neste navegador.', 'err'); }
 // PDFs da sessão (para «relatório sem conferência»).
 const sessaoControle = () => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao')
-  .map(x => ({ prestadorCod: x.rel.cab.prestadorCod, tipo: tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) }) }));
+  .map(x => ({ prestadorCod: x.rel.cab.prestadorCod, unidade: unidadeSugeridaPeloArquivo(x.nome || '') || '', tipo: tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) }) }));
 const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apolo.laudos, cfg: S.cfg, rodadas: S.rodadas, chave: S.comp, sessao: sessaoControle(), marcas: marcasControle(), naoSRA: S.cfg.medicosNaoSRA || [] }) : null;
 
 const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;
@@ -5019,7 +5172,7 @@ async function desenharControleUnidade() {
     ${ctl.semUnidade.length ? `<p class="small badge warn">Unidade do Apolo sem código no cadastro (Bases → Unidades, campo Apolo): ${ctl.semUnidade.map(x => `${esc(x.nome)} (${x.laudos} laudos)`).join(', ')}</p>` : ''}
     ${u ? `<div class="subabas" role="tablist">${u.grupos.map(g => `<button class="${g.grupo === CU.grupo ? 'on' : ''}" data-cugr="${g.grupo}">${GRUPOS_CONTROLE[g.grupo]} <em>${g.resumo.falta} falta(m)</em></button>`).join('')}</div>
     <h3>Unidade ${esc(u.cod)} - ${esc(u.nome)} · ${GRUPOS_CONTROLE[G.grupo]}</h3>
-    <div class="cu-res">${k(r.laudaram, cur ? 'médicos V3 laudaram' : 'laudaram')}${k(r.aceitos, 'aceitos', 'ok')}${k(r.conferidos, 'conferidos sem aceite', 'info')}${r.semConferencia ? k(r.semConferencia, 'relatório sem conferência', 'warn') : ''}${k(r.gerar, 'a gerar no MV', 'err')}${r.semLaudo ? k(r.semLaudo, 'relatório sem laudo', 'warn') : ''}${r.semCadastro ? k(r.semCadastro, 'sem cadastro', 'warn') : ''}${r.fora + r.verificados ? k(r.fora + r.verificados, 'fora do repasse / verificados') : ''}</div>
+    <div class="cu-res">${k(r.laudaram, cur ? 'médicos V3 laudaram' : 'laudaram')}${k(r.aceitos, 'aceitos', 'ok')}${k(r.conferidos, 'conferindo (sem aceite)', 'info')}${r.semConferencia ? k(r.semConferencia, 'relatório sem conferência', 'warn') : ''}${k(r.gerar, 'a gerar no MV', 'err')}${r.semLaudo ? k(r.semLaudo, 'relatório sem laudo', 'warn') : ''}${r.semCadastro ? k(r.semCadastro, 'sem cadastro', 'warn') : ''}${r.fora + r.verificados ? k(r.fora + r.verificados, 'fora do repasse / verificados') : ''}</div>
     <div class="tw"><table class="cu-tab"><thead><tr><th>Cód.</th><th>Prestador</th>${cur ? '<th>Regra V3</th>' : ''}<th class="num">${cur ? 'Laudos que a SRA paga' : 'Laudos no Apolo'}</th>${cur ? '<th class="num">Fora da regra</th>' : ''}<th class="num">Linhas no MV</th><th>Situação</th><th></th></tr></thead><tbody>
     ${itens.map(x => `<tr class="${FALTA_CONTROLE.has(x.situacao) ? 'cu-falta' : ''}"><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}${x.cod ? '' : ' <span class="muted small">(Apolo)</span>'}</td>${cur ? `<td class="small">${esc(regraTxt(x.regraV3))}</td>` : ''}<td class="num">${fmtN(x.laudos)}</td>${cur ? `<td class="num">${x.foraRegra.length ? `${fmtN(x.foraRegra.reduce((s, f) => s + f.q, 0))}<div class="small muted">${x.foraRegra.map(f => esc(`${f.n}: ${f.q}`)).join(' · ')} (fora da regra)</div>` : '—'}</td>` : ''}<td class="num">${x.rodadaId ? fmtN(x.linhasMV) : '—'}</td><td>${sit(x)}</td><td>${acao(x)}</td></tr>`).join('') || `<tr><td colspan="8" class="muted">Nada faltando neste grupo.${CU.soFalta ? ' Desmarque «só o que falta» para ver todos.' : ''}</td></tr>`}
     </tbody></table></div>
@@ -5079,7 +5232,7 @@ function painelControleUnidade() {
   const ctl = controleAtual(); if (!ctl) return '';
   const linhas = ctl.unidades.flatMap(u => u.grupos.filter(G => G.resumo.falta || G.resumo.semLaudo).map(G => ({ u, G })));
   return `<div class="card"><div class="fx-topo"><h2 style="margin:0">Prestadores por unidade</h2><button class="sec mini" id="btCtlUn">Ver prestadores por unidade</button></div>
-    ${linhas.length ? `<div class="cu-ini">${linhas.map(({ u, G }) => { const r = G.resumo, d = [r.gerar && `${r.gerar} a gerar no MV`, r.semConferencia && `${r.semConferencia} sem conferência`, r.conferidos && `${r.conferidos} sem aceite`, r.semCadastro && `${r.semCadastro} sem cadastro`, r.semLaudo && `${r.semLaudo} aviso(s) de relatório sem laudo`].filter(Boolean).join(' · ');
+    ${linhas.length ? `<div class="cu-ini">${linhas.map(({ u, G }) => { const r = G.resumo, d = [r.gerar && `${r.gerar} a gerar no MV`, r.semConferencia && `${r.semConferencia} sem conferência`, r.conferidos && `${r.conferidos} conferindo (sem aceite)`, r.semCadastro && `${r.semCadastro} sem cadastro`, r.semLaudo && `${r.semLaudo} aviso(s) de relatório sem laudo`].filter(Boolean).join(' · ');
       return `<div class="linha-ini"><strong>Unidade ${esc(u.cod)} · ${G.grupo === 'curitiba' ? 'Curitiba' : G.grupo.toUpperCase()}:</strong> ${r.falta ? `faltam ${r.falta}` : 'nada faltando'} <span class="muted small">${d}</span></div>`; }).join('')}</div>`
       : '<p class="muted">Todos os prestadores que laudaram já têm repasse conferido e aceito.</p>'}</div>`;
 }
@@ -5606,6 +5759,229 @@ function sugestaoDaTarefa(sugs, gId, tId, atual) {
   const s = sugs[`${gId}.${tId}`];
   return s && s.status && atual !== 'na' && RANK_ST[s.status] > RANK_ST[atual] ? s : null;
 }
+
+/* ---- src/ui/28-fluxo-sync.js ---- */
+/* ============================================================
+ * SOL-F36 — Fluxo mensal sincronizado por arquivo numa pasta da rede (Edge/Chrome, File System Access)
+ * e divisão do trabalho por unidade × grupo («Assumir», «Liberar», «Concluir»).
+ * Só o Fluxo vai para a pasta: nada de paciente, PDF ou planilha.
+ * ============================================================ */
+const SY = { handle: null, status: 'off', erro: '', conferidoEm: 0, lm: 0, meta: null, ocupado: false, pendente: false, conflitos: 0, timer: null, aviso: new Set() };
+const CHAVE_SYNC_BASE = 'rm2.fluxoSyncBase';
+const arquivoSync = chave => `fluxo_comp_${chave.slice(5)}-${chave.slice(0, 4)}.json`;
+const suportaPasta = () => typeof window.showDirectoryPicker === 'function';
+
+// A pasta escolhida fica guardada neste navegador (IndexedDB próprio, separado dos dados da ferramenta).
+function dbSync(modo, valor) {
+  return new Promise((ok, falha) => {
+    const rq = indexedDB.open('repasse-medico-sync', 1);
+    rq.onupgradeneeded = () => rq.result.createObjectStore('k');
+    rq.onerror = () => falha(rq.error);
+    rq.onsuccess = () => {
+      try {
+        const tx = rq.result.transaction('k', modo === 'ler' ? 'readonly' : 'readwrite'), st = tx.objectStore('k');
+        const op = modo === 'ler' ? st.get('pasta') : modo === 'apagar' ? st.delete('pasta') : st.put(valor, 'pasta');
+        op.onsuccess = () => ok(op.result); op.onerror = () => falha(op.error);
+      } catch (e) { falha(e); }
+    };
+  });
+}
+async function temPermissaoPasta(pedir = false) {
+  const h = SY.handle; if (!h) return false;
+  if (!h.queryPermission) return true;
+  if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') return true;
+  return pedir && h.requestPermission ? await h.requestPermission({ mode: 'readwrite' }) === 'granted' : false;
+}
+async function definirPastaSync(handle) {
+  SY.handle = handle; SY.lm = 0; SY.meta = null;
+  if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
+  iniciarTimerSync();
+  if (handle) await sincronizarFluxo({ interativo: true }); else { SY.status = 'off'; atualizarBarraSync(); }
+}
+async function escolherPastaSync() {
+  if (!suportaPasta()) return avisar('Este navegador não grava em pastas. Use o Edge ou o Chrome no computador.', 'warn');
+  const op = await exigirOperador(); if (!op) return;
+  try { await definirPastaSync(await window.showDirectoryPicker({ id: 'rm-fluxo', mode: 'readwrite' })); avisar('Fluxo conectado à pasta. As mudanças passam a ser gravadas nela.', 'ok'); }
+  catch (e) { if (e.name !== 'AbortError') avisar(`Não foi possível usar a pasta (${e.message}).`, 'err'); }
+}
+async function restaurarPastaSync() {
+  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') sincronizarFluxo(); else atualizarBarraSync(); } } catch (e) { /* sem pasta guardada */ }
+}
+
+// Lê a pasta, mescla com a versão local e grava o resultado. interativo: pode abrir o diálogo de conflitos.
+async function sincronizarFluxo({ interativo = false } = {}) {
+  const chave = S.comp;
+  if (!SY.handle || !chave) return;
+  if (SY.ocupado) { SY.pendente = true; return; }
+  if (!(await temPermissaoPasta(interativo))) { SY.status = 'permissao'; atualizarBarraSync(); return; }
+  SY.ocupado = true;
+  try {
+    for (let tentativa = 0; tentativa < 2; tentativa++) {
+      const nome = arquivoSync(chave); let remoto = null, lm = 0;
+      try { const f = await (await SY.handle.getFileHandle(nome)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_FLUXO_SYNC || d.chave !== chave) throw new Error(`${nome} não é o Fluxo desta competência`); remoto = d; }
+      catch (e) { if (e.name !== 'NotFoundError') throw e; }
+      const local = S.fluxo.competencias[chave] || null, bases = lerLocal(CHAVE_SYNC_BASE) || {};
+      let { comp, conflitos } = mesclarFluxo(local, remoto?.comp || null, bases[chave] || null);
+      if (conflitos.length) {
+        if (!interativo && location.hash !== '#fluxo') { SY.status = 'conflito'; SY.conflitos = conflitos.length; return; }
+        const escolhas = await resolverConflitosFluxo(conflitos, remoto);
+        if (!escolhas) { SY.status = 'conflito'; SY.conflitos = conflitos.length; return; }
+        comp = aplicarEscolhasFluxo(comp, conflitos, escolhas);
+      }
+      if (!comp) { SY.status = 'ok'; SY.conferidoEm = Date.now(); return; }
+      if (json(comp) !== json(local)) { S.fluxo.competencias[chave] = comp; gravarFluxoLocal(); if (location.hash === '#fluxo') RENDER.fluxo(); }
+      if (json(comp) !== json(remoto?.comp)) {
+        const fh = await SY.handle.getFileHandle(nome, { create: true });
+        if (lm && (await fh.getFile()).lastModified !== lm) continue;   // alguém gravou enquanto eu mesclava: mescla de novo
+        const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
+        const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp })); await w.close();
+        SY.lm = (await fh.getFile()).lastModified; SY.meta = meta;
+      } else { SY.lm = lm; SY.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SY.meta; }
+      bases[chave] = comp; gravarLocal(CHAVE_SYNC_BASE, bases);
+      SY.status = 'ok'; SY.erro = ''; SY.conflitos = 0; SY.conferidoEm = Date.now();
+      return;
+    }
+  } catch (e) { SY.status = 'erro'; SY.erro = e.message || String(e); }
+  finally { SY.ocupado = false; atualizarBarraSync(); if (SY.pendente) { SY.pendente = false; setTimeout(() => sincronizarFluxo(), 50); } }
+}
+async function resolverConflitosFluxo(conflitos, remoto) {
+  const quem = remoto?.atualizadoPor || 'outra pessoa';
+  const r = await dialogo(`${conflitos.length} item(ns) mudados pelos dois`, `<p class="small">Você e ${esc(quem)} mudaram os mesmos itens desde a última sincronização. Escolha qual versão fica; nas etapas, o histórico das duas é guardado.</p>
+    ${conflitos.map((c, i) => `<div class="sy-conf"><b>${esc(c.rotulo)}</b>
+      <label class="small"><input type="radio" name="c${i}" value="local" checked> A minha: ${esc(resumoValorFluxo(c.local))}</label>
+      <label class="small"><input type="radio" name="c${i}" value="remoto"> A de ${esc(quem)}: ${esc(resumoValorFluxo(c.remoto))}</label></div>`).join('')}`, [['', 'Decidir depois', 'sec'], ['ok', 'Aplicar escolhas']]);
+  return r.botao === 'ok' ? conflitos.map((c, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local') : null;
+}
+function iniciarTimerSync() {
+  clearInterval(SY.timer); if (!SY.handle) return;
+  SY.timer = setInterval(async () => {
+    if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
+    try { const f = await (await SY.handle.getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
+    catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
+    atualizarBarraSync();
+  }, 30000);
+}
+
+// Toda gravação do Fluxo agenda a sincronização (sem esperar).
+const gravarFluxoLocal = salvarFluxo;
+let syncAgendada = 0;
+salvarFluxo = function (msg = '') { gravarFluxoLocal(msg); if (SY.handle && SY.status !== 'permissao') { clearTimeout(syncAgendada); syncAgendada = setTimeout(() => sincronizarFluxo(), 800); } };
+
+/* ---------- Barra de sincronização ---------- */
+function barraSync() {
+  const pasta = SY.handle ? `${esc(SY.handle.name)}\\${esc(arquivoSync(S.comp))}` : '';
+  const ha = ms => { const s = Math.round((Date.now() - ms) / 1000); return s < 60 ? `${s} s` : `${Math.round(s / 60)} min`; };
+  if (!SY.handle) return `<div class="sy-barra off" id="fxSync"><span class="sy-dot"></span><b>Fluxo só neste navegador.</b><span class="muted">Para trabalhar junto com outra pessoa, conecte o Fluxo a uma pasta da rede que vocês dois acessam.</span><span class="sy-esp"></span>${suportaPasta() ? '<button class="sec mini" data-sy="escolher">Conectar à pasta da rede…</button>' : '<span class="small muted">Use o Edge ou o Chrome no computador para conectar.</span>'}</div>`;
+  const ult = SY.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SY.meta.atualizadoPor || '—')}</b> às ${new Date(SY.meta.atualizadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : '';
+  const bt = `<button class="sec mini" data-sy="agora">Atualizar agora</button><button class="sec mini" data-sy="escolher">Trocar pasta…</button><button class="sec mini" data-sy="desconectar">Desconectar</button>`;
+  if (SY.status === 'permissao') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>Acesso à pasta ${esc(SY.handle.name)} precisa ser liberado.</b><span class="muted">O Edge pede uma vez por sessão (ou marque «permitir sempre»).</span><span class="sy-esp"></span><button class="mini" data-sy="liberar">Liberar acesso</button>${bt}</div>`;
+  if (SY.status === 'erro') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>Sem acesso à pasta</b><span class="muted">— mudanças guardadas neste navegador; vão para a pasta quando voltar (${esc(SY.erro)}).</span><span class="sy-esp"></span><button class="mini" data-sy="agora">Tentar de novo</button>${bt}</div>`;
+  if (SY.status === 'conflito') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>${SY.conflitos} item(ns) mudados pelos dois.</b><span class="muted">Escolha qual versão fica.</span><span class="sy-esp"></span><button class="mini" data-sy="resolver">Resolver</button>${bt}</div>`;
+  return `<div class="sy-barra ok" id="fxSync"><span class="sy-dot"></span><b>${SY.ocupado ? 'Sincronizando…' : 'Sincronizado'}</b> com <code>${pasta}</code><span class="muted">${SY.conferidoEm ? ` · conferido há ${ha(SY.conferidoEm)}` : ''}${ult}</span><span class="sy-esp"></span>${bt}</div>`;
+}
+function ligarBarraSync(raiz) {
+  raiz.querySelectorAll('[data-sy]').forEach(b => b.onclick = async () => {
+    const a = b.dataset.sy;
+    if (a === 'escolher') return escolherPastaSync();
+    if (a === 'desconectar') { if (await confirmar('Desconectar da pasta?', 'O Fluxo continua neste navegador; a pasta e o arquivo não são apagados.', 'Desconectar')) definirPastaSync(null); return; }
+    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); return sincronizarFluxo({ interativo: true }); } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
+    sincronizarFluxo({ interativo: true });
+  });
+}
+function atualizarBarraSync() { const b = $('fxSync'); if (!b) return; b.outerHTML = barraSync(); ligarBarraSync($('fxSync').parentElement); }
+
+/* ---------- Divisão do trabalho ---------- */
+// Unidade × grupo: USG e IMG nas unidades com nome do Apolo; Curitiba nas unidades V3.
+function celulasDivisao() {
+  const ctl = S.apolo ? controleAtual() : null, cel = [];
+  for (const u of S.cfg.unidades.filter(x => (x.apolo || []).length).sort((a, b) => +a.cod - +b.cod))
+    for (const g of ehUnidadeV3(S.cfg, u.cod) ? ['curitiba'] : ['usg', 'img']) {
+      const G = ctl?.unidades.find(x => x.cod === String(u.cod))?.grupos.find(x => x.grupo === g);
+      cel.push({ un: String(u.cod), nome: u.nome, gr: g, resumo: G ? { falta: G.resumo.falta, gerar: G.resumo.gerar, conferindo: G.resumo.conferidos, aceitos: G.resumo.aceitos, laudaram: G.resumo.laudaram } : null });
+    }
+  return cel;
+}
+// Quem está com a unidade grava o resumo dela na pasta (os outros não têm as conferências dele).
+function atualizarResumosDivisao(comp) {
+  if (!comp?.divisao || !S.operador) return false;
+  let mudou = false;
+  for (const c of celulasDivisao()) {
+    const d = comp.divisao[chaveDivisao(c.un, c.gr)];
+    if (!c.resumo || !d || d.por !== S.operador || d.status === 'livre') continue;
+    const { em, por, ...ant } = d.resumo || {};
+    if (json(ant) !== json(c.resumo)) { d.resumo = { ...c.resumo, em: agoraISO(), por: S.operador }; mudou = true; }
+  }
+  return mudou;
+}
+function cartaoDivisao(comp) {
+  if (atualizarResumosDivisao(comp)) salvarFluxo();
+  const hora = iso => { const d = new Date(iso), hoje = isoDia(new Date()) === iso.slice(0, 10); return `${hoje ? 'hoje' : d.toLocaleDateString('pt-BR').slice(0, 5)} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; };
+  const cels = celulasDivisao().map(c => {
+    const d = comp.divisao?.[chaveDivisao(c.un, c.gr)], st = d?.status || 'livre', meu = d?.por === S.operador;
+    const r = (st !== 'livre' && !meu && d?.resumo) ? d.resumo : (c.resumo || d?.resumo);
+    const falta = r ? (r.falta ? `faltam ${r.falta}${r.gerar ? ` · ${r.gerar} a gerar no MV` : ''}${r.conferindo ? ` · ${r.conferindo} conferindo` : ''}` : (r.laudaram ? 'todos com aceite' : 'sem laudos')) + (r.por && r.por !== S.operador ? ` <span class="muted">(resumo de ${esc(r.por)})</span>` : '') : '<span class="muted">carregue a planilha de laudos para ver o que falta</span>';
+    const cls = st === 'concluida' ? 'ok' : st === 'assumida' ? (meu ? 'eu' : 'outro') : '';
+    const quem = st === 'concluida' ? `Concluída por ${esc(d.por)}` : st === 'assumida' ? (meu ? 'Você' : esc(d.por)) : 'Livre';
+    const acoes = st === 'livre' ? `<button class="mini" data-dv="assumir">Assumir</button>` : st === 'assumida' ? (meu ? `<button class="sec mini" data-dv="liberar">Liberar</button><button class="${r && !r.falta && r.laudaram ? '' : 'sec '}mini" data-dv="concluir">Concluir</button>` : `<button class="sec mini" data-dv="assumir">Assumir eu</button>`) : `<button class="sec mini" data-dv="reabrir">Reabrir</button>`;
+    return `<div class="dv-cel ${cls}" data-dvk="${c.un}|${c.gr}"><b>Unidade ${esc(c.un)} · ${c.gr === 'curitiba' ? 'Curitiba' : c.gr.toUpperCase()}</b><span class="dv-quem">${quem}</span>
+      <small>${st === 'livre' ? '—' : `${st === 'concluida' ? 'concluiu' : 'assumiu'} ${hora(d.em)}`}</small><small>${falta}</small><div class="acoes">${acoes}</div></div>`;
+  }).join('');
+  const feed = feedFluxo(comp, 8);
+  return `<div class="card" id="fxDivisao"><div class="fx-topo"><h2 style="margin:0">Divisão do trabalho <span class="muted small">competência ${rotuloCompetencia(comp.chave)}</span></h2></div>
+    <p class="small muted">Quem está com cada unidade. «Assumir» marca o seu nome; os outros veem pela pasta da rede. O «faltam» vem de Prestadores por unidade, gravado por quem está com a unidade.</p>
+    <div class="dv-quadro">${cels}</div>
+    ${feed.length ? `<details class="dv-feed"${FX.feedAberto ? ' open' : ''}><summary>Últimas mudanças</summary>${feed.map(f => `<div><b>${esc(f.por || '—')}</b> ${esc(f.texto)} <small class="muted">· ${hora(f.em)}</small></div>`).join('')}</details>` : ''}</div>`;
+}
+function ligarDivisao(raiz, comp) {
+  raiz.querySelectorAll('[data-dv]').forEach(b => b.onclick = async () => {
+    if (!exigirAberta(comp.chave, 'mudar a divisão do trabalho')) return;
+    const op = await exigirOperador(); if (!op) return;
+    const [un, gr] = b.closest('[data-dvk]').dataset.dvk.split('|'), d = comp.divisao?.[chaveDivisao(un, gr)], a = b.dataset.dv;
+    if (a === 'assumir' && d?.status === 'assumida' && d.por !== op && !await confirmar('Assumir a unidade?', `A unidade ${esc(un)} está com ${esc(d.por)}. Ela passa para você, e fica registrado.`, 'Assumir')) return;
+    marcarDivisao(comp, un, gr, a === 'assumir' || a === 'reabrir' ? 'assumida' : a === 'concluir' ? 'concluida' : 'livre', op);
+    atualizarResumosDivisao(comp); salvarFluxo(); RENDER.fluxo();
+  });
+  const det = raiz.querySelector('.dv-feed'); if (det) det.ontoggle = () => { FX.feedAberto = det.open; };
+}
+
+// Aviso ao escolher uma unidade que está com outra pessoa (não bloqueia).
+function avisoDivisao(un, gr) {
+  const d = S.fluxo.competencias[S.comp]?.divisao?.[chaveDivisao(un, gr)], k = `${S.comp}|${un}|${gr}`;
+  if (!d || d.status !== 'assumida' || !S.operador || d.por === S.operador || SY.aviso.has(k)) return '';
+  return `<div class="dv-aviso" data-dvav="${esc(k)}"><b>A unidade ${esc(un)} · ${gr === 'curitiba' ? 'Curitiba' : gr.toUpperCase()} está com ${esc(d.por)}</b> desde ${new Date(d.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}. <span class="muted">Você pode continuar (fica registrado) ou combinar com ${esc(d.por)}.</span>
+    <div class="acoes"><button class="sec mini" data-dvc="${esc(un)}|${gr}">Continuar mesmo assim</button></div></div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-dvc]'); if (!b) return;
+  const [un, gr] = b.dataset.dvc.split('|'), comp = S.fluxo.competencias[S.comp], d = comp?.divisao?.[chaveDivisao(un, gr)];
+  if (d) { (d.intervencoes ||= []).push({ por: S.operador, em: agoraISO() }); d.intervencoes = d.intervencoes.slice(-20); salvarFluxo(); }
+  SY.aviso.add(`${S.comp}|${un}|${gr}`); b.closest('.dv-aviso')?.remove();
+});
+
+// Fluxo: barra de sincronização e divisão no topo do acompanhamento.
+const _desenharAcompanhamento = desenharAcompanhamento;
+desenharAcompanhamento = function () {
+  _desenharAcompanhamento();
+  const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
+  c.insertAdjacentHTML('afterbegin', barraSync()); ligarBarraSync(c);
+  if (comp) { const topo = c.querySelector('.fx-topo'); (topo || c.firstElementChild).insertAdjacentHTML('afterend', cartaoDivisao(comp)); ligarDivisao(c, comp); }
+};
+// Prestadores por unidade e Conferência: aviso da divisão.
+const _desenharControleUnidade = desenharControleUnidade;
+desenharControleUnidade = async function () {
+  await _desenharControleUnidade();
+  const alvo = document.querySelector('#pag-conferencia .cu-res'); if (!alvo || !CU.unidade || !CU.grupo) return;
+  alvo.insertAdjacentHTML('beforebegin', avisoDivisao(CU.unidade, CU.grupo));
+};
+document.addEventListener('change', e => {
+  if (e.target.id !== 'cfUn' && e.target.id !== 'cfRel') return;
+  document.querySelectorAll('#pag-conferencia .dv-aviso').forEach(x => x.remove());
+  const un = $('cfUn')?.value, x = S.relatorios.find(r => r.id === $('cfRel')?.value); if (!un || un === '*' || !x) return;
+  const gr = ehUnidadeV3(S.cfg, un) ? 'curitiba' : tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) });
+  $('cfUn').closest('.campo, label, div')?.insertAdjacentHTML('afterend', avisoDivisao(un, gr));
+});
+// Ao entrar no Fluxo ou trocar de competência, confere a pasta.
+window.addEventListener('hashchange', () => { if (location.hash === '#fluxo' && SY.handle && SY.status !== 'permissao') sincronizarFluxo({ interativo: true }); });
 
 /* ---- src/ui/30-correcao.js ---- */
 /* ============================================================
@@ -7603,12 +7979,13 @@ function aplicarTema() {
     await aplicarRetencaoPlanilhas();
     const nRest = await restaurarPlanilhasDaCompetencia(); S.restaurando = false;
     if (nRest) irPara(location.hash.slice(1) || 'inicio', true); else if ((location.hash.slice(1) || 'inicio') === 'inicio') RENDER.inicio();
+    restaurarPastaSync();   // Fluxo compartilhado pela pasta da rede (SOL-F36)
     const st = $('stInit'); st.className = 'badge ok'; st.textContent = 'Pronto · processamento local';
   } catch (e) {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3 } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }) } };   // usado pelos testes automatizados
 })();
 
 </script>

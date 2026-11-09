@@ -286,3 +286,18 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
 .cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
 .fh-ctl{margin-bottom:8px}
+/* SOL-F36 — Fluxo sincronizado e divisão do trabalho */
+.sy-barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;border:1px solid var(--line)}
+.sy-barra.ok{background:var(--okbg);border-color:var(--ok)}.sy-barra.warn{background:var(--warnbg);border-color:var(--warn)}.sy-barra.off{background:var(--card)}
+.sy-barra code{font-size:12px;word-break:break-all}.sy-esp{flex:1}
+.sy-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}.sy-barra.ok .sy-dot{background:var(--ok)}.sy-barra.warn .sy-dot{background:var(--warn)}
+.sy-conf{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-direction:column;gap:4px}
+.dv-quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+.dv-cel{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.dv-cel small{color:var(--muted)}.dv-cel .acoes{margin-top:6px}
+.dv-cel.eu{border-color:var(--accent);background:var(--infobg)}.dv-cel.outro{border-color:#b89be0;background:#f4eefb}.dv-cel.ok{border-color:var(--ok);background:var(--okbg)}
+.dv-quem{font-weight:700}.dv-cel.outro .dv-quem{color:#5b3d99}
+.dv-feed{margin-top:10px;font-size:12.5px}.dv-feed summary{cursor:pointer;color:var(--muted);font-weight:600}.dv-feed div{padding:4px 0;border-bottom:1px solid var(--line)}
+.dv-aviso{border:1px solid #b89be0;background:#f4eefb;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:8px 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-cel.outro,:root:not([data-theme="light"]) .dv-aviso{background:#2a2140;border-color:#6b4fa0}:root:not([data-theme="light"]) .dv-cel.outro .dv-quem{color:#cdb6f2}}
+:root[data-theme="dark"] .dv-cel.outro,:root[data-theme="dark"] .dv-aviso{background:#2a2140;border-color:#6b4fa0}

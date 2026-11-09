@@ -7,7 +7,7 @@
  * ============================================================ */
 const GRUPOS_CONTROLE = { usg: 'USG (com Doppler)', img: 'IMG (demais exames)', curitiba: 'Curitiba (V3)' };
 const SITUACAO_CONTROLE = {
-  gerar: ['err', 'Gerar no MV'], 'sem-conferencia': ['warn', 'Relatório sem conferência'], conferido: ['info', 'Conferido'],
+  gerar: ['err', 'Gerar no MV'], 'sem-conferencia': ['warn', 'Relatório sem conferência'], conferido: ['info', 'Conferindo'],   // há rodada, ainda sem aceite: continua «Conferindo» até o aceite
   aceito: ['ok', 'Aceito'], 'sem-laudo': ['warn', 'Relatório sem laudo'], 'sem-cadastro': ['warn', 'Sem cadastro'],
   conflito: ['err', 'Nome em dois cadastros'], fora: ['info', 'Fora do repasse'], verificado: ['info', 'Verificado']
 };
@@ -68,7 +68,8 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
     if (!it.rodada || r.em > it.rodada.em) it.rodada = r;
   }
   // 3) Situação de cada item.
-  const temSessao = (cod, g) => sessao.some(s => String(s.prestadorCod) === String(cod) && (g === 'curitiba' || s.tipo === g));
+  // PDF carregado: vale para a unidade sugerida pelo nome do arquivo; sem sugestão, para qualquer unidade.
+  const temSessao = (cod, g, un) => sessao.some(s => String(s.prestadorCod) === String(cod) && (g === 'curitiba' || s.tipo === g) && (!s.unidade || String(s.unidade) === String(un)));
   const resultado = [];
   for (const u of [...unidades.values()].sort((a, b) => +a.cod - +b.cod)) {
     const grupos = Object.values(u.grupos).map(G => {
@@ -80,7 +81,7 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
         else if (it.p?.naoRealizaRepasse) sit = 'fora';
         else if (!it.laudos && it.rodada) sit = 'sem-laudo';
         else if (it.rodada) sit = it.rodada.aceite ? 'aceito' : 'conferido';
-        else if (temSessao(it.cod, G.grupo)) sit = 'sem-conferencia';
+        else if (temSessao(it.cod, G.grupo, u.cod)) sit = 'sem-conferencia';
         else sit = 'gerar';
         const disp = marcas.dispensado?.[it.k];
         if (disp && (sit === 'sem-laudo' || sit === 'gerar')) sit = sit === 'sem-laudo' ? 'verificado' : 'fora';

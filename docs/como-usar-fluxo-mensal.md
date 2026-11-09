@@ -25,4 +25,15 @@
 
 ## Onde ficam os dados
 
-No armazenamento deste navegador, sem dados de pacientes. Faça **Configurações → Exportar backup** regularmente; o backup inclui o fluxo mensal. Outra pessoa da equipe só vê o seu fluxo se você enviar o backup (não há sincronização automática).
+No armazenamento deste navegador, sem dados de pacientes. Faça **Configurações → Exportar backup** regularmente; o backup inclui o fluxo mensal. Para trabalhar junto com outra pessoa, use a pasta da rede (abaixo).
+
+## Trabalhar em dupla: Fluxo na pasta da rede
+
+1. **Uma vez só:** crie na rede uma pasta só para isso, por exemplo `Repasse Médico\Fluxo compartilhado`. Não precisa de subpastas por competência: a ferramenta cria um arquivo por competência (`fluxo_comp_10-2026.json`).
+2. **Em cada computador (Edge ou Chrome):** Fluxo mensal → **Conectar à pasta da rede…** → escolha a mesma pasta → permita o acesso. Se o Edge oferecer «permitir sempre», marque; senão, ao abrir a ferramenta, clique em **Liberar acesso** na barra.
+3. **No dia a dia:** a barra no topo do Fluxo mostra «Sincronizado» e quem gravou por último. As mudanças vão para a pasta sozinhas, e as do colega chegam ao entrar no Fluxo ou em até 30 segundos. **Atualizar agora** força na hora.
+4. **Dividir as unidades:** no card **Divisão do trabalho**, clique em **Assumir** na unidade que você vai fazer. O colega vê o seu nome e o que falta nela. Ao terminar, **Concluir**; para devolver, **Liberar**. Se você abrir na Conferência uma unidade que está com o colega, aparece um aviso (não bloqueia).
+5. **Os dois mudaram a mesma etapa:** a ferramenta pergunta qual versão fica e guarda o histórico das duas.
+6. **Rede fora do ar:** a barra fica amarela e as mudanças ficam no navegador até a pasta voltar.
+
+Vai para a pasta só o Fluxo (etapas, status, datas, anotações, controle documental e divisão). Conferências, aceites, NCs, cadastro e equivalências continuam no navegador de cada um.
