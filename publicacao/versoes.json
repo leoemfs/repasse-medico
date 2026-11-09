@@ -2,6 +2,11 @@
   "_leia": "Versões lançadas publicadas no GitHub Pages (a primeira é a atual). Lançar = acrescentar a nova versão no topo e enviar à main; o workflow «Publicar versão no GitHub Pages» publica.",
   "versoes": [
     {
+      "versao": "2.1.0-alpha.8",
+      "commit": "e39c8cbd9109f229023e76842556f6492c2c6ad9",
+      "data": "2026-11-09"
+    },
+    {
       "versao": "2.1.0-alpha.7",
       "commit": "70979786d02544d9bb55ff52ed9cc3e126594382",
       "data": "2026-11-09"
