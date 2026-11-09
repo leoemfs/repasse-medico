@@ -5,7 +5,7 @@
  * a ferramenta roda de novo as conferências afetadas que estiverem carregadas nesta sessão.
  * ============================================================ */
 const DV = { unidade: '*', sel: new Set(), abertos: new Set() };
-const abasEq = () => `<div class="subabas" role="tablist">${[['base', 'Base de equivalências'], ['destrava', 'O que mais destrava']].map(([k, t]) => `<button role="tab" class="${(FE.sub || 'base') === k ? 'on' : ''}" aria-selected="${(FE.sub || 'base') === k}" data-esub="${k}">${t}</button>`).join('')}</div>`;
+const abasEq = () => `<div class="subabas" role="tablist">${[['base', 'Base de equivalências'], ['destrava', 'O que mais destrava'], ['uso', 'Uso nas conferências']].map(([k, t]) => `<button role="tab" class="${(FE.sub || 'base') === k ? 'on' : ''}" aria-selected="${(FE.sub || 'base') === k}" data-esub="${k}">${t}</button>`).join('')}</div>`;
 function ligarAbasEq(raiz) { raiz.querySelectorAll('[data-esub]').forEach(b => b.onclick = () => { FE.sub = b.dataset.esub; RENDER.equivalencias(); }); }
 // Atalho do Início («o que mais destrava»).
 document.addEventListener('click', e => { if (e.target.closest('[data-destrava]')) FE.sub = 'destrava'; });

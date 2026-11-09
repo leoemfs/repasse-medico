@@ -879,3 +879,15 @@ Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 
 
 ## Correção de prestador com regra composta (09/11/2026, v2.1.0-alpha.19)
 Causa do erro «Cannot read properties of undefined (reading 'responsavel')» na Correção de prestador: quando o laudo compatível é confirmado por uma **regra composta** (e não por uma relação simples código × título), não existe «relação» com responsável, e o texto do detalhe tentava ler esse campo. Agora o detalhe diz «validado para 41001109 (regra composta «TC abdome total», responsável)». Teste novo em `test/compostas.mjs` (Correção de prestador com laudo de regra composta).
+
+## SOL-F41 — Controle das equivalências pelo uso nas conferências (09/11/2026, v2.1.0-alpha.20)
+Pedido: «Preciso estabelecer um controle mais preciso sobre as equivalências.» Sem preferência entre escopo mais fino, rastrear o uso, validação em duas etapas e revisão periódica; começamos pelo uso, porque não muda nenhuma regra da conferência e mostra o que cada validação sustenta.
+- **Equivalências → «Uso nas conferências»** (nova subaba): para cada relação validada (ou regra composta validada), as linhas do MV que ela confirmou («Conferido» ou «com ressalva») na última rodada de cada relatório de cada competência; últimas competências lado a lado, última competência com uso, prestadores, unidades e Vl Repasse confirmado. O detalhe mostra a conta por competência (confirmadas, com ressalva, pareadas sem confirmar, relatórios, valor).
+- **Situação de uso:** «Em uso» (confirmou linhas em uma das últimas N competências com rodadas; N = 1, 2, 3 ou 6, padrão 3) · «Parada» (confirmou antes, não nessas N) · «Nunca usada» (nenhuma linha nas rodadas guardadas). Filtros por situação e busca; alternância entre relações e regras compostas.
+- **Tirar a validação com o impacto à vista:** «Voltar a pendente» e «Desativar», na subaba nova e na Base de equivalências, mostram quantas linhas as relações escolhidas confirmaram no total e na competência (em quantos relatórios). Com uso, a justificativa é obrigatória e o histórico da relação guarda «uso: N linha(s) nas rodadas». Rodadas e aceites já feitos não mudam.
+- **Base de equivalências:** coluna «Uso nas conferências» («4 linha(s) · últ. 11/2026» ou «nunca usada») e o uso por competência no detalhe da relação.
+- **Exportar uso (.xlsx):** Leia-me · Relações · Regras compostas, uma coluna por competência.
+- **Rodadas:** cada linha passa a guardar o id da relação que a sustentou (`eqId`). Nas rodadas antigas, a relação é achada pelo par código × título no escopo da unidade.
+- Teste: `test/eq_uso.mjs` (dados fictícios: 4 competências, rodada antiga sem id, duas rodadas do mesmo relatório, regra composta, planilha e diálogo de impacto).
+- **Próximos passos possíveis** (não feitos): escopo da relação por convênio, prestador ou vigência; validação em duas etapas (propor × aprovar); revalidação periódica ou quando a descrição do código mudar no catálogo.
+

@@ -6,6 +6,7 @@ const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: n
 
 RENDER.equivalencias = () => {
   if (FE.sub === 'destrava') return desenharDestrava();
+  if (FE.sub === 'uso') return desenharUsoEq();
   if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
@@ -46,6 +47,8 @@ RENDER.equivalencias = () => {
     editarComposta(null, novaComposta({ nome: c.titulo.slice(0, 60), titulos: [c.titulo], itens: c.codigos.map(k => ({ rotulo: (descCod(c, k) || k).replace(/\s*-\s*OP$/, '').slice(0, 40), codigos: [k], qtd: 1, excecoes: [] })), origem: 'conflito de equivalência' })); });
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
+  // Uso nas conferências (SOL-F41): linhas confirmadas por cada relação nas rodadas guardadas.
+  const usoConf = usoEquivalencias(S.rodadas || [], S.eq);
   const filtrar = () => {
     const q = norm(FE.busca);
     return S.eq.itens.filter(e => (FE.status === '*' || e.status === FE.status) && (FE.confianca === '*' || (e.confianca || '') === FE.confianca)
@@ -68,10 +71,10 @@ RENDER.equivalencias = () => {
       { t: '', html: e => `<input type="checkbox" data-id="${e.id}"${FE.sel.has(e.id) ? ' checked' : ''}>` },
       { t: 'Código', v: e => e.codigo }, { t: 'Descrição MV', v: e => e.descMV }, { t: 'TITLE do Apolo', v: e => e.titulo },
       { t: 'Status', html: e => `<span class="badge ${e.status === 'validada' ? 'ok' : e.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[e.status])}</span>${e.ambiguo ? ' <span class="badge warn">ambígua</span>' : ''}` },
-      { t: 'Confiança', v: e => e.confianca }, { t: 'Laudos no Apolo', n: true, v: e => S.apolo ? (usoTitulo.get(chaveTitulo(e.titulo)) || 0) : '—' }, { t: 'Escopo', v: e => `${e.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + e.escopo.unidade}${e.escopo.modalidade === '*' ? '' : ' · ' + e.escopo.modalidade}` },
+      { t: 'Confiança', v: e => e.confianca }, { t: 'Laudos no Apolo', n: true, v: e => S.apolo ? (usoTitulo.get(chaveTitulo(e.titulo)) || 0) : '—' }, { t: 'Uso nas conferências', v: e => textoUso(usoConf, e) }, { t: 'Escopo', v: e => `${e.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + e.escopo.unidade}${e.escopo.modalidade === '*' ? '' : ' · ' + e.escopo.modalidade}` },
       { t: 'Responsável', v: e => e.responsavel ? `${e.responsavel} · ${new Date(e.validadoEm).toLocaleDateString('pt-BR')}` : '' }
     ],
-    detalhe: e => `<div class="det"><div><h4>Análise de origem</h4><p class="small">${esc(e.justificativa || '—')}</p><h4>Ponto de atenção</h4><p class="small">${esc(e.atencao || '—')}</p><p class="small muted">Origem: ${esc(e.origem || '—')}</p></div>
+    detalhe: e => `<div class="det"><div><h4>Análise de origem</h4><p class="small">${esc(e.justificativa || '—')}</p><h4>Ponto de atenção</h4><p class="small">${esc(e.atencao || '—')}</p><p class="small muted">Origem: ${esc(e.origem || '—')}</p>${(() => { const u = usoConf.relacoes.get(e.id); return u?.linhas ? `<h4>Uso nas conferências</h4><p class="small">${u.linhas} linha(s) confirmada(s) · ${[...u.porComp].sort((a, b) => a[0].localeCompare(b[0])).map(([c, x]) => `${rotuloCompetencia(c)}: ${x.linhas}`).join(' · ')} · ${u.prestadores.size} prestador(es)</p>` : ''; })()}</div>
       <div><h4>Histórico</h4>${e.historico.length ? `<ul class="small">${e.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por)}: ${esc(STATUS_EQ[h.de] || h.de)} → ${esc(STATUS_EQ[h.para] || h.para)}${h.motivo ? ` (${esc(h.motivo)})` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Sem alterações.</p>'}</div></div>`
   });
   const ligar = () => $('eqTab').querySelectorAll('input[data-id]').forEach(ch => ch.onchange = () => { ch.checked ? FE.sel.add(ch.dataset.id) : FE.sel.delete(ch.dataset.id); info(); });
@@ -83,8 +86,13 @@ RENDER.equivalencias = () => {
   const mudar = async (status, rotulo) => {
     const op = await exigirOperador(); if (!op) return;
     const amb = S.eq.itens.filter(e => FE.sel.has(e.id) && e.ambiguo).length;
-    const r = await dialogo(`${rotulo} ${FE.sel.size} relação(ões)`, `<p>Responsável: <strong>${esc(op)}</strong>.</p>${status === 'validada' && amb ? `<p class="badge warn">${amb} relação(ões) ambíguas: confirme que o título identifica só este código.</p>` : ''}<label class="campo">Justificativa${status === 'validada' ? ' (recomendada)' : ''}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
+    // Tirar a validação: mostra o que essas relações confirmaram nas conferências (SOL-F41) e exige justificativa.
+    const valSel = status === 'validada' ? [] : S.eq.itens.filter(e => FE.sel.has(e.id) && e.status === 'validada').map(e => e.id);
+    const compImp = usoConf.competencias.includes(S.comp) ? S.comp : usoConf.competencias.at(-1) || S.comp;
+    const imp = valSel.length ? impactoTirarValidacao(usoConf, valSel, compImp) : null, exige = !!imp?.comUso;
+    const r = await dialogo(`${rotulo} ${FE.sel.size} relação(ões)`, `<p>Responsável: <strong>${esc(op)}</strong>.</p>${status === 'validada' && amb ? `<p class="badge warn">${amb} relação(ões) ambíguas: confirme que o título identifica só este código.</p>` : ''}${imp ? textoImpacto(imp, valSel.length, compImp) : ''}<label class="campo">Justificativa${status === 'validada' ? ' (recomendada)' : exige ? ' (obrigatória)' : ''}<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', rotulo]]);
     if (r.botao !== 'ok') return;
+    if (exige && !(r.campos.motivo || '').trim()) return avisar('Essas relações confirmaram linhas nas conferências: informe a justificativa.', 'warn');
     const n = alterarStatusEq(S.eq, [...FE.sel], status, op, r.campos.motivo, S.comp);
     FE.sel.clear(); salvarEq(`${n} relação(ões) atualizadas.`); RENDER.equivalencias();
   };

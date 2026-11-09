@@ -43,6 +43,7 @@ node test/conferencia_lote.mjs  # vários PDFs do mesmo prestador: filtro por un
 node test/pasta_raiz.mjs        # pasta raiz na rede: criar pastas, ler PDFs e planilhas, sincronizar equivalências (SOL-F37/F38)
 node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36)
 node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
+node test/eq_uso.mjs            # uso das equivalências nas conferências: em uso, paradas, nunca usadas e impacto antes de tirar a validação
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
 node test/competencia10.mjs     # competência 10/2026 inteira com os arquivos reais (dados/comp_10-2026)
