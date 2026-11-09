@@ -676,3 +676,54 @@ Pedido: anotações «Melhorias e ajustes – Equivalências TUSS e Regras Compo
 Pedido: «olha aí o tanto de possíveis compostas que estão para serem validadas, por que não tem uma opção aí também para adicionar validações compostas?». Na base carregada, 164 títulos do Apolo têm 2 ou mais códigos pendentes; a maioria é «um ou outro» (mamografia digital × convencional), poucos são «um e outro» (Doppler mamas = USG mamas + Doppler).
 - Prévia: botão «Criar regra composta com as selecionadas…» na barra; visualização «Agrupar por título» com três decisões por título (Juntos (composta)… · Um ou outro · Só o marcado); relações cobertas por regra saem de Pendentes («Cobertas por regra composta») e voltam se a regra for desativada.
 - Aguardando aprovação.
+
+## SOL-F35 — Controle por unidade: quem laudou × quem já tem repasse — A FAZER (pedido de 09/11/2026)
+Pedido: «Na unidade 1, quantos e quais prestadores fizeram laudos? Quantos já foram, quais eu já conferi e aceitei, quantos ainda faltam? Hoje eu abro a planilha de laudos, filtro a unidade e o US e anoto num papel os médicos para gerar o repasse no MV. Já esqueci um, e é um transtorno.»
+
+**Objetivo:** a lista de quem precisa de repasse sai da planilha de laudos do Apolo (já guardada na competência), e não do papel. Nenhum prestador que laudou pode ficar sem repasse sem que a ferramenta avise.
+
+### De onde vem a lista
+- **Planilha de laudos do Apolo** da competência: cada laudo tem a unidade (BRANCH_NAME), a modalidade (MODALITY) e o médico.
+- **Unidade:** o nome do Apolo é ligado ao código da unidade (1, 2, 4, 5, 7, 10, 17) pelo cadastro de unidades. Um nome novo pede para ser ligado uma vez, e a ligação fica guardada.
+- **Grupo de repasse:**
+  - **USG:** modalidade US, com o Doppler junto (Doppler é sempre do grupo de USG), em todas as unidades menos a 5;
+  - **IMG:** as demais modalidades (RX, mamografia, densitometria, tomografia, ressonância…), em todas as unidades menos a 5;
+  - **Curitiba (V3, unidade 5):** todos os exames num grupo só.
+- **Médico → prestador:** pelo cadastro de Bases, só com nome idêntico ou alias validado (RN-208). Médico do Apolo sem cadastro aparece numa linha própria, «sem cadastro», com os atalhos que já existem: «+ Cadastrar» e «Vincular como alias». A ferramenta nunca adivinha o prestador (RN-206). Residente entra pelo próprio cadastro (tipo residente).
+
+### Situação de cada prestador × unidade × grupo (calculada, sem digitação)
+| Situação | Quando | O que fazer |
+|---|---|---|
+| **Gerar no MV** | laudou no Apolo e ainda não há relatório do MV desta competência (nem PDF carregado nem rodada) | gerar o relatório de repasse no MV |
+| **Relatório sem conferência** | há relatório, ainda sem rodada de conferência | rodar a conferência |
+| **Conferido** | há rodada, sem aceite | revisar e dar o aceite |
+| **Aceito** | a última rodada tem aceite | — |
+| **Relatório sem laudo** | há relatório do MV, mas o médico não aparece no Apolo nessa unidade e grupo | verificar (prestador errado, outra unidade, laudo em outro nome) |
+| **Fora do repasse** | cadastro «não realiza repasse» ou dispensado neste mês, com motivo e responsável | — (sai da contagem do que falta) |
+
+Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para o PDF carregado agora quanto para qualquer rodada de conferência guardada da competência (prestador × unidade × grupo). Também há um «✓ gerado no MV» manual, para marcar o que já foi gerado e ainda não foi carregado.
+
+### Onde aparece
+- **Conferência → nova subaba «Prestadores por unidade»:** um quadro por unidade e grupo. Exemplo de resumo: «Unidade 1 · USG: 14 prestadores laudaram · 9 aceitos · 3 conferidos sem aceite · 2 a gerar no MV». Abaixo do resumo, a lista com cód., nome, nº de laudos no Apolo, nº de linhas no relatório do MV (quando houver) e a situação. Filtros por unidade, grupo e situação, com «Só o que falta» ligado por padrão. Clicar na linha abre a Conferência já com o relatório, a unidade e o médico escolhidos.
+- **Início:** painel curto, com o total do que falta por unidade (ex.: «Unidade 1 · USG: faltam 5 (2 a gerar no MV)»).
+- **Fechamento:** aviso quando alguém laudou e não tem repasse naquela unidade e grupo («2 prestadores laudaram na unidade 1 (USG) e não têm relatório»). O aviso não bloqueia o fechamento, mas fica na exportação de indicadores.
+- **Fluxo (F16):** a etapa de geração dos relatórios no MV ganha a sugestão «Concluída — 0 a gerar», e a de conferência «12 de 14 com aceite», a partir desse controle.
+- **Exportar «Lista para gerar no MV» (Excel/impressão):** prestador, código, unidade, grupo e nº de laudos. Substitui o papel.
+
+### Regras e cuidados
+- **Período:** os laudos são os da produção que a competência paga, ou seja, a mesma planilha usada na conferência.
+- **Nº de laudos × nº de linhas do MV:** serve só de referência rápida. A conferência continua sendo a fonte do que bate ou não.
+- **Privacidade:** o quadro e a exportação têm só médico, unidade e contagens, nunca nome de paciente.
+- **Prestador genérico** (correção de prestador): fica fora da lista. Os laudos dele aparecem pelo médico que laudou.
+- **Troca do Apolo pelo Cloov (SOL-F34):** usa os mesmos campos (unidade, modalidade, médico) e entra no mesmo mapeamento.
+
+### Critérios de aceite
+1. Com a planilha de laudos e nenhum PDF, a unidade 1 · USG lista todos os médicos com laudo US/Doppler na unidade 1, com a contagem igual ao filtro manual da planilha.
+2. Médico do Apolo sem cadastro aparece como «sem cadastro», sem prestador sugerido.
+3. Carregar o PDF e rodar a conferência muda a situação para «Conferido», e o aceite muda para «Aceito», sem digitar nada.
+4. Na unidade 5, todos os exames aparecem num grupo só (Curitiba).
+5. O Fechamento avisa quem laudou e não tem relatório, e a lista «gerar no MV» sai em Excel.
+
+### Para decidir na prévia
+- Se a unidade 5 (Curitiba) deve mostrar todos os exames juntos ou separar USG e IMG só para consulta.
+- Se «Relatório sem laudo» deve virar candidato a NC ou só aviso.
