@@ -30,7 +30,7 @@ No armazenamento deste navegador, sem dados de pacientes. Faça **Configuraçõe
 ## Trabalhar em dupla: Fluxo na pasta da rede
 
 1. **Uma vez só:** crie na rede uma pasta só para isso, por exemplo `Repasse Médico\Fluxo compartilhado`. Não precisa de subpastas por competência: a ferramenta cria um arquivo por competência (`fluxo_comp_10-2026.json`).
-2. **Em cada computador (Edge ou Chrome):** Fluxo mensal → **Conectar à pasta da rede…** → escolha a mesma pasta → permita o acesso. Se o Edge oferecer «permitir sempre», marque; senão, ao abrir a ferramenta, clique em **Liberar acesso** na barra.
+2. **Em cada computador (Edge ou Chrome):** Início → **Conectar a pasta raiz…** → escolha a pasta raiz do aplicativo (a que contém «Fluxo mensal», «Equivalência TUSS», «Bases de dados») → permita o acesso. Depois, **Criar pastas da competência** monta as pastas do mês com os nomes certos. Se o Edge oferecer «permitir sempre», marque; senão, ao abrir a ferramenta, clique em **Liberar acesso** na barra.
 3. **No dia a dia:** a barra no topo do Fluxo mostra «Sincronizado» e quem gravou por último. As mudanças vão para a pasta sozinhas, e as do colega chegam ao entrar no Fluxo ou em até 30 segundos. **Atualizar agora** força na hora.
 4. **Dividir as unidades:** na subaba **Divisão do trabalho** do Fluxo, clique em **Assumir** na unidade que você vai fazer. O colega vê o seu nome e o que falta nela. Ao terminar, **Concluir**; para devolver, **Liberar**. Se você abrir na Conferência uma unidade que está com o colega, aparece um aviso (não bloqueia).
 5. **Os dois mudaram a mesma etapa:** a ferramenta pergunta qual versão fica e guarda o histórico das duas.

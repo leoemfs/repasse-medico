@@ -30,19 +30,23 @@ async function temPermissaoPasta(pedir = false) {
   return pedir && h.requestPermission ? await h.requestPermission({ mode: 'readwrite' }) === 'granted' : false;
 }
 async function definirPastaSync(handle) {
-  SY.handle = handle; SY.lm = 0; SY.meta = null;
+  SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); if (typeof SYQ !== 'undefined') { SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off'; }
   if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
   iniciarTimerSync();
-  if (handle) await sincronizarFluxo({ interativo: true }); else { SY.status = 'off'; atualizarBarraSync(); }
+  if (handle) { await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } else { SY.status = 'off'; atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }
 }
 async function escolherPastaSync() {
   if (!suportaPasta()) return avisar('Este navegador não grava em pastas. Use o Edge ou o Chrome no computador.', 'warn');
   const op = await exigirOperador(); if (!op) return;
-  try { await definirPastaSync(await window.showDirectoryPicker({ id: 'rm-fluxo', mode: 'readwrite' })); avisar('Fluxo conectado à pasta. As mudanças passam a ser gravadas nela.', 'ok'); }
+  try {
+    const h = await window.showDirectoryPicker({ id: 'rm-raiz', mode: 'readwrite' });
+    if (ehSubpastaConhecida(h.name)) return avisar(`«${h.name}» é uma das subpastas. Escolha a pasta raiz do aplicativo (a que contém Fluxo mensal, Equivalência TUSS, Bases de dados…).`, 'warn');
+    await definirPastaSync(h); avisar(`Pasta raiz «${h.name}» conectada: Fluxo, equivalências e relatórios passam a usar as subpastas dela.`, 'ok');
+  }
   catch (e) { if (e.name !== 'AbortError') avisar(`Não foi possível usar a pasta (${e.message}).`, 'err'); }
 }
 async function restaurarPastaSync() {
-  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') sincronizarFluxo(); else atualizarBarraSync(); } } catch (e) { /* sem pasta guardada */ }
+  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.legado = ehPastaLegadaFluxo(h); SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') { await sincronizarFluxo(); await sincronizarEq(); if (S.cfg.parametros.lerPastaAoAbrir !== false) atualizarDaPasta({ silencioso: true }); } else atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } } catch (e) { /* sem pasta guardada */ }
 }
 
 // Lê a pasta, mescla com a versão local e grava o resultado. interativo: pode abrir o diálogo de conflitos.
@@ -55,7 +59,7 @@ async function sincronizarFluxo({ interativo = false } = {}) {
   try {
     for (let tentativa = 0; tentativa < 2; tentativa++) {
       const nome = arquivoSync(chave); let remoto = null, lm = 0;
-      try { const f = await (await SY.handle.getFileHandle(nome)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_FLUXO_SYNC || d.chave !== chave) throw new Error(`${nome} não é o Fluxo desta competência`); remoto = d; }
+      try { const f = await (await (await dirFluxo()).getFileHandle(nome)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_FLUXO_SYNC || d.chave !== chave) throw new Error(`${nome} não é o Fluxo desta competência`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
       const local = S.fluxo.competencias[chave] || null, bases = lerLocal(CHAVE_SYNC_BASE) || {};
       let { comp, conflitos } = mesclarFluxo(local, remoto?.comp || null, bases[chave] || null);
@@ -68,7 +72,7 @@ async function sincronizarFluxo({ interativo = false } = {}) {
       if (!comp) { SY.status = 'ok'; SY.conferidoEm = Date.now(); return; }
       if (json(comp) !== json(local)) { S.fluxo.competencias[chave] = comp; gravarFluxoLocal(); if (location.hash === '#fluxo') RENDER.fluxo(); }
       if (json(comp) !== json(remoto?.comp)) {
-        const fh = await SY.handle.getFileHandle(nome, { create: true });
+        const fh = await (await dirFluxo()).getFileHandle(nome, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;   // alguém gravou enquanto eu mesclava: mescla de novo
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
         const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp })); await w.close();
@@ -93,7 +97,7 @@ function iniciarTimerSync() {
   clearInterval(SY.timer); if (!SY.handle) return;
   SY.timer = setInterval(async () => {
     if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
-    try { const f = await (await SY.handle.getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
+    try { if (typeof checarEqPasta === 'function') checarEqPasta(); const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
     catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
     atualizarBarraSync();
   }, 30000);
@@ -106,11 +110,11 @@ salvarFluxo = function (msg = '') { gravarFluxoLocal(msg); if (SY.handle && SY.s
 
 /* ---------- Barra de sincronização ---------- */
 function barraSync() {
-  const pasta = SY.handle ? `${esc(SY.handle.name)}\\${esc(arquivoSync(S.comp))}` : '';
+  const pasta = SY.handle ? `${esc(SY.handle.name)}${SY.legado ? '' : '\\' + esc(SY.nomeFluxo || PASTAS_RAIZ.fluxo.nome)}\\${esc(arquivoSync(S.comp))}` : '';
   const ha = ms => { const s = Math.round((Date.now() - ms) / 1000); return s < 60 ? `${s} s` : `${Math.round(s / 60)} min`; };
-  if (!SY.handle) return `<div class="sy-barra off" id="fxSync"><span class="sy-dot"></span><b>Fluxo só neste navegador.</b><span class="muted">Para trabalhar junto com outra pessoa, conecte o Fluxo a uma pasta da rede que vocês dois acessam.</span><span class="sy-esp"></span>${suportaPasta() ? '<button class="sec mini" data-sy="escolher">Conectar à pasta da rede…</button>' : '<span class="small muted">Use o Edge ou o Chrome no computador para conectar.</span>'}</div>`;
+  if (!SY.handle) return `<div class="sy-barra off" id="fxSync"><span class="sy-dot"></span><b>Fluxo só neste navegador.</b><span class="muted">Para trabalhar junto com outra pessoa, conecte a pasta raiz do aplicativo na rede (no Início).</span><span class="sy-esp"></span>${suportaPasta() ? '<button class="sec mini" data-sy="escolher">Conectar a pasta raiz…</button>' : '<span class="small muted">Use o Edge ou o Chrome no computador para conectar.</span>'}</div>`;
   const ult = SY.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SY.meta.atualizadoPor || '—')}</b> às ${new Date(SY.meta.atualizadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : '';
-  const bt = `<button class="sec mini" data-sy="agora">Atualizar agora</button><button class="sec mini" data-sy="escolher">Trocar pasta…</button><button class="sec mini" data-sy="desconectar">Desconectar</button>`;
+  const bt = `<button class="sec mini" data-sy="agora">Atualizar agora</button><button class="sec mini" data-sy="escolher">Trocar pasta raiz…</button><button class="sec mini" data-sy="desconectar">Desconectar</button>`;
   if (SY.status === 'permissao') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>Acesso à pasta ${esc(SY.handle.name)} precisa ser liberado.</b><span class="muted">O Edge pede uma vez por sessão (ou marque «permitir sempre»).</span><span class="sy-esp"></span><button class="mini" data-sy="liberar">Liberar acesso</button>${bt}</div>`;
   if (SY.status === 'erro') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>Sem acesso à pasta</b><span class="muted">— mudanças guardadas neste navegador; vão para a pasta quando voltar (${esc(SY.erro)}).</span><span class="sy-esp"></span><button class="mini" data-sy="agora">Tentar de novo</button>${bt}</div>`;
   if (SY.status === 'conflito') return `<div class="sy-barra warn" id="fxSync"><span class="sy-dot"></span><b>${SY.conflitos} item(ns) mudados pelos dois.</b><span class="muted">Escolha qual versão fica.</span><span class="sy-esp"></span><button class="mini" data-sy="resolver">Resolver</button>${bt}</div>`;
@@ -121,7 +125,7 @@ function ligarBarraSync(raiz) {
     const a = b.dataset.sy;
     if (a === 'escolher') return escolherPastaSync();
     if (a === 'desconectar') { if (await confirmar('Desconectar da pasta?', 'O Fluxo continua neste navegador; a pasta e o arquivo não são apagados.', 'Desconectar')) definirPastaSync(null); return; }
-    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); return sincronizarFluxo({ interativo: true }); } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
+    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); return; } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
     sincronizarFluxo({ interativo: true });
   });
 }

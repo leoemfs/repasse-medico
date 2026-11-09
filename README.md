@@ -38,6 +38,7 @@ node test/aceite_cobertura.mjs  # aceite na Conferência (F11) e cobertura/valid
 node test/fluxo_dados.mjs       # candidatos a NC guardados (F17) e Fluxo ligado aos dados (F14, F13, F16)
 node test/compostas.mjs         # regras compostas e por convênio (F5 v2: títulos, palavras, quantidade, exceção por convênio, fusão por %)
 node test/prestadores_unidade.mjs # prestadores por unidade (SOL-F35) com a competência 10/2026 real
+node test/pasta_raiz.mjs        # pasta raiz na rede: criar pastas, ler PDFs e planilhas, sincronizar equivalências (SOL-F37/F38)
 node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36)
 node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)

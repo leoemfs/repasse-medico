@@ -30,6 +30,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Compostas na lista de pendentes (alpha.8):** Equivalências → Visualização «Agrupar por título» com «Juntos», «Um ou outro» e «Só o marcado»; botão «Criar regra composta com as selecionadas»; relações resolvidas por regra validada ficam «Cobertas por regra composta».
 
+- **Pasta raiz na rede (alpha.9):** no Início, conectar a pasta raiz uma vez, criar as pastas do mês com os nomes certos e «Atualizar da pasta» (PDFs do MV e planilhas lidos da pasta, só o que mudou). Equivalências TUSS sincronizadas entre as pessoas, como o Fluxo.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

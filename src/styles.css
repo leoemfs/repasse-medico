@@ -304,3 +304,6 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* Equivalências: agrupar por título (compostas na lista de pendentes) */
 .cp-bt{background:#5b3d99;border-color:#5b3d99;color:#fff}.cp-bt:disabled{opacity:.5}
 .eq-grupos td{vertical-align:top}.tag-cod{display:flex;gap:6px;align-items:baseline;font-size:12.5px;padding:2px 0}
+/* Pasta raiz no Início */
+.pr-card.ok{border-left:4px solid var(--ok)}.pr-card.warn{border-left:4px solid var(--warn)}.pr-card.off{border-left:4px solid var(--accent)}
+.pr-st{display:flex;flex-direction:column;gap:4px;margin-top:6px}

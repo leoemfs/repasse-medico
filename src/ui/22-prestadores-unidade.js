@@ -8,7 +8,7 @@ const marcasControle = () => { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; retu
 function gravarMarcasControle(m) { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; t[S.comp] = m; if (!gravarLocal(CHAVE_CONTROLE_UN, t)) avisar('Não foi possível gravar a marca neste navegador.', 'err'); }
 // PDFs da sessão (para «relatório sem conferência»).
 const sessaoControle = () => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao')
-  .map(x => ({ prestadorCod: x.rel.cab.prestadorCod, unidade: unidadeSugeridaPeloArquivo(x.nome || '') || '', tipo: tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) }) }));
+  .map(x => ({ prestadorCod: x.rel.cab.prestadorCod, unidade: x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome || '') || '', tipo: x.grupoPasta && x.grupoPasta !== 'curitiba' ? x.grupoPasta :  tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) }) }));
 const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apolo.laudos, cfg: S.cfg, rodadas: S.rodadas, chave: S.comp, sessao: sessaoControle(), marcas: marcasControle(), naoSRA: S.cfg.medicosNaoSRA || [] }) : null;
 
 const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;

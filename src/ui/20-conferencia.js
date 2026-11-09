@@ -18,12 +18,12 @@ function seletoresAnalise(prefixo, tolPadrao) {
   if (proximo) S.cfProximo = null;
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
-  const sugerida = rel ? unidadeSugeridaPeloArquivo(rel.nome) : '';
+  const sugerida = rel ? (rel.unidadePasta || unidadeSugeridaPeloArquivo(rel.nome)) : '';
   const unSel = ultimo?.relId === relSel ? ultimo.unidadeCod : (sugerida && unidadePorCod(S.cfg, sugerida) ? sugerida : '');
   return `<div class="grid4">
     <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}`]), relSel)}</select></label>
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
-      <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? 'Sugerida pelo nome do arquivo: confirme.' : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
+      <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
     <div id="${prefixo}Extra"></div></div>`;
 }

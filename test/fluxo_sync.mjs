@@ -22,7 +22,7 @@ async function usuario(nome) {
   return p;
 }
 // Pasta simulada com a mesma interface do Edge (getFileHandle/getFile/createWritable).
-const conectar = p => p.evaluate(() => window.__RM.t.definirPastaSync({ name: 'Repasse Médico', getFileHandle: async (n, o = {}) => {
+const conectar = p => p.evaluate(() => window.__RM.t.definirPastaSync({ name: 'Fluxo mensal', getFileHandle: async (n, o = {}) => {
   if (!o.create && !(await window.__fsLer(n))) throw new DOMException('não existe', 'NotFoundError');
   return { getFile: async () => { const r = await window.__fsLer(n); if (!r) throw new DOMException('não existe', 'NotFoundError'); return { lastModified: r.lm, text: async () => r.txt }; },
     createWritable: async () => { let buf = ''; return { write: async t => { buf += t; }, close: async () => window.__fsGravar(n, buf) }; } };
