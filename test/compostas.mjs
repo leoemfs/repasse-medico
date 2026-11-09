@@ -82,6 +82,22 @@ await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas')
 const lista = await p.textContent('#cardCompostas');
 ok(/USG mamas \+ Doppler/.test(lista) && /×2/.test(lista) && /não exigido/.test(lista) && /contém DOPPLER e um de PUNHO · OMBRO · JOELHO/.test(lista), 'lista mostra títulos, palavras, quantidade e excludente por convênio');
 await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_lista.png' });
+// 5) Conflito (título validado para dois códigos) → «um ou outro» vira regra composta e o conflito deixa de travar.
+await p.evaluate(() => { const { S: E, t } = window.__RM;
+  const mk = (codigo, descMV, titulo) => { const e = t.novaRelacao({ codigo, titulo, descMV, escopo: { unidade: '*', modalidade: '*' }, origem: 'teste' }); E.eq.itens.push(e); t.alterarStatusEq(E.eq, [e.id], 'validada', 'Teste', 'teste', '2026-10'); };
+  mk('40901204', 'USG BOLSA ESCROTAL - OP', 'ULTRASSONOGRAFIA DO ESCROTO'); mk('40901203', 'USG ORGAOS SUPERF. (TIREOIDE OU ESCROTO OU PENIS OU CRANIO)', 'ULTRASSONOGRAFIA DO ESCROTO');
+  mk('40901204', 'USG BOLSA ESCROTAL - OP', 'USG DOPPLER DE BOLSA ESCROTAL'); mk('40901386', 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - OP', 'USG DOPPLER DE BOLSA ESCROTAL'); });
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('[data-confou]');
+const cf = await p.textContent('ul.conflitos');
+ok(/ULTRASSONOGRAFIA DO ESCROTO[\s\S]*um ou outro/.test(cf) && /USG DOPPLER DE BOLSA ESCROTAL[\s\S]*juntos/.test(cf), 'conflito indica possível regra composta: escroto = um ou outro; título com Doppler = juntos');
+await p.locator('ul.conflitos li:has-text("ULTRASSONOGRAFIA DO ESCROTO") [data-confou]').click(); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="just"]', 'escroto lançado como bolsa escrotal ou órgãos superficiais'); await okDlg('ok');
+const esc2 = await p.evaluate(() => { const { S: E, t } = window.__RM, idx = t.indiceEquivalencias(E.eq); return ['40901204', '40901203'].map(c => t.avaliarProcedimento(idx, c, 'ULTRASSONOGRAFIA DO ESCROTO').estado); });
+ok(esc2.join() === 'validada,validada' && !/«ULTRASSONOGRAFIA DO ESCROTO»/.test(await p.textContent('ul.conflitos').catch(() => '')) && /resolvidos por regra composta/.test(await p.textContent('#pag-equivalencias')), '«Um ou outro»: regra validada, os dois códigos confirmam o laudo e o título sai dos conflitos');
+await p.locator('ul.conflitos li:has-text("USG DOPPLER DE BOLSA ESCROTAL") [data-confjt]').click(); await p.waitForSelector('#dlg[open]');
+ok(await p.inputValue('#dlgCorpo [name="cod0"]') === '40901204' && await p.inputValue('#dlgCorpo [name="cod1"]') === '40901386' && /USG DOPPLER DE BOLSA ESCROTAL/.test(await p.inputValue('#dlgCorpo [name="titulos"]')), '«Juntos» abre o cadastro da regra composta já com o título e os dois códigos');
+await p.screenshot({ path: out + 'compostas_conflito_juntos.png' });
+await okDlg('');
 // Desativada não vale.
 await p.click('[data-cmpdes]'); await okDlg('').catch(() => {});
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));

@@ -26,6 +26,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Fluxo compartilhado (alpha.6, SOL-F36):** o Fluxo mensal pode ficar numa pasta da rede e sincroniza entre as pessoas (Edge ou Chrome). Card «Divisão do trabalho»: quem assumiu cada unidade × grupo, com o que falta, e aviso ao entrar numa unidade de outra pessoa.
 
+- **Conflitos viram regra composta (alpha.7):** no card de conflitos de Equivalências, «Um ou outro» (ex.: escroto = bolsa escrotal ou órgãos superficiais) ou «Juntos» (título com Doppler = base + Doppler). A Divisão do trabalho virou subaba do Fluxo.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

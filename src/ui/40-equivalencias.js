@@ -6,7 +6,13 @@ const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: n
 
 RENDER.equivalencias = () => {
   if (FE.sub === 'destrava') return desenharDestrava();
-  const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, conf = conflitosEquivalencias(S.eq);
+  const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
+  // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
+  const cpVal = indiceEquivalencias(S.eq).compostas || [], regraDoConf = c => cpVal.find(r => compostaCasaTitulo(r, c.titulo) > 0);
+  const conf = todosConf.filter(c => !regraDoConf(c)), cobertos = todosConf.filter(c => regraDoConf(c));
+  // Sugestão: título com Doppler e um código de Doppler + um código base → «juntos»; senão «um ou outro».
+  const sugestaoConf = c => { const dop = c.relacoes.filter(r => /DOPPLER/.test(norm(r.descMV || ''))).length; return /DOPPLER/.test(norm(c.titulo)) && dop && dop < c.codigos.length ? 'juntos' : 'ou'; };
+  const descCod = (c, cod) => c.relacoes.find(r => r.codigo === cod)?.descMV || '';
   $('pag-equivalencias').innerHTML = `
   <div class="card"><h2>Base de equivalências <span class="muted small">revisão ${S.eq.revisao} · ${S.eq.atualizadoEm ? new Date(S.eq.atualizadoEm).toLocaleString('pt-BR') : ''}</span></h2>
     <p class="lead">Ordem: confiança da análise e, depois, quantidade de laudos com o título no Apolo carregado. Cada relação liga um código TUSS do MV a um TITLE do Apolo. Só relação <strong>validada</strong>, sem conflito, sustenta confirmação automática. Candidatos importados da planilha de análise entram como pendentes; a pontuação/confiança da planilha ordena a revisão, mas não valida nada.</p>
@@ -15,8 +21,13 @@ RENDER.equivalencias = () => {
       <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
-  ${conf.length ? `<div class="card" style="border-color:var(--err)"><h2>Conflitos</h2><p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos.</p><ul class="conflitos">${conf.map((c, i) => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} <button class="sec mini" data-conf="${i}">Desfazer conflito…</button></li>`).join('')}</ul>
-    <p class="small muted">Desfazer: você escolhe o código correto e as outras validações deste título voltam a pendente, com justificativa no histórico. Quando um laudo precisar de dois códigos (ex.: articular + doppler), a regra composta virá depois (SOL-F5).</p></div>` : ''}
+  ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
+    ${conf.length ? `<p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos. Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (ex.: escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (ex.: título com Doppler = exame base <i>e</i> Doppler na mesma conta).</p>
+    <ul class="conflitos">${conf.map((c, i) => { const sg = sugestaoConf(c); return `<li><div>«${esc(c.titulo)}» → ${c.codigos.map(k => `<b>${esc(k)}</b> <span class="muted small">${esc(descCod(c, k))}</span>`).join(' · ')}</div>
+      <div class="small muted">Possível regra composta: ${sg === 'juntos' ? '<b>juntos</b> (base + Doppler na mesma conta)' : '<b>um ou outro</b> (qualquer um dos códigos confirma o laudo)'}.</div>
+      <div class="acoes" style="margin-top:4px"><button class="${sg === 'ou' ? '' : 'sec '}mini" data-confou="${i}">Um ou outro</button><button class="${sg === 'juntos' ? '' : 'sec '}mini" data-confjt="${i}">Juntos (composta)…</button><button class="sec mini" data-conf="${i}">Só um código…</button></div></li>`; }).join('')}</ul>
+    <p class="small muted">«Um ou outro» cria uma regra composta validada com os códigos como alternativas (o laudo sustenta uma linha). «Juntos» abre o cadastro da regra composta já preenchido (quantidade e convênio você ajusta). «Só um código» mantém o código escolhido e volta os outros a pendente. As relações validadas continuam no histórico.</p>` : ''}
+    ${cobertos.length ? `<details class="small"><summary>${cobertos.length} título(s) com mais de um código resolvidos por regra composta</summary><ul>${cobertos.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} · regra «${esc(nomeComposta(regraDoConf(c)))}»</li>`).join('')}</ul></details>` : ''}</div>` : ''}
   ${cardCompostas()}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
@@ -28,6 +39,9 @@ RENDER.equivalencias = () => {
     <div id="eqTab" style="margin-top:10px"></div></div>`;
   ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
+  $('pag-equivalencias').querySelectorAll('[data-confou]').forEach(b => b.onclick = () => conflitoUmOuOutro(conf[+b.dataset.confou]));
+  $('pag-equivalencias').querySelectorAll('[data-confjt]').forEach(b => b.onclick = () => { const c = conf[+b.dataset.confjt];
+    editarComposta(null, novaComposta({ nome: c.titulo.slice(0, 60), titulos: [c.titulo], itens: c.codigos.map(k => ({ rotulo: (descCod(c, k) || k).replace(/\s*-\s*OP$/, '').slice(0, 40), codigos: [k], qtd: 1, excecoes: [] })), origem: 'conflito de equivalência' })); });
   // Laudos do Apolo carregado por título: ajuda a priorizar o que validar primeiro.
   const usoTitulo = S.apolo ? contar(S.apolo.laudos, l => chaveTitulo(l.titulo)) : new Map();
   const filtrar = () => {
@@ -108,4 +122,18 @@ async function desfazerConflito(c) {
     salvarEq(`Conflito desfeito em «${c.titulo}»: mantido ${r.campos.codigo}; ${n} relação(ões) voltaram a pendente.`);
   } catch (e) { return avisar(e.message, 'err'); }
   RENDER.equivalencias();
+}
+
+// Conflito → regra composta «um ou outro»: qualquer um dos códigos confirma o laudo (uma linha).
+async function conflitoUmOuOutro(c) {
+  const op = await exigirOperador(); if (!op) return;
+  const r = await dialogo(`«${c.titulo}»: um código ou outro`, `<p class="small">Cria uma regra composta <b>validada</b> por ${esc(op)}: o título confirma <b>uma</b> linha com qualquer um destes códigos.</p>
+    <ul class="small">${c.relacoes.filter((x, i, a) => a.findIndex(y => y.codigo === x.codigo) === i).map(x => `<li><b>${esc(x.codigo)}</b> — ${esc(x.descMV || '')}</li>`).join('')}</ul>
+    <label class="campo">Justificativa (obrigatória)<input type="text" name="just" placeholder="ex.: escroto pode ser lançado como bolsa escrotal ou órgãos superficiais"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Criar e validar']]);
+  if (r.botao !== 'ok') return;
+  if (!r.campos.just?.trim()) return avisar('Informe a justificativa.', 'warn');
+  const nova = novaComposta({ nome: `${c.titulo.slice(0, 50)} (um ou outro)`, titulos: [c.titulo], itens: [{ rotulo: 'um dos códigos', codigos: [...c.codigos], qtd: 1, excecoes: [] }], justificativa: r.campos.just.trim(), origem: 'conflito de equivalência' });
+  S.eq.compostas = S.eq.compostas || []; S.eq.compostas.push(nova);
+  alterarStatusComposta(S.eq, nova.id, 'validada', op, r.campos.just.trim(), S.comp);
+  salvarEq(`Regra composta «${nova.nome}» validada: o conflito deixa de travar a conferência.`); RENDER.equivalencias();
 }

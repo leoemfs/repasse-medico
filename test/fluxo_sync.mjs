@@ -36,7 +36,7 @@ const ana = await usuario('Ana Teste'), leo = await usuario('Leo Teste');
 await mudar(ana, 'usg', 'gerar', 'and');
 await conectar(ana);
 ok(fs.existsSync(pasta + 'fluxo_comp_10-2026.json') && JSON.parse(fs.readFileSync(pasta + 'fluxo_comp_10-2026.json', 'utf8')).atualizadoPor === 'Ana Teste', 'ao conectar, o Fluxo da competência vai para a pasta (fluxo_comp_10-2026.json), com quem gravou');
-ok(/Sincronizado/.test(await ana.textContent('#fxSync')), 'barra «Sincronizado» no topo do Fluxo');
+ok(/Sincronizado/.test(await ana.textContent('#fxSync')) && !(await ana.isVisible('#fxDivisao')), 'barra «Sincronizado» no topo do Fluxo; a divisão fica na subaba própria');
 // 2) Leo conecta depois, com mudanças próprias: junta sem conflito.
 await mudar(leo, 'img', 'gerar', 'and');
 await conectar(leo);
@@ -44,9 +44,9 @@ ok((await st(leo, 'usg', 'gerar')).status === 'and' && (await st(leo, 'img', 'ge
 await sinc(ana);
 ok((await st(ana, 'img', 'gerar')).status === 'and', 'Ana recebe a mudança do Leo');
 // 3) Divisão do trabalho: Ana assume a unidade 1 · USG pela tela; Leo vê.
-await ana.goto(html + '#inicio'); await ana.goto(html + '#fluxo'); await ana.waitForSelector('#fxDivisao');
+await ana.goto(html + '#inicio'); await ana.goto(html + '#fluxo'); await ana.click('[data-sub="divisao"]'); await ana.waitForSelector('#fxDivisao');
 await ana.locator('[data-dvk="1|usg"] [data-dv="assumir"]').click(); await ana.waitForTimeout(1500);
-await sinc(leo); await leo.goto(html + '#inicio'); await leo.goto(html + '#fluxo'); await leo.waitForSelector('#fxDivisao');
+await sinc(leo); await leo.goto(html + '#inicio'); await leo.goto(html + '#fluxo'); await leo.click('[data-sub="divisao"]'); await leo.waitForSelector('#fxDivisao');
 const cel = await leo.textContent('[data-dvk="1|usg"]');
 ok(/Ana Teste/.test(cel) && /assumiu/.test(cel) && await leo.isVisible('[data-dvk="1|usg"].outro'), `Leo vê a unidade 1 · USG com a Ana (${cel.replace(/\s+/g, ' ').trim().slice(0, 60)})`);
 await leo.locator('[data-dvk="17|usg"] [data-dv="assumir"]').click(); await leo.waitForTimeout(1500); await sinc(ana);

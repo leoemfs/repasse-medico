@@ -165,7 +165,7 @@ function cartaoDivisao(comp) {
   }).join('');
   const feed = feedFluxo(comp, 8);
   return `<div class="card" id="fxDivisao"><div class="fx-topo"><h2 style="margin:0">Divisão do trabalho <span class="muted small">competência ${rotuloCompetencia(comp.chave)}</span></h2></div>
-    <p class="small muted">Quem está com cada unidade. «Assumir» marca o seu nome; os outros veem pela pasta da rede. O «faltam» vem de Prestadores por unidade, gravado por quem está com a unidade.</p>
+    <p class="small muted">Quem está com cada unidade. «Assumir» marca o seu nome; os outros veem pela pasta da rede (barra acima). O «faltam» vem de Prestadores por unidade, gravado por quem está com a unidade.</p>
     <div class="dv-quadro">${cels}</div>
     ${feed.length ? `<details class="dv-feed"${FX.feedAberto ? ' open' : ''}><summary>Últimas mudanças</summary>${feed.map(f => `<div><b>${esc(f.por || '—')}</b> ${esc(f.texto)} <small class="muted">· ${hora(f.em)}</small></div>`).join('')}</details>` : ''}</div>`;
 }
@@ -201,8 +201,13 @@ desenharAcompanhamento = function () {
   _desenharAcompanhamento();
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
   c.insertAdjacentHTML('afterbegin', barraSync()); ligarBarraSync(c);
-  if (comp) { const topo = c.querySelector('.fx-topo'); (topo || c.firstElementChild).insertAdjacentHTML('afterend', cartaoDivisao(comp)); ligarDivisao(c, comp); }
 };
+// Subaba «Divisão do trabalho»: barra de sincronização + quadro unidade × grupo + últimas mudanças.
+function desenharDivisaoFluxo() {
+  const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
+  c.innerHTML = barraSync() + (comp ? cartaoDivisao(comp) : `<div class="card"><h2>Competência ${rotuloCompetencia(FX.chave)} ainda não iniciada</h2><p class="lead">Inicie o checklist da competência em «Acompanhamento» para dividir as unidades.</p></div>`);
+  ligarBarraSync(c); if (comp) ligarDivisao(c, comp);
+}
 // Prestadores por unidade e Conferência: aviso da divisão.
 const _desenharControleUnidade = desenharControleUnidade;
 desenharControleUnidade = async function () {

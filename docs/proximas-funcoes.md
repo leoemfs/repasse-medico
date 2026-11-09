@@ -758,3 +758,10 @@ Pedido: «Uso junto de outro colaborador; dá para conectar o Fluxo mensal e sin
 - **Aviso:** em Prestadores por unidade e na Conferência (ao escolher unidade e relatório), «A unidade X está com Fulano» com «Continuar mesmo assim» (registrado na divisão).
 - **Prestadores por unidade:** a situação de quem tem rodada sem aceite passou a «Conferindo» (até o aceite), e o PDF carregado só conta como «relatório sem conferência» na unidade indicada no nome do arquivo (ex.: `_un17`), quando houver.
 - Teste: `test/fluxo_sync.mjs` (dois usuários com navegadores separados e uma pasta simulada em disco).
+
+## Conflitos de equivalência indicam possível regra composta; Divisão do trabalho em subaba (09/11/2026, v2.1.0-alpha.7)
+Pedido: «equivalências em conflito devem indicar possível equivalência composta, onde um título pode ter mais de um TUSS (ULTRASSONOGRAFIA DO ESCROTO = USG BOLSA ESCROTAL ou USG ÓRGÃOS SUPERF.) e até título com Doppler que na conta tem o base e o Doppler juntos» e «coloque a Divisão do trabalho como subaba dentro de Fluxo».
+- **Card de conflitos:** cada título mostra os códigos com a descrição do MV e a sugestão: **juntos** quando o título tem Doppler e um dos códigos é de Doppler; senão **um ou outro**. Botões: «Um ou outro» (cria regra composta validada, com justificativa, com os códigos como alternativas: o laudo sustenta uma linha) · «Juntos (composta)…» (abre o cadastro da regra composta já com o título e os códigos) · «Só um código…» (o antigo desfazer conflito).
+- A regra composta validada vale por cima das relações simples. O título coberto sai da lista e da contagem de conflitos e aparece em «títulos resolvidos por regra composta». As relações validadas continuam no histórico.
+- **Fluxo → subaba «Divisão do trabalho»**, com a barra de sincronização da pasta da rede; o Acompanhamento mantém só a barra.
+- A prévia «regras compostas na lista de pendentes» (agrupar por título, três decisões) continua aguardando aprovação.

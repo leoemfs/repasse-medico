@@ -40,9 +40,9 @@ RENDER.fluxo = async () => {
   if (DB.ok) S.rodadas = await dbTodas();   // sugestões e classificação usam as rodadas mais recentes
   FX.chave = S.comp || chaveAtual();
   const p = $('pag-fluxo');
-  p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
+  p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'divisao' ? 'on' : ''}" data-sub="divisao" aria-selected="${FX.sub === 'divisao'}">Divisão do trabalho</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
   p.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { FX.sub = b.dataset.sub; RENDER.fluxo(); });
-  FX.sub === 'modelo' ? desenharModeloFluxo() : desenharAcompanhamento();
+  FX.sub === 'modelo' ? desenharModeloFluxo() : FX.sub === 'divisao' ? desenharDivisaoFluxo() : desenharAcompanhamento();
 };
 
 /* ---------------- Acompanhamento ---------------- */
