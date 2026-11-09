@@ -27,13 +27,26 @@ function cardCompostas() {
       <td class="small">${c.itens.flatMap(it => (it.excecoes || []).map(e => `<span class="badge info">${esc(e.convenio)}</span> ${esc(it.rotulo || it.codigos[0])}: ${e.tipo === 'nao-exigido' ? '<b>não exigido</b>' : `<b>×${e.qtd}</b>`}`)).join('<br>') || '<span class="muted">—</span>'}</td>
       <td class="n small">${efet(c)}</td>
       <td><span class="badge ${c.status === 'validada' ? 'ok' : c.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[c.status])}</span>${c.responsavel ? `<small class="nc-det">${esc(c.responsavel)} · ${new Date(c.validadoEm).toLocaleDateString('pt-BR')}</small>` : ''}</td>
-      <td style="white-space:nowrap">${c.status !== 'validada' ? `<button class="mini" data-cmpval="${c.id}">Validar</button> ` : ''}<button class="sec mini" data-cmped="${c.id}" aria-label="Editar">✎</button> ${c.status !== 'desativada' ? `<button class="perigo mini" data-cmpdes="${c.id}" title="Desativar">✕</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma regra composta ainda.</p>'}
+      <td style="white-space:nowrap">${c.status !== 'validada' ? `<button class="mini" data-cmpval="${c.id}">Validar</button> ` : ''}<button class="sec mini" data-cmped="${c.id}" aria-label="Editar">✎</button> ${c.itens.flatMap(it => it.codigos).length > 1 ? `<button class="sec mini" data-cmpmodo="${c.id}" title="Trocar entre «juntos» e «um ou outro»">⇄ ${modoComposta(c) === 'ou' ? 'Juntos' : 'Um ou outro'}</button>` : ''} ${c.status !== 'desativada' ? `<button class="perigo mini" data-cmpdes="${c.id}" title="Desativar">✕</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted small">Nenhuma regra composta ainda.</p>'}
     <div class="acoes"><button class="sec" id="cmpNova">+ Regra composta</button><span class="small muted">A simulação refaz as conferências da competência com os PDFs e o Apolo carregados nesta sessão.</span></div></div>`;
 }
 function ligarCompostas(raiz) {
   if (!raiz.querySelector('#cardCompostas')) return;
   $('cmpNova').onclick = () => editarComposta(null);
   raiz.querySelectorAll('[data-cmped]').forEach(b => b.onclick = () => editarComposta(b.dataset.cmped));
+  raiz.querySelectorAll('[data-cmpmodo]').forEach(b => b.onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const c = S.eq.compostas.find(x => x.id === b.dataset.cmpmodo), novoModo = modoComposta(c) === 'ou' ? 'juntos' : 'ou', depois = { ...regraComposta(c), itens: itensNoModo(c, novoModo) };
+    const perdeExc = regraComposta(c).itens.some(it => (it.excecoes || []).length) || regraComposta(c).itens.some(it => (+it.qtd || 1) !== 1);
+    const r = await dialogo(`«${nomeComposta(c)}»: ${novoModo === 'ou' ? 'um ou outro' : 'juntos'}`, `<p class="small"><b>Hoje:</b> ${esc(leituraRegraComposta(c, descTussUI, true))}</p><p class="small"><b>Fica:</b> ${esc(leituraRegraComposta(depois, descTussUI, true))}</p>
+      ${perdeExc ? '<p class="small badge warn">As quantidades diferentes de 1 e as exceções por convênio desta regra deixam de valer.</p>' : ''}<p class="small muted">A regra continua ${esc(STATUS_EQ[c.status] || c.status)}; a troca fica no histórico, com o seu nome. Rode as conferências de novo para aplicar.</p>
+      <label class="campo">Justificativa (obrigatória)<input type="text" name="just" placeholder="${novoModo === 'ou' ? 'ex.: o escroto é lançado como bolsa escrotal ou como órgãos superficiais' : 'ex.: a conta traz os dois procedimentos'}"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Trocar']]);
+    if (r.botao !== 'ok') return; if (!r.campos.just?.trim()) return avisar('Informe a justificativa.', 'warn');
+    for (const k of ['titulo', 'codigos', 'porConvenio']) delete c[k];
+    c.itens = depois.itens; c.titulos = depois.titulos; c.nome = c.nome || depois.nome;
+    (c.historico ||= []).push({ em: agoraISO(), por: op, de: c.status, para: c.status, motivo: `trocada para «${novoModo === 'ou' ? 'um ou outro' : 'juntos'}»: ${r.campos.just.trim()}`, competencia: S.comp });
+    S.eq.revisao++; S.eq.atualizadoEm = agoraISO(); salvarEq(`Regra «${nomeComposta(c)}» agora é «${novoModo === 'ou' ? 'um ou outro' : 'juntos'}». Rode as conferências de novo para aplicar.`); RENDER.equivalencias();
+  });
   raiz.querySelectorAll('[data-cmpsim]').forEach(b => b.onclick = async () => {
     const c = S.eq.compostas.find(x => x.id === b.dataset.cmpsim); b.disabled = true; b.textContent = 'Simulando…';
     const r = await simularComposta(regraComposta(c)); if (!r) { b.disabled = false; b.textContent = 'Simular'; return; }
@@ -96,6 +109,7 @@ function regraDoFormulario(k, base) {
     const exc = (k['excConv' + i] || '').trim() && k['excTipo' + i] ? [{ convenio: k['excConv' + i].trim().toUpperCase(), tipo: k['excTipo' + i], qtd: k['excTipo' + i] === 'quantidade' ? Math.max(0, +k['excQtd' + i] || 0) : 0 }] : [];
     itens.push({ rotulo: (k['rot' + i] || '').trim(), codigos, qtd: Math.max(0, Math.round(+k['qtd' + i] || 1)), excecoes: exc });
   }
+  if (k.modo === 'ou' && itens.length) { const cods = [...new Set(itens.flatMap(it => it.codigos))]; itens.splice(0, itens.length, { rotulo: 'um dos códigos', codigos: cods, qtd: 1, excecoes: [] }); }
   const titulos = String(k.titulos || '').split('\n').map(t => t.trim()).filter(Boolean);
   const palavras = { todas: lerPalavras(k.palTodas), umaDe: lerPalavras(k.palUmaDe) };
   return { ...base, nome: (k.nome || '').trim(), titulos, palavras: palavras.todas.length || palavras.umaDe.length ? palavras : null, itens, escopo: { unidade: k.unidade || '*', modalidade: '*' }, justificativa: (k.just || '').trim() };
@@ -134,6 +148,9 @@ async function editarComposta(id, rascunho = null, sim = null) {
       <div><label class="campo">Ou por palavras: o título contém todas estas<input type="text" name="palTodas" value="${esc((c.palavras?.todas || []).join(', '))}" placeholder="ex.: DOPPLER"></label>
       <label class="campo">e pelo menos uma destas (opcional)<input type="text" name="palUmaDe" value="${esc((c.palavras?.umaDe || []).join(', '))}" placeholder="ex.: ARTICULAR, PUNHO, OMBRO, JOELHO"></label><span class="small muted">Para variações de nome. Separe por vírgula.</span></div></div>
     <h4 style="margin:10px 0 4px">Composição na conta do MV</h4>
+    <div class="modo-cp"><label><input type="radio" name="modo" value="juntos"${modoComposta(c) === 'juntos' ? ' checked' : ''}> <b>Juntos</b> — a conta tem <b>cada</b> procedimento abaixo (ex.: transvaginal <b>e</b> Doppler)</label>
+      <label><input type="radio" name="modo" value="ou"${modoComposta(c) === 'ou' ? ' checked' : ''}> <b>Um ou outro</b> — a conta tem <b>um</b> dos códigos abaixo (ex.: escroto = bolsa escrotal <b>ou</b> órgãos superficiais)</label>
+      <span class="small muted">Em «Um ou outro», todos os códigos preenchidos viram alternativas de uma linha só (quantidade 1, sem exceção por convênio).</span></div>
     <div class="itens-cp">${itens.slice(0, MAX_ITENS_CP).map(linhaItem).join('')}</div>
     ${itens.length < MAX_ITENS_CP ? '<p class="small muted">Precisa de mais procedimentos? Salve e edite de novo: aparecem mais linhas.</p>' : ''}
     <label class="campo">Justificativa<input type="text" name="just" value="${esc(c.justificativa || '')}"></label>

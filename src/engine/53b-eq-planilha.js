@@ -64,3 +64,11 @@ function xlsxEquivalencias(eq, { usoTitulo = new Map(), operador = '' } = {}) {
     { nome: 'Títulos das regras', larguras: [56, 10, 22, 34, 12, 34], linhas: T, filtro: T.length > 1 }
   ]);
 }
+
+// Modo da regra composta: «juntos» (a conta tem cada item) ou «ou» (um item só, com códigos alternativos).
+const modoComposta = c0 => { const c = regraComposta(c0); return c.itens.length === 1 && c.itens[0].codigos.length > 1 && (+c.itens[0].qtd || 1) === 1 ? 'ou' : 'juntos'; };
+function itensNoModo(c0, modo) {
+  const c = regraComposta(c0), cods = [...new Set(c.itens.flatMap(it => it.codigos))];
+  if (modo === 'ou') return [{ rotulo: 'um dos códigos', codigos: cods, qtd: 1, excecoes: [] }];
+  return cods.map(cd => ({ rotulo: '', codigos: [cd], qtd: 1, excecoes: [] }));
+}

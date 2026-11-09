@@ -164,6 +164,26 @@ wb=openpyxl.load_workbook(sys.argv[1]); r=wb['Regras compostas']; it=wb['Itens d
 print(json.dumps({'abas':wb.sheetnames,'leit':[x[2] for x in r.iter_rows(min_row=2,values_only=True)],'itens':it.max_row-1,'rel':rel.max_row-1}))`, xe]).toString());
 const nIt = await p.evaluate(() => window.__RM.S.eq.compostas.map(c => window.__RM.t.regraComposta(c)).reduce((s, c) => s + c.itens.reduce((t, i) => t + Math.max(1, (i.excecoes || []).length), 0), 0));
 ok(xq.abas.join('|') === 'Leia-me|Relações|Regras compostas|Itens das regras|Títulos das regras' && xq.itens === nIt && xq.rel === await p.evaluate(() => window.__RM.S.eq.itens.length) && xq.leit.every(t => /espera na conta/.test(t)), `«Exportar planilha (.xlsx)»: Leia-me, ${xq.rel} relações, ${xq.leit.length} regras com a leitura, ${xq.itens} itens linha a linha e os títulos de cada regra`);
+// 8) «Juntos» × «Um ou outro»: a regra do escroto cadastrada como juntos vira um ou outro com um clique.
+await p.evaluate(() => { const { S: E, t } = window.__RM; const c = t.novaComposta({ nome: 'Bolsa escrotal', titulos: ['ULTRASSONOGRAFIA DA BOLSA ESCROTAL'], itens: [{ rotulo: '', codigos: ['40901204'], qtd: 1, excecoes: [] }, { rotulo: '', codigos: ['40901203'], qtd: 1, excecoes: [] }] }); E.eq.compostas.push(c); t.alterarStatusComposta(E.eq, c.id, 'validada', 'Teste', 'teste'); });
+const escroto = async () => p.evaluate(() => { const { S: E, t } = window.__RM, dt = new Date(Date.UTC(2026, 8, 15)), dia = t.diaSerial(dt);
+  const laudos = [{ i: 0, paciente: 'PACIENTE ESC', pn: 'PACIENTE ESC', data: dt, dia, titulo: 'ULTRASSONOGRAFIA DA BOLSA ESCROTAL', modalidade: 'US', medico: 'M', mn: 'M', unidade: 'X', convenio: '' }];
+  const regs = [{ seq: 1, chave: 'e1', codigo: '40901203', procDesc: 'USG ORGAOS SUPERF', grupoNome: 'ULTRASSONOGRAFIA - OUTROS', convenio: 'PARTICULAR', paciente: 'PACIENTE ESC', data: dt, vlTotal: 100, vlRepasse: 40, quant: 1, conta: '1', atendimento: '1' }];
+  const res = t.conferirCruzado({ regs, cab: {} }, { laudos }, E.cfg, E.eq, { tol: 0, unidadeCod: '*', medicos: null });
+  return res.linhas.filter(x => x.r).map(x => x.status + ([...x.marcadores].includes('composta-falta') ? '+falta' : '')).join(); });
+ok(await escroto() === 'ressalva+falta', 'regra «juntos» do escroto: só um dos códigos na conta vira composição incompleta');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
+const linhaEsc = p.locator('#cardCompostas tbody tr:has(td > b:text-is("Bolsa escrotal"))').first();
+await linhaEsc.locator('[data-cmpmodo]').click(); await p.waitForSelector('#dlg[open]');
+ok(/Fica:.*qualquer um destes códigos: 40901204.* ou 40901203/.test(await p.textContent('#dlgCorpo')), 'trocar para «um ou outro» mostra como fica, em português');
+await p.fill('#dlgCorpo [name="just"]', 'escroto: bolsa escrotal ou órgãos superficiais'); await okDlg('ok');
+const esc3 = await p.evaluate(() => { const c = window.__RM.S.eq.compostas.find(x => x.nome === 'Bolsa escrotal'); return { n: c.itens.length, cods: c.itens[0].codigos.join(','), st: c.status, h: c.historico.at(-1).motivo }; });
+ok(esc3.n === 1 && esc3.cods === '40901204,40901203' && esc3.st === 'validada' && /um ou outro/.test(esc3.h), `regra agora é «um ou outro» (um item com 40901204 ou 40901203), continua validada e a troca fica no histórico`);
+ok(await escroto() === 'conferido', 'com «um ou outro», só um dos códigos na conta confere o laudo');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
+await p.locator('#cardCompostas tbody tr:has(td > b:text-is("Bolsa escrotal")) [data-cmped]').first().click(); await p.waitForSelector('#dlg[open]');
+ok(await p.isChecked('#dlgCorpo input[name="modo"][value="ou"]'), 'o cadastro da regra mostra a escolha «Juntos» / «Um ou outro»');
+await okDlg('');
 // Desativada não vale.
 await p.click('[data-cmpdes]'); await okDlg('').catch(() => {});
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));

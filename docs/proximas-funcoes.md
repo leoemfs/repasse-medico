@@ -848,3 +848,9 @@ Pedido: «Não estou entendendo a configuração das regras compostas; coloque u
 - **Equivalências → «Exportar planilha (.xlsx)»** (o JSON continua em «Exportar base (.json)»). Abas: **Leia-me** (o que é cada aba e como ler uma regra composta) · **Relações** (1 linha por código TUSS × TITLE: status, descrição no MV, laudos no Apolo carregado, escopo, responsável, data, confiança, ambígua, regra que cobre, justificativa, última mudança) · **Regras compostas** (1 linha por regra, com «Como a regra funciona» em português) · **Itens das regras** (1 linha por procedimento esperado e por exceção de convênio: códigos aceitos, descrição, quantidade, convênio, o que muda) · **Títulos das regras** (1 linha por título que aciona cada regra: da lista, por palavras ou do mesmo estudo).
 - **Na tela**, cada regra composta mostra a leitura curta abaixo do nome: «Espera na conta: 1× 40901114 (USG MAMAS - OP) e 2× 40901386 (DOPPLER…). No convênio UNIMED, Doppler é esperado 1×.»
 - Os botões da base (importar, mesclar, exportar, nova relação) passaram a funcionar também na visualização «Agrupar por título».
+
+## Regra composta: «Juntos» ou «Um ou outro» explícito (09/11/2026, v2.1.0-alpha.15)
+Pedido: a regra do escroto («ULTRASSONOGRAFIA DO ESCROTO» ou «… DA BOLSA ESCROTAL») estava como 1× 40901204 **e** 1× 40901203; deveria ser 40901204 **ou** 40901203.
+- **Lista de regras compostas:** botão «⇄ Um ou outro» / «⇄ Juntos» em cada regra com mais de um código. Mostra «Hoje» e «Fica» em português, pede justificativa, mantém o status (validada continua validada) e grava a troca no histórico. Rodar as conferências de novo para aplicar.
+- **Cadastro da regra:** escolha «Juntos — a conta tem cada procedimento» / «Um ou outro — a conta tem um dos códigos» acima da composição; em «Um ou outro», os códigos preenchidos viram alternativas de uma linha só.
+- Próximo: tela de cadastro mais simples (pedido: «essa tela também está muito confusa») — prévia enviada.
