@@ -773,9 +773,17 @@ Pedido aprovado: «aprovado a prévia das compostas na lista de pendentes».
 
 - **Teste `competencia.mjs` intermitente (ambiente de teste):** na etapa «competência lembrada após recarregar», o navegador de teste às vezes recarrega o arquivo local com o armazenamento vazio (de 5 chaves sobram 3; nenhum código da ferramenta apaga as chaves — conferido com interceptação de removeItem/clear). O teste passou a mostrar o diagnóstico (S.comp, valor guardado, nº de chaves). Na alpha.5 e na alpha.6 passou 8 de 8; na alpha.8, cerca de 2 em 3. No site (https) e no uso normal o valor fica guardado; acompanhar.
 
-## SOL-F37 — Sincronizar as equivalências TUSS pela pasta da rede — A FAZER (pedido de 09/11/2026)
+## SOL-F37 — Sincronizar as equivalências TUSS pela pasta da rede — prévia enviada (pedido de 09/11/2026)
 Pedido: «Outra coisa importante que teremos que sincronizar: equivalências TUSS.»
 - Mesmo modelo do Fluxo (SOL-F36): um arquivo `equivalencias.json` na mesma pasta da rede (não é por competência), mescla de três vias por relação (código × título × escopo) e por regra composta, com conflito só quando os dois mudaram a mesma relação/regra (escolha com o histórico das duas).
 - A validação continua exigindo responsável; o histórico de cada relação mostra quem validou em qual computador/navegador.
 - Barra de sincronização também em Equivalências. O que muda uma relação passa a valer para o outro na próxima conferência (as rodadas já feitas não mudam).
 - Depois: Bases (cadastro de prestadores, aliases, regras) pelo mesmo caminho.
+
+### SOL-F37 — prévia (09/11/2026)
+- Mesma pasta conectada no Fluxo (sem escolher de novo); arquivo único `equivalencias.json` (vale para todas as competências); barra de sincronização no topo de Equivalências; confere a cada 30 s e grava depois de cada validação.
+- **Primeira vez, juntar as bases:** mostra as duas (sua × pasta) e o resultado antes de juntar; validada por um e pendente para o outro fica validada (com quem validou); o que só um tem entra; cópia da base para «Desfazer» em Configurações.
+- **Decisões diferentes na mesma relação ou regra composta:** «Ficar com a minha / com a da outra pessoa / Decidir depois», com o histórico das duas. Códigos diferentes validados para o mesmo título caem no card de Conflitos («Um ou outro», «Juntos»).
+- **Quem validou:** responsável obrigatório; marca «pela pasta» e histórico com a origem.
+- **Conferências já feitas:** aviso «Ana validou 3 relações que mudam 2 conferências carregadas aqui» com «Rodar de novo as afetadas» (nada roda sozinho).
+- Vai para a pasta: relações, regras compostas e catálogo TUSS. Não vai: contagem de laudos por título (calculada da planilha de cada um). Bases fica para a etapa seguinte.
