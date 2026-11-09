@@ -34,6 +34,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Conferência por causa (alpha.12):** resultado em uma frase com barra de progresso, «O que falta decidir» agrupado pela decisão que resolve mais linhas (validar e conferir de novo, um ou outro, aceitar em lote), aceite depois das decisões, tabela e Excel na ordem situação → paciente → data → MV → laudo → o que falta.
 
+- **Laudo do mesmo estudo (alpha.13):** o 2º laudo do mesmo exame (ex.: «Doppler de transvaginal» no dia da «USG transvaginal com Doppler») não aparece mais como faltante quando a regra composta já fechou; um clique inclui o título na regra.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

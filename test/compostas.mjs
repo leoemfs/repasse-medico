@@ -35,6 +35,7 @@ await p.evaluate(({ DOP, ART, ORG, TCS, TCP }) => {
   E.eq.compostas.push(
     v('TC abdome total', { titulos: ['TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', 'TOMOGRAFIA DE ABDOME TOTAL'], itens: [{ rotulo: 'TC abdome superior', codigos: [TCS], qtd: 1, excecoes: [] }, { rotulo: 'TC pelve', codigos: [TCP], qtd: 1, excecoes: [] }] }),
     v('USG articular + Doppler', { titulos: [], palavras: { todas: ['DOPPLER'], umaDe: ['PUNHO', 'OMBRO', 'JOELHO'] }, itens: [{ rotulo: 'USG articular', codigos: [ART], qtd: 1, excecoes: [{ convenio: 'UNIMED', tipo: 'nao-exigido', qtd: 0 }] }, { rotulo: 'Doppler', codigos: [DOP], qtd: 1, excecoes: [] }] }),
+    v('Transvaginal + Doppler', { titulos: ['ULTRASSONOGRAFIA TRANSVAGINAL COM DOPPLER'], itens: [{ rotulo: 'USG transvaginal', codigos: ['40901300'], qtd: 1, excecoes: [] }, { rotulo: 'Doppler', codigos: [DOP], qtd: 1, excecoes: [] }] }),
     // Formato antigo (v1): continua valendo.
     { id: 'cmpv1', titulo: 'DOPPLER DE TIREOIDE', codigos: [ORG, DOP], porConvenio: [{ convenio: 'UNIMED', codigos: [DOP] }], escopo: { unidade: '*', modalidade: '*' }, status: 'validada', responsavel: 'Teste', historico: [] });
 }, { DOP, ART, ORG, TCS, TCP });
@@ -65,6 +66,27 @@ ok(P['PACIENTE MAMAS FALTA'].every(x => /ressalva\+composta\+composta-falta/.tes
 ok(P['PACIENTE PUNHO UNIMED'].some(x => x === `${ART}:so-faturamento+eq-divergente`) && P['PACIENTE PUNHO UNIMED'].some(x => /^40901386:conferido\+composta$/.test(x)), `punho com Doppler (UNIMED): Doppler conferido; articular sobra (excludente) (${P['PACIENTE PUNHO UNIMED'].join(', ')})`);
 ok(P['PACIENTE PUNHO PART'].every(x => /conferido\+composta$/.test(x)), 'punho com Doppler (particular): título reconhecido pelas palavras; articular + Doppler conferidos');
 ok(P['PACIENTE TIREOIDE UNIMED'].every(x => /conferido\+composta$/.test(x)), 'regra no formato antigo continua valendo (tireoide UNIMED: só o Doppler)');
+// 2b) Mesmo estudo: «USG transvaginal com Doppler» fecha transvaginal + Doppler; o 2º laudo «Doppler de transvaginal»
+// do mesmo dia não é «Só no laudo» faltante (vira decisão de um clique; com a regra marcada, conta como conferido).
+const tv = async () => p.evaluate(({ DOP }) => {
+  const { S: E, t } = window.__RM, dt = new Date(Date.UTC(2026, 8, 12)), dia = t.diaSerial(dt), laudos = [], regs = [];
+  const L = titulo => laudos.push({ i: laudos.length, paciente: 'PACIENTE TV', pn: 'PACIENTE TV', data: dt, dia, titulo, modalidade: 'US', medico: 'MEDICO TESTE', mn: 'MEDICO TESTE', unidade: 'X', convenio: '' });
+  L('ULTRASSONOGRAFIA TRANSVAGINAL COM DOPPLER'); L('DOPPLER DE TRANSVAGINAL');
+  ['40901300', DOP].forEach((c, k) => regs.push({ seq: k + 1, chave: 'tv' + k, codigo: c, procDesc: 'P' + c, grupoNome: 'ULTRASSONOGRAFIA - OUTROS', convenio: 'PARTICULAR', paciente: 'PACIENTE TV', data: dt, vlTotal: 100, vlRepasse: 40, quant: 1, conta: '7' + k, atendimento: '6' + k }));
+  const res = t.conferirCruzado({ regs, cab: {} }, { laudos }, E.cfg, E.eq, { tol: 0, unidadeCod: '*', medicos: null });
+  const l2 = res.linhas.find(x => x.l?.titulo === 'DOPPLER DE TRANSVAGINAL' && !x.r);
+  return { mv: res.linhas.filter(x => x.r).map(x => x.status).join(), l2: l2 ? `${l2.status}:${[...l2.marcadores].join('+')}` : 'pareado', cz: t.causasDaConferencia(res, E.eq.compostas).grupos.map(g => g.tipo).join() };
+}, { DOP });
+let tv1 = await tv();
+ok(tv1.mv === 'conferido,conferido' && tv1.l2 === 'so-laudo:mesmo-estudo-possivel' && /mesmo-estudo/.test(tv1.cz), `2º laudo do mesmo estudo vira decisão «Laudo do mesmo estudo?» (não «Só no laudo» comum) (${tv1.l2})`);
+await p.evaluate(() => { const r = window.__RM.S.eq.compostas.find(c => c.nome === 'Transvaginal + Doppler'); r.titulosMesmoEstudo = ['DOPPLER DE TRANSVAGINAL']; });
+tv1 = await tv();
+ok(tv1.l2 === 'conferido:mesmo-estudo' && !/mesmo-estudo/.test(tv1.cz), `com o título incluído na regra como do mesmo estudo, o laudo conta como conferido (${tv1.l2})`);
+await p.evaluate(() => { const r = window.__RM.S.eq.compostas.find(c => c.nome === 'Transvaginal + Doppler'); delete r.titulosMesmoEstudo;
+  const { S: E, t } = window.__RM, e = t.novaRelacao({ codigo: '40901386', titulo: 'DOPPLER DE TRANSVAGINAL', descMV: 'DOPPLER', escopo: { unidade: '*', modalidade: '*' }, origem: 'teste' }); E.eq.itens.push(e); t.alterarStatusEq(E.eq, [e.id], 'validada', 'Teste', 'teste', '2026-10'); });
+tv1 = await tv();
+ok(tv1.l2 === 'conferido:mesmo-estudo', `com equivalência validada «DOPPLER DE TRANSVAGINAL» × Doppler, também reconhece o mesmo estudo (${tv1.l2})`);
+await p.evaluate(() => { const E = window.__RM.S.eq; E.itens = E.itens.filter(e => e.titulo !== 'DOPPLER DE TRANSVAGINAL'); });
 
 // 3) Fusão de imagem: percentual da unidade onde foi feita (padrão) ou % fixo do valor faturado.
 const fus = await p.evaluate(() => { const { S: E, t } = window.__RM, e = E.cfg.classes.equivalentes.find(x => x.nome === 'Fusão de imagem'), l = { grupo: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', desc: 'FUSAO DE IMAGEM', vlTotal: 500, quant: 1, convenio: 'X' };

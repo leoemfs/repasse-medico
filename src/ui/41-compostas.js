@@ -22,7 +22,7 @@ function cardCompostas() {
     <p class="lead">Quando um exame laudado corresponde a <b>vários procedimentos</b> na conta (ex.: TC abdome total = abdome superior + inferior; USG de mamas com Doppler = mamas + Doppler ×2; na UNIMED, só um Doppler). A conferência aceita um laudo para cada procedimento esperado e aponta o que falta ou sobra. «Nesta competência» conta o que a regra sustentou na última rodada de cada relatório.</p>
     ${l.length ? `<div class="tw"><table><thead><tr><th>Regra</th><th>Títulos do Apolo</th><th>Composição no MV</th><th>Exceções por convênio</th><th class="n">Nesta competência</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
       <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}</td>
-      <td class="small">${c.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}${c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? ` <span class="tag-cp">contém ${esc((c.palavras.todas || []).join(' + '))}${(c.palavras.umaDe || []).length ? ` e um de ${esc(c.palavras.umaDe.join(' · '))}` : ''}</span>` : ''}</td>
+      <td class="small">${c.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}${(c.titulosMesmoEstudo || []).length ? `<div class="muted" style="margin-top:4px">Mesmo estudo: ${c.titulosMesmoEstudo.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}</div>` : ''}${c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? ` <span class="tag-cp">contém ${esc((c.palavras.todas || []).join(' + '))}${(c.palavras.umaDe || []).length ? ` e um de ${esc(c.palavras.umaDe.join(' · '))}` : ''}</span>` : ''}</td>
       <td class="small">${c.itens.map(descricaoItem).join('<span class="muted"> + </span>')}</td>
       <td class="small">${c.itens.flatMap(it => (it.excecoes || []).map(e => `<span class="badge info">${esc(e.convenio)}</span> ${esc(it.rotulo || it.codigos[0])}: ${e.tipo === 'nao-exigido' ? '<b>não exigido</b>' : `<b>×${e.qtd}</b>`}`)).join('<br>') || '<span class="muted">—</span>'}</td>
       <td class="n small">${efet(c)}</td>
@@ -154,6 +154,7 @@ async function editarComposta(id, rascunho = null, sim = null) {
   const erros = validarRegraComposta(nova, (S.eq.compostas || []).filter(x => x !== atual).map(regraComposta));
   if (erros.length) { avisar('Regra não gravada: ' + erros.join('; ') + '.', 'warn'); return editarComposta(id, nova, sim); }
   const dados = { nome: nova.nome, titulos: nova.titulos, palavras: nova.palavras, itens: nova.itens, escopo: nova.escopo, justificativa: nova.justificativa };
+  if (atual?.titulosMesmoEstudo) dados.titulosMesmoEstudo = atual.titulosMesmoEstudo;
   let alvo;
   if (atual) {
     const antes = JSON.stringify(regraComposta(atual).itens) + JSON.stringify([regraComposta(atual).titulos, atual.palavras || null, atual.escopo]);

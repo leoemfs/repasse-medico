@@ -14,6 +14,7 @@ function botoesCausa(c, n) {
     case 'convenio': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(mesmo convênio)`, false) + b('nc', 'Registrar NC') + ver;
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
     case 'composta-falta': return b('nc', 'Registrar NC do que falta', false) + b('aceitar', 'Considerar no repasse') + ver;
+    case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo estudo (incluir na regra)', false) + b('nc', 'Não é → NC') + ver;
     case 'so-laudo': return b('ncs', 'Ir para os candidatos a NC', false) + ver;
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
@@ -82,6 +83,14 @@ function ligarCausas(raiz, CZ, res, ctx) {
     if (ac === 'bases') { location.hash = 'bases'; return; }
     if (ac === 'ncs') { const h = [...$('cfRes').querySelectorAll('.card h2')].find(x => /NC/.test(x.textContent)); h ? h.scrollIntoView({ behavior: 'smooth', block: 'start' }) : (location.hash = 'nc'); return; }
     if (['validar', 'nao-eq', 'cadastrar', 'ou'].includes(ac)) { await decidirEquivalenciaCausa(c, ac); return; }
+    if (ac === 'mesmo-estudo') {
+      const op = await exigirOperador(); if (!op) return;
+      const regra = (S.eq.compostas || []).find(x => x.id === c.regraId); if (!regra) return avisar('Regra composta não encontrada.', 'warn');
+      if (!await confirmar('Laudo do mesmo estudo', `«${esc(c.titulo)}» passa a contar como laudo do mesmo exame da regra «${esc(c.nome)}»: quando estiver no mesmo dia e paciente de um laudo que fechou a regra, não aparece mais como «Só no laudo». Vale para todos os relatórios; fica no histórico da regra (${esc(op)}).`, 'Incluir na regra')) return;
+      regra.titulosMesmoEstudo = [...new Set([...(regra.titulosMesmoEstudo || []), c.titulo])];
+      (regra.historico ||= []).push({ em: agoraISO(), por: op, de: regra.status, para: regra.status, motivo: `laudo do mesmo estudo: «${c.titulo}»`, competencia: S.comp });
+      S.eq.revisao++; S.eq.atualizadoEm = agoraISO(); salvarEq('Título incluído na regra composta. Conferindo de novo…'); await executarConferencia(); return;
+    }
     if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => candidatoDaLinhaConferencia(res.linhas[i], ctx, S.cfg)));
     if (ac === 'aceitar') {
       const sug = c.tipo === 'convenio' ? `Mesmo convênio escrito de outro jeito: MV «${c.mv}» × laudo «${c.laudo}»` : c.tipo === 'data' ? 'Data do laudo dentro do esperado para o atendimento' : c.tipo === 'nome-semelhante' ? 'Mesmo paciente: nome escrito de outro jeito' : c.tipo === 'repetida' ? 'As duas linhas estão certas (dois exames)' : '';

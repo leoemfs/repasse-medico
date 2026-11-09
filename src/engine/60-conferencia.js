@@ -27,6 +27,8 @@ const MARCADORES = {
   'convenio-divergente': 'Convênio divergente',
   'id-duplo': 'ID de paciente com dois cadastros',
   'linha-repetida': 'Linha repetida no MV',
+  'mesmo-estudo': 'Laudo do mesmo estudo (regra composta)',
+  'mesmo-estudo-possivel': 'Pode ser o mesmo estudo (regra composta)',
   'valor-simbolico': 'Valor simbólico',
   'possivel-bilateral': 'Laudo já usado por linha do mesmo código',
   'modalidade-desconhecida': 'Modalidade do grupo não mapeada',
@@ -179,9 +181,26 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     && (!periodo || (l.data && l.data >= periodo[0] && l.data <= periodo[1])));
   const escopoSemData = periodo ? Lun.filter(l => l.dia === null && (!medicos || medicos.has(l.mn))
     && (modsDesconhecidas || !modsRelatorio.size || modsRelatorio.has(l.modalidade))) : [];
+  // Laudo do mesmo estudo de uma regra composta (ex.: «USG transvaginal com Doppler» fechou transvaginal + Doppler, e o
+  // mesmo exame tem um 2º laudo «Doppler de transvaginal»): mesmo paciente e dia, e o título aponta para um código já
+  // lançado pela composição — por equivalência validada ou por estar na lista «mesmo estudo» da regra.
+  const mesmoEstudo = l => {
+    if (l.dia === null) return null;
+    for (const [li, u] of compostoUsos) {
+      const L = usado.get(li)?.par?.l; if (!L || L === l || L.pn !== l.pn || L.dia !== l.dia) continue;
+      const regra = (idx.compostas || []).find(c => c.id === u.id), cods = [...new Set(u.bs.map(b => b.r.codigo))];
+      const naRegra = (regra?.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === chaveTitulo(l.titulo));
+      const viaEq = !naRegra && cods.some(cd => { const a = avaliarProcedimento(idx, cd, l.titulo, { unidade: opc.unidadeCod === '*' ? '' : opc.unidadeCod, modalidade: l.modalidade }); return a.estado === 'validada' && !a.composta; });
+      return { L, regra, cods, via: naRegra ? 'regra' : viaEq ? 'eq' : null };
+    }
+    return null;
+  };
   for (const l of [...escopo, ...escopoSemData]) {
     if (usado.has(l.i)) continue;
     const marc = new Set(); if (l.dia === null) marc.add('laudo-sem-data'); if (l.idDuplo) marc.add('id-duplo');
+    const me = mesmoEstudo(l), nome = me?.regra ? nomeComposta(me.regra) : 'regra composta';
+    if (me?.via) { marc.add('mesmo-estudo'); linhas.push({ origem: 'Apolo', status: 'conferido', b: null, r: null, l, tipo: 'procedimento', marcadores: marc, motivos: [`Mesmo estudo do laudo «${me.L.titulo}» (mesmo paciente e dia), já lançado pela regra composta «${nome}»: ${me.cods.join(' + ')}${me.via === 'regra' ? ' — título incluído na regra como do mesmo estudo' : ' — equivalência validada do título'}.`], cands: [], mesmoEstudo: me.regra?.id || '' }); continue; }
+    if (me) { marc.add('mesmo-estudo-possivel'); linhas.push({ origem: 'Apolo', status: 'so-laudo', b: null, r: null, l, tipo: 'procedimento', marcadores: marc, motivos: ['Sem lançamento correspondente neste relatório do MV.', `Pode ser o mesmo estudo do laudo «${me.L.titulo}» (mesmo paciente e dia), já lançado pela regra composta «${nome}»: ${me.cods.join(' + ')}.`], cands: [], mesmoEstudoPossivel: { regraId: me.regra?.id || '', nome, laudo: me.L.titulo, cods: me.cods } }); continue; }
     linhas.push({ origem: 'Apolo', status: 'so-laudo', b: null, r: null, l, tipo: 'procedimento', marcadores: marc, motivos: ['Sem lançamento correspondente neste relatório do MV.'], cands: [] });
   }
 

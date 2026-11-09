@@ -10,6 +10,7 @@ const CAUSAS = {
   convenio: { acao: 'Aceitar se for o mesmo convênio escrito de outro jeito', titulo: c => `Convênio diferente: MV «${c.mv}» × laudo «${c.laudo}»` },
   data: { acao: 'Aceitar se a data estiver dentro do esperado', titulo: () => 'Data do laudo diferente da data do MV (dentro da tolerância)' },
   'composta-falta': { acao: 'Conferir a composição; registrar NC do que falta', titulo: c => `Composição incompleta: ${c.nome}` },
+  'mesmo-estudo': { acao: 'Se for o mesmo exame, incluir o título na regra composta (o laudo deixa de ser «Só no laudo»)', titulo: c => `Laudo do mesmo estudo? «${c.titulo}» no mesmo dia de «${c.laudo}» (regra «${c.nome}»: ${c.cods.join(' + ')})` },
   'so-laudo': { acao: 'Revisar os candidatos a NC (laudo sem lançamento)', titulo: () => 'Laudos sem lançamento neste relatório (Só no laudo)' },
   hm: { acao: 'Cadastrar a regra de HM em Bases', titulo: () => 'Itens HM — regra pendente' },
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
@@ -29,6 +30,7 @@ function causasDaConferencia(res, compostas = []) {
   res.linhas.forEach((x, i) => {
     if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental') return;
     const m = x.marcadores, p = x.par, r = x.r, l = x.l, base = r && l ? { codigo: r.codigo, desc: r.procDesc || '', titulo: l.titulo } : {};
+    if (x.status === 'so-laudo' && x.mesmoEstudoPossivel) return add(`me|${x.mesmoEstudoPossivel.regraId}|${chaveTitulo(l.titulo)}`, { tipo: 'mesmo-estudo', titulo: l.titulo, ...x.mesmoEstudoPossivel }, i);
     if (x.status === 'so-laudo') return add('so-laudo', { tipo: 'so-laudo' }, i);
     if (x.status === 'hm-pendente') return add('hm', { tipo: 'hm' }, i);
     if (x.status === 'classificacao-pendente') return add('classificacao', { tipo: 'classificacao' }, i);
