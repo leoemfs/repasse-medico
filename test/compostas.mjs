@@ -93,6 +93,15 @@ tv1 = await tv();
 ok(tv1.l2 === 'conferido:mesmo-estudo', `com equivalência validada «DOPPLER DE TRANSVAGINAL» × Doppler, também reconhece o mesmo estudo (${tv1.l2})`);
 await p.evaluate(() => { const E = window.__RM.S.eq; E.itens = E.itens.filter(e => e.titulo !== 'DOPPLER DE TRANSVAGINAL'); });
 
+// 2c) Correção de prestador com laudo de regra composta (relato de 09/11/2026: «Cannot read properties of undefined (reading 'responsavel')»).
+const corr = await p.evaluate(({ TCS, TCP }) => {
+  const { S: E, t } = window.__RM, dt = new Date(Date.UTC(2026, 8, 10)), dia = t.diaSerial(dt);
+  const laudos = [{ i: 0, paciente: 'PACIENTE CORR', pn: 'PACIENTE CORR', data: dt, dia, titulo: 'TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', modalidade: 'CT', medico: 'MEDICO TESTE', mn: 'MEDICO TESTE', unidade: 'X', convenio: '' }];
+  const regs = [TCS, TCP].map((c, k) => ({ seq: k + 1, chave: 'g' + k, codigo: c, procDesc: 'P' + c, grupoNome: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', convenio: 'PARTICULAR', paciente: 'PACIENTE CORR', data: dt, vlTotal: 100, vlRepasse: 40, quant: 1, conta: '5' + k, atendimento: '4' + k, prestadorCod: '2', prestadorNome: 'GENERICO' }));
+  try { const res = t.corrigirPrestador({ regs, cab: { prestadorCod: '2', prestadorNome: 'GENERICO' } }, { laudos }, E.cfg, E.eq, { unidadeCod: '*', tol: 0 }); return { ok: true, est: res.linhas.map(o => o.estado).join(), det: res.linhas[0]?.detalhe || '' }; }
+  catch (e) { return { ok: false, erro: e.message }; }
+}, { TCS, TCP });
+ok(corr.ok && /identificado/.test(corr.est) && /regra composta «TC abdome total»/.test(corr.det), `Correção de prestador com laudo de regra composta identifica o médico sem erro (${corr.ok ? corr.est + ' · ' + corr.det.slice(0, 90) : corr.erro})`);
 // 3) Fusão de imagem: percentual da unidade onde foi feita (padrão) ou % fixo do valor faturado.
 const fus = await p.evaluate(() => { const { S: E, t } = window.__RM, e = E.cfg.classes.equivalentes.find(x => x.nome === 'Fusão de imagem'), l = { grupo: 'TOMOGRAFIA COMPUT. DIAGNOSTICA', desc: 'FUSAO DE IMAGEM', vlTotal: 500, quant: 1, convenio: 'X' };
   const un1 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '1'), un17 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '17'), un5 = t.valorEsperadoIMG(E.cfg, null, 'A', l, '5');

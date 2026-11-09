@@ -65,7 +65,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     if (medicos.length === 1 && !medicosConflito.some(m => m !== medicos[0])) {
       const c = validos.sort((a, b) => a.dd - b.dd || b.nm - a.nm)[0];
       o.estado = 'identificado'; o.medico = c.l.medico; o.laudo = c.l;
-      o.detalhe = `${c.nm === 3 ? 'Nome idêntico' : 'Nome truncado compatível'}, ${c.dd ? `data a ${c.dd} dia(s)` : 'mesma data'}, «${c.l.titulo}» validado para ${r.codigo} (${c.proc.relacao.responsavel || 'sem responsável'}).`;
+      o.detalhe = `${c.nm === 3 ? 'Nome idêntico' : 'Nome truncado compatível'}, ${c.dd ? `data a ${c.dd} dia(s)` : 'mesma data'}, «${c.l.titulo}» validado para ${r.codigo} (${c.proc.relacao ? (c.proc.relacao.responsavel || 'sem responsável') : c.proc.composta ? `regra composta «${nomeComposta(c.proc.composta)}»${c.proc.composta.responsavel ? `, ${c.proc.composta.responsavel}` : ''}` : 'sem responsável'}).`;
       if (c.dd) o.alertas.push(`Data do laudo difere ${c.dd} dia(s)`);
       if (validos.length > 1) o.alertas.push(`${validos.length} laudos compatíveis do mesmo médico`);
       const pm = prestadorDoMedico(idxPrest, c.l.medico);

@@ -875,4 +875,7 @@ Pedido (print da decisão «Composição incompleta: ULTRASSONOGRAFIA DO ESCROTO
 Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 2 USG; clicar em «Executar identificação» não mostrava nada). Com os arquivos reais da competência 10 (PDFs de correção, Power BI, PDF marcado como vindo da pasta USG da unidade 2) a identificação roda normalmente aqui — o erro depende dos arquivos do usuário e ficava só no console.
 - «Executar identificação» e «Executar conferência» mostram «Processando…» enquanto rodam e, se algo falhar, a mensagem na tela («Não foi possível executar …: <motivo>»).
 - Qualquer erro inesperado em qualquer tela passa a aparecer como aviso (continua no console).
-- Aguardando a mensagem que aparecer no caso do Gilberto para corrigir a causa.
+- Mensagem recebida: «Cannot read properties of undefined (reading 'responsavel')» → corrigido na v2.1.0-alpha.19.
+
+## Correção de prestador com regra composta (09/11/2026, v2.1.0-alpha.19)
+Causa do erro «Cannot read properties of undefined (reading 'responsavel')» na Correção de prestador: quando o laudo compatível é confirmado por uma **regra composta** (e não por uma relação simples código × título), não existe «relação» com responsável, e o texto do detalhe tentava ler esse campo. Agora o detalhe diz «validado para 41001109 (regra composta «TC abdome total», responsável)». Teste novo em `test/compostas.mjs` (Correção de prestador com laudo de regra composta).
