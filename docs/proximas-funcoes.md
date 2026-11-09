@@ -688,7 +688,11 @@ Pedido: «Na unidade 1, quantos e quais prestadores fizeram laudos? Quantos já 
 - **Grupo de repasse:**
   - **USG:** modalidade US, com o Doppler junto (Doppler é sempre do grupo de USG), em todas as unidades menos a 5;
   - **IMG:** as demais modalidades (RX, mamografia, densitometria, tomografia, ressonância…), em todas as unidades menos a 5;
-  - **Curitiba (V3, unidade 5):** todos os exames num grupo só.
+  - **Curitiba (V3, unidade 5):** um grupo só, geral (sem separar USG e IMG), **mas só com o que a SRA paga** — decisão de 09/11/2026: «não faço em partes; faço geral, mas não todos os exames por prestador: alguns são pegos pela equipe da G.O. Laudos, eu pago só os que prestam serviço pela SRA; tem que seguir as regras de cadastro dos prestadores de Curitiba». Na unidade 5:
+    - entra na lista só o médico com regra V3 no cadastro (Bases → Médicos V3);
+    - os laudos contados seguem a regra V3 dele: modo percentual = todos os exames; modo valor fixo = só os grupos cadastrados (ex.: USG e ressonância), e os demais exames dele ficam fora da contagem;
+    - médicos sem regra V3 (ex.: equipe da G.O. Laudos) aparecem recolhidos em «Outros médicos na unidade 5 — não pagos pela SRA», só para consulta, sem contar como pendência;
+    - médico do Apolo sem cadastro na unidade 5 pede uma decisão uma vez: «presta serviço pela SRA (cadastrar como V3)» ou «não é pago pela SRA». A escolha fica no cadastro, com quem e quando.
 - **Médico → prestador:** pelo cadastro de Bases, só com nome idêntico ou alias validado (RN-208). Médico do Apolo sem cadastro aparece numa linha própria, «sem cadastro», com os atalhos que já existem: «+ Cadastrar» e «Vincular como alias». A ferramenta nunca adivinha o prestador (RN-206). Residente entra pelo próprio cadastro (tipo residente).
 
 ### Situação de cada prestador × unidade × grupo (calculada, sem digitação)
@@ -698,7 +702,7 @@ Pedido: «Na unidade 1, quantos e quais prestadores fizeram laudos? Quantos já 
 | **Relatório sem conferência** | há relatório, ainda sem rodada de conferência | rodar a conferência |
 | **Conferido** | há rodada, sem aceite | revisar e dar o aceite |
 | **Aceito** | a última rodada tem aceite | — |
-| **Relatório sem laudo** | há relatório do MV, mas o médico não aparece no Apolo nessa unidade e grupo | verificar (prestador errado, outra unidade, laudo em outro nome) |
+| **Relatório sem laudo** | há relatório do MV, mas o médico não aparece no Apolo nessa unidade e grupo | **aviso, não é NC** (decisão de 09/11/2026): verificar prestador errado, outra unidade ou laudo em outro nome. Aparece no quadro, no Início e no Fechamento até ser resolvido ou marcado como verificado (com motivo) |
 | **Fora do repasse** | cadastro «não realiza repasse» ou dispensado neste mês, com motivo e responsável | — (sai da contagem do que falta) |
 
 Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para o PDF carregado agora quanto para qualquer rodada de conferência guardada da competência (prestador × unidade × grupo). Também há um «✓ gerado no MV» manual, para marcar o que já foi gerado e ainda não foi carregado.
@@ -721,9 +725,6 @@ Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para 
 1. Com a planilha de laudos e nenhum PDF, a unidade 1 · USG lista todos os médicos com laudo US/Doppler na unidade 1, com a contagem igual ao filtro manual da planilha.
 2. Médico do Apolo sem cadastro aparece como «sem cadastro», sem prestador sugerido.
 3. Carregar o PDF e rodar a conferência muda a situação para «Conferido», e o aceite muda para «Aceito», sem digitar nada.
-4. Na unidade 5, todos os exames aparecem num grupo só (Curitiba).
+4. Na unidade 5, um grupo só, com os médicos V3 e só os exames que a regra V3 de cada um cobre; os demais médicos ficam em «não pagos pela SRA», fora da contagem.
 5. O Fechamento avisa quem laudou e não tem relatório, e a lista «gerar no MV» sai em Excel.
-
-### Para decidir na prévia
-- Se a unidade 5 (Curitiba) deve mostrar todos os exames juntos ou separar USG e IMG só para consulta.
-- Se «Relatório sem laudo» deve virar candidato a NC ou só aviso.
+6. «Relatório sem laudo» aparece como aviso, nunca como candidato a NC.
