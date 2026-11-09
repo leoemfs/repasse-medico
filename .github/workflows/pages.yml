@@ -1,9 +1,10 @@
-# Publica a ferramenta no GitHub Pages só quando uma versão é lançada (tag v2.1.0-alpha.N).
+# Publica a ferramenta no GitHub Pages só quando uma versão é lançada (nova entrada em publicacao/versoes.json).
 # O site é a página do dist/ da versão; dados de pacientes nunca vão ao site (tudo roda no navegador).
 name: Publicar versão no GitHub Pages
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+    paths: ['publicacao/versoes.json']
   workflow_dispatch:
 permissions:
   contents: read

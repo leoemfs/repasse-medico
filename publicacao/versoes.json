@@ -1,0 +1,35 @@
+{
+  "_leia": "Versões lançadas publicadas no GitHub Pages (a primeira é a atual). Lançar = acrescentar a nova versão no topo e enviar à main; o workflow publica.",
+  "versoes": [
+    {
+      "versao": "2.1.0-alpha.5",
+      "commit": "695a28d00ee2324732b0d3cfa6258f82b73ec196",
+      "data": "2026-11-09"
+    },
+    {
+      "versao": "2.1.0-alpha.4",
+      "commit": "5b69b780b71413792258b046644c78e71bdd329d",
+      "data": "2026-11-04"
+    },
+    {
+      "versao": "2.1.0-alpha.3",
+      "commit": "740e2ef010b71d34e2c0c79b8daef3c62270d0e6",
+      "data": "2026-11-04"
+    },
+    {
+      "versao": "2.1.0-alpha.2",
+      "commit": "699d1a4e3ef72e2791a1472270de68cf2a954ea9",
+      "data": "2026-11-04"
+    },
+    {
+      "versao": "2.1.0-alpha.1",
+      "commit": "43af40e2b35c6579a460d46c7d3aa24fd4f4ab66",
+      "data": "2026-11-03"
+    },
+    {
+      "versao": "2.1.0-alpha",
+      "commit": "e773ea8ad26989f8294d0072db4e7f5853c2aab6",
+      "data": "2026-11-03"
+    }
+  ]
+}
