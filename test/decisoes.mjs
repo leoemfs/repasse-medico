@@ -69,12 +69,12 @@ const rodId = await S(() => window.__RM.S.conf.ctx.rodadaId);
 ok(dl.suggestedFilename() === `conferencia_medico_15_unidade_1_comp_10-2026_rodada_${rodId}.xlsx`, `nome do arquivo com médico, unidade, competência e rodada (${dl.suggestedFilename()})`);
 const xs = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
 wb=openpyxl.load_workbook(sys.argv[1]); c=wb['Conferência']; cab=[x.value for x in c[1]]
-linhas=list(c.iter_rows(min_row=2,values_only=True)); pend=wb['Pendências'].max_row-1
-print(json.dumps({'abas':wb.sheetnames,'cab':cab,'n':len(linhas),'cons':sum(1 for r in linhas if (r[1] or '').startswith('Considerado no repasse: doppler')),'nc':sum(1 for r in linhas if (r[1] or '').startswith('Tratado: NC')),'conf':sum(1 for r in linhas if r[0]=='Conferido'),'pend':pend,'unid':linhas[0][2]}))`, xl]).toString());
-ok(JSON.stringify(xs.abas) === JSON.stringify(['Conferência', 'Pendências', 'Resumo', 'Informações', 'Técnico', 'Por procedimento', 'Títulos sem validação', 'Candidatos', 'MV original']), `abas: ${xs.abas.join(', ')}`);
-ok(xs.cab.join('|') === 'Status|Decisão na competência|Unidade MV|Paciente MV|Cód. TUSS MV|Descrição do procedimento MV|Data MV|Convênio MV|Grupo de procedimento MV|Médico MV|Vl Repasse|Unidade Apolo|Paciente Apolo|Título do laudo (TITLE)|Descrição do estudo (STUDY)|Data Apolo|Convênio Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise', 'aba principal: status, decisão, MV e Apolo lado a lado, ressalvas e observações no fim');
+linhas=list(c.iter_rows(min_row=2,values_only=True)); f=wb['O que falta decidir']; pend=sum(1 for r in f.iter_rows(min_row=2,values_only=True) if isinstance(r[0],int))
+print(json.dumps({'abas':wb.sheetnames,'cab':cab,'n':len(linhas),'cons':sum(1 for r in linhas if (r[1] or '').startswith('Considerado no repasse: doppler')),'nc':sum(1 for r in linhas if (r[1] or '').startswith('Tratado: NC')),'conf':sum(1 for r in linhas if r[0]=='Conferido'),'pend':pend,'unid':linhas[0][10],'np':sum(1 for r in linhas if r[0]=='Item não procedimental')}))`, xl]).toString());
+ok(JSON.stringify(xs.abas) === JSON.stringify(['O que falta decidir', 'Conferência', 'Resumo', 'Informações', 'Técnico', 'Por procedimento', 'Títulos sem validação', 'Candidatos', 'MV original']), `abas: ${xs.abas.join(', ')}`);
+ok(xs.cab.join('|') === 'Situação|Decisão na competência|Paciente|Data|Cód. TUSS MV|Procedimento no MV|Laudo (TITLE)|O que falta / por quê|Vl Repasse|Convênio MV|Unidade MV|Grupo de procedimento MV|Médico MV|Paciente MV|Paciente Apolo|Data Apolo|Descrição do estudo (STUDY)|Convênio Apolo|Unidade Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise', 'colunas na ordem de quem confere: situação, paciente, data, MV, laudo, o que falta (SOL-F40)');
 ok(xs.cons === 1 && xs.nc === 1 && /ULTRAMED APUCARANA/.test(xs.unid), `decisões na planilha (considerada ${xs.cons}, NC ${xs.nc}) e unidade MV da sessão`);
-ok(xs.pend === xs.n - xs.conf - 2, `Pendências = registros sem conferência e sem decisão (${xs.pend} de ${xs.n})`);
+ok(xs.pend === xs.n - xs.conf - 2 - xs.np, `«O que falta decidir» = registros sem conferência e sem decisão (${xs.pend} de ${xs.n})`);
 // Aceite desconta as decisões.
 await p.goto(html + '#rodadas'); await p.waitForSelector('[data-ac]');
 await p.click('[data-ac]'); await p.waitForSelector('#dlg[open]');

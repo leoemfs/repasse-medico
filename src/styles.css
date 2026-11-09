@@ -310,3 +310,13 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* Início: filtros da lista de relatórios do MV */
 .lm-filtros{margin-bottom:4px}.lm-tab{max-height:560px;overflow:auto}
 .cf-fil{margin-bottom:6px}.cf-fil .campo{min-width:180px}
+/* SOL-F40 — Conferência por causa */
+.cf-barra{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:8px 0}
+.cf-barra span{display:block;height:100%}.cf-b-ok{background:#3f9b62}.cf-b-ress{background:#e0b23c}.cf-b-pend{background:#e08a3c}.cf-b-sf{background:#c9473d}
+.cf-det{margin-top:10px}.cf-det summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.cz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.cz small{color:var(--muted);display:block;font-size:12px;margin-top:2px}.cz.cz-sl{background:var(--infobg)}
+.cz-n{font-size:22px;font-weight:800;text-align:right;line-height:1}.cz-n small{font-size:11px;font-weight:600}
+.cz-sep{border-top:1px dashed var(--line);margin:12px 0 4px;padding-top:8px;font-size:12.5px;color:var(--muted);font-weight:600}
+.cf-fl{background:var(--infobg);border-radius:8px;padding:6px 10px;margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){.cz{grid-template-columns:minmax(0,1fr)}.cz-n{text-align:left}}

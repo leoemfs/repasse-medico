@@ -41,19 +41,32 @@ const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC' };
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
   const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
-  const cabPrincipal = [...cabecalho(['Status', 'Decisão na competência'], SIT),
-    ...cabecalho(['Unidade MV', 'Paciente MV', 'Cód. TUSS MV', 'Descrição do procedimento MV', 'Data MV', 'Convênio MV', 'Grupo de procedimento MV', 'Médico MV', 'Vl Repasse']),
-    ...cabecalho(['Unidade Apolo', 'Paciente Apolo', 'Título do laudo (TITLE)', 'Descrição do estudo (STUDY)', 'Data Apolo', 'Convênio Apolo', 'Modalidade Apolo', 'Médico Apolo'], AP),
+  // Ordem de quem confere (SOL-F40): situação → paciente → data → o que o MV lançou → o que o laudo diz → o que falta.
+  const CZ = causasDaConferencia(res, ctx.compostas || []);
+  const cabPrincipal = [...cabecalho(['Situação', 'Decisão na competência'], SIT), ...cabecalho(['Paciente', 'Data']),
+    ...cabecalho(['Cód. TUSS MV', 'Procedimento no MV']), ...cabecalho(['Laudo (TITLE)'], AP), ...cabecalho(['O que falta / por quê'], OBS), ...cabecalho(['Vl Repasse']),
+    ...cabecalho(['Convênio MV', 'Unidade MV', 'Grupo de procedimento MV', 'Médico MV', 'Paciente MV']),
+    ...cabecalho(['Paciente Apolo', 'Data Apolo', 'Descrição do estudo (STUDY)', 'Convênio Apolo', 'Unidade Apolo', 'Modalidade Apolo', 'Médico Apolo'], AP),
     ...cabecalho(['Ressalvas', 'Observações e análise'], OBS)];
   const textoDecisao = d => d ? `${TIPOS_DECISAO[d.tipo]}${d.justificativa ? ': ' + d.justificativa : ''}${d.tipo === 'nc' && d.situacao ? ` (${SITUACAO_NC[d.situacao] || d.situacao})` : ''}` : '';
   const linhaPrincipal = x => {
     const r = x.r, l = x.l, f = st(x.status), dec = x.decisao;
+    const i = res.linhas.indexOf(x), falta = dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '');
     return [{ v: STATUS_CONF[x.status].nome, st: { ...f, b: true } }, { v: textoDecisao(dec), st: dec ? { fill: COR_DECISAO[dec.tipo], b: true } : {} },
-      r ? ctx.unidadeNome : '', r?.paciente || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', r?.data || '', r?.convenio || '', r?.grupoNome || '', r ? r.prestadorNome : '', r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '',
-      l?.unidade || '', l?.paciente || '', l?.titulo || '', l?.descricao || '', l?.data || '', l?.convenio || '', l?.modalidade || '', l?.medico || '',
+      r?.paciente || l?.paciente || '', r?.data || l?.data || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', l?.titulo || '', { v: falta, st: { wrap: true } }, r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '',
+      r?.convenio || '', r ? ctx.unidadeNome : '', r?.grupoNome || '', r ? r.prestadorNome : '', r?.paciente || '',
+      l?.paciente || '', l?.data || '', l?.descricao || '', l?.convenio || '', l?.unidade || '', l?.modalidade || '', l?.medico || '',
       { v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { wrap: true } }, { v: x.motivos.join(' | '), st: { wrap: true } }];
   };
-  const largP = [24, 30, 24, 32, 12, 46, 11, 28, 24, 28, 12, 22, 32, 40, 40, 11, 28, 10, 28, 34, 80];
+  const largP = [22, 28, 32, 11, 12, 40, 40, 44, 12, 24, 24, 24, 28, 30, 30, 11, 40, 24, 22, 10, 28, 34, 80];
+  // «O que falta decidir»: uma linha por pendência, agrupada pela decisão que a resolve.
+  const F = [cabecalho(['Decisão', 'O que decidir', 'Ação sugerida', 'Linhas na decisão', 'Paciente', 'Data', 'Cód. TUSS MV', 'Procedimento no MV', 'Laudo (TITLE)', 'Convênio MV', 'Convênio laudo', 'Vl Repasse', 'Por quê'])];
+  [...CZ.grupos, ...CZ.umaUma].forEach((c, n) => {
+    const cor = n % 2 ? 'FFF2CC' : 'FCE4D6';
+    for (const i of c.linhas) { const x = res.linhas[i], r = x.r, l = x.l;
+      F.push([{ v: n + 1, st: { fill: cor, b: true } }, { v: c.rotulo, st: { fill: cor, wrap: true } }, { v: c.acao, st: { wrap: true } }, c.linhas.length, r?.paciente || l?.paciente || '', r?.data || l?.data || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', l?.titulo || '', r?.convenio || '', l?.convenio || '', r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '', { v: x.motivos.join(' | '), st: { wrap: true } }]); }
+  });
+  if (F.length === 1) F.push(['Nada falta decidir neste relatório: é só registrar o aceite na ferramenta.']);
   const pendente = x => x.status !== 'conferido' && !x.decisao;
   // Resumo
   const R = [cabecalho(['Categoria principal', 'Registros únicos', 'Vl Repasse', 'Vl Total'])];
@@ -93,8 +106,8 @@ function xlsxConferencia(res, ctx) {
   const C = [cabecalho(['Linha MV', 'Código TUSS', 'Paciente (MV)', 'Data (MV)', 'Categoria final', 'Faixa', 'TITLE candidato', 'Médico', 'Data laudo', 'Nível do nome', 'Dias de diferença', 'Equivalência', 'Associado à linha?'])];
   for (const x of res.linhas) if (x.r) for (const c of x.cands) C.push([x.r.seq, { v: x.r.codigo, st: T }, x.r.paciente, x.r.data, STATUS_CONF[x.status].nome, c.tier, c.l.titulo, c.l.medico, c.l.data || '', ['', 'semelhante', 'truncado', 'idêntico'][c.nm], c.dd, c.proc.estado, x.l === c.l ? 'SIM' : 'NÃO']);
   return criarXlsx([
+    { nome: 'O que falta decidir', larguras: [9, 60, 44, 10, 32, 11, 12, 40, 40, 22, 22, 12, 80], linhas: F, filtro: F.length > 2 },
     { nome: 'Conferência', larguras: largP, linhas: [cabPrincipal, ...res.linhas.map(linhaPrincipal)], filtro: true },
-    { nome: 'Pendências', larguras: largP, linhas: [cabPrincipal, ...res.linhas.filter(pendente).map(linhaPrincipal)], filtro: true },
     { nome: 'Resumo', larguras: [52, 22, 16, 16], linhas: R, filtro: false, congelar: false },
     { nome: 'Informações', larguras: [44, 110], linhas: I, filtro: false, congelar: false },
     { nome: 'Técnico', larguras: [24, 8, 8, 30, 7, 10, 11, 12, 7, 9, 12, 22, 12, 10, 12, 8, 60, 24], linhas: [cabTec, ...res.linhas.map(linhaTec)], filtro: true },

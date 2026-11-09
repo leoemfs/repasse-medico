@@ -217,7 +217,7 @@ function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '
   }
   if (relacao.length) return { estado: 'pendente', relacao: relacao[0], motivo: `Equivalência ${relacao[0].ambiguo ? 'ambígua ' : ''}ainda não validada` };
   const valCodigo = (idx.porCodigo.get(codigo) || []).some(e => e.status === 'validada' && escopoCobre(e.escopo, unidade, modalidade));
-  if (valCodigo || valTitulo.length) return { estado: 'divergente', motivo: valTitulo.length ? `Título validado para outro código (${[...new Set(valTitulo.map(e => e.codigo))].join(', ')})` : 'Código tem títulos validados, mas não este' };
+  if (valCodigo || valTitulo.length) return { estado: 'divergente', outrosCodigos: [...new Set(valTitulo.map(e => e.codigo))], motivo: valTitulo.length ? `Título validado para outro código (${[...new Set(valTitulo.map(e => e.codigo))].join(', ')})` : 'Código tem títulos validados, mas não este' };
   return { estado: 'sem-cadastro', motivo: 'Sem equivalência cadastrada para o par código × título' };
 }
 

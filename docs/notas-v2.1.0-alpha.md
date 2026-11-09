@@ -32,6 +32,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Pasta raiz na rede (alpha.9):** no Início, conectar a pasta raiz uma vez, criar as pastas do mês com os nomes certos e «Atualizar da pasta» (PDFs do MV e planilhas lidos da pasta, só o que mudou). Equivalências TUSS sincronizadas entre as pessoas, como o Fluxo.
 
+- **Conferência por causa (alpha.12):** resultado em uma frase com barra de progresso, «O que falta decidir» agrupado pela decisão que resolve mais linhas (validar e conferir de novo, um ou outro, aceitar em lote), aceite depois das decisões, tabela e Excel na ordem situação → paciente → data → MV → laudo → o que falta.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

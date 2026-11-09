@@ -161,44 +161,62 @@ function desenharConferencia() {
   const { res, ctx, comparacao } = S.conf, c = $('cfRes'); if (!c) return;
   aplicarDecisoes(res, indiceDecisoesComp(ctx.chaveCompetencia));
   const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
-  c.innerHTML = `<div class="card"><h2>Resultado <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
+  const CZ = causasDaConferencia(res, S.eq.compostas || []), pct = CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0;
+  const nLote = CZ.grupos.filter(g => g.tipo !== 'so-laudo').reduce((t, g) => t + g.linhas.length, 0);
+  const seg = k => res.linhas.filter(x => x.r && (k === 'ok' ? (x.status === 'conferido' || x.status === 'nao-procedimental' || x.decisao) : !x.decisao && (k === 'ress' ? x.status === 'ressalva' : k === 'sf' ? x.status === 'so-faturamento' : !['conferido', 'nao-procedimental', 'ressalva', 'so-faturamento'].includes(x.status)))).length;
+  const barra = CZ.totalMV ? ['ok', 'ress', 'pend', 'sf'].map(k => `<span class="cf-b-${k}" style="width:${seg(k) / CZ.totalMV * 100}%" title="${seg(k)}"></span>`).join('') : '';
+  c.innerHTML = `<div class="card cf-frase"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
+    <div class="cf-barra">${barra}</div>
+    <p style="margin:6px 0"><b>${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${pct}%.</b> ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => g.tipo !== 'so-laudo').length} resolvem ${nLote} linha(s) de uma vez` : ''}${CZ.umaUma.length ? `${nLote ? ',' : ':'} ${CZ.umaUma.length} linha(s) precisam ser olhadas uma a uma` : ''}${CZ.grupos.some(g => g.tipo === 'so-laudo') ? `${nLote || CZ.umaUma.length ? ', e' : ':'} ${CZ.grupos.find(g => g.tipo === 'so-laudo').linhas.length} laudo(s) sem lançamento para revisar como NC` : ''}.` : 'Nada falta decidir neste relatório: é só registrar o aceite.'}</p>
+    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<a class="small" href="#cfAceite">Ir para o aceite ↓</a>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel">Exportar Excel</button></div>
+    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}</details></div>
+    <details class="cf-det"${S.conf.detAberto ? ' open' : ''}><summary>Detalhes da rodada (relatório, período, volume, equivalências${comparacao ? ', comparação com a rodada anterior' : ''})</summary>
     <dl class="kv"><dt>Relatório</dt><dd>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · repasse ${esc(ctx.relatorio.cab.repasse)} · ${esc(ctx.relatorio.cab.descricao)}</dd>
     <dt>Unidade</dt><dd>${esc(ctx.unidadeNome)}</dd><dt>Médico(s) no escopo</dt><dd>${esc(ctx.medicosNomes || 'Todos os médicos')}</dd>
     <dt>Período de produção</dt><dd>${res.periodo ? `${fmtData(res.periodo[0])} a ${fmtData(res.periodo[1])}` : '—'} · modalidades ${esc(res.modalidades.join(', ') || '—')}</dd>
     <dt>Volume</dt><dd>${res.nMV} linhas do MV (${res.nProcedimentos} procedimentos) · ${res.nLaudosEscopo} laudos no escopo · ${res.nPares} pares</dd>
     <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
-    ${comparacao ? resumoComparacao(comparacao) : ''}
-    ${quadroAceite()}
-    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}
+    ${comparacao ? resumoComparacao(comparacao) : ''}</details></div>
+    ${cartaoCausas(CZ, res)}
+    <div class="card cf-aceite-card">${quadroAceite()}</div>
+    <div class="card"><h2>Linhas</h2>
     <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
     <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
     <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
-    <div class="acoes"><input type="search" id="cfBusca" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}" style="max-width:420px"><button id="cfExcel">Exportar Excel</button><button id="cfLimpar" class="sec">Limpar filtros</button></div>
+    <div class="acoes"><input type="search" id="cfBusca" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}" style="max-width:420px"><button id="cfExcel">Exportar Excel</button><button id="cfLimpar" class="sec">Limpar filtros</button><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label></div>
+    ${S.conf.filtroLinhas ? `<div class="cf-fl small"><b>Mostrando as ${S.conf.filtroLinhas.idx.length} linha(s) de:</b> ${esc(S.conf.filtroLinhas.titulo)} <button class="sec mini" id="cfFlLimpar">Mostrar todas</button></div>` : ''}
     <div id="cfTab" style="margin-top:10px"></div></div>
     ${ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''}
     <div class="card"><h2>Equivalências desta rodada</h2><div id="cfEq"></div></div>`;
   ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
-  $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; desenharConferencia(); };
-  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, ctx), nomeArquivoAnalise('conferencia', ctx));
+  $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; S.conf.filtroLinhas = null; desenharConferencia(); };
+  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [] }), nomeArquivoAnalise('conferencia', ctx));
+  if ($('cfIrCausas')) $('cfIrCausas').onclick = () => $('cfCausas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('cfVerTodas').onclick = () => { S.conf.soFalta = false; S.conf.filtroLinhas = null; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
+  $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
+  if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
+  const det = c.querySelector('.cf-det'); if (det) det.ontoggle = () => { S.conf.detAberto = det.open; };
+  ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
   const filtrar = () => {
     const q = norm(S.conf.busca);
-    return res.linhas.filter(x => (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
+    const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size;
+    return res.linhas.filter((x, i) => (!fl || fl.has(i)) && (!soFalta || (!x.decisao && x.status !== 'conferido' && x.status !== 'nao-procedimental'))
+      && (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
       && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => m.startsWith('dec-') ? x.decisao?.tipo === m.slice(4) : x.marcadores.has(m)))
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
-      { t: 'Linha', n: true, v: x => x.r ? x.r.seq : '—' }, { t: 'Origem', v: x => x.origem },
-      { t: 'Categoria', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) },
-      { t: 'Código', v: x => x.r?.codigo || '' }, { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente },
-      { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) }, { t: 'TITLE do laudo', v: x => x.l?.titulo || '' },
-      { t: 'Médico do laudo', v: x => x.l?.medico || '' }, { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' },
-      { t: 'Marcadores', v: x => [...x.marcadores].map(m => MARCADORES[m]).join(' · ') }
+      { t: 'Situação', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) },
+      { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
+      { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
+      { t: 'O que falta / por quê', v: x => x.decisao ? '' : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
+      { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
-    detalhe: x => `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, res.linhas.indexOf(x))}</div><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+    detalhe: x => `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, res.linhas.indexOf(x))}</div><p class="small muted" style="margin:0 0 6px">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
       ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map(cd => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]})${cd.l === x.l ? '</strong>' : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`
