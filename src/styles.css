@@ -309,3 +309,4 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .pr-st{display:flex;flex-direction:column;gap:4px;margin-top:6px}
 /* Início: filtros da lista de relatórios do MV */
 .lm-filtros{margin-bottom:4px}.lm-tab{max-height:560px;overflow:auto}
+.cf-fil{margin-bottom:6px}.cf-fil .campo{min-width:180px}

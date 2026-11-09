@@ -11,17 +11,30 @@ function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
   return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
 }
+// Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
+const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };
+const unDoRel = x => x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome) || '';
+const grDoRel = x => x.grupoPasta || (ehUnidadeV3(S.cfg, unDoRel(x)) ? 'curitiba' : tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(l => ({ grupo: l.grupoNome })) }));
+const rotGr = g => g === 'curitiba' ? 'Curitiba' : String(g || '').toUpperCase();
 function seletoresAnalise(prefixo, tolPadrao) {
-  const rels = relatoriosPara(prefixo);
-  const proximo = prefixo === 'cf' && S.cfProximo && rels.some(r => r.id === S.cfProximo.relId) ? S.cfProximo : null;
+  const todos = relatoriosPara(prefixo), F = FILTRO_REL[prefixo];
+  const proximo = prefixo === 'cf' && S.cfProximo && todos.some(r => r.id === S.cfProximo.relId) ? S.cfProximo : null;
   const ultimo = proximo || S[prefixo === 'cf' ? 'conf' : 'corr']?.ctx;
   if (proximo) S.cfProximo = null;
+  const passa = x => (F.un === '*' || unDoRel(x) === F.un) && (F.gr === '*' || grDoRel(x) === F.gr);
+  if (proximo && !todos.filter(passa).some(r => r.id === proximo.relId)) { F.un = '*'; F.gr = '*'; }
+  const rels = todos.filter(passa).sort((a, b) => (+unDoRel(a) || 999) - (+unDoRel(b) || 999) || grDoRel(a).localeCompare(grDoRel(b)) || a.rel.cab.prestadorNome.localeCompare(b.rel.cab.prestadorNome));
+  const uns = [...new Set(todos.map(unDoRel).filter(Boolean))].sort((a, b) => +a - +b), grs = [...new Set(todos.map(grDoRel))];
+  const filtro = todos.length > 1 ? `<div class="filtros cf-fil"><label class="campo">Relatórios da unidade<select id="${prefixo}FUn">${opcoes([['*', 'Todas'], ...uns.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`])], F.un)}</select></label>
+    <label class="campo">Grupo<select id="${prefixo}FGr">${opcoes([['*', 'Todos'], ...grs.map(g => [g, rotGr(g)])], F.gr)}</select></label>
+    <div class="campo"><span class="small muted">${rels.length} de ${todos.length} relatório(s)</span>${prefixo === 'cf' && rels.length > 1 && (F.un !== '*' || F.gr !== '*') ? `<button type="button" class="sec mini" data-cflote>Conferir os ${rels.length} relatórios filtrados</button>` : ''}</div></div>` : '';
+  if (!rels.length) return filtro + '<p class="muted">Nenhum relatório com esse filtro.</p>';
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
   const sugerida = rel ? (rel.unidadePasta || unidadeSugeridaPeloArquivo(rel.nome)) : '';
   const unSel = ultimo?.relId === relSel ? ultimo.unidadeCod : (sugerida && unidadePorCod(S.cfg, sugerida) ? sugerida : '');
-  return `<div class="grid4">
-    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}${r.unidadePasta ? ` · unidade ${r.unidadePasta}${r.grupoPasta ? ' ' + (r.grupoPasta === 'curitiba' ? 'Curitiba' : r.grupoPasta.toUpperCase()) : ''}` : ''}`]), relSel)}</select></label>
+  return `${filtro}<div class="grid4">
+    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${unDoRel(r) ? `unidade ${unDoRel(r)} ` : ''}${rotGr(grDoRel(r))} · ${r.rel.cab.descricao || r.nome}`]), relSel)}</select></label>
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
       <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
@@ -88,6 +101,7 @@ RENDER.conferencia = () => {
       salvarCfg(`Alias «${b.dataset.cfalias}» validado para o prestador ${prest.cod}.`, 'aliases'); extra();
     });
   };
+  if (!$('cfRel')) { $('cfRodar').disabled = true; return; }
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
   $('cfRodar').onclick = executarConferencia;
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
@@ -135,7 +149,7 @@ async function rodarDeNovoAfetadas(rodadas) {
   const feitas = [], faltam = [];
   for (const r of rodadas) {
     const hash = (r.arquivos || []).find(a => a.papel === 'MV')?.hash;
-    const x = S.relatorios.find(y => y.hash === hash) || S.relatorios.find(y => String(y.rel.cab.prestadorCod) === String(r.prestadorCod) && y.rel.cab.repasse === r.repasse);
+    const x = S.relatorios.find(y => y.hash === hash) || S.relatorios.find(y => String(y.rel.cab.prestadorCod) === String(r.prestadorCod) && y.rel.cab.repasse === r.repasse && (!unDoRel(y) || unDoRel(y) === String(r.unidadeCod)));
     if (!x || !S.apolo) { faltam.push(r); continue; }
     const novo = await rodarConferencia(x, r.unidadeCod, r.parametros?.tol ?? S.cfg.parametros.tolConferencia, r.parametros?.medico || '@prest');
     feitas.push({ antes: r, depois: novo.rodada });
@@ -295,3 +309,30 @@ document.addEventListener('change', e => {
   sel.value = un; sel.dispatchEvent(new Event('change', { bubbles: true }));
   const dica = $(pre + 'UnDica'); if (dica) dica.textContent = x.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.';
 }, true);
+
+// Filtros do seletor: redesenha a página com a lista filtrada.
+document.addEventListener('change', e => {
+  const m = /^(cf|co)F(Un|Gr)$/.exec(e.target.id || ''); if (!m) return;
+  FILTRO_REL[m[1]][m[2] === 'Un' ? 'un' : 'gr'] = e.target.value;
+  if (m[1] === 'cf') RENDER.conferencia(); else RENDER.correcao();
+});
+// Conferir em lote os relatórios filtrados: cada um na unidade dele, com o médico do cadastro (ou todos da unidade).
+document.addEventListener('click', async e => {
+  if (!e.target.closest('[data-cflote]')) return;
+  const F = FILTRO_REL.cf, rels = relatoriosPara('cf').filter(x => (F.un === '*' || unDoRel(x) === F.un) && (F.gr === '*' || grDoRel(x) === F.gr));
+  const semUn = rels.filter(x => !unDoRel(x)), ok = rels.filter(x => unDoRel(x));
+  if (!S.apolo) return avisar('Carregue a planilha de laudos no Início.', 'warn');
+  const op = await exigirOperador(); if (!op) return;
+  if (!await confirmar(`Conferir ${ok.length} relatório(s)?`, `Cada relatório é conferido na unidade da pasta dele, com a tolerância ${esc($('cfTol')?.value || S.cfg.parametros.tolConferencia)} dia(s) e o médico do cadastro (ou todos os médicos da unidade, quando o prestador não tem vínculo nela). Cada um vira uma rodada.${semUn.length ? `<br><b>${semUn.length} sem unidade</b> ficam de fora: escolha a unidade de cada um.` : ''}`, 'Conferir')) return;
+  const tol = +($('cfTol')?.value ?? S.cfg.parametros.tolConferencia); let n = 0;
+  for (const x of ok) {
+    const un = unDoRel(x), ligados = medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod);
+    const presente = laudosDaUnidade(S.apolo, S.cfg, un).some(l => ligados.includes(l.mn));
+    avisar(`Conferindo ${++n} de ${ok.length}: ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} (unidade ${un})…`, 'info');
+    await rodarConferencia(x, un, tol, presente ? '@prest' : '*');
+    await new Promise(r => setTimeout(r, 0));
+  }
+  S.rodadas = await dbTodas();
+  avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.`, 'ok');
+  RENDER.conferencia();
+});
