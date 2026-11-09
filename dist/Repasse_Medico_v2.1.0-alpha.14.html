@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.13</title>
+<title>Repasse Médico v2.1.0-alpha.14</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -328,13 +328,14 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cz-sep{border-top:1px dashed var(--line);margin:12px 0 4px;padding-top:8px;font-size:12.5px;color:var(--muted);font-weight:600}
 .cf-fl{background:var(--infobg);border-radius:8px;padding:6px 10px;margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media (max-width:700px){.cz{grid-template-columns:minmax(0,1fr)}.cz-n{text-align:left}}
+.cp-leitura{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:4px;max-width:420px;line-height:1.35}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.13 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.14 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -385,7 +386,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.13';
+const MOTOR_VERSAO = '2.1.0-alpha.14';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -2151,6 +2152,74 @@ function planilhaControleUnidade(ctl, chave) {
   }
   const larg = [30, 20, 12, 36, 14, 26, 12, 24, 22, 36];
   return criarXlsx([{ nome: 'Gerar no MV', larguras: larg, linhas, filtro: true, congelar: 1 }, { nome: `Todos ${chave}`, larguras: larg, linhas: todas, filtro: true, congelar: 1 }]);
+}
+
+/* ---- src/engine/53b-eq-planilha.js ---- */
+/* ============================================================
+ * Equivalências em planilha (.xlsx), linha a linha, e a leitura em português de cada regra composta.
+ * Abas: Leia-me · Relações (1 linha por código × título) · Regras compostas (1 linha por regra, com a leitura)
+ * · Itens das regras (1 linha por procedimento esperado) · Títulos das regras (1 linha por título reconhecido).
+ * ============================================================ */
+// «O laudo «X» espera na conta: 1× 40901300 (USG transvaginal) e 1× 40901386 (Doppler). Na UNIMED, o Doppler não é exigido.»
+function leituraRegraComposta(c0, descDe = () => '', curta = false) {
+  const c = regraComposta(c0), qt = n => `${n}×`;
+  const reconhece = c.titulos.length ? `Laudo com o título ${c.titulos.map(t => `«${t}»`).join(' ou ')}` : 'Laudo';
+  const pal = c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? `${c.titulos.length ? ' ou com' : ' com'} título que contém ${(c.palavras.todas || []).join(' e ')}${(c.palavras.umaDe || []).length ? `${(c.palavras.todas || []).length ? ' e ' : ''}uma destas palavras: ${c.palavras.umaDe.join(', ')}` : ''}` : '';
+  const itens = c.itens.map(it => `${qt(it.qtd)} ${it.codigos.map(cd => `${cd}${descDe(cd) ? ` (${descDe(cd)})` : ''}`).join(' ou ')}${it.rotulo && !it.codigos.some(cd => descDe(cd)) ? ` [${it.rotulo}]` : ''}`);
+  const esp = itens.length === 1 && c.itens[0].codigos.length > 1 ? `uma linha com qualquer um destes códigos: ${itens[0].replace(/^1× /, '')}` : itens.join(' e ');
+  const exc = c.itens.flatMap(it => (it.excecoes || []).map(e => `No convênio ${e.convenio}, ${it.rotulo || it.codigos[0]} ${e.tipo === 'nao-exigido' ? 'não é exigido (se vier na conta, sobra)' : `é esperado ${qt(e.qtd)}`}.`));
+  const unid = c.escopo?.unidade && c.escopo.unidade !== '*' ? ` Vale só na unidade ${c.escopo.unidade}.` : '';
+  const me = (c.titulosMesmoEstudo || []).length ? ` Laudos do mesmo estudo (mesmo paciente e dia, não cobram outra linha): ${c.titulosMesmoEstudo.map(t => `«${t}»`).join(', ')}.` : '';
+  if (curta) return `Espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${(c.titulosMesmoEstudo || []).length ? ' Laudos do mesmo estudo não cobram outra linha.' : ''}`;
+  return `${reconhece}${pal} espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${unid}${me}`;
+}
+function xlsxEquivalencias(eq, { usoTitulo = new Map(), operador = '' } = {}) {
+  const desc = new Map(); for (const t of eq.catalogoTUSS || []) desc.set(String(t.codigo), t.desc || t.descricao || '');
+  for (const e of eq.itens || []) if (e.descMV && !desc.has(e.codigo)) desc.set(e.codigo, e.descMV);
+  const descDe = cd => desc.get(String(cd)) || '';
+  const regras = (eq.compostas || []).map(regraComposta), nomeR = id => { const r = regras.find(x => x.id === id); return r ? nomeComposta(r) : ''; };
+  const dt = s => s ? String(s).slice(0, 10).split('-').reverse().join('/') : '';
+  const ST = { validada: 'C6EFCE', pendente: 'FFEB9C', desativada: 'D9D9D9', coberta: 'DDEBF7' };
+  const rel = [cabecalho(['Status', 'Código TUSS (MV)', 'Descrição no MV', 'TITLE do laudo (Apolo)', 'Laudos no Apolo carregado', 'Unidade', 'Modalidade', 'Responsável', 'Validada em', 'Confiança da análise', 'Ambígua', 'Coberta pela regra composta', 'Justificativa / análise', 'Última mudança'])];
+  for (const e of [...(eq.itens || [])].sort((a, b) => a.titulo.localeCompare(b.titulo) || a.codigo.localeCompare(b.codigo))) {
+    const h = (e.historico || []).at(-1);
+    rel.push([{ v: STATUS_EQ[e.status] || e.status, st: { fill: ST[e.status] || 'FFFFFF', b: true } }, { v: e.codigo, st: { fmt: 'text' } }, e.descMV || descDe(e.codigo), e.titulo, usoTitulo.get(chaveTitulo(e.titulo)) || '', e.escopo?.unidade === '*' ? 'todas' : e.escopo?.unidade || '', e.escopo?.modalidade === '*' ? 'todas' : e.escopo?.modalidade || '',
+      e.responsavel || '', dt(e.validadoEm), e.confianca || '', e.ambiguo ? 'sim' : '', e.cobertaPor ? nomeR(e.cobertaPor) : '', { v: [e.justificativa, e.atencao].filter(Boolean).join(' | '), st: { wrap: true } }, h ? `${dt(h.em)} · ${h.por || '—'}: ${STATUS_EQ[h.de] || h.de} → ${STATUS_EQ[h.para] || h.para}${h.motivo ? ` (${h.motivo})` : ''}` : '']);
+  }
+  const R = [cabecalho(['Regra', 'Status', 'Como a regra funciona (leitura)', 'Títulos do Apolo', 'Palavras do título', 'Laudos do mesmo estudo', 'Unidade', 'Responsável', 'Validada em', 'Justificativa'])];
+  const I = [cabecalho(['Regra', 'Status', 'Item', 'Nome curto', 'Código(s) TUSS aceitos', 'Descrição no MV', 'Quantidade esperada', 'Exceção: convênio', 'Exceção: o que muda', 'Exceção: quantidade'])];
+  const T = [cabecalho(['TITLE do laudo (Apolo)', 'Laudos no Apolo carregado', 'Reconhecido por', 'Regra', 'Status da regra', 'Espera na conta'])];
+  for (const r of regras) {
+    const st = { v: STATUS_EQ[r.status] || r.status, st: { fill: ST[r.status] || 'FFFFFF', b: true } }, nome = nomeComposta(r);
+    R.push([{ v: nome, st: { b: true } }, st, { v: leituraRegraComposta(r, descDe), st: { wrap: true } }, { v: r.titulos.join('\n'), st: { wrap: true } },
+      r.palavras ? [(r.palavras.todas || []).length ? `contém: ${r.palavras.todas.join(', ')}` : '', (r.palavras.umaDe || []).length ? `e uma de: ${r.palavras.umaDe.join(', ')}` : ''].filter(Boolean).join(' ') : '',
+      { v: (r.titulosMesmoEstudo || []).join('\n'), st: { wrap: true } }, r.escopo?.unidade && r.escopo.unidade !== '*' ? r.escopo.unidade : 'todas', r.responsavel || '', dt(r.validadoEm), r.justificativa || '']);
+    r.itens.forEach((it, k) => {
+      const ex = it.excecoes || [];
+      const base = [nome, st, k + 1, it.rotulo || '', { v: it.codigos.join(' ou '), st: { fmt: 'text' } }, { v: it.codigos.map(descDe).filter(Boolean).join(' / '), st: { wrap: true } }, it.qtd];
+      if (!ex.length) I.push([...base, '', '', '']);
+      for (const e of ex) I.push([...base, e.convenio, e.tipo === 'nao-exigido' ? 'não exigido' : 'quantidade diferente', e.tipo === 'nao-exigido' ? 0 : e.qtd]);
+    });
+    const espera = r.itens.map(it => `${it.qtd}× ${it.codigos.join(' ou ')}`).join(' + ');
+    for (const t of r.titulos) T.push([t, usoTitulo.get(chaveTitulo(t)) || '', 'título da lista', nome, st, espera]);
+    for (const t of r.titulosMesmoEstudo || []) T.push([t, usoTitulo.get(chaveTitulo(t)) || '', 'laudo do mesmo estudo', nome, st, 'nada a mais (mesmo exame)']);
+    if (r.palavras && ((r.palavras.todas || []).length || (r.palavras.umaDe || []).length)) T.push([`(palavras) contém ${(r.palavras.todas || []).join(' e ')}${(r.palavras.umaDe || []).length ? ` e uma de ${r.palavras.umaDe.join(', ')}` : ''}`, '', 'palavras do título', nome, st, espera]);
+  }
+  const L = [cabecalho(['Aba', 'O que mostra']), ...[
+    ['Relações', 'Uma linha por relação código TUSS do MV × TITLE do laudo do Apolo. Só «Validada» confirma automaticamente na conferência. «Coberta por regra composta» = a relação está resolvida por uma regra composta validada.'],
+    ['Regras compostas', 'Uma linha por regra. A coluna «Como a regra funciona» diz, em português, o que o laudo espera encontrar na conta do MV, as exceções por convênio e os laudos do mesmo estudo.'],
+    ['Itens das regras', 'Uma linha por procedimento que a regra espera na conta (e uma por exceção de convênio). «Código(s) aceitos» com «ou» = qualquer um deles vale. Quantidade 2 = o código precisa vir duas vezes.'],
+    ['Títulos das regras', 'Uma linha por título do Apolo que aciona uma regra (título da lista, palavras do título ou laudo do mesmo estudo).'],
+    ['Como ler uma regra composta', 'Uma regra composta diz: quando o laudo tem este título, a conta do MV deve ter estes procedimentos. Ex.: «USG transvaginal com Doppler» = 1× transvaginal + 1× Doppler. «Um ou outro» é uma regra com um item só e vários códigos: qualquer um confirma o laudo. Exceção por convênio muda a quantidade (ex.: UNIMED ×1) ou dispensa o item (não exigido).'],
+    ['Gerado em', `${new Date().toLocaleString('pt-BR')}${operador ? ` · ${operador}` : ''} · base revisão ${eq.revisao || ''} · ${(eq.itens || []).length} relações · ${regras.length} regras compostas`]
+  ].map(([a, b]) => [{ v: a, st: { b: true } }, { v: b, st: { wrap: true } }])];
+  return criarXlsx([
+    { nome: 'Leia-me', larguras: [28, 120], linhas: L, filtro: false, congelar: false },
+    { nome: 'Relações', larguras: [16, 12, 44, 50, 10, 9, 10, 20, 11, 12, 8, 30, 60, 60], linhas: rel, filtro: true },
+    { nome: 'Regras compostas', larguras: [34, 12, 90, 50, 30, 40, 9, 20, 11, 40], linhas: R, filtro: R.length > 1 },
+    { nome: 'Itens das regras', larguras: [34, 12, 6, 22, 24, 50, 10, 22, 20, 10], linhas: I, filtro: I.length > 1 },
+    { nome: 'Títulos das regras', larguras: [56, 10, 22, 34, 12, 34], linhas: T, filtro: T.length > 1 }
+  ]);
 }
 
 /* ---- src/engine/60-conferencia.js ---- */
@@ -7482,7 +7551,7 @@ RENDER.equivalencias = () => {
     <div class="grid4">
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
-    <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
+    <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqXlsx">Exportar planilha (.xlsx)</button><button id="eqExp" class="sec">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
     ${conf.length ? `<p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos. Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (ex.: escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (ex.: título com Doppler = exame base <i>e</i> Doppler na mesma conta).</p>
@@ -7515,6 +7584,15 @@ RENDER.equivalencias = () => {
       .sort((a, b) => (ORDEM_CONF[a.confianca] ?? 3) - (ORDEM_CONF[b.confianca] ?? 3) || (usoTitulo.get(chaveTitulo(b.titulo)) || 0) - (usoTitulo.get(chaveTitulo(a.titulo)) || 0) || a.codigo.localeCompare(b.codigo));
   };
   const info = () => { const n = FE.sel.size; ['eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => $(id).disabled = !n); $('eqInfo').textContent = n ? `${n} selecionada(s)` : ''; };
+  const ligarBotoesBase = () => {
+    $('eqImpX').onclick = () => $('eqArqX').click(); $('eqArqX').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
+    $('eqImpJM').onclick = () => $('eqArqJM').click(); $('eqArqJM').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
+    $('eqImpJS').onclick = () => $('eqArqJS').click(); $('eqArqJS').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'substituir');
+    $('eqExp').onclick = () => baixarJSON(S.eq, `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.json`);
+    $('eqXlsx').onclick = () => baixarZip(xlsxEquivalencias(S.eq, { usoTitulo, operador: S.operador }), `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.xlsx`);
+    $('eqNova').onclick = novaRelacaoManual;
+  };
+  ligarBotoesBase();
   if (FE.vis === 'titulo') { desenharGruposTitulo(usoTitulo); ligarFiltrosEq(); return; }
   const t = tabela($('eqTab'), {
     porPagina: 100, linhas: filtrar(), colunas: [
@@ -7544,11 +7622,6 @@ RENDER.equivalencias = () => {
   $('eqVal').onclick = () => mudar('validada', 'Validar');
   $('eqPend').onclick = () => mudar('pendente', 'Voltar a pendente');
   $('eqDes').onclick = () => mudar('desativada', 'Desativar');
-  $('eqImpX').onclick = () => $('eqArqX').click(); $('eqArqX').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
-  $('eqImpJM').onclick = () => $('eqArqJM').click(); $('eqArqJM').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
-  $('eqImpJS').onclick = () => $('eqArqJS').click(); $('eqArqJS').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'substituir');
-  $('eqExp').onclick = () => baixarJSON(S.eq, `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.json`);
-  $('eqNova').onclick = novaRelacaoManual;
 };
 
 async function novaRelacaoManual() {
@@ -7690,7 +7763,7 @@ function cardCompostas() {
   return `<div class="card" id="cardCompostas"><h2>Regras compostas e por convênio <span class="muted small">${l.filter(c => c.status === 'validada').length} validada(s) · ${l.filter(c => c.status === 'pendente').length} pendente(s) · efetividade na competência ${rotuloCompetencia(S.comp)}</span></h2>
     <p class="lead">Quando um exame laudado corresponde a <b>vários procedimentos</b> na conta (ex.: TC abdome total = abdome superior + inferior; USG de mamas com Doppler = mamas + Doppler ×2; na UNIMED, só um Doppler). A conferência aceita um laudo para cada procedimento esperado e aponta o que falta ou sobra. «Nesta competência» conta o que a regra sustentou na última rodada de cada relatório.</p>
     ${l.length ? `<div class="tw"><table><thead><tr><th>Regra</th><th>Títulos do Apolo</th><th>Composição no MV</th><th>Exceções por convênio</th><th class="n">Nesta competência</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
-      <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}</td>
+      <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}<small class="cp-leitura">${esc(leituraRegraComposta(c, descTussUI, true))}</small></td>
       <td class="small">${c.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}${(c.titulosMesmoEstudo || []).length ? `<div class="muted" style="margin-top:4px">Mesmo estudo: ${c.titulosMesmoEstudo.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}</div>` : ''}${c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? ` <span class="tag-cp">contém ${esc((c.palavras.todas || []).join(' + '))}${(c.palavras.umaDe || []).length ? ` e um de ${esc(c.palavras.umaDe.join(' · '))}` : ''}</span>` : ''}</td>
       <td class="small">${c.itens.map(descricaoItem).join('<span class="muted"> + </span>')}</td>
       <td class="small">${c.itens.flatMap(it => (it.excecoes || []).map(e => `<span class="badge info">${esc(e.convenio)}</span> ${esc(it.rotulo || it.codigos[0])}: ${e.tipo === 'nao-exigido' ? '<b>não exigido</b>' : `<b>×${e.qtd}</b>`}`)).join('<br>') || '<span class="muted">—</span>'}</td>
@@ -7836,6 +7909,12 @@ async function editarComposta(id, rascunho = null, sim = null) {
   if (sim) CP.simulacoes.set(alvo.id, sim);
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
   salvarEq(`Regra composta «${dados.nome}» ${atual ? 'atualizada' : 'cadastrada'}${r.botao === 'ok' ? ' e validada' : ''}. Rode as conferências de novo para aplicar.`); RENDER.equivalencias();
+}
+
+// Descrição do código TUSS (catálogo da base ou descrição do MV nas relações), para a leitura em português das regras.
+function descTussUI(cd) {
+  const k = String(cd); if (!descTussUI.m || descTussUI.rev !== S.eq.revisao) { const m = new Map(); for (const t of S.eq.catalogoTUSS || []) m.set(String(t.codigo), t.desc || t.descricao || ''); for (const e of S.eq.itens || []) if (e.descMV && !m.has(e.codigo)) m.set(e.codigo, e.descMV); descTussUI.m = m; descTussUI.rev = S.eq.revisao; }
+  return descTussUI.m.get(k) || '';
 }
 
 /* ---- src/ui/42-destrava.js ---- */

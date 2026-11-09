@@ -20,7 +20,7 @@ RENDER.equivalencias = () => {
     <div class="grid4">
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
-    <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
+    <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqXlsx">Exportar planilha (.xlsx)</button><button id="eqExp" class="sec">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
     ${conf.length ? `<p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos. Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (ex.: escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (ex.: título com Doppler = exame base <i>e</i> Doppler na mesma conta).</p>
@@ -53,6 +53,15 @@ RENDER.equivalencias = () => {
       .sort((a, b) => (ORDEM_CONF[a.confianca] ?? 3) - (ORDEM_CONF[b.confianca] ?? 3) || (usoTitulo.get(chaveTitulo(b.titulo)) || 0) - (usoTitulo.get(chaveTitulo(a.titulo)) || 0) || a.codigo.localeCompare(b.codigo));
   };
   const info = () => { const n = FE.sel.size; ['eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => $(id).disabled = !n); $('eqInfo').textContent = n ? `${n} selecionada(s)` : ''; };
+  const ligarBotoesBase = () => {
+    $('eqImpX').onclick = () => $('eqArqX').click(); $('eqArqX').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
+    $('eqImpJM').onclick = () => $('eqArqJM').click(); $('eqArqJM').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
+    $('eqImpJS').onclick = () => $('eqArqJS').click(); $('eqArqJS').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'substituir');
+    $('eqExp').onclick = () => baixarJSON(S.eq, `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.json`);
+    $('eqXlsx').onclick = () => baixarZip(xlsxEquivalencias(S.eq, { usoTitulo, operador: S.operador }), `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.xlsx`);
+    $('eqNova').onclick = novaRelacaoManual;
+  };
+  ligarBotoesBase();
   if (FE.vis === 'titulo') { desenharGruposTitulo(usoTitulo); ligarFiltrosEq(); return; }
   const t = tabela($('eqTab'), {
     porPagina: 100, linhas: filtrar(), colunas: [
@@ -82,11 +91,6 @@ RENDER.equivalencias = () => {
   $('eqVal').onclick = () => mudar('validada', 'Validar');
   $('eqPend').onclick = () => mudar('pendente', 'Voltar a pendente');
   $('eqDes').onclick = () => mudar('desativada', 'Desativar');
-  $('eqImpX').onclick = () => $('eqArqX').click(); $('eqArqX').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
-  $('eqImpJM').onclick = () => $('eqArqJM').click(); $('eqArqJM').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
-  $('eqImpJS').onclick = () => $('eqArqJS').click(); $('eqArqJS').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'substituir');
-  $('eqExp').onclick = () => baixarJSON(S.eq, `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.json`);
-  $('eqNova').onclick = novaRelacaoManual;
 };
 
 async function novaRelacaoManual() {

@@ -21,7 +21,7 @@ function cardCompostas() {
   return `<div class="card" id="cardCompostas"><h2>Regras compostas e por convênio <span class="muted small">${l.filter(c => c.status === 'validada').length} validada(s) · ${l.filter(c => c.status === 'pendente').length} pendente(s) · efetividade na competência ${rotuloCompetencia(S.comp)}</span></h2>
     <p class="lead">Quando um exame laudado corresponde a <b>vários procedimentos</b> na conta (ex.: TC abdome total = abdome superior + inferior; USG de mamas com Doppler = mamas + Doppler ×2; na UNIMED, só um Doppler). A conferência aceita um laudo para cada procedimento esperado e aponta o que falta ou sobra. «Nesta competência» conta o que a regra sustentou na última rodada de cada relatório.</p>
     ${l.length ? `<div class="tw"><table><thead><tr><th>Regra</th><th>Títulos do Apolo</th><th>Composição no MV</th><th>Exceções por convênio</th><th class="n">Nesta competência</th><th>Situação</th><th></th></tr></thead><tbody>${l.map(c => `<tr>
-      <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}</td>
+      <td><b>${esc(nomeComposta(c))}</b>${c.escopo.unidade === '*' ? '' : `<small class="nc-det">unidade ${esc(c.escopo.unidade)}</small>`}<small class="cp-leitura">${esc(leituraRegraComposta(c, descTussUI, true))}</small></td>
       <td class="small">${c.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}${(c.titulosMesmoEstudo || []).length ? `<div class="muted" style="margin-top:4px">Mesmo estudo: ${c.titulosMesmoEstudo.map(t => `<span class="tag-cp">${esc(t)}</span>`).join(' ')}</div>` : ''}${c.palavras && ((c.palavras.todas || []).length || (c.palavras.umaDe || []).length) ? ` <span class="tag-cp">contém ${esc((c.palavras.todas || []).join(' + '))}${(c.palavras.umaDe || []).length ? ` e um de ${esc(c.palavras.umaDe.join(' · '))}` : ''}</span>` : ''}</td>
       <td class="small">${c.itens.map(descricaoItem).join('<span class="muted"> + </span>')}</td>
       <td class="small">${c.itens.flatMap(it => (it.excecoes || []).map(e => `<span class="badge info">${esc(e.convenio)}</span> ${esc(it.rotulo || it.codigos[0])}: ${e.tipo === 'nao-exigido' ? '<b>não exigido</b>' : `<b>×${e.qtd}</b>`}`)).join('<br>') || '<span class="muted">—</span>'}</td>
@@ -167,4 +167,10 @@ async function editarComposta(id, rascunho = null, sim = null) {
   if (sim) CP.simulacoes.set(alvo.id, sim);
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
   salvarEq(`Regra composta «${dados.nome}» ${atual ? 'atualizada' : 'cadastrada'}${r.botao === 'ok' ? ' e validada' : ''}. Rode as conferências de novo para aplicar.`); RENDER.equivalencias();
+}
+
+// Descrição do código TUSS (catálogo da base ou descrição do MV nas relações), para a leitura em português das regras.
+function descTussUI(cd) {
+  const k = String(cd); if (!descTussUI.m || descTussUI.rev !== S.eq.revisao) { const m = new Map(); for (const t of S.eq.catalogoTUSS || []) m.set(String(t.codigo), t.desc || t.descricao || ''); for (const e of S.eq.itens || []) if (e.descMV && !m.has(e.codigo)) m.set(e.codigo, e.descMV); descTussUI.m = m; descTussUI.rev = S.eq.revisao; }
+  return descTussUI.m.get(k) || '';
 }

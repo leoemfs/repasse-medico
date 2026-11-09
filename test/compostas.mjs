@@ -3,6 +3,7 @@
 // Dados fictícios montados no próprio teste; códigos TUSS reais do MV.
 import { createRequire } from 'module';
 import fs from 'fs';
+import { execFileSync } from 'child_process';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/';
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
@@ -153,6 +154,16 @@ await p.selectOption('#eqVis', 'lista'); await p.waitForSelector('#eqTab input[d
 await p.check('#eqTodos'); await p.click('#eqCmp'); await p.waitForSelector('#dlg[open]');
 ok(/DOPPLER MAMAS/.test(await p.inputValue('#dlgCorpo [name="titulos"]')) && ['40901114', '40901386'].includes(await p.inputValue('#dlgCorpo [name="cod0"]')), '«Criar regra composta com as selecionadas» abre o cadastro com títulos e códigos marcados');
 await okDlg('');
+// 7) Planilha de equivalências linha a linha e leitura em português das regras.
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqXlsx');
+const leit = await p.$$eval('#cardCompostas .cp-leitura', e => e.map(x => x.textContent));
+ok(leit.some(t => /^Espera na conta: 1× 40901114.*e 2× 40901386.*No convênio UNIMED.*esperado 1×/.test(t)), `cada regra mostra como funciona, em português (${(leit.find(t => /MAMAS/.test(t)) || '').slice(0, 140)}…)`);
+const ctxDl = p.context(); const [dlx] = await Promise.all([p.waitForEvent('download'), p.click('#eqXlsx')]); const xe = out + 'equivalencias.xlsx'; await dlx.saveAs(xe);
+const xq = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
+wb=openpyxl.load_workbook(sys.argv[1]); r=wb['Regras compostas']; it=wb['Itens das regras']; rel=wb['Relações']
+print(json.dumps({'abas':wb.sheetnames,'leit':[x[2] for x in r.iter_rows(min_row=2,values_only=True)],'itens':it.max_row-1,'rel':rel.max_row-1}))`, xe]).toString());
+const nIt = await p.evaluate(() => window.__RM.S.eq.compostas.map(c => window.__RM.t.regraComposta(c)).reduce((s, c) => s + c.itens.reduce((t, i) => t + Math.max(1, (i.excecoes || []).length), 0), 0));
+ok(xq.abas.join('|') === 'Leia-me|Relações|Regras compostas|Itens das regras|Títulos das regras' && xq.itens === nIt && xq.rel === await p.evaluate(() => window.__RM.S.eq.itens.length) && xq.leit.every(t => /espera na conta/.test(t)), `«Exportar planilha (.xlsx)»: Leia-me, ${xq.rel} relações, ${xq.leit.length} regras com a leitura, ${xq.itens} itens linha a linha e os títulos de cada regra`);
 // Desativada não vale.
 await p.click('[data-cmpdes]'); await okDlg('').catch(() => {});
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
