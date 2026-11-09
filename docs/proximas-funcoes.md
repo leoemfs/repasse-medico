@@ -787,3 +787,12 @@ Pedido: «Outra coisa importante que teremos que sincronizar: equivalências TUS
 - **Quem validou:** responsável obrigatório; marca «pela pasta» e histórico com a origem.
 - **Conferências já feitas:** aviso «Ana validou 3 relações que mudam 2 conferências carregadas aqui» com «Rodar de novo as afetadas» (nada roda sozinho).
 - Vai para a pasta: relações, regras compostas e catálogo TUSS. Não vai: contagem de laudos por título (calculada da planilha de cada um). Bases fica para a etapa seguinte.
+
+## SOL-F38 — Ler os PDFs do MV (e as planilhas) direto da pasta da rede — PROPOSTA (09/11/2026)
+Pedido: «A ferramenta não segura os PDFs. Podemos indicar uma pasta (Relatórios MV › Competência 11-2026 › USG › Unidade 2 Jacarezinho) e, com um clique, atualizar a leitura depois das alterações no MV, sem ficar colocando toda hora?» A pasta raiz do aplicativo já tem: Bases de dados, backups, Fluxo mensal, Equivalência TUSS (sincronização).
+- **Conectar a pasta raiz uma vez** (Edge/Chrome): a ferramenta usa as subpastas que já existem — Fluxo mensal (SOL-F36), Equivalência TUSS (SOL-F37, em vez de ao lado do Fluxo), Relatórios MV (nova) e, se quiser, Bases de dados para as planilhas de laudos e do Power BI.
+- **Estrutura dos relatórios:** `Relatórios MV/Comp_11-2026/USG|IMG|Curitiba|Correção/Unidade 2 - Jacarezinho/*.pdf` — a mesma árvore da exportação «Comp_MM-AAAA». Competência, grupo e unidade vêm do caminho (nome da subpasta começa pelo número da unidade); não precisa renomear arquivo.
+- **«Atualizar da pasta»** (Início e Conferência, por unidade e grupo ou tudo): lê só o que é novo ou mudou desde a última leitura (nome, tamanho, data); o PDF novo do mesmo prestador × unidade substitui o anterior; mostra «3 PDFs mudaram» e oferece «Rodar de novo as conferências afetadas».
+- **Ao abrir a ferramenta:** os PDFs da competência do topo são lidos da pasta sozinhos (opcional), então recarregar a página não perde os relatórios.
+- Os PDFs continuam só na rede da empresa; a ferramenta lê no navegador e não guarda cópia.
+- Tamanho estimado: M.
