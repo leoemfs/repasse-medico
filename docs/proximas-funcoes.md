@@ -870,3 +870,9 @@ Pedido (print da decisão «Composição incompleta: ULTRASSONOGRAFIA DO ESCROTO
 - **Só no laudo**, separado pelo Power BI quando carregado: «Lançados para outro prestador (Power BI): correção de prestador» (botão «Apontar correção de prestador» → NC «Prestador incorreto», com o prestador lançado pelo Power BI, o prestador certo = o do relatório, conta e atendimento) · «Só no laudo — sem lançamento / conta aberta / sem remessa / lançado depois» (Registrar NC com a natureza sugerida pelo Power BI; «É correção de prestador…» também disponível) · «Lançados no relatório do médico do laudo». Sem Power BI: uma decisão só com «Apontar correção de prestador…» e «Registrar NC (não lançado)».
 - A frase do resultado diz «N laudo(s) sem lançamento para apontar (correção de prestador ou NC)».
 - Teste com dados reais (`test/conferencia_causas.mjs`, com o Power BI de 10/2026): o «Só no laudo» do prestador 15 na unidade 17 veio como lançado para outro prestador → correção de prestador.
+
+## Erros visíveis e «Processando…» (09/11/2026, v2.1.0-alpha.18)
+Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 2 USG; clicar em «Executar identificação» não mostrava nada). Com os arquivos reais da competência 10 (PDFs de correção, Power BI, PDF marcado como vindo da pasta USG da unidade 2) a identificação roda normalmente aqui — o erro depende dos arquivos do usuário e ficava só no console.
+- «Executar identificação» e «Executar conferência» mostram «Processando…» enquanto rodam e, se algo falhar, a mensagem na tela («Não foi possível executar …: <motivo>»).
+- Qualquer erro inesperado em qualquer tela passa a aparecer como aviso (continua no console).
+- Aguardando a mensagem que aparecer no caso do Gilberto para corrigir a causa.

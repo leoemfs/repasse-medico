@@ -286,3 +286,16 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
 }
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');
+
+// Botão de execução: mostra «Processando…» e, se algo der errado, a mensagem na tela (antes o erro ficava só no console).
+async function comProcessando(bt, fn, oque) {
+  if (!bt || bt.dataset.rodando) return;
+  const txt = bt.textContent; bt.dataset.rodando = '1'; bt.disabled = true; bt.textContent = 'Processando…';
+  await new Promise(r => setTimeout(r, 30));   // deixa a tela mostrar o «Processando…»
+  try { await fn(); }
+  catch (e) { console.error(e); avisar(`Não foi possível executar ${oque}: ${e?.message || e}. Se continuar, me envie esta mensagem.`, 'err'); }
+  finally { if (document.body.contains(bt)) { bt.disabled = false; bt.textContent = txt; delete bt.dataset.rodando; } }
+}
+// Erro inesperado em qualquer tela: aparece como aviso (e continua no console).
+window.addEventListener('error', e => { if (e?.message && !/ResizeObserver/.test(e.message)) avisar(`Erro inesperado: ${e.message}. Se continuar, me envie esta mensagem.`, 'err'); });
+window.addEventListener('unhandledrejection', e => { const m = e?.reason?.message || String(e?.reason || ''); if (m && e.reason?.name !== 'AbortError') avisar(`Erro inesperado: ${m}. Se continuar, me envie esta mensagem.`, 'err'); });

@@ -103,7 +103,7 @@ RENDER.conferencia = () => {
   };
   if (!$('cfRel')) { $('cfRodar').disabled = true; return; }
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
-  $('cfRodar').onclick = executarConferencia;
+  $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
 function faltamArquivos() {

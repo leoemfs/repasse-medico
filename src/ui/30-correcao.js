@@ -10,7 +10,7 @@ RENDER.correcao = () => {
     <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
   if (!$('coRel')) { $('coRodar').disabled = true; return; }
   $('coExtra').innerHTML = '';
-  $('coRodar').onclick = executarCorrecao;
+  $('coRodar').onclick = () => comProcessando($('coRodar'), executarCorrecao, 'a identificação');
   if (S.corr && S.corr.ctx.chaveCompetencia === S.comp) desenharCorrecao();
 };
 
