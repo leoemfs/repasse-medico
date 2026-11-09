@@ -677,7 +677,7 @@ Pedido: «olha aí o tanto de possíveis compostas que estão para serem validad
 - Prévia: botão «Criar regra composta com as selecionadas…» na barra; visualização «Agrupar por título» com três decisões por título (Juntos (composta)… · Um ou outro · Só o marcado); relações cobertas por regra saem de Pendentes («Cobertas por regra composta») e voltam se a regra for desativada.
 - Aguardando aprovação.
 
-## SOL-F35 — Controle por unidade: quem laudou × quem já tem repasse — A FAZER (pedido de 09/11/2026)
+## SOL-F35 — Controle por unidade: quem laudou × quem já tem repasse — IMPLEMENTADA na v2.1.0-alpha.5 (pedido de 09/11/2026)
 Pedido: «Na unidade 1, quantos e quais prestadores fizeram laudos? Quantos já foram, quais eu já conferi e aceitei, quantos ainda faltam? Hoje eu abro a planilha de laudos, filtro a unidade e o US e anoto num papel os médicos para gerar o repasse no MV. Já esqueci um, e é um transtorno.»
 
 **Objetivo:** a lista de quem precisa de repasse sai da planilha de laudos do Apolo (já guardada na competência), e não do papel. Nenhum prestador que laudou pode ficar sem repasse sem que a ferramenta avise.
@@ -728,3 +728,12 @@ Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para 
 4. Na unidade 5, um grupo só, com os médicos V3 e só os exames que a regra V3 de cada um cobre; os demais médicos ficam em «não pagos pela SRA», fora da contagem.
 5. O Fechamento avisa quem laudou e não tem relatório, e a lista «gerar no MV» sai em Excel.
 6. «Relatório sem laudo» aparece como aviso, nunca como candidato a NC.
+
+### SOL-F35 — implementação (v2.1.0-alpha.5, 09/11/2026)
+- **Conferência → «Prestadores por unidade»** (subaba ao lado de «Conferir relatório»): abre só com a planilha de laudos. Unidades com o número do que falta; grupos USG (com Doppler) e IMG, e Curitiba num grupo só. Resumo (laudaram, aceitos, conferidos sem aceite, relatório sem conferência, a gerar no MV, relatório sem laudo, sem cadastro) e lista com «só o que falta (e avisos)» ligado por padrão.
+- **Ações:** «✓ gerado no MV» (marca com quem e quando; continua na lista até ter rodada) · «Fora do repasse neste mês…» (motivo obrigatório) · «Marcar como verificado…» para relatório sem laudo · «Cadastrar ou vincular…» (o mesmo cadastro do Apolo de Bases, inclusive V3) · em Curitiba, «Não é pago pela SRA» (fica no cadastro, desfazível) · «Abrir conferência» (escolhe o PDF, se carregado, e a unidade).
+- **Curitiba:** só médicos com regra V3; regra por valor fixo conta só os grupos cadastrados e mostra o resto em «fora da regra»; prestadores sem regra V3 e os marcados como não pagos pela SRA ficam em «Outros médicos — não pagos pela SRA» (recolhido, só consulta).
+- **Exportar lista para gerar no MV (Excel)**: aba «Gerar no MV» e aba com todos; **Imprimir**: só o que falta, com coluna para ticar.
+- **Início:** painel «Prestadores por unidade» com o que falta por unidade e grupo. **Fechamento:** avisos do grupo da subaba (quem laudou e não tem relatório; relatório sem laudo), sem bloquear, e o mesmo bloco na exportação de indicadores. **Fluxo (F16):** sugestão nas etapas «Gerar … no MV» de USG, IMG e Curitiba.
+- As marcas da competência ficam neste navegador (`rm2.controleUnidades`), sem dado de paciente.
+- **Teste com a competência 10/2026 real** (`test/prestadores_unidade.mjs`): todo laudo da planilha cai em exatamente um prestador da sua unidade e grupo; unidade 17 · USG: 22 médicos laudaram; com o PDF e a conferência do prestador 15, a situação passa a «Conferido» e, com o aceite, a «Aceito». Na unidade 5, 7 médicos do Apolo aparecem «sem cadastro» na base de teste (entre eles o Dr. Ian, que precisa estar ligado ao código dele no MV).

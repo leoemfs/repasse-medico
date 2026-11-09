@@ -402,6 +402,7 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
       ['NCs da competência', `${ind.ncs.total} · ${ind.ncs.impactam} impactam o pagamento (R$ ${fmtBR(ind.ncs.valor)} nas vindas do MV)`], ['Linhas com decisão (NC ou considerada)', ind.decisoes]]), [],
     ...bloco('USG por unidade', ind.usgPorUnidade), ...bloco('USG por faixa', ind.usgPorFaixa), ...bloco('IMG por unidade', ind.imgPorUnidade), ...bloco('IMG por classe', ind.imgPorClasse),
     ...(ind.cobertura ? bloco(`Cobertura automática por prestador (%) — competência ${fmtBR(ind.cobertura.pct)}%`, ind.cobertura.porPrestador.map(e => [`${e.cod} - ${e.nome} (${e.conferidas} de ${e.total})${e.maiorBloqueio ? ` · maior bloqueio: ${e.maiorBloqueio[0]}` : ''}`, e.pct]), '') : []),
-    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
+    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, ''),
+    ...(ind.controleUnidade?.length ? bloco('Prestadores por unidade (laudos × repasse) — avisos', ind.controleUnidade.map(a => [a.texto, '']), '') : [])];
   return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
 }

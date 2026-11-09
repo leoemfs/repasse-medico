@@ -36,13 +36,14 @@ RENDER.fechamento = async () => {
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
+    ${avisosFechamentoControle()}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
     <div id="fhCorpo"></div>`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
-  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp) }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
+  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp), controleUnidade: S.apolo ? avisosControleUnidade(controleAtual()).filter(a => a.tipo !== 'sem-cadastro') : [] }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
@@ -287,7 +288,8 @@ const ACOES_DOC = [['relatorio', 'E-mail enviado (relatório e prévia)'], ['nfR
 function fecharMenuSituacao() { const m = $('menuSit'); if (m) m.remove(); }
 document.addEventListener('click', e => { if (!e.target.closest('#menuSit')) fecharMenuSituacao(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuSituacao(); });
-window.addEventListener('scroll', fecharMenuSituacao, true);
+let menuSitEm = 0;   // a rolagem que termina logo depois do clique (rolagem suave) não fecha o menu
+window.addEventListener('scroll', () => { if (Date.now() - menuSitEm > 500) fecharMenuSituacao(); }, true);
 function abrirMenuSituacao(btn, f) {
   fecharMenuSituacao();
   const [modo, cod] = btn.dataset.sit.split('|'), x = listaFech(f, modo).find(y => y.cod === cod); if (!x) return;
@@ -297,7 +299,7 @@ function abrirMenuSituacao(btn, f) {
     ${x.manual ? '<button type="button" data-ac="tirar">Tirar a marca «Verificar» (volta ao calculado)</button>' : '<button type="button" data-ac="verificar">Marcar para verificar… <small>pede o motivo</small></button>'}
     <hr>${ACOES_DOC.map(([k, t]) => `<button type="button" data-ac="${k}">${doc[k] ? `✓ ${t} · ${fmtData(paraData(doc[k]))} <small>desfazer</small>` : `${t} <small>grava no Fluxo</small>`}</button>`).join('')}
     <hr><div class="rodape">Situação calculada: ${esc(SITUACAO_FECH[x.situacaoCalculada || x.situacao].nome)}</div>`;
-  document.body.appendChild(m);
+  document.body.appendChild(m); menuSitEm = Date.now();
   const r = btn.getBoundingClientRect(), w = 320;
   m.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left)) + 'px';
   m.style.top = (r.bottom + 4 + m.offsetHeight > window.innerHeight ? Math.max(8, r.top - m.offsetHeight - 4) : r.bottom + 4) + 'px';
@@ -326,3 +328,11 @@ async function acaoSituacao(ac, modo, x) {
   }
   RENDER.fechamento();
 }
+
+// SOL-F35: quem laudou e não tem relatório, e relatório sem laudo, no grupo da subaba (não bloqueia o fechamento).
+function avisosFechamentoControle() {
+  if (!S.apolo || !['usg', 'img', 'curitiba'].includes(FH.sub)) return '';
+  const av = avisosControleUnidade(controleAtual()).filter(a => a.grupo === FH.sub && a.tipo !== 'sem-cadastro');
+  return av.length ? `<div class="fh-ctl">${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></div>` : '';
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) CU.sub = 'unidades'; });

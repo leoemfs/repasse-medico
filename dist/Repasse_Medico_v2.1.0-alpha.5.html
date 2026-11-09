@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.4</title>
+<title>Repasse Médico v2.1.0-alpha.5</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -280,13 +280,27 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .item-cp{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
 .item-cp .alt-cp{width:100%;margin-top:-4px}.sim-cp{background:var(--okbg);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
 @media (max-width:700px){.item-cp{grid-template-columns:1fr}}
+/* SOL-F35 — Prestadores por unidade */
+.aviso-fixo.err{background:var(--errbg);color:var(--err)}
+.cu-un{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.cu-un button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600}
+.cu-un button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cu-un .q{margin-left:6px;font-weight:800}
+.cu-res{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.cu-k{border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px;min-width:90px}
+.cu-k b{display:block;font-size:17px}
+.cu-tab tr.cu-falta td{background:var(--warnbg)}
+.cu-outros{border:1px dashed var(--line);border-radius:10px;padding:6px 10px;margin-top:10px}
+.cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
+.cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
+.fh-ctl{margin-bottom:8px}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.4 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.5 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -337,7 +351,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.4';
+const MOTOR_VERSAO = '2.1.0-alpha.5';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1877,6 +1891,134 @@ function efetividadeCompostas(rodadas, chave) {
     if (l.compostaSobra) pegar(l.compostaSobra).sobra++;
   }
   return m;
+}
+
+/* ---- src/engine/53-prestadores-unidade.js ---- */
+/* ============================================================
+ * SOL-F35 — Controle por unidade: quem laudou (planilha de laudos) × quem já tem repasse.
+ * Grupos: USG (US, com o Doppler) e IMG (demais modalidades) nas unidades fora da V3; Curitiba (unidade V3)
+ * num grupo só, só com médicos V3 e só os exames que a regra V3 de cada um cobre.
+ * Situação calculada: gerar no MV · relatório sem conferência · conferido · aceito · relatório sem laudo (aviso)
+ * · sem cadastro · fora do repasse. Só médico, unidade e contagens: nenhum dado de paciente.
+ * ============================================================ */
+const GRUPOS_CONTROLE = { usg: 'USG (com Doppler)', img: 'IMG (demais exames)', curitiba: 'Curitiba (V3)' };
+const SITUACAO_CONTROLE = {
+  gerar: ['err', 'Gerar no MV'], 'sem-conferencia': ['warn', 'Relatório sem conferência'], conferido: ['info', 'Conferido'],
+  aceito: ['ok', 'Aceito'], 'sem-laudo': ['warn', 'Relatório sem laudo'], 'sem-cadastro': ['warn', 'Sem cadastro'],
+  conflito: ['err', 'Nome em dois cadastros'], fora: ['info', 'Fora do repasse'], verificado: ['info', 'Verificado']
+};
+// Situações que contam como «falta» (pendência de repasse).
+const FALTA_CONTROLE = new Set(['gerar', 'sem-conferencia', 'conferido', 'sem-cadastro', 'conflito']);
+
+// Nome da unidade no Apolo → código (cadastro de unidades, campo «apolo»).
+function mapaUnidadesApolo(cfg) {
+  const m = new Map();
+  for (const u of cfg.unidades || []) for (const n of u.apolo || []) m.set(norm(n), String(u.cod));
+  return m;
+}
+// O laudo está coberto pela regra V3 do médico? Percentual = todos; valor fixo = só os grupos cadastrados.
+function laudoNaRegraV3(regra, modalidade) {
+  if (!regra || regra.modo !== 'fixo') return true;
+  return (regra.grupos || []).some(g => {
+    if (g.grupo === GRUPO_USG_V3) return modalidade === 'US';
+    const mods = modalidadesDoGrupo(g.grupo);
+    return !mods || mods.includes(modalidade);
+  });
+}
+const grupoDoLaudo = (cfg, unidadeCod, modalidade) => ehUnidadeV3(cfg, unidadeCod) ? 'curitiba' : (modalidade === 'US' ? 'usg' : 'img');
+
+/* laudos: laudos do Apolo; rodadas: todas; chave: competência; sessao: [{prestadorCod, tipo}] dos PDFs carregados;
+ * marcas: {gerado:{k:{por,em}}, dispensado:{k:{motivo,por,em}}}; naoSRA: [{mn, nome, por, em}] (médicos fora da SRA na V3). */
+function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], marcas = {}, naoSRA = [] }) {
+  const mapaUn = mapaUnidadesApolo(cfg), idx = indicePrestadores(cfg), foraSRA = new Set(naoSRA.map(x => x.mn));
+  const unidades = new Map(), semUnidade = new Map();
+  const un = cod => unidades.get(cod) || unidades.set(cod, { cod, nome: unidadePorCod(cfg, cod)?.nome || '', v3: ehUnidadeV3(cfg, cod), grupos: {}, outros: new Map() }).get(cod);
+  const grp = (u, g) => u.grupos[g] || (u.grupos[g] = { grupo: g, itens: new Map() });
+  const item = (G, k, base) => G.itens.get(k) || G.itens.set(k, { k, laudos: 0, foraRegra: new Map(), linhasMV: 0, medicos: new Set(), ...base }).get(k);
+  // 1) Laudos do Apolo.
+  for (const l of laudos || []) {
+    const cod = mapaUn.get(norm(l.unidade));
+    if (!cod) { semUnidade.set(l.unidade, (semUnidade.get(l.unidade) || 0) + 1); continue; }
+    const u = un(cod), g = grupoDoLaudo(cfg, cod, l.modalidade), G = grp(u, g), r = prestadorDoMedico(idx, l.medico);
+    if (r.estado === 'ok') {
+      const p = r.prestador;
+      if (g === 'curitiba' && !p.regras?.v3) { const o = u.outros.get('p' + p.cod) || u.outros.set('p' + p.cod, { nome: p.nomeMV, cod: p.cod, laudos: 0, motivo: 'sem regra V3 no cadastro' }).get('p' + p.cod); o.laudos++; continue; }
+      const it = item(G, `${g}|${cod}|${p.cod}`, { cod: String(p.cod), nome: p.nomeMV, p });
+      it.medicos.add(l.medico);
+      if (g === 'curitiba' && !laudoNaRegraV3(p.regras?.v3regra, l.modalidade)) { const n = NOME_MODALIDADE[l.modalidade] || l.modalidade || 'sem modalidade'; it.foraRegra.set(n, (it.foraRegra.get(n) || 0) + 1); }
+      else it.laudos++;
+    } else {
+      const mn = norm(l.medico);
+      if (!mn) continue;
+      if (g === 'curitiba' && foraSRA.has(mn)) { const o = u.outros.get('m' + mn) || u.outros.set('m' + mn, { nome: l.medico, cod: '', laudos: 0, motivo: 'não é pago pela SRA', marca: naoSRA.find(x => x.mn === mn) }).get('m' + mn); o.laudos++; continue; }
+      const it = item(G, `${g}|${cod}|apolo:${mn}`, { cod: '', nome: l.medico, mn, conflito: r.estado === 'conflito' ? r.candidatos.map(p => p.cod) : null });
+      it.medicos.add(l.medico); it.laudos++;
+    }
+  }
+  // 2) Rodadas de conferência da competência (prestador × unidade × grupo), a mais recente.
+  for (const r of rodadas || []) {
+    if (r.tipo !== 'conferencia' || competenciaDaRodada(r) !== chave || !r.unidadeCod || r.unidadeCod === '*') continue;
+    const cod = String(r.unidadeCod), g = ehUnidadeV3(cfg, cod) ? 'curitiba' : tipoRepasseDaRodada(r), G = grp(un(cod), g);
+    const p = cfg.prestadores.find(x => String(x.cod) === String(r.prestadorCod));
+    const it = item(G, `${g}|${cod}|${r.prestadorCod}`, { cod: String(r.prestadorCod), nome: p?.nomeMV || r.prestadorNome, p });
+    if (!it.rodada || r.em > it.rodada.em) it.rodada = r;
+  }
+  // 3) Situação de cada item.
+  const temSessao = (cod, g) => sessao.some(s => String(s.prestadorCod) === String(cod) && (g === 'curitiba' || s.tipo === g));
+  const resultado = [];
+  for (const u of [...unidades.values()].sort((a, b) => +a.cod - +b.cod)) {
+    const grupos = Object.values(u.grupos).map(G => {
+      const itens = [...G.itens.values()].map(it => {
+        const linhas = it.rodada ? it.rodada.linhas.filter(l => !l.tipoItem || l.tipoItem === 'procedimento').length : 0;
+        let sit;
+        if (it.conflito) sit = 'conflito';
+        else if (!it.cod) sit = 'sem-cadastro';
+        else if (it.p?.naoRealizaRepasse) sit = 'fora';
+        else if (!it.laudos && it.rodada) sit = 'sem-laudo';
+        else if (it.rodada) sit = it.rodada.aceite ? 'aceito' : 'conferido';
+        else if (temSessao(it.cod, G.grupo)) sit = 'sem-conferencia';
+        else sit = 'gerar';
+        const disp = marcas.dispensado?.[it.k];
+        if (disp && (sit === 'sem-laudo' || sit === 'gerar')) sit = sit === 'sem-laudo' ? 'verificado' : 'fora';
+        return { k: it.k, cod: it.cod, nome: it.nome, mn: it.mn || '', medicos: [...it.medicos], laudos: it.laudos, foraRegra: [...it.foraRegra].map(([n, q]) => ({ n, q })),
+          linhasMV: linhas, rodadaId: it.rodada?.id || '', relId: it.rodada?.relId || '', aceite: it.rodada?.aceite || null, regraV3: G.grupo === 'curitiba' ? it.p?.regras?.v3regra || null : null,
+          situacao: sit, gerado: marcas.gerado?.[it.k] || null, dispensado: disp || null, conflito: it.conflito };
+      }).sort((a, b) => (FALTA_CONTROLE.has(b.situacao) - FALTA_CONTROLE.has(a.situacao)) || b.laudos - a.laudos || a.nome.localeCompare(b.nome));
+      const c = s => itens.filter(x => x.situacao === s).length;
+      const resumo = { laudaram: itens.filter(x => x.laudos > 0 && x.situacao !== 'fora').length, aceitos: c('aceito'), conferidos: c('conferido'), semConferencia: c('sem-conferencia'),
+        gerar: c('gerar'), semLaudo: c('sem-laudo'), semCadastro: c('sem-cadastro') + c('conflito'), fora: c('fora'), verificados: c('verificado') };
+      resumo.falta = itens.filter(x => FALTA_CONTROLE.has(x.situacao)).length;
+      return { grupo: G.grupo, itens, resumo };
+    }).sort((a, b) => Object.keys(GRUPOS_CONTROLE).indexOf(a.grupo) - Object.keys(GRUPOS_CONTROLE).indexOf(b.grupo));
+    resultado.push({ cod: u.cod, nome: u.nome, v3: u.v3, grupos, outros: [...u.outros.values()].sort((a, b) => b.laudos - a.laudos) });
+  }
+  return { unidades: resultado, semUnidade: [...semUnidade].map(([nome, laudos]) => ({ nome, laudos })) };
+}
+// Avisos para o Início e o Fechamento: quem laudou e não tem relatório, e relatório sem laudo.
+function avisosControleUnidade(ctl) {
+  const av = [];
+  for (const u of ctl.unidades) for (const G of u.grupos) {
+    const rot = `unidade ${u.cod} (${G.grupo === 'curitiba' ? 'Curitiba' : G.grupo.toUpperCase()})`;
+    const ger = G.itens.filter(x => x.situacao === 'gerar');
+    if (ger.length) av.push({ tipo: 'gerar', unidade: u.cod, grupo: G.grupo, texto: `${ger.length} prestador(es) laudaram na ${rot} e não têm relatório: ${ger.map(x => `${x.cod} ${x.nome}`).join(', ')}` });
+    for (const x of G.itens.filter(y => y.situacao === 'sem-laudo')) av.push({ tipo: 'sem-laudo', unidade: u.cod, grupo: G.grupo, texto: `Relatório sem laudo: ${x.cod} ${x.nome} (${rot}): ${x.linhasMV} linha(s) no MV e nenhum laudo no Apolo` });
+    const sc = G.itens.filter(y => y.situacao === 'sem-cadastro' || y.situacao === 'conflito');
+    if (sc.length) av.push({ tipo: 'sem-cadastro', unidade: u.cod, grupo: G.grupo, texto: `${sc.length} médico(s) do Apolo sem cadastro na ${rot}: ${sc.map(x => x.nome).join(', ')}` });
+  }
+  return av;
+}
+// Planilha «Lista para gerar no MV» (e o resto do que falta), sem dado de paciente.
+function planilhaControleUnidade(ctl, chave) {
+  const linhas = [cabecalho(['Unidade', 'Grupo', 'Cód. prestador', 'Prestador', 'Laudos no Apolo', 'Laudos fora da regra V3', 'Linhas no MV', 'Situação', 'Gerado no MV (marcado)', 'Observação'])];
+  const todas = [cabecalho(linhas[0].map(c => c.v))];
+  for (const u of ctl.unidades) for (const G of u.grupos) for (const x of G.itens) {
+    const row = [`${u.cod} - ${u.nome}`, GRUPOS_CONTROLE[G.grupo], x.cod, x.nome, { v: x.laudos, st: { fmt: 'int' } }, x.foraRegra.map(f => `${f.n}: ${f.q}`).join('; '), { v: x.linhasMV, st: { fmt: 'int' } },
+      SITUACAO_CONTROLE[x.situacao][1], x.gerado ? `${x.gerado.por} · ${String(x.gerado.em).slice(0, 10)}` : '', x.dispensado?.motivo || ''];
+    if (x.situacao === 'gerar') linhas.push(row);
+    todas.push(row);
+  }
+  const larg = [30, 20, 12, 36, 14, 26, 12, 24, 22, 36];
+  return criarXlsx([{ nome: 'Gerar no MV', larguras: larg, linhas, filtro: true, congelar: 1 }, { nome: `Todos ${chave}`, larguras: larg, linhas: todas, filtro: true, congelar: 1 }]);
 }
 
 /* ---- src/engine/60-conferencia.js ---- */
@@ -3457,7 +3599,8 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
       ['NCs da competência', `${ind.ncs.total} · ${ind.ncs.impactam} impactam o pagamento (R$ ${fmtBR(ind.ncs.valor)} nas vindas do MV)`], ['Linhas com decisão (NC ou considerada)', ind.decisoes]]), [],
     ...bloco('USG por unidade', ind.usgPorUnidade), ...bloco('USG por faixa', ind.usgPorFaixa), ...bloco('IMG por unidade', ind.imgPorUnidade), ...bloco('IMG por classe', ind.imgPorClasse),
     ...(ind.cobertura ? bloco(`Cobertura automática por prestador (%) — competência ${fmtBR(ind.cobertura.pct)}%`, ind.cobertura.porPrestador.map(e => [`${e.cod} - ${e.nome} (${e.conferidas} de ${e.total})${e.maiorBloqueio ? ` · maior bloqueio: ${e.maiorBloqueio[0]}` : ''}`, e.pct]), '') : []),
-    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, '')];
+    ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, ''),
+    ...(ind.controleUnidade?.length ? bloco('Prestadores por unidade (laudos × repasse) — avisos', ind.controleUnidade.map(a => [a.texto, '']), '') : [])];
   return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
 }
 
@@ -4190,7 +4333,7 @@ function ligarPlanilhasGuardadas(raiz) {
  * ============================================================ */
 RENDER.inicio = () => {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
-  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}
+  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}${painelControleUnidade()}
   <div class="card">
     <h2>Preparar o repasse</h2>
     <p class="lead">Carregue os arquivos uma vez; depois abra a análise. Nenhuma análise altera o MV: as correções são feitas lá, e a nova extração é conferida aqui em outra rodada.</p>
@@ -4810,6 +4953,138 @@ function ligarQuadroAceite() {
   };
 }
 
+/* ---- src/ui/22-prestadores-unidade.js ---- */
+/* ============================================================
+ * Conferência → «Prestadores por unidade» (SOL-F35)
+ * Quem laudou na planilha de laudos × quem já tem relatório, conferência e aceite, por unidade e grupo.
+ * ============================================================ */
+const CU = { sub: 'conferir', unidade: '', grupo: '', soFalta: true };
+const CHAVE_CONTROLE_UN = 'rm2.controleUnidades', fmtN = n => (+n || 0).toLocaleString('pt-BR');
+const marcasControle = () => { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; return t[S.comp] || (t[S.comp] = { gerado: {}, dispensado: {} }); };
+function gravarMarcasControle(m) { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; t[S.comp] = m; if (!gravarLocal(CHAVE_CONTROLE_UN, t)) avisar('Não foi possível gravar a marca neste navegador.', 'err'); }
+// PDFs da sessão (para «relatório sem conferência»).
+const sessaoControle = () => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao')
+  .map(x => ({ prestadorCod: x.rel.cab.prestadorCod, tipo: tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(r => ({ grupo: r.grupoNome })) }) }));
+const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apolo.laudos, cfg: S.cfg, rodadas: S.rodadas, chave: S.comp, sessao: sessaoControle(), marcas: marcasControle(), naoSRA: S.cfg.medicosNaoSRA || [] }) : null;
+
+const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;
+const ligarAbasConferencia = raiz => raiz.querySelectorAll('[data-cusub]').forEach(b => b.onclick = () => { CU.sub = b.dataset.cusub; RENDER.conferencia(); });
+
+const _renderConferencia = RENDER.conferencia;
+RENDER.conferencia = () => {
+  if (CU.sub === 'unidades') return desenharControleUnidade();
+  _renderConferencia();
+  const p = $('pag-conferencia'); p.insertAdjacentHTML('afterbegin', abasConferencia()); ligarAbasConferencia(p);
+  if (CU.abrir) { const a = CU.abrir; CU.abrir = null; preSelecionarConferencia(a); }
+};
+// «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
+function preSelecionarConferencia(a) {
+  const rel = S.relatorios.find(x => x.id === a.relId) || S.relatorios.find(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
+  if (!rel || !$('cfRel')) return avisar(`O PDF do prestador ${a.cod} não está carregado nesta sessão. Carregue-o no Início para conferir.`, 'warn');
+  $('cfRel').value = rel.id; $('cfRel').dispatchEvent(new Event('change'));
+  if ($('cfUn')) { $('cfUn').value = a.unidade; $('cfUn').dispatchEvent(new Event('change')); }
+  $('cfRel').scrollIntoView({ block: 'center' });
+}
+
+async function desenharControleUnidade() {
+  const pg = $('pag-conferencia');
+  S.rodadas = await dbTodas();
+  if (!S.apolo) { pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade</h2><p class="lead">Carregue a planilha de laudos do Apolo no Início. A lista de quem precisa de repasse sai dela, por unidade.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`; return ligarAbasConferencia(pg); }
+  const ctl = controleAtual(), uns = ctl.unidades.filter(u => u.grupos.some(G => G.itens.length));
+  const gruposDe = u => u.grupos.map(G => G.grupo);
+  if (!uns.some(u => u.cod === CU.unidade)) CU.unidade = uns[0]?.cod || '';
+  const u = uns.find(x => x.cod === CU.unidade);
+  if (u && !gruposDe(u).includes(CU.grupo)) CU.grupo = gruposDe(u)[0];
+  const G = u?.grupos.find(x => x.grupo === CU.grupo);
+  const faltaUn = x => x.grupos.reduce((s, g) => s + g.resumo.falta, 0);
+  const k = (n, t, cor) => `<div class="cu-k"${cor ? ` style="border-color:var(--${cor})"` : ''}><b${cor ? ` style="color:var(--${cor})"` : ''}>${n}</b>${t}</div>`;
+  const r = G?.resumo;
+  const itens = G ? G.itens.filter(x => !CU.soFalta || FALTA_CONTROLE.has(x.situacao) || x.situacao === 'sem-laudo') : [];
+  const cur = G?.grupo === 'curitiba';
+  const regraTxt = rg => !rg ? 'sem regra cadastrada (conta todos)' : rg.modo === 'fixo' ? `valor fixo · ${(rg.grupos || []).map(g => rotuloGrupoV3(g.grupo)).join(', ')}` : 'percentual · todos';
+  const acao = x => {
+    if (x.situacao === 'gerar') return `<button class="sec mini" data-cuger="${esc(x.k)}">${x.gerado ? '↺ desmarcar gerado' : '✓ gerado no MV'}</button> <button class="sec mini" data-cudisp="${esc(x.k)}">Fora do repasse neste mês…</button>`;
+    if (x.situacao === 'sem-cadastro' || x.situacao === 'conflito') return `<button class="sec mini" data-cucad="${esc(x.nome)}" data-n="${x.laudos}">Cadastrar ou vincular…</button>${cur ? ` <button class="sec mini" data-cunsra="${esc(x.nome)}">Não é pago pela SRA</button>` : ''}`;
+    if (x.situacao === 'sem-laudo') return `<button class="sec mini" data-cudisp="${esc(x.k)}">Marcar como verificado…</button>`;
+    if (x.situacao === 'conferido' || x.situacao === 'sem-conferencia' || x.situacao === 'aceito') return `<button class="mini" data-cuabrir="${esc(x.k)}">Abrir conferência</button>`;
+    if ((x.situacao === 'fora' || x.situacao === 'verificado') && x.dispensado) return `<button class="sec mini" data-cuvolta="${esc(x.k)}">Desfazer</button>`;
+    return '';
+  };
+  const sit = x => { const [c, t] = SITUACAO_CONTROLE[x.situacao]; return `<span class="badge ${c}">${t}</span>${x.gerado && x.situacao === 'gerar' ? `<div class="small muted">gerado no MV · ${esc(x.gerado.por)} · ${new Date(x.gerado.em).toLocaleDateString('pt-BR')}</div>` : ''}${x.dispensado ? `<div class="small muted">${esc(x.dispensado.motivo)} · ${esc(x.dispensado.por)}</div>` : ''}${x.situacao === 'conflito' ? `<div class="small muted">nome em dois cadastros: ${x.conflito.map(esc).join(', ')}</div>` : ''}`; };
+  pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade <span class="muted small">planilha de laudos: ${esc(S.apolo.nome)} · competência ${esc(rotuloCompetencia(S.comp))}</span></h2>
+    <p class="lead">Quem laudou (planilha de laudos) × quem já tem relatório, conferência e aceite. USG inclui o Doppler. Em Curitiba, um grupo só, com os médicos V3 e só os exames que a regra V3 de cada um cobre. Só médico, unidade e contagens.</p>
+    <div class="acoes"><label class="small"><input type="checkbox" id="cuSoFalta"${CU.soFalta ? ' checked' : ''}> só o que falta (e avisos)</label><span style="flex:1"></span>
+      <button class="sec" id="cuExp">Exportar lista para gerar no MV (Excel)</button><button class="sec" id="cuImp">Imprimir</button></div>
+    <div class="cu-un" role="tablist">${uns.map(x => `<button class="${x.cod === CU.unidade ? 'on' : ''}" data-cuun="${x.cod}" title="${esc(x.nome)}">Unidade ${esc(x.cod)}<span class="q">${faltaUn(x)}</span></button>`).join('')}</div>
+    ${ctl.semUnidade.length ? `<p class="small badge warn">Unidade do Apolo sem código no cadastro (Bases → Unidades, campo Apolo): ${ctl.semUnidade.map(x => `${esc(x.nome)} (${x.laudos} laudos)`).join(', ')}</p>` : ''}
+    ${u ? `<div class="subabas" role="tablist">${u.grupos.map(g => `<button class="${g.grupo === CU.grupo ? 'on' : ''}" data-cugr="${g.grupo}">${GRUPOS_CONTROLE[g.grupo]} <em>${g.resumo.falta} falta(m)</em></button>`).join('')}</div>
+    <h3>Unidade ${esc(u.cod)} - ${esc(u.nome)} · ${GRUPOS_CONTROLE[G.grupo]}</h3>
+    <div class="cu-res">${k(r.laudaram, cur ? 'médicos V3 laudaram' : 'laudaram')}${k(r.aceitos, 'aceitos', 'ok')}${k(r.conferidos, 'conferidos sem aceite', 'info')}${r.semConferencia ? k(r.semConferencia, 'relatório sem conferência', 'warn') : ''}${k(r.gerar, 'a gerar no MV', 'err')}${r.semLaudo ? k(r.semLaudo, 'relatório sem laudo', 'warn') : ''}${r.semCadastro ? k(r.semCadastro, 'sem cadastro', 'warn') : ''}${r.fora + r.verificados ? k(r.fora + r.verificados, 'fora do repasse / verificados') : ''}</div>
+    <div class="tw"><table class="cu-tab"><thead><tr><th>Cód.</th><th>Prestador</th>${cur ? '<th>Regra V3</th>' : ''}<th class="num">${cur ? 'Laudos que a SRA paga' : 'Laudos no Apolo'}</th>${cur ? '<th class="num">Fora da regra</th>' : ''}<th class="num">Linhas no MV</th><th>Situação</th><th></th></tr></thead><tbody>
+    ${itens.map(x => `<tr class="${FALTA_CONTROLE.has(x.situacao) ? 'cu-falta' : ''}"><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}${x.cod ? '' : ' <span class="muted small">(Apolo)</span>'}</td>${cur ? `<td class="small">${esc(regraTxt(x.regraV3))}</td>` : ''}<td class="num">${fmtN(x.laudos)}</td>${cur ? `<td class="num">${x.foraRegra.length ? `${fmtN(x.foraRegra.reduce((s, f) => s + f.q, 0))}<div class="small muted">${x.foraRegra.map(f => esc(`${f.n}: ${f.q}`)).join(' · ')} (fora da regra)</div>` : '—'}</td>` : ''}<td class="num">${x.rodadaId ? fmtN(x.linhasMV) : '—'}</td><td>${sit(x)}</td><td>${acao(x)}</td></tr>`).join('') || `<tr><td colspan="8" class="muted">Nada faltando neste grupo.${CU.soFalta ? ' Desmarque «só o que falta» para ver todos.' : ''}</td></tr>`}
+    </tbody></table></div>
+    <p class="small muted">«Linhas no MV» vem da última rodada de conferência e serve só de referência rápida; a conferência diz o que bate. «Relatório sem laudo» é aviso, não NC.</p>
+    ${cur && u.outros.length ? `<details class="cu-outros"><summary>Outros médicos na unidade ${esc(u.cod)} — não pagos pela SRA (${u.outros.length} médico(s) · ${fmtN(u.outros.reduce((s, o) => s + o.laudos, 0))} laudos) · só consulta</summary>
+      <ul class="small">${u.outros.map(o => `<li>${esc(o.cod ? o.cod + ' - ' : '')}${esc(o.nome)} · ${fmtN(o.laudos)} laudos · <span class="muted">${esc(o.motivo)}${o.marca ? ` (${esc(o.marca.por)}, ${new Date(o.marca.em).toLocaleDateString('pt-BR')}) <button class="sec mini" data-cusra="${esc(o.marca.mn)}">Desfazer</button>` : ''}</span></li>`).join('')}</ul></details>` : ''}` : '<p class="muted">Nenhum laudo com unidade reconhecida na planilha.</p>'}</div>`;
+  ligarAbasConferencia(pg);
+  const re = () => desenharControleUnidade();
+  pg.querySelectorAll('[data-cuun]').forEach(b => b.onclick = () => { CU.unidade = b.dataset.cuun; CU.grupo = ''; re(); });
+  pg.querySelectorAll('[data-cugr]').forEach(b => b.onclick = () => { CU.grupo = b.dataset.cugr; re(); });
+  $('cuSoFalta').onchange = e => { CU.soFalta = e.target.checked; re(); };
+  $('cuExp').onclick = () => baixarZip(planilhaControleUnidade(ctl, S.comp), `prestadores_por_unidade_comp_${S.comp.slice(5)}-${S.comp.slice(0, 4)}.xlsx`);
+  $('cuImp').onclick = () => imprimirControleUnidade(ctl);
+  const acharItem = kk => G.itens.find(x => x.k === kk);
+  pg.querySelectorAll('[data-cuger]').forEach(b => b.onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const m = marcasControle(); if (m.gerado[b.dataset.cuger]) delete m.gerado[b.dataset.cuger]; else m.gerado[b.dataset.cuger] = { por: op, em: agoraISO() };
+    gravarMarcasControle(m); re();
+  });
+  pg.querySelectorAll('[data-cudisp]').forEach(b => b.onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    const x = acharItem(b.dataset.cudisp), semLaudo = x.situacao === 'sem-laudo';
+    const r2 = await dialogo(semLaudo ? `Relatório sem laudo — ${x.cod} ${x.nome}` : `Fora do repasse neste mês — ${x.cod} ${x.nome}`, `<p class="small">${semLaudo ? 'O aviso some desta competência; o motivo fica registrado.' : 'O prestador sai do que falta só nesta competência; o motivo fica registrado.'}</p><label class="campo">Motivo *<input type="text" name="motivo" placeholder="${semLaudo ? 'ex.: laudos com outro nome no Apolo' : 'ex.: pago por outra empresa'}"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+    if (r2.botao !== 'ok') return;
+    if (!r2.campos.motivo?.trim()) return avisar('Informe o motivo.', 'warn');
+    const m = marcasControle(); m.dispensado[x.k] = { motivo: r2.campos.motivo.trim(), por: op, em: agoraISO() }; gravarMarcasControle(m); re();
+  });
+  pg.querySelectorAll('[data-cuvolta]').forEach(b => b.onclick = () => { const m = marcasControle(); delete m.dispensado[b.dataset.cuvolta]; gravarMarcasControle(m); re(); });
+  pg.querySelectorAll('[data-cucad]').forEach(b => b.onclick = async () => { await cadastrarMedicoApolo(b.dataset.cucad, +b.dataset.n); re(); });
+  pg.querySelectorAll('[data-cunsra]').forEach(b => b.onclick = async () => {
+    const op = await exigirOperador(); if (!op) return;
+    if (!await confirmar('Não é pago pela SRA?', `«${esc(b.dataset.cunsra)}» deixa de aparecer como pendência em Curitiba (ex.: equipe da G.O. Laudos) e vai para «Outros médicos — não pagos pela SRA». Fica no cadastro, com o seu nome.`, 'Confirmar')) return;
+    S.cfg.medicosNaoSRA = (S.cfg.medicosNaoSRA || []).filter(x => x.mn !== norm(b.dataset.cunsra));
+    S.cfg.medicosNaoSRA.push({ mn: norm(b.dataset.cunsra), nome: b.dataset.cunsra, por: op, em: agoraISO() });
+    salvarCfg(`«${b.dataset.cunsra}» marcado como não pago pela SRA (Curitiba).`, 'prestadores'); re();
+  });
+  pg.querySelectorAll('[data-cusra]').forEach(b => b.onclick = () => { S.cfg.medicosNaoSRA = (S.cfg.medicosNaoSRA || []).filter(x => x.mn !== b.dataset.cusra); salvarCfg('Médico volta a ser avaliado em Curitiba.', 'prestadores'); re(); });
+  pg.querySelectorAll('[data-cuabrir]').forEach(b => b.onclick = () => {
+    const x = acharItem(b.dataset.cuabrir); CU.sub = 'conferir'; CU.abrir = { cod: x.cod, relId: x.relId, unidade: u.cod };
+    if (!S.relatorios.length) { CU.abrir = null; return avisar(`Carregue o PDF do prestador ${x.cod} no Início para abrir a conferência.`, 'warn'); }
+    RENDER.conferencia();
+  });
+}
+
+// Impressão: só o que falta, por unidade e grupo (substitui a lista no papel).
+function imprimirControleUnidade(ctl) {
+  const blocos = ctl.unidades.flatMap(u => u.grupos.map(G => ({ u, G, itens: G.itens.filter(x => FALTA_CONTROLE.has(x.situacao) || x.situacao === 'sem-laudo') })).filter(b => b.itens.length));
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Prestadores por unidade ${esc(rotuloCompetencia(S.comp))}</title><style>body{font:12px Arial,sans-serif;margin:16px}h1{font-size:16px}h2{font-size:13px;margin:14px 0 4px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #999;padding:3px 6px;text-align:left}td.n{text-align:right}.cx{width:18px}</style></head><body>
+    <h1>Prestadores por unidade — o que falta · competência ${esc(rotuloCompetencia(S.comp))}</h1><p>Planilha de laudos: ${esc(S.apolo?.nome || '')} · impresso em ${new Date().toLocaleString('pt-BR')}</p>
+    ${blocos.map(b => `<h2>Unidade ${esc(b.u.cod)} - ${esc(b.u.nome)} · ${GRUPOS_CONTROLE[b.G.grupo]}</h2><table><tr><th class="cx">✓</th><th>Cód.</th><th>Prestador</th><th>Laudos</th><th>Situação</th></tr>${b.itens.map(x => `<tr><td class="cx"></td><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}</td><td class="n">${x.laudos}</td><td>${SITUACAO_CONTROLE[x.situacao][1]}</td></tr>`).join('')}</table>`).join('') || '<p>Nada faltando.</p>'}</body></html>`;
+  const w = window.open('', '_blank'); if (!w) return avisar('O navegador bloqueou a janela de impressão.', 'warn');
+  w.document.write(html); w.document.close(); w.focus(); w.print();
+}
+
+// Resumo para o Início: o que falta por unidade e grupo.
+function painelControleUnidade() {
+  const ctl = controleAtual(); if (!ctl) return '';
+  const linhas = ctl.unidades.flatMap(u => u.grupos.filter(G => G.resumo.falta || G.resumo.semLaudo).map(G => ({ u, G })));
+  return `<div class="card"><div class="fx-topo"><h2 style="margin:0">Prestadores por unidade</h2><button class="sec mini" id="btCtlUn">Ver prestadores por unidade</button></div>
+    ${linhas.length ? `<div class="cu-ini">${linhas.map(({ u, G }) => { const r = G.resumo, d = [r.gerar && `${r.gerar} a gerar no MV`, r.semConferencia && `${r.semConferencia} sem conferência`, r.conferidos && `${r.conferidos} sem aceite`, r.semCadastro && `${r.semCadastro} sem cadastro`, r.semLaudo && `${r.semLaudo} aviso(s) de relatório sem laudo`].filter(Boolean).join(' · ');
+      return `<div class="linha-ini"><strong>Unidade ${esc(u.cod)} · ${G.grupo === 'curitiba' ? 'Curitiba' : G.grupo.toUpperCase()}:</strong> ${r.falta ? `faltam ${r.falta}` : 'nada faltando'} <span class="muted small">${d}</span></div>`; }).join('')}</div>`
+      : '<p class="muted">Todos os prestadores que laudaram já têm repasse conferido e aceito.</p>'}</div>`;
+}
+document.addEventListener('click', e => { if (e.target.closest('#btCtlUn')) { CU.sub = 'unidades'; location.hash = 'conferencia'; if (location.hash === '#conferencia') RENDER.conferencia(); } });
+
 /* ---- src/ui/25-fluxo.js ---- */
 /* ============================================================
  * Fluxo mensal: acompanhamento da competência e manutenção do modelo de fluxos
@@ -5309,6 +5584,14 @@ function sugestoesFluxo(comp) {
     const env = docs.filter(d => d.relatorio).length, nf = docs.filter(d => d.nfFinanceiro).length;
     put(`${g}.envio`, conta(null, env, docs.length), `${env} de ${docs.length} relatório(s) e prévia(s) enviados`);
     put(`${g}.nf`, conta(null, nf, docs.length), `${nf} de ${docs.length} NF(s) encaminhadas ao Financeiro`);
+  }
+  // SOL-F35: quem laudou na planilha de laudos × quem já tem relatório (por grupo, todas as unidades).
+  if (S.apolo && comp.chave === S.comp) {
+    const ctl = controleAtual(), soma = (g, f) => ctl.unidades.reduce((s, u) => s + u.grupos.filter(G => G.grupo === g).reduce((t, G) => t + f(G), 0), 0);
+    for (const g of ['usg', 'img', 'curitiba']) {
+      const total = soma(g, G => G.itens.filter(x => x.laudos > 0 && x.situacao !== 'fora' && x.situacao !== 'sem-cadastro' && x.situacao !== 'conflito').length), falta = soma(g, G => G.resumo.gerar);
+      if (total) put(`${g}.gerar`, falta ? 'and' : 'ok', falta ? `faltam ${falta} de ${total} prestador(es) a gerar no MV (Prestadores por unidade)` : `${total} prestador(es) que laudaram já têm relatório`);
+    }
   }
   const corr = (S.rodadas || []).filter(r => r.tipo === 'correcao' && competenciaDaRodada(r) === comp.chave).length;
   if (corr) put('img.processar', 'ok', `${corr} rodada(s) de correção de prestador neste mês`);
@@ -5821,13 +6104,14 @@ RENDER.fechamento = async () => {
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
+    ${avisosFechamentoControle()}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
     <div id="fhCorpo"></div>`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
-  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp) }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
+  $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp), controleUnidade: S.apolo ? avisosControleUnidade(controleAtual()).filter(a => a.tipo !== 'sem-cadastro') : [] }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
@@ -6072,7 +6356,8 @@ const ACOES_DOC = [['relatorio', 'E-mail enviado (relatório e prévia)'], ['nfR
 function fecharMenuSituacao() { const m = $('menuSit'); if (m) m.remove(); }
 document.addEventListener('click', e => { if (!e.target.closest('#menuSit')) fecharMenuSituacao(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuSituacao(); });
-window.addEventListener('scroll', fecharMenuSituacao, true);
+let menuSitEm = 0;   // a rolagem que termina logo depois do clique (rolagem suave) não fecha o menu
+window.addEventListener('scroll', () => { if (Date.now() - menuSitEm > 500) fecharMenuSituacao(); }, true);
 function abrirMenuSituacao(btn, f) {
   fecharMenuSituacao();
   const [modo, cod] = btn.dataset.sit.split('|'), x = listaFech(f, modo).find(y => y.cod === cod); if (!x) return;
@@ -6082,7 +6367,7 @@ function abrirMenuSituacao(btn, f) {
     ${x.manual ? '<button type="button" data-ac="tirar">Tirar a marca «Verificar» (volta ao calculado)</button>' : '<button type="button" data-ac="verificar">Marcar para verificar… <small>pede o motivo</small></button>'}
     <hr>${ACOES_DOC.map(([k, t]) => `<button type="button" data-ac="${k}">${doc[k] ? `✓ ${t} · ${fmtData(paraData(doc[k]))} <small>desfazer</small>` : `${t} <small>grava no Fluxo</small>`}</button>`).join('')}
     <hr><div class="rodape">Situação calculada: ${esc(SITUACAO_FECH[x.situacaoCalculada || x.situacao].nome)}</div>`;
-  document.body.appendChild(m);
+  document.body.appendChild(m); menuSitEm = Date.now();
   const r = btn.getBoundingClientRect(), w = 320;
   m.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left)) + 'px';
   m.style.top = (r.bottom + 4 + m.offsetHeight > window.innerHeight ? Math.max(8, r.top - m.offsetHeight - 4) : r.bottom + 4) + 'px';
@@ -6111,6 +6396,14 @@ async function acaoSituacao(ac, modo, x) {
   }
   RENDER.fechamento();
 }
+
+// SOL-F35: quem laudou e não tem relatório, e relatório sem laudo, no grupo da subaba (não bloqueia o fechamento).
+function avisosFechamentoControle() {
+  if (!S.apolo || !['usg', 'img', 'curitiba'].includes(FH.sub)) return '';
+  const av = avisosControleUnidade(controleAtual()).filter(a => a.grupo === FH.sub && a.tipo !== 'sem-cadastro');
+  return av.length ? `<div class="fh-ctl">${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></div>` : '';
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) CU.sub = 'unidades'; });
 
 /* ---- src/ui/40-equivalencias.js ---- */
 /* ============================================================
@@ -7315,7 +7608,7 @@ function aplicarTema() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3 } };   // usado pelos testes automatizados
 })();
 
 </script>

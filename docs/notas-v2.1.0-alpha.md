@@ -22,6 +22,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 - **Regras compostas v2 (alpha.3):** vários títulos ou palavras por regra, quantidade por código (mamas: Doppler ×2), exceção por convênio (UNIMED: Doppler ×1 nas mamas; punho e tireoide só com o Doppler), busca no cadastro, simulação antes de validar e efetividade real na lista. Na competência 10/2026, as 5 regras levaram a cobertura de 0% para 9,4%.
 - **Fusão de imagem pelo percentual da unidade (alpha.4):** a fusão vale o percentual geral de repasse da unidade onde foi feita (ex.: unidade 1 = 44% do valor faturado). Em Bases → Classes, colunas «Ou % do valor faturado» e «Ou % da unidade».
 
+- **Prestadores por unidade (alpha.5, SOL-F35):** na Conferência, quem laudou na planilha de laudos × quem já tem relatório, conferência e aceite, por unidade (USG com Doppler, IMG e Curitiba pela regra V3). Lista «gerar no MV» em Excel ou impressa, avisos no Início, no Fechamento e no Fluxo.
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

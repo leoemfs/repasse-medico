@@ -91,6 +91,14 @@ function sugestoesFluxo(comp) {
     put(`${g}.envio`, conta(null, env, docs.length), `${env} de ${docs.length} relatório(s) e prévia(s) enviados`);
     put(`${g}.nf`, conta(null, nf, docs.length), `${nf} de ${docs.length} NF(s) encaminhadas ao Financeiro`);
   }
+  // SOL-F35: quem laudou na planilha de laudos × quem já tem relatório (por grupo, todas as unidades).
+  if (S.apolo && comp.chave === S.comp) {
+    const ctl = controleAtual(), soma = (g, f) => ctl.unidades.reduce((s, u) => s + u.grupos.filter(G => G.grupo === g).reduce((t, G) => t + f(G), 0), 0);
+    for (const g of ['usg', 'img', 'curitiba']) {
+      const total = soma(g, G => G.itens.filter(x => x.laudos > 0 && x.situacao !== 'fora' && x.situacao !== 'sem-cadastro' && x.situacao !== 'conflito').length), falta = soma(g, G => G.resumo.gerar);
+      if (total) put(`${g}.gerar`, falta ? 'and' : 'ok', falta ? `faltam ${falta} de ${total} prestador(es) a gerar no MV (Prestadores por unidade)` : `${total} prestador(es) que laudaram já têm relatório`);
+    }
+  }
   const corr = (S.rodadas || []).filter(r => r.tipo === 'correcao' && competenciaDaRodada(r) === comp.chave).length;
   if (corr) put('img.processar', 'ok', `${corr} rodada(s) de correção de prestador neste mês`);
   if (S.nc) {

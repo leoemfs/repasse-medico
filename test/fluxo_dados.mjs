@@ -59,7 +59,7 @@ const sugUSG = await p.textContent('[data-g="usg"] tr[data-t="conf"]');
 ok(/Sugestão: .*Em andamento.*1 de \d+ prestador\(es\) com aceite|Sugestão: .*Concluída/.test(sugUSG), `etapa «Conferência» com status sugerido (${sugUSG.match(/Sugestão:[^C]*/)?.[0]?.trim()})`);
 await p.click('[data-g="usg"] tr[data-t="gerar"] [data-sug]'); await p.waitForTimeout(300);
 const st = await S(() => { const t = window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.gerar; return [t.status, t.historico.at(-1).campo]; });
-ok(st[0] === 'ok' && st[1] === 'sugestão confirmada', 'confirmar a sugestão muda o status e fica no histórico');
+ok(['ok', 'and'].includes(st[0]) && st[1] === 'sugestão confirmada', 'confirmar a sugestão muda o status e fica no histórico');
 await p.screenshot({ path: out + 'fluxo_sugestao.png' });
 await abrirG('classif');
 const cl = await p.textContent('[data-g="classif"]');

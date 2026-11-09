@@ -3,7 +3,7 @@
  * ============================================================ */
 RENDER.inicio = () => {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
-  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}
+  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}${painelControleUnidade()}
   <div class="card">
     <h2>Preparar o repasse</h2>
     <p class="lead">Carregue os arquivos uma vez; depois abra a análise. Nenhuma análise altera o MV: as correções são feitas lá, e a nova extração é conferida aqui em outra rodada.</p>

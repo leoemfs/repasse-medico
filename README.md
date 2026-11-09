@@ -37,6 +37,7 @@ node test/descontos.mjs         # descontos parcelados: parcela automática, ale
 node test/aceite_cobertura.mjs  # aceite na Conferência (F11) e cobertura/validação em lote (F15)
 node test/fluxo_dados.mjs       # candidatos a NC guardados (F17) e Fluxo ligado aos dados (F14, F13, F16)
 node test/compostas.mjs         # regras compostas e por convênio (F5 v2: títulos, palavras, quantidade, exceção por convênio, fusão por %)
+node test/prestadores_unidade.mjs # prestadores por unidade (SOL-F35) com a competência 10/2026 real
 node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
