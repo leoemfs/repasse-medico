@@ -21,7 +21,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
   const sugerida = rel ? (rel.unidadePasta || unidadeSugeridaPeloArquivo(rel.nome)) : '';
   const unSel = ultimo?.relId === relSel ? ultimo.unidadeCod : (sugerida && unidadePorCod(S.cfg, sugerida) ? sugerida : '');
   return `<div class="grid4">
-    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}`]), relSel)}</select></label>
+    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}${r.unidadePasta ? ` · unidade ${r.unidadePasta}${r.grupoPasta ? ' ' + (r.grupoPasta === 'curitiba' ? 'Curitiba' : r.grupoPasta.toUpperCase()) : ''}` : ''}`]), relSel)}</select></label>
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
       <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
@@ -286,3 +286,12 @@ function ligarQuadroAceite() {
     avisar('Aceite desfeito.', 'ok'); desenharConferencia();
   };
 }
+
+// Trocar o relatório no seletor leva junto a unidade dele (da pasta ou do nome do arquivo), para não conferir na unidade do relatório anterior.
+document.addEventListener('change', e => {
+  if (e.target.id !== 'cfRel' && e.target.id !== 'coRel') return;
+  const pre = e.target.id.slice(0, 2), x = S.relatorios.find(r => r.id === e.target.value), un = x ? (x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome)) : '';
+  const sel = $(pre + 'Un'); if (!sel || !un || ![...sel.options].some(o => o.value === un) || sel.value === un) return;
+  sel.value = un; sel.dispatchEvent(new Event('change', { bubbles: true }));
+  const dica = $(pre + 'UnDica'); if (dica) dica.textContent = x.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.';
+}, true);

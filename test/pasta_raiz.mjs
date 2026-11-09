@@ -65,6 +65,14 @@ fs.copyFileSync(d('apolo_09-2026.xlsx'), R + 'Bases de dados/Comp_10-2026/laudos
 await ana.click('#prAtualizar'); await ana.waitForFunction(() => window.__RM.S.relatorios.length === 1 && !!window.__RM.S.apolo, null, { timeout: 120000 }); await ana.waitForTimeout(500);
 const lido = await ana.evaluate(() => { const x = window.__RM.S.relatorios[0]; return { un: x.unidadePasta, gr: x.grupoPasta, n: window.__RM.S.relatorios.length }; });
 ok(lido.n === 1 && lido.un === '1' && lido.gr === 'usg', '«Atualizar da pasta»: lê o PDF da pasta da unidade (unidade 1, USG) e a planilha de laudos; ignora _antigos');
+await ana.goto(html + '#inicio'); await ana.waitForSelector('#lmUn');
+await ana.selectOption('#lmUn', '-'); await ana.waitForTimeout(200);
+const vazio = /0 de 1 relatório/.test(await ana.textContent('#listaMV'));
+await ana.selectOption('#lmUn', '1'); await ana.waitForTimeout(200);
+ok(vazio && /1 de 1 relatório/.test(await ana.textContent('#listaMV')) && /1 · USG \(pasta\)/.test(await ana.textContent('#listaMV')), 'lista de relatórios com filtros (unidade, grupo, finalidade, totais) e a coluna «Unidade · grupo» da pasta');
+await ana.evaluate(() => { window.__RM.S.relatorios[0].grupoPasta = 'img'; }); await ana.selectOption('#lmGrupo', '*'); await ana.waitForTimeout(200);
+ok(/PDF de USG na pasta IMG/.test(await ana.textContent('#listaMV')), 'avisa quando o PDF é de um grupo diferente da pasta onde está (relatório errado na pasta)');
+await ana.evaluate(() => { window.__RM.S.relatorios[0].grupoPasta = 'usg'; });
 await ana.goto(html + '#conferencia'); await ana.waitForSelector('#cfUn');
 ok(await ana.inputValue('#cfUn') === '1' && /Pela pasta da unidade/.test(await ana.textContent('#pag-conferencia')), 'Conferência já vem com a unidade da pasta');
 await ana.goto(html + '#inicio'); await ana.waitForSelector('#prAtualizar');

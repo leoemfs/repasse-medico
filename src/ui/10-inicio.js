@@ -118,17 +118,37 @@ function resumoApolo(a) {
   return `<span class="badge ok">${a.laudos.length.toLocaleString('pt-BR')} laudos</span> <span class="muted small">${esc(a.nome)} · última linha com dados ${a.ultimaLinha} · ${a.segundos.toFixed(1)} s</span>${al.length ? `<div class="small" style="margin-top:6px;color:var(--warn)">Atenção: ${esc(al.join(' · '))}</div>` : ''}${a.ignoradas ? `<div class="small muted">${a.ignoradas} linha(s) vazias ignoradas.</div>` : ''}`;
 }
 
+const LM = { busca: '', grupo: '*', unidade: '*', fin: '*', tot: '*' };
 function desenharListaMV() {
   const c = $('listaMV'); if (!c) return;
   if (!S.relatorios.length) { c.innerHTML = '<p class="muted">Nenhum relatório carregado.</p>'; return; }
-  c.innerHTML = `<div class="tw"><table><thead><tr><th>Arquivo</th><th>Prestador</th><th>Repasse</th><th>Competência</th><th>Produção</th><th>Finalidade</th><th class="n">Linhas</th><th class="n">Vl Repasse</th><th>Totais do PDF</th><th></th></tr></thead><tbody>${S.relatorios.map(x => {
-    const r = x.rel;
-    return `<tr><td>${esc(x.nome)}</td><td>${esc(r.cab.prestadorCod)} - ${esc(r.cab.prestadorNome)}</td><td>${esc(r.cab.repasse)} · ${esc(r.cab.descricao)}</td><td>${esc(r.cab.competencia)}</td><td>${(() => { const d = producaoDoArquivo(x, () => r.regs.map(l => l.data)); return d ? `<span class="${d.mes === producaoEsperada(S.comp) ? '' : 'txt-warn'}">${rotuloMes(d.mes)}</span>` : '—'; })()}</td>
+  // Filtros (busca, grupo, unidade, finalidade, totais). O grupo vem da pasta ou, sem pasta, do próprio relatório.
+  const tipoPdf = x => tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(l => ({ grupo: l.grupoNome })) });
+  const grupoDe = x => x.grupoPasta || (ehUnidadeV3(S.cfg, x.unidadePasta || '') ? 'curitiba' : tipoPdf(x));
+  const unDe = x => x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome) || '';
+  const foraDaPasta = x => x.grupoPasta && x.grupoPasta !== 'curitiba' && tipoPdf(x) !== x.grupoPasta;
+  const uns = [...new Set(S.relatorios.map(unDe).filter(Boolean))].sort((a, b) => +a - +b), q = norm(LM.busca);
+  const vis = S.relatorios.filter(x => (!q || norm(`${x.nome} ${x.rel.cab.prestadorCod} ${x.rel.cab.prestadorNome} ${x.rel.cab.repasse} ${x.rel.cab.descricao}`).includes(q))
+    && (LM.grupo === '*' || grupoDe(x) === LM.grupo) && (LM.unidade === '*' || (LM.unidade === '-' ? !unDe(x) : unDe(x) === LM.unidade))
+    && (LM.fin === '*' || (x.finalidade || finalidadePadrao(x.rel)) === LM.fin) && (LM.tot === '*' || (LM.tot === 'ok' ? x.rel.ok : LM.tot === 'av' ? !x.rel.ok : foraDaPasta(x))));
+  const nFora = S.relatorios.filter(foraDaPasta).length;
+  c.innerHTML = `<div class="filtros lm-filtros">
+      <label class="campo">Buscar<input type="search" id="lmBusca" value="${esc(LM.busca)}" placeholder="prestador, código, arquivo ou repasse"></label>
+      <label class="campo">Grupo<select id="lmGrupo">${opcoes([['*', 'Todos'], ['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba']], LM.grupo)}</select></label>
+      <label class="campo">Unidade<select id="lmUn">${opcoes([['*', 'Todas'], ...uns.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`]), ['-', 'Sem unidade']], LM.unidade)}</select></label>
+      <label class="campo">Finalidade<select id="lmFin">${opcoes([['*', 'Todas'], ['conferencia', 'Conferência'], ['correcao', 'Correção de prestador']], LM.fin)}</select></label>
+      <label class="campo">Totais do PDF<select id="lmTot">${opcoes([['*', 'Todos'], ['ok', 'Conferem'], ['av', 'Com avisos'], ['pasta', `Grupo diferente da pasta (${nFora})`]], LM.tot)}</select></label></div>
+    <p class="small muted">${vis.length} de ${S.relatorios.length} relatório(s).${nFora ? ` <span class="badge warn">${nFora} PDF(s) com grupo diferente da pasta</span> — confira se o relatório certo está na pasta.` : ''}</p>
+    <div class="tw lm-tab"><table><thead><tr><th>Arquivo</th><th>Prestador</th><th>Unidade · grupo</th><th>Repasse</th><th>Competência</th><th>Produção</th><th>Finalidade</th><th class="n">Linhas</th><th class="n">Vl Repasse</th><th>Totais do PDF</th><th></th></tr></thead><tbody>${vis.map(x => {
+    const r = x.rel, g = grupoDe(x);
+    return `<tr><td>${esc(x.nome)}</td><td>${esc(r.cab.prestadorCod)} - ${esc(r.cab.prestadorNome)}</td><td>${unDe(x) ? `${esc(unDe(x))} · ` : ''}${g === 'curitiba' ? 'Curitiba' : g.toUpperCase()}${x.unidadePasta ? ' <span class="muted small">(pasta)</span>' : ''}${foraDaPasta(x) ? `<div><span class="badge warn" title="O relatório é de ${tipoPdf(x).toUpperCase()}, mas está na pasta ${x.grupoPasta.toUpperCase()}">PDF de ${tipoPdf(x).toUpperCase()} na pasta ${x.grupoPasta.toUpperCase()}</span></div>` : ''}</td><td>${esc(r.cab.repasse)} · ${esc(r.cab.descricao)}</td><td>${esc(r.cab.competencia)}</td><td>${(() => { const d = producaoDoArquivo(x, () => r.regs.map(l => l.data)); return d ? `<span class="${d.mes === producaoEsperada(S.comp) ? '' : 'txt-warn'}">${rotuloMes(d.mes)}</span>` : '—'; })()}</td>
       <td><select data-fin="${x.id}" aria-label="Finalidade">${opcoes([['conferencia', 'Conferência'], ['correcao', 'Correção de prestador']], x.finalidade || finalidadePadrao(r))}</select></td><td class="n">${r.regs.length}</td><td class="n">${fmtBR(r.totExtraido[0])}</td>
       <td>${r.ok ? '<span class="badge ok">Conferem</span>' : `<span class="badge err" title="${esc(r.avisos.join('\n'))}">${r.avisos.length} aviso(s)</span>`}${r.notas.length ? ` <span class="muted small" title="${esc(r.notas.join('\n'))}">ⓘ ${r.notas.length} nota(s)</span>` : ''}</td>
       <td style="white-space:nowrap"><button class="sec" data-xl="${x.id}">Excel</button> <button class="perigo" data-rm="${x.id}" title="Remover da sessão">✕</button></td></tr>`;
   }).join('')}</tbody></table></div>
   ${S.relatorios.some(x => !x.rel.ok) ? `<ul class="avisos">${S.relatorios.flatMap(x => x.rel.avisos.slice(0, 6).map(a => `<li>${esc(x.nome)}: ${esc(a)}</li>`)).join('')}</ul>` : ''}`;
+  $('lmBusca').oninput = e => { LM.busca = e.target.value; clearTimeout(LM.t); LM.t = setTimeout(() => { desenharListaMV(); const i = $('lmBusca'); i.focus(); i.setSelectionRange(LM.busca.length, LM.busca.length); }, 250); };
+  [['lmGrupo', 'grupo'], ['lmUn', 'unidade'], ['lmFin', 'fin'], ['lmTot', 'tot']].forEach(([id, k]) => { $(id).onchange = e => { LM[k] = e.target.value; desenharListaMV(); }; });
   c.querySelectorAll('[data-xl]').forEach(b => b.onclick = () => { const x = S.relatorios.find(y => y.id === b.dataset.xl); baixarZip(xlsxExtracao(x.rel), `MV_extraido_${nomeSeguro(x.rel.cab.prestadorNome)}_${x.rel.cab.repasse}.xlsx`); });
   c.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { S.relatorios = S.relatorios.filter(y => y.id !== b.dataset.rm); RENDER.inicio(); });
   c.querySelectorAll('[data-fin]').forEach(s => s.onchange = () => { S.relatorios.find(y => y.id === s.dataset.fin).finalidade = s.value; avisar(`Relatório marcado para ${s.value === 'correcao' ? 'a Correção de prestador' : 'a Conferência'}.`, 'ok'); });

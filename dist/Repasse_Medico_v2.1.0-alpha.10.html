@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.9</title>
+<title>Repasse Médico v2.1.0-alpha.10</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -315,13 +315,15 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* Pasta raiz no Início */
 .pr-card.ok{border-left:4px solid var(--ok)}.pr-card.warn{border-left:4px solid var(--warn)}.pr-card.off{border-left:4px solid var(--accent)}
 .pr-st{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+/* Início: filtros da lista de relatórios do MV */
+.lm-filtros{margin-bottom:4px}.lm-tab{max-height:560px;overflow:auto}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.9 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.10 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -372,7 +374,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.9';
+const MOTOR_VERSAO = '2.1.0-alpha.10';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -4704,17 +4706,37 @@ function resumoApolo(a) {
   return `<span class="badge ok">${a.laudos.length.toLocaleString('pt-BR')} laudos</span> <span class="muted small">${esc(a.nome)} · última linha com dados ${a.ultimaLinha} · ${a.segundos.toFixed(1)} s</span>${al.length ? `<div class="small" style="margin-top:6px;color:var(--warn)">Atenção: ${esc(al.join(' · '))}</div>` : ''}${a.ignoradas ? `<div class="small muted">${a.ignoradas} linha(s) vazias ignoradas.</div>` : ''}`;
 }
 
+const LM = { busca: '', grupo: '*', unidade: '*', fin: '*', tot: '*' };
 function desenharListaMV() {
   const c = $('listaMV'); if (!c) return;
   if (!S.relatorios.length) { c.innerHTML = '<p class="muted">Nenhum relatório carregado.</p>'; return; }
-  c.innerHTML = `<div class="tw"><table><thead><tr><th>Arquivo</th><th>Prestador</th><th>Repasse</th><th>Competência</th><th>Produção</th><th>Finalidade</th><th class="n">Linhas</th><th class="n">Vl Repasse</th><th>Totais do PDF</th><th></th></tr></thead><tbody>${S.relatorios.map(x => {
-    const r = x.rel;
-    return `<tr><td>${esc(x.nome)}</td><td>${esc(r.cab.prestadorCod)} - ${esc(r.cab.prestadorNome)}</td><td>${esc(r.cab.repasse)} · ${esc(r.cab.descricao)}</td><td>${esc(r.cab.competencia)}</td><td>${(() => { const d = producaoDoArquivo(x, () => r.regs.map(l => l.data)); return d ? `<span class="${d.mes === producaoEsperada(S.comp) ? '' : 'txt-warn'}">${rotuloMes(d.mes)}</span>` : '—'; })()}</td>
+  // Filtros (busca, grupo, unidade, finalidade, totais). O grupo vem da pasta ou, sem pasta, do próprio relatório.
+  const tipoPdf = x => tipoRepasseDaRodada({ descricao: x.rel.cab.descricao, repasse: x.rel.cab.repasse, linhas: x.rel.regs.map(l => ({ grupo: l.grupoNome })) });
+  const grupoDe = x => x.grupoPasta || (ehUnidadeV3(S.cfg, x.unidadePasta || '') ? 'curitiba' : tipoPdf(x));
+  const unDe = x => x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome) || '';
+  const foraDaPasta = x => x.grupoPasta && x.grupoPasta !== 'curitiba' && tipoPdf(x) !== x.grupoPasta;
+  const uns = [...new Set(S.relatorios.map(unDe).filter(Boolean))].sort((a, b) => +a - +b), q = norm(LM.busca);
+  const vis = S.relatorios.filter(x => (!q || norm(`${x.nome} ${x.rel.cab.prestadorCod} ${x.rel.cab.prestadorNome} ${x.rel.cab.repasse} ${x.rel.cab.descricao}`).includes(q))
+    && (LM.grupo === '*' || grupoDe(x) === LM.grupo) && (LM.unidade === '*' || (LM.unidade === '-' ? !unDe(x) : unDe(x) === LM.unidade))
+    && (LM.fin === '*' || (x.finalidade || finalidadePadrao(x.rel)) === LM.fin) && (LM.tot === '*' || (LM.tot === 'ok' ? x.rel.ok : LM.tot === 'av' ? !x.rel.ok : foraDaPasta(x))));
+  const nFora = S.relatorios.filter(foraDaPasta).length;
+  c.innerHTML = `<div class="filtros lm-filtros">
+      <label class="campo">Buscar<input type="search" id="lmBusca" value="${esc(LM.busca)}" placeholder="prestador, código, arquivo ou repasse"></label>
+      <label class="campo">Grupo<select id="lmGrupo">${opcoes([['*', 'Todos'], ['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba']], LM.grupo)}</select></label>
+      <label class="campo">Unidade<select id="lmUn">${opcoes([['*', 'Todas'], ...uns.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`]), ['-', 'Sem unidade']], LM.unidade)}</select></label>
+      <label class="campo">Finalidade<select id="lmFin">${opcoes([['*', 'Todas'], ['conferencia', 'Conferência'], ['correcao', 'Correção de prestador']], LM.fin)}</select></label>
+      <label class="campo">Totais do PDF<select id="lmTot">${opcoes([['*', 'Todos'], ['ok', 'Conferem'], ['av', 'Com avisos'], ['pasta', `Grupo diferente da pasta (${nFora})`]], LM.tot)}</select></label></div>
+    <p class="small muted">${vis.length} de ${S.relatorios.length} relatório(s).${nFora ? ` <span class="badge warn">${nFora} PDF(s) com grupo diferente da pasta</span> — confira se o relatório certo está na pasta.` : ''}</p>
+    <div class="tw lm-tab"><table><thead><tr><th>Arquivo</th><th>Prestador</th><th>Unidade · grupo</th><th>Repasse</th><th>Competência</th><th>Produção</th><th>Finalidade</th><th class="n">Linhas</th><th class="n">Vl Repasse</th><th>Totais do PDF</th><th></th></tr></thead><tbody>${vis.map(x => {
+    const r = x.rel, g = grupoDe(x);
+    return `<tr><td>${esc(x.nome)}</td><td>${esc(r.cab.prestadorCod)} - ${esc(r.cab.prestadorNome)}</td><td>${unDe(x) ? `${esc(unDe(x))} · ` : ''}${g === 'curitiba' ? 'Curitiba' : g.toUpperCase()}${x.unidadePasta ? ' <span class="muted small">(pasta)</span>' : ''}${foraDaPasta(x) ? `<div><span class="badge warn" title="O relatório é de ${tipoPdf(x).toUpperCase()}, mas está na pasta ${x.grupoPasta.toUpperCase()}">PDF de ${tipoPdf(x).toUpperCase()} na pasta ${x.grupoPasta.toUpperCase()}</span></div>` : ''}</td><td>${esc(r.cab.repasse)} · ${esc(r.cab.descricao)}</td><td>${esc(r.cab.competencia)}</td><td>${(() => { const d = producaoDoArquivo(x, () => r.regs.map(l => l.data)); return d ? `<span class="${d.mes === producaoEsperada(S.comp) ? '' : 'txt-warn'}">${rotuloMes(d.mes)}</span>` : '—'; })()}</td>
       <td><select data-fin="${x.id}" aria-label="Finalidade">${opcoes([['conferencia', 'Conferência'], ['correcao', 'Correção de prestador']], x.finalidade || finalidadePadrao(r))}</select></td><td class="n">${r.regs.length}</td><td class="n">${fmtBR(r.totExtraido[0])}</td>
       <td>${r.ok ? '<span class="badge ok">Conferem</span>' : `<span class="badge err" title="${esc(r.avisos.join('\n'))}">${r.avisos.length} aviso(s)</span>`}${r.notas.length ? ` <span class="muted small" title="${esc(r.notas.join('\n'))}">ⓘ ${r.notas.length} nota(s)</span>` : ''}</td>
       <td style="white-space:nowrap"><button class="sec" data-xl="${x.id}">Excel</button> <button class="perigo" data-rm="${x.id}" title="Remover da sessão">✕</button></td></tr>`;
   }).join('')}</tbody></table></div>
   ${S.relatorios.some(x => !x.rel.ok) ? `<ul class="avisos">${S.relatorios.flatMap(x => x.rel.avisos.slice(0, 6).map(a => `<li>${esc(x.nome)}: ${esc(a)}</li>`)).join('')}</ul>` : ''}`;
+  $('lmBusca').oninput = e => { LM.busca = e.target.value; clearTimeout(LM.t); LM.t = setTimeout(() => { desenharListaMV(); const i = $('lmBusca'); i.focus(); i.setSelectionRange(LM.busca.length, LM.busca.length); }, 250); };
+  [['lmGrupo', 'grupo'], ['lmUn', 'unidade'], ['lmFin', 'fin'], ['lmTot', 'tot']].forEach(([id, k]) => { $(id).onchange = e => { LM[k] = e.target.value; desenharListaMV(); }; });
   c.querySelectorAll('[data-xl]').forEach(b => b.onclick = () => { const x = S.relatorios.find(y => y.id === b.dataset.xl); baixarZip(xlsxExtracao(x.rel), `MV_extraido_${nomeSeguro(x.rel.cab.prestadorNome)}_${x.rel.cab.repasse}.xlsx`); });
   c.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { S.relatorios = S.relatorios.filter(y => y.id !== b.dataset.rm); RENDER.inicio(); });
   c.querySelectorAll('[data-fin]').forEach(s => s.onchange = () => { S.relatorios.find(y => y.id === s.dataset.fin).finalidade = s.value; avisar(`Relatório marcado para ${s.value === 'correcao' ? 'a Correção de prestador' : 'a Conferência'}.`, 'ok'); });
@@ -4943,7 +4965,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
   const sugerida = rel ? (rel.unidadePasta || unidadeSugeridaPeloArquivo(rel.nome)) : '';
   const unSel = ultimo?.relId === relSel ? ultimo.unidadeCod : (sugerida && unidadePorCod(S.cfg, sugerida) ? sugerida : '');
   return `<div class="grid4">
-    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}`]), relSel)}</select></label>
+    <label class="campo">Relatório MV<select id="${prefixo}Rel">${opcoes(rels.map(r => [r.id, `${r.rel.cab.prestadorCod} - ${r.rel.cab.prestadorNome} · ${r.rel.cab.descricao || r.nome}${r.unidadePasta ? ` · unidade ${r.unidadePasta}${r.grupoPasta ? ' ' + (r.grupoPasta === 'curitiba' ? 'Curitiba' : r.grupoPasta.toUpperCase()) : ''}` : ''}`]), relSel)}</select></label>
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
       <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
@@ -5209,6 +5231,15 @@ function ligarQuadroAceite() {
   };
 }
 
+// Trocar o relatório no seletor leva junto a unidade dele (da pasta ou do nome do arquivo), para não conferir na unidade do relatório anterior.
+document.addEventListener('change', e => {
+  if (e.target.id !== 'cfRel' && e.target.id !== 'coRel') return;
+  const pre = e.target.id.slice(0, 2), x = S.relatorios.find(r => r.id === e.target.value), un = x ? (x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome)) : '';
+  const sel = $(pre + 'Un'); if (!sel || !un || ![...sel.options].some(o => o.value === un) || sel.value === un) return;
+  sel.value = un; sel.dispatchEvent(new Event('change', { bubbles: true }));
+  const dica = $(pre + 'UnDica'); if (dica) dica.textContent = x.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.';
+}, true);
+
 /* ---- src/ui/22-prestadores-unidade.js ---- */
 /* ============================================================
  * Conferência → «Prestadores por unidade» (SOL-F35)
@@ -5235,7 +5266,10 @@ RENDER.conferencia = () => {
 };
 // «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
 function preSelecionarConferencia(a) {
-  const rel = S.relatorios.find(x => x.id === a.relId) || S.relatorios.find(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
+  const doPrest = S.relatorios.filter(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
+  // Mesmo prestador com vários PDFs (unidades e grupos diferentes): o da unidade e do grupo da linha, senão o da unidade.
+  const rel = S.relatorios.find(x => x.id === a.relId) || doPrest.find(x => x.unidadePasta === a.unidade && (!a.grupo || a.grupo === 'curitiba' || x.grupoPasta === a.grupo)) || doPrest.find(x => (x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome)) === a.unidade) || (doPrest.length === 1 ? doPrest[0] : null);
+  if (!rel && doPrest.length > 1) return avisar(`O prestador ${a.cod} tem ${doPrest.length} PDFs carregados e nenhum é da unidade ${a.unidade}. Escolha o relatório na Conferência.`, 'warn');
   if (!rel || !$('cfRel')) return avisar(`O PDF do prestador ${a.cod} não está carregado nesta sessão. Carregue-o no Início para conferir.`, 'warn');
   $('cfRel').value = rel.id; $('cfRel').dispatchEvent(new Event('change'));
   if ($('cfUn')) { $('cfUn').value = a.unidade; $('cfUn').dispatchEvent(new Event('change')); }
@@ -5314,7 +5348,7 @@ async function desenharControleUnidade() {
   });
   pg.querySelectorAll('[data-cusra]').forEach(b => b.onclick = () => { S.cfg.medicosNaoSRA = (S.cfg.medicosNaoSRA || []).filter(x => x.mn !== b.dataset.cusra); salvarCfg('Médico volta a ser avaliado em Curitiba.', 'prestadores'); re(); });
   pg.querySelectorAll('[data-cuabrir]').forEach(b => b.onclick = () => {
-    const x = acharItem(b.dataset.cuabrir); CU.sub = 'conferir'; CU.abrir = { cod: x.cod, relId: x.relId, unidade: u.cod };
+    const x = acharItem(b.dataset.cuabrir); CU.sub = 'conferir'; CU.abrir = { cod: x.cod, relId: x.relId, unidade: u.cod, grupo: G.grupo };
     if (!S.relatorios.length) { CU.abrir = null; return avisar(`Carregue o PDF do prestador ${x.cod} no Início para abrir a conferência.`, 'warn'); }
     RENDER.conferencia();
   });

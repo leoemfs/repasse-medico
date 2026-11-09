@@ -23,7 +23,10 @@ RENDER.conferencia = () => {
 };
 // «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
 function preSelecionarConferencia(a) {
-  const rel = S.relatorios.find(x => x.id === a.relId) || S.relatorios.find(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
+  const doPrest = S.relatorios.filter(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
+  // Mesmo prestador com vários PDFs (unidades e grupos diferentes): o da unidade e do grupo da linha, senão o da unidade.
+  const rel = S.relatorios.find(x => x.id === a.relId) || doPrest.find(x => x.unidadePasta === a.unidade && (!a.grupo || a.grupo === 'curitiba' || x.grupoPasta === a.grupo)) || doPrest.find(x => (x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome)) === a.unidade) || (doPrest.length === 1 ? doPrest[0] : null);
+  if (!rel && doPrest.length > 1) return avisar(`O prestador ${a.cod} tem ${doPrest.length} PDFs carregados e nenhum é da unidade ${a.unidade}. Escolha o relatório na Conferência.`, 'warn');
   if (!rel || !$('cfRel')) return avisar(`O PDF do prestador ${a.cod} não está carregado nesta sessão. Carregue-o no Início para conferir.`, 'warn');
   $('cfRel').value = rel.id; $('cfRel').dispatchEvent(new Event('change'));
   if ($('cfUn')) { $('cfUn').value = a.unidade; $('cfUn').dispatchEvent(new Event('change')); }
@@ -102,7 +105,7 @@ async function desenharControleUnidade() {
   });
   pg.querySelectorAll('[data-cusra]').forEach(b => b.onclick = () => { S.cfg.medicosNaoSRA = (S.cfg.medicosNaoSRA || []).filter(x => x.mn !== b.dataset.cusra); salvarCfg('Médico volta a ser avaliado em Curitiba.', 'prestadores'); re(); });
   pg.querySelectorAll('[data-cuabrir]').forEach(b => b.onclick = () => {
-    const x = acharItem(b.dataset.cuabrir); CU.sub = 'conferir'; CU.abrir = { cod: x.cod, relId: x.relId, unidade: u.cod };
+    const x = acharItem(b.dataset.cuabrir); CU.sub = 'conferir'; CU.abrir = { cod: x.cod, relId: x.relId, unidade: u.cod, grupo: G.grupo };
     if (!S.relatorios.length) { CU.abrir = null; return avisar(`Carregue o PDF do prestador ${x.cod} no Início para abrir a conferência.`, 'warn'); }
     RENDER.conferencia();
   });
