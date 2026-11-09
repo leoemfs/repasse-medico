@@ -737,3 +737,14 @@ Como os PDFs do MV só ficam na sessão, «já tem relatório» vale tanto para 
 - **Início:** painel «Prestadores por unidade» com o que falta por unidade e grupo. **Fechamento:** avisos do grupo da subaba (quem laudou e não tem relatório; relatório sem laudo), sem bloquear, e o mesmo bloco na exportação de indicadores. **Fluxo (F16):** sugestão nas etapas «Gerar … no MV» de USG, IMG e Curitiba.
 - As marcas da competência ficam neste navegador (`rm2.controleUnidades`), sem dado de paciente.
 - **Teste com a competência 10/2026 real** (`test/prestadores_unidade.mjs`): todo laudo da planilha cai em exatamente um prestador da sua unidade e grupo; unidade 17 · USG: 22 médicos laudaram; com o PDF e a conferência do prestador 15, a situação passa a «Conferido» e, com o aceite, a «Aceito». Na unidade 5, 7 médicos do Apolo aparecem «sem cadastro» na base de teste (entre eles o Dr. Ian, que precisa estar ligado ao código dele no MV).
+
+## SOL-F36 — Fluxo mensal sincronizado pela pasta da rede e divisão das unidades — prévia enviada (09/11/2026)
+Pedido: «Uso junto de outro colaborador; dá para conectar o Fluxo mensal e sincronizar? Rede da empresa, os dois usam Edge, só o Fluxo por enquanto. Preciso saber se ele está fazendo a unidade 1 e eu faço outra.»
+- **Sincronização:** um arquivo por competência (`fluxo_comp_MM-AAAA.json`) numa pasta da rede escolhida uma vez em cada computador (File System Access do Edge; «permitir sempre»). Com o Fluxo aberto: confere o arquivo a cada 30 s e grava logo depois de cada mudança. Sem acesso à pasta: barra amarela, mudanças ficam no navegador e vão quando voltar.
+- **Mescla por etapa:** mudanças em etapas diferentes se juntam sozinhas; a mesma etapa alterada pelos dois desde a última sincronização pede escolha («ficar com a minha / com a da outra pessoa»), e as duas versões ficam no histórico.
+- **Divisão do trabalho:** quadro unidade × grupo (USG, IMG, Curitiba) com «Assumir», «Liberar» e «Concluída» (sugerida quando tudo tem aceite, confirmada por clique). O «faltam» de cada unidade é o resumo de Prestadores por unidade (SOL-F35) gravado na pasta por quem está com ela, porque conferências e aceites ficam no navegador de quem fez.
+- **Aviso, sem bloqueio:** ao escolher na Conferência ou em Prestadores por unidade uma unidade assumida por outra pessoa, «A unidade 1 · USG está com Ana desde 08:55» com «Continuar mesmo assim» (fica registrado) ou «Escolher outra unidade».
+- **Últimas mudanças:** resumo do dia (quem mudou o quê e quando).
+- **Vai para a pasta:** só o Fluxo mensal (etapas, status, datas, anotações, controle documental e quem assumiu cada unidade). Nada de paciente, PDF ou planilha.
+- **Fica para depois:** Bases, Equivalências, NCs e conferências continuam por navegador. O Fechamento da competência inteira continua vendo só os aceites de quem o abre; juntar as conferências dos dois é uma etapa seguinte.
+- Tamanho estimado: M.
