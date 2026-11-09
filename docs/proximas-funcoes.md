@@ -863,3 +863,10 @@ Pedido: «essa tela também está muito confusa, preciso que seja mais fácil de
 - **Como vai funcionar:** a regra em português, atualizada enquanto se preenche.
 - **Mais opções** (recolhido): nome (preenchido com o 1º título), unidade, justificativa. Saem «nome curto» (vem da descrição do MV, sem cortar palavra), «alternativas na mesma posição» e as três caixas fixas de procedimento.
 - Validação: «um destes» com um item e 2+ códigos é válido; Enter numa busca não fecha a tela. Descrição do código: catálogo das equivalências, catálogo TUSS geral ou o nome escolhido na busca.
+
+## Conferência: tornar a regra alternante e «Só no laudo» como correção de prestador (09/11/2026, v2.1.0-alpha.17)
+Pedido (print da decisão «Composição incompleta: ULTRASSONOGRAFIA DO ESCROTO»): «quero que seja um alternante» e «casos que só têm no laudo e não no MV podem indicar correção de prestador, que deve ser apontado assim como NC».
+- **Composição incompleta** de regra «juntos» com 2+ códigos: botão «Tornar a regra alternante (um ou outro) e conferir de novo» na própria decisão (mostra hoje × fica, pede justificativa, mantém o status, grava no histórico da regra).
+- **Só no laudo**, separado pelo Power BI quando carregado: «Lançados para outro prestador (Power BI): correção de prestador» (botão «Apontar correção de prestador» → NC «Prestador incorreto», com o prestador lançado pelo Power BI, o prestador certo = o do relatório, conta e atendimento) · «Só no laudo — sem lançamento / conta aberta / sem remessa / lançado depois» (Registrar NC com a natureza sugerida pelo Power BI; «É correção de prestador…» também disponível) · «Lançados no relatório do médico do laudo». Sem Power BI: uma decisão só com «Apontar correção de prestador…» e «Registrar NC (não lançado)».
+- A frase do resultado diz «N laudo(s) sem lançamento para apontar (correção de prestador ou NC)».
+- Teste com dados reais (`test/conferencia_causas.mjs`, com o Power BI de 10/2026): o «Só no laudo» do prestador 15 na unidade 17 veio como lançado para outro prestador → correção de prestador.

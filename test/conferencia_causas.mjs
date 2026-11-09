@@ -22,6 +22,7 @@ await p.waitForFunction(() => window.__RM.S.eq.itens.length > 900, null, { timeo
 await p.evaluate(() => { const { S, t } = window.__RM; t.alterarStatusEq(S.eq, S.eq.itens.filter(e => e.confianca === 'Alta').map(e => e.id), 'validada', 'Teste Causas', 'confiança alta', '2026-10'); });
 await p.goto(html + '#inicio'); await p.setInputFiles('#inMV', pasta + 'MV_USG_15_un17.pdf'); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 120000 });
 await p.setInputFiles('#inApolo', pasta + 'APOLO_10-2026_ref_09-2026.xlsx'); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 300000 });
+await p.setInputFiles('#inPBI', pasta + 'POWERBI_10-2026_ref_09-2026.xlsx'); await p.waitForFunction(() => !!window.__RM.S.pbi, null, { timeout: 300000 });
 while (await p.isVisible('#dlg[open]')) await okDlg();
 await p.goto(html + '#conferencia'); await p.waitForSelector('#cfRodar'); await p.selectOption('#cfUn', '17'); await p.waitForTimeout(150);
 if (!(await p.$eval('#cfMed option[value="@prest"]', o => !o.disabled))) await p.selectOption('#cfMed', '*');
@@ -37,6 +38,12 @@ const grupos = causas.filter(c => !/Só no laudo/.test(c.t)), ordenado = grupos.
 ok(causas.length > 0 && ordenado, `«O que falta decidir»: ${causas.length} decisão(ões), da que resolve mais linhas para a que resolve menos`);
 const soma = await p.evaluate(() => { const { S } = window.__RM, res = S.conf.res; return res.linhas.filter(x => !x.decisao && x.status !== 'conferido' && x.status !== 'nao-procedimental').length; });
 ok(causas.reduce((s, c) => s + c.n, 0) === soma, `cada linha pendente está em exatamente uma decisão (${soma} linhas)`);
+// «Só no laudo» com o Power BI: separa correção de prestador e NC; apontar correção vira NC «Prestador incorreto».
+const sl = causas.map(c => c.t).filter(t => /Só no laudo|outro prestador|outro relatório/i.test(t));
+info(`«Só no laudo» separados: ${sl.join(' | ') || '(nenhum)'}`);
+ok(!sl.includes('Laudos sem lançamento neste relatório (Só no laudo)'), 'com o Power BI, os «Só no laudo» vêm separados pelo que aconteceu (outro prestador, sem lançamento, conta aberta…)');
+const btCp = p.locator('#cfCausas [data-cza="corrprest"]').first();
+if (await btCp.count()) { await btCp.click(); await p.waitForSelector('#dlg[open]'); ok(/Prestador incorreto/.test(await p.textContent('#dlgCorpo')), '«Apontar correção de prestador» abre o registro como NC «Prestador incorreto»'); await okDlg(''); }
 await p.screenshot({ path: out + 'conferencia_causas.png', fullPage: false });
 await p.locator('#cfCausas').screenshot({ path: out + 'conferencia_causas_lista.png' });
 // Ver as linhas de uma decisão.

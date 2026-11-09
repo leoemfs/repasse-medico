@@ -13,9 +13,13 @@ function botoesCausa(c, n) {
     case 'eq-conflito': return b('equivalencias', 'Resolver em Equivalências', false) + ver;
     case 'convenio': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(mesmo convênio)`, false) + b('nc', 'Registrar NC') + ver;
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
-    case 'composta-falta': return b('nc', 'Registrar NC do que falta', false) + b('aceitar', 'Considerar no repasse') + ver;
+    case 'composta-falta': { const r0 = (S.eq.compostas || []).find(x => x.id === c.regraId), alt = r0 && modoComposta(r0) === 'juntos' && regraComposta(r0).itens.flatMap(it => it.codigos).length > 1;
+      return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Considerar no repasse') + ver; }
+    case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + ver;
+    case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + ver;
+    case 'sl-outro-relatorio': return ver + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
     case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo estudo (incluir na regra)', false) + b('nc', 'Não é → NC') + ver;
-    case 'so-laudo': return b('ncs', 'Ir para os candidatos a NC', false) + ver;
+    case 'so-laudo': return b('corrprest', 'Apontar correção de prestador…') + b('nc', 'Registrar NC (não lançado)') + b('ncs', 'Candidatos a NC') + ver;
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
     case 'nome-semelhante': return b('aceitar', 'É o mesmo paciente', false) + b('nc', 'Não é → NC') + ver;
@@ -91,11 +95,38 @@ function ligarCausas(raiz, CZ, res, ctx) {
       (regra.historico ||= []).push({ em: agoraISO(), por: op, de: regra.status, para: regra.status, motivo: `laudo do mesmo estudo: «${c.titulo}»`, competencia: S.comp });
       S.eq.revisao++; S.eq.atualizadoEm = agoraISO(); salvarEq('Título incluído na regra composta. Conferindo de novo…'); await executarConferencia(); return;
     }
-    if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => candidatoDaLinhaConferencia(res.linhas[i], ctx, S.cfg)));
+    if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => { const x = res.linhas[i], cd = candidatoDaLinhaConferencia(x, ctx, S.cfg); const nat = x.pbi && SITUACAO_PBI[x.pbi.situacao]?.natureza; if (nat && nat !== 'prestador-incorreto') { cd.natureza = nat; cd.categoria = categoriaSugerida(cd.campos, nat); cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria }); } return cd; }));
+    if (ac === 'corrprest') ok = await abrirRegistroNC(c.linhas.map(i => candidatoCorrecaoPrestador(res.linhas[i], ctx)));
+    if (ac === 'alternante') { await tornarAlternante(c.regraId); return; }
     if (ac === 'aceitar') {
       const sug = c.tipo === 'convenio' ? `Mesmo convênio escrito de outro jeito: MV «${c.mv}» × laudo «${c.laudo}»` : c.tipo === 'data' ? 'Data do laudo dentro do esperado para o atendimento' : c.tipo === 'nome-semelhante' ? 'Mesmo paciente: nome escrito de outro jeito' : c.tipo === 'repetida' ? 'As duas linhas estão certas (dois exames)' : '';
       ok = await considerarLinhas(res, c.linhas, c.rotulo, sug);
     }
     if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
+}
+
+// «Só no laudo» que é correção de prestador: o laudo é deste médico, mas o lançamento foi para outro prestador
+// (o genérico, por exemplo). Vira NC «Prestador incorreto», com o prestador lançado (Power BI, quando houver) e o certo.
+function candidatoCorrecaoPrestador(x, ctx) {
+  const cd = candidatoDaLinhaConferencia(x, ctx, S.cfg, 'so-laudo'), p = x.pbi || {};
+  cd.natureza = 'prestador-incorreto'; cd.categoria = 'prestador';
+  Object.assign(cd.campos, { prestadorIncorreto: p.prestador || '', prestadorCorrigido: `${ctx.relatorio.cab.prestadorNome} (${ctx.relatorio.cab.prestadorCod})`, medico: x.l?.medico || cd.campos.medico });
+  if (p.conta) cd.campos.conta = p.conta; if (p.atendimento) cd.campos.idAtendimento = p.atendimento;
+  cd.motivo = `Correção de prestador: laudo de ${x.l?.medico || 'médico do relatório'} sem lançamento no relatório do prestador ${ctx.relatorio.cab.prestadorCod}${p.prestador ? `; lançado para ${p.prestador}` : ''}. ${cd.motivo}`;
+  cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria });
+  return cd;
+}
+// Tornar a regra composta alternante (um ou outro) direto da conferência.
+async function tornarAlternante(regraId) {
+  const op = await exigirOperador(); if (!op) return;
+  const c = (S.eq.compostas || []).find(x => x.id === regraId); if (!c) return avisar('Regra composta não encontrada.', 'warn');
+  const depois = { ...regraComposta(c), itens: itensNoModo(c, 'ou') };
+  const r = await dialogo(`«${nomeComposta(c)}»: alternante`, `<p class="small"><b>Hoje:</b> ${esc(leituraRegraComposta(c, descTussUI, true))}</p><p class="small"><b>Fica:</b> ${esc(leituraRegraComposta(depois, descTussUI, true))}</p>
+    <p class="small muted">Vale para todos os relatórios; a regra continua ${esc(STATUS_EQ[c.status] || c.status)} e a troca fica no histórico, com o seu nome.</p><label class="campo">Justificativa (obrigatória)<input type="text" name="just" placeholder="ex.: o exame é lançado com um código ou com o outro"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Tornar alternante e conferir de novo']]);
+  if (r.botao !== 'ok') return; if (!r.campos.just?.trim()) return avisar('Informe a justificativa.', 'warn');
+  for (const k of ['titulo', 'codigos', 'porConvenio']) delete c[k];
+  c.itens = depois.itens; c.titulos = depois.titulos; c.nome = c.nome || depois.nome;
+  (c.historico ||= []).push({ em: agoraISO(), por: op, de: c.status, para: c.status, motivo: `trocada para «um ou outro» na conferência: ${r.campos.just.trim()}`, competencia: S.comp });
+  S.eq.revisao++; S.eq.atualizadoEm = agoraISO(); salvarEq('Regra alternante. Conferindo de novo…'); await executarConferencia();
 }

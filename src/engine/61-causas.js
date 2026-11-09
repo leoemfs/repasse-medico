@@ -11,7 +11,10 @@ const CAUSAS = {
   data: { acao: 'Aceitar se a data estiver dentro do esperado', titulo: () => 'Data do laudo diferente da data do MV (dentro da tolerância)' },
   'composta-falta': { acao: 'Conferir a composição; registrar NC do que falta', titulo: c => `Composição incompleta: ${c.nome}` },
   'mesmo-estudo': { acao: 'Se for o mesmo exame, incluir o título na regra composta (o laudo deixa de ser «Só no laudo»)', titulo: c => `Laudo do mesmo estudo? «${c.titulo}» no mesmo dia de «${c.laudo}» (regra «${c.nome}»: ${c.cods.join(' + ')})` },
-  'so-laudo': { acao: 'Revisar os candidatos a NC (laudo sem lançamento)', titulo: () => 'Laudos sem lançamento neste relatório (Só no laudo)' },
+  'so-laudo': { acao: 'Pode ser correção de prestador (lançado para outro prestador, ex.: o genérico) ou NC (não lançado). Carregue o Power BI para a ferramenta separar.', titulo: () => 'Laudos sem lançamento neste relatório (Só no laudo)' },
+  'sl-outro-prestador': { acao: 'Apontar a correção de prestador (fica como NC «Prestador incorreto», com o prestador lançado e o certo)', titulo: () => 'Lançados para outro prestador (Power BI): correção de prestador' },
+  'sl-nc': { acao: 'Registrar NC (natureza sugerida pelo Power BI)', titulo: c => `Só no laudo — ${SITUACAO_PBI[c.sit]?.nome || c.sit}` },
+  'sl-outro-relatorio': { acao: 'Conferir no relatório do médico do laudo; NC só se não estiver lá', titulo: () => 'Lançados no relatório do médico do laudo (outro relatório)' },
   hm: { acao: 'Cadastrar a regra de HM em Bases', titulo: () => 'Itens HM — regra pendente' },
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
   repetida: { acao: 'Decidir qual lançamento vale; o outro vira NC (ou as duas estão certas)', titulo: () => 'Linha repetida no MV' },
@@ -31,7 +34,13 @@ function causasDaConferencia(res, compostas = []) {
     if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental') return;
     const m = x.marcadores, p = x.par, r = x.r, l = x.l, base = r && l ? { codigo: r.codigo, desc: r.procDesc || '', titulo: l.titulo } : {};
     if (x.status === 'so-laudo' && x.mesmoEstudoPossivel) return add(`me|${x.mesmoEstudoPossivel.regraId}|${chaveTitulo(l.titulo)}`, { tipo: 'mesmo-estudo', titulo: l.titulo, ...x.mesmoEstudoPossivel }, i);
-    if (x.status === 'so-laudo') return add('so-laudo', { tipo: 'so-laudo' }, i);
+    if (x.status === 'so-laudo') {
+      const sit = x.pbi?.situacao;
+      if (sit === 'outro-prestador') return add('sl|op', { tipo: 'sl-outro-prestador' }, i);
+      if (sit === 'outro-relatorio') return add('sl|or', { tipo: 'sl-outro-relatorio' }, i);
+      if (sit) return add(`sl|${sit}`, { tipo: 'sl-nc', sit }, i);
+      return add('so-laudo', { tipo: 'so-laudo' }, i);
+    }
     if (x.status === 'hm-pendente') return add('hm', { tipo: 'hm' }, i);
     if (x.status === 'classificacao-pendente') return add('classificacao', { tipo: 'classificacao' }, i);
     if (x.status === 'so-faturamento') return uma.push({ k: 'sf|' + i, tipo: 'so-faturamento', linhas: [i] });
@@ -43,14 +52,15 @@ function causasDaConferencia(res, compostas = []) {
     if (m.has('ambiguo')) return uma.push({ k: 'amb|' + i, tipo: 'ambiguo', linhas: [i] });
     if (m.has('outro-medico')) return uma.push({ k: 'med|' + i, tipo: 'outro-medico', linhas: [i] });
     if (m.has('nome-semelhante')) return uma.push({ k: 'nome|' + i, tipo: 'nome-semelhante', linhas: [i] });
-    if (m.has('composta-falta')) return add(`cmp|${x.composta}`, { tipo: 'composta-falta', nome: nomeCp(x.composta) }, i);
+    if (m.has('composta-falta')) return add(`cmp|${x.composta}`, { tipo: 'composta-falta', nome: nomeCp(x.composta), regraId: x.composta }, i);
     if (m.has('convenio-divergente') && r && l) return add(`conv|${norm(r.convenio)}|${norm(l.convenio)}`, { tipo: 'convenio', mv: r.convenio, laudo: l.convenio }, i);
     if (m.has('data-divergente')) return add('data', { tipo: 'data' }, i);
     uma.push({ k: 'out|' + i, tipo: 'outro', linhas: [i] });
   });
   const fim = c => ({ ...c, rotulo: CAUSAS[c.tipo].titulo(c), acao: CAUSAS[c.tipo].acao, vl: r2(c.linhas.reduce((s, i) => s + (+res.linhas[i].r?.vlRepasse || 0), 0)) });
   // Primeiro o que resolve mais linhas; «Só no laudo» por último entre os grupos (vai para as NCs).
-  const grupos = [...g.values()].map(fim).sort((a, b) => (a.tipo === 'so-laudo') - (b.tipo === 'so-laudo') || b.linhas.length - a.linhas.length);
+  const ehSL = c => c.tipo === 'so-laudo' || c.tipo.startsWith('sl-');
+  const grupos = [...g.values()].map(fim).sort((a, b) => ehSL(a) - ehSL(b) || b.linhas.length - a.linhas.length);
   const umaUma = uma.map(fim);
   const mv = res.linhas.filter(x => x.r), conferidas = mv.filter(x => x.status === 'conferido' || x.status === 'nao-procedimental' || x.decisao).length;
   const porLinha = new Map();
