@@ -55,7 +55,9 @@ ok((await p.$$('#rdTab tbody tr.clicavel')).length === 1, '«mostrar todas as co
 await ir('fluxo');
 ok(/Checklist da competência 09\/2026/.test(await p.textContent('#pag-fluxo')) && !(await p.$('#fxAnt')), 'Fluxo mensal segue o seletor do topo (sem ‹ › próprio)');
 await p.reload(); await p.waitForFunction(() => window.__RM && /Competência/.test(document.getElementById('compGlobal')?.textContent || ''));
-ok(/Competência 09\/2026/.test(await seletor()), 'competência escolhida lembrada após recarregar');
+await p.waitForFunction(() => /09\/2026/.test(document.getElementById('compGlobal')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
+const lembrada = await S(() => `S.comp=${window.__RM.S.comp} guardada=${localStorage.getItem('rm2.competencia')} chaves=${Object.keys(localStorage).length} tamanho=${Object.keys(localStorage).reduce((s, k) => s + (localStorage.getItem(k) || '').length, 0)}`);
+ok(/Competência 09\/2026/.test(await seletor()), `competência escolhida lembrada após recarregar (${lembrada})`);
 await p.click('#compProx'); await p.waitForFunction(() => /10\/2026/.test(document.getElementById('compGlobal').textContent));
 
 // 4) Alteração nas bases registrada na competência.

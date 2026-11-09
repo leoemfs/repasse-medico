@@ -764,4 +764,18 @@ Pedido: «equivalências em conflito devem indicar possível equivalência compo
 - **Card de conflitos:** cada título mostra os códigos com a descrição do MV e a sugestão: **juntos** quando o título tem Doppler e um dos códigos é de Doppler; senão **um ou outro**. Botões: «Um ou outro» (cria regra composta validada, com justificativa, com os códigos como alternativas: o laudo sustenta uma linha) · «Juntos (composta)…» (abre o cadastro da regra composta já com o título e os códigos) · «Só um código…» (o antigo desfazer conflito).
 - A regra composta validada vale por cima das relações simples. O título coberto sai da lista e da contagem de conflitos e aparece em «títulos resolvidos por regra composta». As relações validadas continuam no histórico.
 - **Fluxo → subaba «Divisão do trabalho»**, com a barra de sincronização da pasta da rede; o Acompanhamento mantém só a barra.
-- A prévia «regras compostas na lista de pendentes» (agrupar por título, três decisões) continua aguardando aprovação.
+
+## Regras compostas na lista de pendentes (09/11/2026, v2.1.0-alpha.8) — prévia aprovada
+Pedido aprovado: «aprovado a prévia das compostas na lista de pendentes».
+- **Visualização «Agrupar por título (2+ códigos pendentes)»** na lista de Equivalências: título, laudos no Apolo, códigos pendentes com caixa de marcação (todos marcados por padrão) e três decisões: «Juntos (composta)…» (abre o cadastro já preenchido), «Um ou outro» (regra validada com justificativa, códigos como alternativas), «Só o marcado» (valida o código marcado e desativa os outros do título com o motivo «outro código escolhido para este título»). 60 títulos por página, mais usados no Apolo primeiro.
+- **Barra da lista:** «Criar regra composta com as selecionadas…» (títulos e códigos das relações marcadas; até 6 códigos).
+- **Novo status «Coberta por regra composta»:** relação pendente cujo título e código já estão numa regra composta validada sai de Pendentes (com histórico); se a regra deixar de valer (pendente, desativada, removida), volta a pendente. Vale também para as regras já existentes. Filtro de status «Cobertas por regra composta» e contagem no topo.
+
+- **Teste `competencia.mjs` intermitente (ambiente de teste):** na etapa «competência lembrada após recarregar», o navegador de teste às vezes recarrega o arquivo local com o armazenamento vazio (de 5 chaves sobram 3; nenhum código da ferramenta apaga as chaves — conferido com interceptação de removeItem/clear). O teste passou a mostrar o diagnóstico (S.comp, valor guardado, nº de chaves). Na alpha.5 e na alpha.6 passou 8 de 8; na alpha.8, cerca de 2 em 3. No site (https) e no uso normal o valor fica guardado; acompanhar.
+
+## SOL-F37 — Sincronizar as equivalências TUSS pela pasta da rede — A FAZER (pedido de 09/11/2026)
+Pedido: «Outra coisa importante que teremos que sincronizar: equivalências TUSS.»
+- Mesmo modelo do Fluxo (SOL-F36): um arquivo `equivalencias.json` na mesma pasta da rede (não é por competência), mescla de três vias por relação (código × título × escopo) e por regra composta, com conflito só quando os dois mudaram a mesma relação/regra (escolha com o histórico das duas).
+- A validação continua exigindo responsável; o histórico de cada relação mostra quem validou em qual computador/navegador.
+- Barra de sincronização também em Equivalências. O que muda uma relação passa a valer para o outro na próxima conferência (as rodadas já feitas não mudam).
+- Depois: Bases (cadastro de prestadores, aliases, regras) pelo mesmo caminho.

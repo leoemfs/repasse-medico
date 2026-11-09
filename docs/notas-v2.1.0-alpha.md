@@ -28,6 +28,8 @@ Esta versão fecha o ciclo da 2.0: a ferramenta passa a ligar as telas entre si,
 
 - **Conflitos viram regra composta (alpha.7):** no card de conflitos de Equivalências, «Um ou outro» (ex.: escroto = bolsa escrotal ou órgãos superficiais) ou «Juntos» (título com Doppler = base + Doppler). A Divisão do trabalho virou subaba do Fluxo.
 
+- **Compostas na lista de pendentes (alpha.8):** Equivalências → Visualização «Agrupar por título» com «Juntos», «Um ou outro» e «Só o marcado»; botão «Criar regra composta com as selecionadas»; relações resolvidas por regra validada ficam «Cobertas por regra composta».
+
 ### Não conformidades
 - **Candidatos guardados (F17):** os candidatos a NC e os dispensados não se perdem mais ao recarregar a página. Ficam na competência com a mesma retenção de 60 dias.
 

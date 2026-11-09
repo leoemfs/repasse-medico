@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.7</title>
+<title>Repasse Médico v2.1.0-alpha.8</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -309,13 +309,16 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .dv-aviso{border:1px solid #b89be0;background:#f4eefb;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:8px 0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-cel.outro,:root:not([data-theme="light"]) .dv-aviso{background:#2a2140;border-color:#6b4fa0}:root:not([data-theme="light"]) .dv-cel.outro .dv-quem{color:#cdb6f2}}
 :root[data-theme="dark"] .dv-cel.outro,:root[data-theme="dark"] .dv-aviso{background:#2a2140;border-color:#6b4fa0}
+/* Equivalências: agrupar por título (compostas na lista de pendentes) */
+.cp-bt{background:#5b3d99;border-color:#5b3d99;color:#fff}.cp-bt:disabled{opacity:.5}
+.eq-grupos td{vertical-align:top}.tag-cod{display:flex;gap:6px;align-items:baseline;font-size:12.5px;padding:2px 0}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.7 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.8 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -366,7 +369,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.7';
+const MOTOR_VERSAO = '2.1.0-alpha.8';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1578,7 +1581,7 @@ function textoEmailV3(c) {
  * Cada relação é um par (código TUSS, título) com status, escopo e histórico.
  * Só relação VALIDADA, dentro do escopo e sem conflito sustenta confirmação (RN-193 a RN-196).
  * ============================================================ */
-const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Desativada' };
+const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Desativada', coberta: 'Coberta por regra composta' };
 const TIPOS_EQ = { titulo: 'Validada por título', descricao: 'Validada por descrição/contexto', exata: 'Exata (mesmo código)' };
 
 // Chave de título: normalizado, com sufixo administrativo final -OP/-HM opcional.
@@ -1814,6 +1817,29 @@ function resolverConflito(base, chaveT, codigoManter, responsavel, justificativa
   if (!doTitulo.some(e => e.codigo === codigoManter)) throw new Error(`O código ${codigoManter} não está validado para este título.`);
   const ids = doTitulo.filter(e => e.codigo !== codigoManter).map(e => e.id);
   return alterarStatusEq(base, ids, 'pendente', responsavel, `Conflito desfeito: mantido o código ${codigoManter}. ${justificativa.trim()}`, competencia);
+}
+
+/* Relações pendentes resolvidas por regra composta validada (mesmo título e código da regra) saem de «Pendentes»
+ * e ficam «Cobertas por regra composta»; se a regra deixar de valer, voltam a pendente. Devolve o nº de mudanças. */
+function aplicarCobertas(base, operador = '', competencia = '') {
+  const regras = (base.compostas || []).map(regraComposta), porId = new Map(regras.map(r => [r.id, r]));
+  const valida = regras.filter(r => r.status === 'validada');
+  const cobre = (r, e) => compostaCasaTitulo(r, e.titulo) > 0 && r.itens.some(it => (it.codigos || []).includes(e.codigo)) && escopoCobre(r.escopo, e.escopo?.unidade === '*' ? '' : e.escopo?.unidade, e.escopo?.modalidade === '*' ? '' : e.escopo?.modalidade);
+  let n = 0;
+  for (const e of base.itens || []) {
+    if (e.status === 'pendente') {
+      const r = valida.find(x => cobre(x, e)); if (!r) continue;
+      e.historico.push({ em: agoraISO(), por: operador || r.responsavel || '', de: 'pendente', para: 'coberta', motivo: `coberta pela regra composta «${nomeComposta(r)}»`, competencia });
+      e.status = 'coberta'; e.cobertaPor = r.id; n++;
+    } else if (e.status === 'coberta') {
+      const r = porId.get(e.cobertaPor);
+      if (r && r.status === 'validada' && cobre(r, e)) continue;
+      e.historico.push({ em: agoraISO(), por: operador || '', de: 'coberta', para: 'pendente', motivo: r ? `regra composta «${nomeComposta(r)}» deixou de valer` : 'regra composta removida', competencia });
+      e.status = 'pendente'; delete e.cobertaPor; n++;
+    }
+  }
+  if (n) { base.revisao++; base.atualizadoEm = agoraISO(); }
+  return n;
 }
 
 /* ---- src/engine/52-cobertura.js ---- */
@@ -6791,10 +6817,11 @@ document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) 
  * Equivalências TUSS: revisão, validação em lote, conflitos, importação e exportação
  * ============================================================ */
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
-const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base' };
+const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base', vis: 'lista', gmarcas: new Map() };
 
 RENDER.equivalencias = () => {
   if (FE.sub === 'destrava') return desenharDestrava();
+  if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
   const cpVal = indiceEquivalencias(S.eq).compostas || [], regraDoConf = c => cpVal.find(r => compostaCasaTitulo(r, c.titulo) > 0);
@@ -6807,7 +6834,7 @@ RENDER.equivalencias = () => {
     <p class="lead">Ordem: confiança da análise e, depois, quantidade de laudos com o título no Apolo carregado. Cada relação liga um código TUSS do MV a um TITLE do Apolo. Só relação <strong>validada</strong>, sem conflito, sustenta confirmação automática. Candidatos importados da planilha de análise entram como pendentes; a pontuação/confiança da planilha ordena a revisão, mas não valida nada.</p>
     <div class="grid4">
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
-      <div><span class="badge info">${cont('desativada')}</span> desativadas</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
+      <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqExp">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
@@ -6820,11 +6847,12 @@ RENDER.equivalencias = () => {
   ${cardCompostas()}
   <div class="card"><div class="filtros">
     <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
-    <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas']], FE.status)}</select></label>
+    <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas'], ['coberta', 'Cobertas por regra composta']], FE.status)}</select></label>
+    <label class="campo">Visualização<select id="eqVis">${opcoes([['lista', 'Uma relação por linha'], ['titulo', 'Agrupar por título (2+ códigos pendentes)']], FE.vis)}</select></label>
     <label class="campo">Confiança da análise<select id="eqCf">${opcoes([['*', 'Todas'], ['Alta', 'Alta'], ['Média', 'Média'], ['Baixa', 'Baixa'], ['', 'Sem confiança']], FE.confianca)}</select></label>
     <label class="campo">Ambíguas<select id="eqAm">${opcoes([['*', 'Todas'], ['sim', 'Só ambíguas'], ['nao', 'Sem ambiguidade']], FE.ambiguo)}</select></label></div>
     <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
-      <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><span id="eqInfo" class="muted small"></span></div>
+      <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><button id="eqCmp" class="cp-bt" disabled>Criar regra composta com as selecionadas…</button><span id="eqInfo" class="muted small"></span></div>
     <div id="eqTab" style="margin-top:10px"></div></div>`;
   ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
@@ -6839,7 +6867,8 @@ RENDER.equivalencias = () => {
       && (FE.ambiguo === '*' || (FE.ambiguo === 'sim') === !!e.ambiguo) && (!q || norm(`${e.codigo} ${e.descMV} ${e.titulo}`).includes(q)))
       .sort((a, b) => (ORDEM_CONF[a.confianca] ?? 3) - (ORDEM_CONF[b.confianca] ?? 3) || (usoTitulo.get(chaveTitulo(b.titulo)) || 0) - (usoTitulo.get(chaveTitulo(a.titulo)) || 0) || a.codigo.localeCompare(b.codigo));
   };
-  const info = () => { const n = FE.sel.size; ['eqVal', 'eqPend', 'eqDes'].forEach(id => $(id).disabled = !n); $('eqInfo').textContent = n ? `${n} selecionada(s)` : ''; };
+  const info = () => { const n = FE.sel.size; ['eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => $(id).disabled = !n); $('eqInfo').textContent = n ? `${n} selecionada(s)` : ''; };
+  if (FE.vis === 'titulo') { desenharGruposTitulo(usoTitulo); ligarFiltrosEq(); return; }
   const t = tabela($('eqTab'), {
     porPagina: 100, linhas: filtrar(), colunas: [
       { t: '', html: e => `<input type="checkbox" data-id="${e.id}"${FE.sel.has(e.id) ? ' checked' : ''}>` },
@@ -6854,10 +6883,8 @@ RENDER.equivalencias = () => {
   const ligar = () => $('eqTab').querySelectorAll('input[data-id]').forEach(ch => ch.onchange = () => { ch.checked ? FE.sel.add(ch.dataset.id) : FE.sel.delete(ch.dataset.id); info(); });
   ligar(); new MutationObserver(ligar).observe($('eqTab'), { childList: true });
   const refiltrar = () => { FE.sel.clear(); $('eqTodos').checked = false; t.atualizar(filtrar()); info(); };
-  $('eqBusca').oninput = e => { FE.busca = e.target.value; refiltrar(); };
-  $('eqSt').onchange = e => { FE.status = e.target.value; refiltrar(); };
-  $('eqCf').onchange = e => { FE.confianca = e.target.value; refiltrar(); };
-  $('eqAm').onchange = e => { FE.ambiguo = e.target.value; refiltrar(); };
+  ligarFiltrosEq(refiltrar);
+  $('eqCmp').onclick = () => compostaDasSelecionadas();
   $('eqTodos').onchange = e => { FE.sel.clear(); if (e.target.checked) filtrar().forEach(x => FE.sel.add(x.id)); t.atualizar(filtrar()); info(); };
   const mudar = async (status, rotulo) => {
     const op = await exigirOperador(); if (!op) return;
@@ -6925,6 +6952,71 @@ async function conflitoUmOuOutro(c) {
   S.eq.compostas = S.eq.compostas || []; S.eq.compostas.push(nova);
   alterarStatusComposta(S.eq, nova.id, 'validada', op, r.campos.just.trim(), S.comp);
   salvarEq(`Regra composta «${nova.nome}» validada: o conflito deixa de travar a conferência.`); RENDER.equivalencias();
+}
+
+// Filtros da lista (nas duas visualizações). Sem refiltrar (visualização por título), redesenha a página.
+function ligarFiltrosEq(refiltrar) {
+  const re = refiltrar || (() => RENDER.equivalencias());
+  $('eqBusca').oninput = e => { FE.busca = e.target.value; if (refiltrar) re(); else { clearTimeout(FE.tBusca); FE.tBusca = setTimeout(() => { RENDER.equivalencias(); $('eqBusca').focus(); $('eqBusca').setSelectionRange(FE.busca.length, FE.busca.length); }, 350); } };
+  $('eqSt').onchange = e => { FE.status = e.target.value; re(); };
+  $('eqCf').onchange = e => { FE.confianca = e.target.value; re(); };
+  $('eqAm').onchange = e => { FE.ambiguo = e.target.value; re(); };
+  $('eqVis').onchange = e => { FE.vis = e.target.value; FE.sel.clear(); RENDER.equivalencias(); };
+  if (!refiltrar) ['eqTodos', 'eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => { const el = $(id); if (el) (el.closest('label') || el).style.display = 'none'; });
+}
+const rotuloCurto = d => String(d || '').replace(/\s*-\s*OP$/, '').slice(0, 40);
+// «Criar regra composta com as selecionadas»: abre o cadastro com os títulos e os códigos marcados.
+function compostaDasSelecionadas() {
+  const sel = S.eq.itens.filter(e => FE.sel.has(e.id)); if (!sel.length) return;
+  const titulos = [...new Set(sel.map(e => e.titulo))], cods = [...new Map(sel.map(e => [e.codigo, e])).values()];
+  if (cods.length > MAX_ITENS_CP) avisar(`São ${cods.length} códigos; a regra comporta ${MAX_ITENS_CP}. Os demais ficam de fora — ajuste no cadastro.`, 'warn');
+  editarComposta(null, novaComposta({ nome: titulos[0].slice(0, 60), titulos, itens: cods.slice(0, MAX_ITENS_CP).map(e => ({ rotulo: rotuloCurto(e.descMV) || e.codigo, codigos: [e.codigo], qtd: 1, excecoes: [] })) }));
+}
+// Visualização por título: só títulos com 2+ códigos pendentes; três decisões por título.
+function desenharGruposTitulo(usoTitulo) {
+  const q = norm(FE.busca), grupos = new Map();
+  for (const e of S.eq.itens) {
+    if (e.status !== 'pendente' || (q && !norm(`${e.codigo} ${e.descMV} ${e.titulo}`).includes(q))) continue;
+    const k = chaveTitulo(e.titulo), g = grupos.get(k) || grupos.set(k, { k, titulo: e.titulo, rel: [] }).get(k); g.rel.push(e);
+  }
+  const lista = [...grupos.values()].map(g => ({ ...g, cods: [...new Map(g.rel.map(e => [e.codigo, e])).values()] })).filter(g => g.cods.length > 1)
+    .sort((a, b) => (usoTitulo.get(b.k) || 0) - (usoTitulo.get(a.k) || 0) || a.titulo.localeCompare(b.titulo));
+  const marcados = g => FE.gmarcas.get(g.k) || new Set(g.cods.map(e => e.codigo));
+  const PAG = 60, pag = Math.min(FE.gpag || 0, Math.max(0, Math.ceil(lista.length / PAG) - 1)), vis = lista.slice(pag * PAG, (pag + 1) * PAG);
+  $('eqTab').innerHTML = `<p class="small muted">${lista.length} título(s) com 2 ou mais códigos pendentes. Na maioria é «um código <i>ou</i> outro» (ex.: mamografia digital ou convencional); alguns são «um <i>e</i> outro» (ex.: Doppler de mamas = USG mamas + Doppler). Marque os códigos e escolha.</p>
+    <div class="tw"><table class="eq-grupos"><thead><tr><th>TITLE do Apolo</th><th class="num">Laudos</th><th>Códigos pendentes para este título</th><th>Decisão</th></tr></thead><tbody>
+    ${vis.map((g, i) => { const m = marcados(g); return `<tr data-gi="${pag * PAG + i}"><td><b>${esc(g.titulo)}</b></td><td class="num">${S.apolo ? (usoTitulo.get(g.k) || 0) : '—'}</td>
+      <td>${g.cods.map(e => `<label class="tag-cod"><input type="checkbox" data-gcod="${esc(e.codigo)}"${m.has(e.codigo) ? ' checked' : ''}> ${esc(e.codigo)} <span class="muted">${esc(rotuloCurto(e.descMV))}</span>${e.confianca ? ` <span class="muted small">(${esc(e.confianca)})</span>` : ''}</label>`).join('')}</td>
+      <td><div class="acoes" style="margin:0"><button class="cp-bt mini" data-gac="juntos">Juntos (composta)…</button><button class="sec mini" data-gac="ou">Um ou outro</button><button class="sec mini" data-gac="so">Só o marcado</button></div></td></tr>`; }).join('') || '<tr><td colspan="4" class="muted">Nenhum título com mais de um código pendente.</td></tr>'}
+    </tbody></table></div>
+    ${lista.length > PAG ? `<div class="acoes"><button class="sec mini" data-gpag="-1"${pag ? '' : ' disabled'}>‹ Anterior</button><span class="small muted">${pag * PAG + 1}–${Math.min(lista.length, (pag + 1) * PAG)} de ${lista.length}</span><button class="sec mini" data-gpag="1"${(pag + 1) * PAG < lista.length ? '' : ' disabled'}>Próxima ›</button></div>` : ''}
+    <p class="small muted">«Juntos» abre o cadastro da regra composta já preenchido (quantidade e convênio ali; simule antes de validar). «Um ou outro»: o laudo confere com qualquer um dos marcados (uma linha) — vira regra validada. «Só o marcado»: valida a relação do código marcado; os outros códigos do título são desativados («outro código escolhido para este título»). As relações cobertas por regra validada saem de Pendentes e voltam se a regra for desativada.</p>`;
+  $('eqTab').querySelectorAll('[data-gpag]').forEach(b => b.onclick = () => { FE.gpag = pag + +b.dataset.gpag; desenharGruposTitulo(usoTitulo); });
+  $('eqTab').querySelectorAll('[data-gcod]').forEach(ch => ch.onchange = () => { const g = lista[+ch.closest('tr').dataset.gi], m = new Set(marcados(g)); ch.checked ? m.add(ch.dataset.gcod) : m.delete(ch.dataset.gcod); FE.gmarcas.set(g.k, m); });
+  $('eqTab').querySelectorAll('[data-gac]').forEach(b => b.onclick = () => decidirGrupoTitulo(lista[+b.closest('tr').dataset.gi], [...marcados(lista[+b.closest('tr').dataset.gi])], b.dataset.gac));
+}
+async function decidirGrupoTitulo(g, cods, acao) {
+  const op = await exigirOperador(); if (!op) return;
+  const desc = c => rotuloCurto(g.cods.find(e => e.codigo === c)?.descMV) || c;
+  if (acao === 'juntos') {
+    if (cods.length < 2) return avisar('Marque pelo menos dois códigos para «Juntos».', 'warn');
+    return editarComposta(null, novaComposta({ nome: g.titulo.slice(0, 60), titulos: [g.titulo], itens: cods.slice(0, MAX_ITENS_CP).map(c => ({ rotulo: desc(c), codigos: [c], qtd: 1, excecoes: [] })) }));
+  }
+  if (acao === 'ou') {
+    if (cods.length < 2) return avisar('Marque pelo menos dois códigos para «Um ou outro».', 'warn');
+    const r = await dialogo(`«${g.titulo}»: um código ou outro`, `<p class="small">Cria uma regra composta <b>validada</b> por ${esc(op)}: o título confirma <b>uma</b> linha com qualquer um destes códigos.</p><ul class="small">${cods.map(c => `<li><b>${esc(c)}</b> — ${esc(desc(c))}</li>`).join('')}</ul><label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Criar e validar']]);
+    if (r.botao !== 'ok') return; if (!r.campos.just?.trim()) return avisar('Informe a justificativa.', 'warn');
+    const nova = novaComposta({ nome: `${g.titulo.slice(0, 50)} (um ou outro)`, titulos: [g.titulo], itens: [{ rotulo: 'um dos códigos', codigos: cods, qtd: 1, excecoes: [] }], justificativa: r.campos.just.trim(), origem: `lista de pendentes (${op})` });
+    (S.eq.compostas ||= []).push(nova); alterarStatusComposta(S.eq, nova.id, 'validada', op, r.campos.just.trim(), S.comp);
+    FE.gmarcas.delete(g.k); salvarEq(`Regra «${nova.nome}» validada.`); return RENDER.equivalencias();
+  }
+  if (cods.length !== 1) return avisar('Para «Só o marcado», deixe marcado um código só.', 'warn');
+  const outros = g.rel.filter(e => e.codigo !== cods[0]), este = g.rel.filter(e => e.codigo === cods[0]);
+  const r = await dialogo(`«${g.titulo}» → ${cods[0]}`, `<p class="small">Valida <b>${esc(cods[0])}</b> — ${esc(desc(cods[0]))} para este título (responsável ${esc(op)}). ${outros.length} relação(ões) com outros códigos deste título ficam desativadas.</p><label class="campo">Justificativa (recomendada)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Validar']]);
+  if (r.botao !== 'ok') return;
+  alterarStatusEq(S.eq, este.map(e => e.id), 'validada', op, r.campos.just || '', S.comp);
+  alterarStatusEq(S.eq, outros.map(e => e.id), 'desativada', op, `outro código escolhido para este título (${cods[0]})`, S.comp);
+  FE.gmarcas.delete(g.k); salvarEq(`«${g.titulo}» → ${cods[0]} validada.`); RENDER.equivalencias();
 }
 
 /* ---- src/ui/41-compostas.js ---- */

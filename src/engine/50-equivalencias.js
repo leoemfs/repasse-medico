@@ -3,7 +3,7 @@
  * Cada relação é um par (código TUSS, título) com status, escopo e histórico.
  * Só relação VALIDADA, dentro do escopo e sem conflito sustenta confirmação (RN-193 a RN-196).
  * ============================================================ */
-const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Desativada' };
+const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Desativada', coberta: 'Coberta por regra composta' };
 const TIPOS_EQ = { titulo: 'Validada por título', descricao: 'Validada por descrição/contexto', exata: 'Exata (mesmo código)' };
 
 // Chave de título: normalizado, com sufixo administrativo final -OP/-HM opcional.
@@ -239,4 +239,27 @@ function resolverConflito(base, chaveT, codigoManter, responsavel, justificativa
   if (!doTitulo.some(e => e.codigo === codigoManter)) throw new Error(`O código ${codigoManter} não está validado para este título.`);
   const ids = doTitulo.filter(e => e.codigo !== codigoManter).map(e => e.id);
   return alterarStatusEq(base, ids, 'pendente', responsavel, `Conflito desfeito: mantido o código ${codigoManter}. ${justificativa.trim()}`, competencia);
+}
+
+/* Relações pendentes resolvidas por regra composta validada (mesmo título e código da regra) saem de «Pendentes»
+ * e ficam «Cobertas por regra composta»; se a regra deixar de valer, voltam a pendente. Devolve o nº de mudanças. */
+function aplicarCobertas(base, operador = '', competencia = '') {
+  const regras = (base.compostas || []).map(regraComposta), porId = new Map(regras.map(r => [r.id, r]));
+  const valida = regras.filter(r => r.status === 'validada');
+  const cobre = (r, e) => compostaCasaTitulo(r, e.titulo) > 0 && r.itens.some(it => (it.codigos || []).includes(e.codigo)) && escopoCobre(r.escopo, e.escopo?.unidade === '*' ? '' : e.escopo?.unidade, e.escopo?.modalidade === '*' ? '' : e.escopo?.modalidade);
+  let n = 0;
+  for (const e of base.itens || []) {
+    if (e.status === 'pendente') {
+      const r = valida.find(x => cobre(x, e)); if (!r) continue;
+      e.historico.push({ em: agoraISO(), por: operador || r.responsavel || '', de: 'pendente', para: 'coberta', motivo: `coberta pela regra composta «${nomeComposta(r)}»`, competencia });
+      e.status = 'coberta'; e.cobertaPor = r.id; n++;
+    } else if (e.status === 'coberta') {
+      const r = porId.get(e.cobertaPor);
+      if (r && r.status === 'validada' && cobre(r, e)) continue;
+      e.historico.push({ em: agoraISO(), por: operador || '', de: 'coberta', para: 'pendente', motivo: r ? `regra composta «${nomeComposta(r)}» deixou de valer` : 'regra composta removida', competencia });
+      e.status = 'pendente'; delete e.cobertaPor; n++;
+    }
+  }
+  if (n) { base.revisao++; base.atualizadoEm = agoraISO(); }
+  return n;
 }

@@ -98,6 +98,39 @@ await p.locator('ul.conflitos li:has-text("USG DOPPLER DE BOLSA ESCROTAL") [data
 ok(await p.inputValue('#dlgCorpo [name="cod0"]') === '40901204' && await p.inputValue('#dlgCorpo [name="cod1"]') === '40901386' && /USG DOPPLER DE BOLSA ESCROTAL/.test(await p.inputValue('#dlgCorpo [name="titulos"]')), '«Juntos» abre o cadastro da regra composta já com o título e os dois códigos');
 await p.screenshot({ path: out + 'compostas_conflito_juntos.png' });
 await okDlg('');
+// 6) Lista de pendentes agrupada por título: um ou outro, só o marcado, juntos e o botão na barra.
+await p.evaluate(() => { const { S: E, t } = window.__RM;
+  const mk = (codigo, descMV, titulo) => E.eq.itens.push(t.novaRelacao({ codigo, titulo, descMV, escopo: { unidade: '*', modalidade: '*' }, origem: 'teste' }));
+  mk('40808041', 'MAMOGRAFIA DIGITAL BILATERAL - OP', 'MAMOGRAFIA DIGITAL'); mk('28850308', 'MAMOGRAFIA DIGITAL UNILATERAL - OP', 'MAMOGRAFIA DIGITAL');
+  mk('40901286', 'USG PARTES MOLES', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO'); mk('40901220', 'USG ARTICULAR (POR ARTICULACAO) - OP', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO'); mk('40901211', 'USG EST. SUPERFICIAIS', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO');
+  mk('40901114', 'USG MAMAS - OP', 'DOPPLER MAMAS'); mk('40901386', 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - OP', 'DOPPLER MAMAS'); });
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqVis');
+await p.selectOption('#eqSt', 'pendente'); await p.selectOption('#eqVis', 'titulo'); await p.waitForSelector('table.eq-grupos');
+const gr = await p.$$eval('table.eq-grupos tbody tr', trs => trs.map(tr => tr.cells[0].textContent.trim()));
+ok(!(await p.isVisible('#eqVal')) && gr.includes('MAMOGRAFIA DIGITAL') && gr.includes('ULTRASSONOGRAFIA DO BRAÇO ESQUERDO') && gr.includes('DOPPLER MAMAS'), `«Agrupar por título»: títulos com 2+ códigos pendentes (${gr.join(' · ')})`);
+await p.screenshot({ path: out + 'compostas_lista_titulo.png', fullPage: true });
+await p.locator('table.eq-grupos tr:has-text("MAMOGRAFIA DIGITAL") [data-gac="ou"]').click(); await p.waitForSelector('#dlg[open]');
+await p.fill('#dlgCorpo [name="just"]', 'digital bilateral ou unilateral'); await okDlg('ok');
+const mam = await p.evaluate(() => window.__RM.S.eq.itens.filter(e => e.titulo === 'MAMOGRAFIA DIGITAL').map(e => e.status).join());
+ok(mam === 'coberta,coberta', `«Um ou outro»: regra validada e as duas relações saem de Pendentes («Cobertas por regra composta») (${mam})`);
+await p.selectOption('#eqVis', 'titulo').catch(() => {}); await p.waitForSelector('table.eq-grupos');
+const braco = p.locator('table.eq-grupos tr:has-text("BRAÇO ESQUERDO")');
+for (const c of ['40901286', '40901211']) await braco.locator(`[data-gcod="${c}"]`).uncheck();
+await braco.locator('[data-gac="so"]').click(); await okDlg('ok');
+const br = await p.evaluate(() => Object.fromEntries(window.__RM.S.eq.itens.filter(e => /BRAÇO/.test(e.titulo)).map(e => [e.codigo, e.status])));
+ok(br['40901220'] === 'validada' && br['40901286'] === 'desativada' && br['40901211'] === 'desativada', '«Só o marcado»: valida o código marcado e desativa os outros do título');
+await p.locator('table.eq-grupos tr:has-text("DOPPLER MAMAS") [data-gac="juntos"]').click(); await p.waitForSelector('#dlg[open]');
+ok(await p.inputValue('#dlgCorpo [name="cod0"]') === '40901114' && await p.inputValue('#dlgCorpo [name="cod1"]') === '40901386', '«Juntos» abre o cadastro da regra com os dois códigos do título');
+await okDlg('');
+// Regra desativada: as relações cobertas voltam a pendente.
+await p.evaluate(() => { const { S: E, t } = window.__RM, r = E.eq.compostas.find(c => /MAMOGRAFIA DIGITAL/.test(c.nome)); t.alterarStatusComposta(E.eq, r.id, 'desativada', 'Teste', 'teste'); });
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqVis');
+ok(await p.evaluate(() => window.__RM.S.eq.itens.filter(e => e.titulo === 'MAMOGRAFIA DIGITAL').every(e => e.status === 'pendente')), 'regra desativada: as relações cobertas voltam a pendente');
+// Botão na barra: regra composta com as selecionadas.
+await p.selectOption('#eqVis', 'lista'); await p.waitForSelector('#eqTab input[data-id]'); await p.fill('#eqBusca', 'DOPPLER MAMAS'); await p.waitForTimeout(300);
+await p.check('#eqTodos'); await p.click('#eqCmp'); await p.waitForSelector('#dlg[open]');
+ok(/DOPPLER MAMAS/.test(await p.inputValue('#dlgCorpo [name="titulos"]')) && ['40901114', '40901386'].includes(await p.inputValue('#dlgCorpo [name="cod0"]')), '«Criar regra composta com as selecionadas» abre o cadastro com títulos e códigos marcados');
+await okDlg('');
 // Desativada não vale.
 await p.click('[data-cmpdes]'); await okDlg('').catch(() => {});
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
