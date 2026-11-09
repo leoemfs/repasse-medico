@@ -1,0 +1,32 @@
+# Publica a ferramenta no GitHub Pages só quando uma versão é lançada (tag v2.1.0-alpha.N).
+# O site é a página do dist/ da versão; dados de pacientes nunca vão ao site (tudo roda no navegador).
+name: Publicar versão no GitHub Pages
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Montar o site (versão atual + versões alpha anteriores para baixar)
+        run: node tools/site-pages.mjs site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

@@ -45,6 +45,15 @@ node test/competencia10.mjs     # competência 10/2026 inteira com os arquivos r
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
 ```
 
+## Publicação (GitHub Pages)
+
+A ferramenta fica em **https://leoemfs.github.io/repasse-medico/**, sempre na última versão lançada. Ela roda inteira no navegador: o site só entrega a página, e os arquivos de pacientes nunca saem do computador.
+
+- **Lançar uma versão:** subir `MOTOR_VERSAO`, gerar o `dist/`, commitar e criar a tag com o mesmo número (`git tag -a v2.1.0-alpha.6 -m "..." && git push origin v2.1.0-alpha.6`). A tag dispara `.github/workflows/pages.yml`, que monta o site com `tools/site-pages.mjs`.
+- Commits sem tag não mudam o site, e versões em teste não aparecem nele.
+- **Versões anteriores:** https://leoemfs.github.io/repasse-medico/versoes/ lista só as da linha 2.1.0-alpha, para baixar e abrir do computador.
+- **Dados:** o navegador guarda os dados separados por endereço. Para passar do arquivo local para o site, use Configurações → «Exportar backup» no arquivo e «Restaurar backup» no site.
+
 ## Regras de desenvolvimento
 
 1. Regra de negócio só em `src/engine/`; as telas apenas chamam o motor.
