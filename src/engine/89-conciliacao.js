@@ -15,20 +15,19 @@ const SITUACAO_PBI = {
   'lancado': { nome: 'Lançado (depois da geração do repasse?)', natureza: 'apos-geracao' }
 };
 const contaFechadaPBI = v => /^(S|SIM|Y|YES|TRUE|1|FECHADA)$/i.test(String(v || '').trim());
-// Índice por dia (lançamentos com paciente e data).
-function indicePBIPorDia(pbi) {
-  if (pbi._porDia) return pbi._porDia;
-  const m = new Map();
-  for (const l of pbi.linhas) { if (!l.pn || !l.data) continue; const d = diaSerial(l.data); (m.get(d) || m.set(d, []).get(d)).push(l); }
-  Object.defineProperty(pbi, '_porDia', { value: m, enumerable: false });
-  return m;
+// Índice por dia e primeiro nome (mesmo resultado da varredura completa; ver indiceNomes).
+function indicePBINomes(pbi) {
+  if (pbi._ixNome) return pbi._ixNome;
+  const ix = indiceNomes(pbi.linhas.filter(l => l.pn && l.data), l => diaSerial(l.data), l => l.pn);
+  Object.defineProperty(pbi, '_ixNome', { value: ix, enumerable: false });
+  return ix;
 }
 /* Procura o atendimento do laudo no Power BI.
  * laudo: {pn, dia, titulo, modalidade}; opc: {unidadeCod, tol, prestadorCod, cfg, idxEq} */
 function conciliarLaudo(pbi, laudo, opc) {
   if (!pbi || !laudo?.pn || laudo.dia === null || laudo.dia === undefined) return null;
-  const porDia = indicePBIPorDia(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
-  for (let d = laudo.dia - tol; d <= laudo.dia + tol; d++) for (const l of porDia.get(d) || []) {
+  const ix = indicePBINomes(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
+  for (const l of ix.candidatos(laudo.pn, laudo.dia, tol)) {
     if (opc.unidadeCod && opc.unidadeCod !== '*' && String(l.unidadeCod) !== String(opc.unidadeCod)) continue;
     const nm = nivelNome(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;
     const mods = modalidadesDoGrupo(l.grupo);
