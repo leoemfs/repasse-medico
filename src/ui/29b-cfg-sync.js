@@ -125,16 +125,20 @@ function aplicarPastasConfig() {
  * conformidades), sem passar por Downloads. Sem pasta, sem permissão ou com erro, o arquivo é baixado como antes. */
 const exportarNaPasta = () => !!SY.handle && !SY.legado && S.cfg?.parametros?.exportarNaPasta !== false;
 async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp) {
-  const blob = zipOuBlob instanceof Blob ? zipOuBlob : await zipOuBlob.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
-  if (exportarNaPasta() && await temPermissaoPasta(true)) {
-    try {
-      const dC = await dirCompetencia(chave, true), alvo = { conf: PASTA_CONF, nc: PASTA_NC }[destino] || PASTA_CONF;
-      const d = await subpasta(dC, alvo, true), fh = await d.getFileHandle(nome, { create: true });
-      const w = await fh.createWritable(); await w.write(blob); await w.close();
-      if ((await fh.getFile()).size !== blob.size) throw new Error('o arquivo gravado ficou com tamanho diferente');
-      avisar(`Gravado na pasta: ${nomeCompPasta(chave)} › ${alvo.nome} › ${nome}`, 'ok');
-      return 'pasta';
-    } catch (e) { avisar(`Não foi possível gravar na pasta (${e.message}); o arquivo foi baixado.`, 'warn'); }
-  }
-  baixarBlob(blob, nome); return 'download';
+  // O arquivo é SEMPRE baixado. Com a pasta conectada e o acesso já liberado, também é gravado na pasta da competência.
+  // (Pedir permissão aqui falhava: depois de gerar o Excel o Edge já não considera o clique, e a exportação parava sem aviso.)
+  let blob;
+  try { blob = zipOuBlob instanceof Blob ? zipOuBlob : await zipOuBlob.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' }); }
+  catch (e) { avisar(`Não foi possível gerar o Excel (${e.message}).`, 'err'); return 'erro'; }
+  baixarBlob(blob, nome);
+  if (!exportarNaPasta()) return 'download';
+  try {
+    if (!(await temPermissaoPasta(false))) { avisar(`Excel baixado. Para gravar também na pasta da competência, libere o acesso à pasta (Configurações → Pastas e sincronização).`, 'warn'); return 'download'; }
+    const dC = await dirCompetencia(chave, true), alvo = { conf: PASTA_CONF, nc: PASTA_NC }[destino] || PASTA_CONF;
+    const d = await subpasta(dC, alvo, true), fh = await d.getFileHandle(nome, { create: true });
+    const w = await fh.createWritable(); await w.write(blob); await w.close();
+    if ((await fh.getFile()).size !== blob.size) throw new Error('o arquivo gravado ficou com tamanho diferente');
+    avisar(`Excel baixado e gravado na pasta: ${nomeCompPasta(chave)} › ${alvo.nome} › ${nome}`, 'ok');
+    return 'pasta';
+  } catch (e) { avisar(`Excel baixado, mas não foi gravado na pasta (${e.message}).`, 'warn'); return 'download'; }
 }

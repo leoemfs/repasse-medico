@@ -82,7 +82,10 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
         : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2 && dd === 0) ? 3
           : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2) ? 4
             : (nm === 1 && ['validada', 'pendente', 'conflito'].includes(proc.estado)) ? 5
-              : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 6 : 0;
+              : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 6
+                // Nome só semelhante, mesma data, convênio compatível e procedimento sem equivalência: par PENDENTE (decisão humana),
+                // em vez de duas linhas soltas («Só no faturamento» + «Só no laudo»).
+                : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio) !== false) ? 7 : 0;
       if (!tier) continue;
       b.cands.push({ l, nm, dd, proc, tier, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio) });
     }
@@ -96,7 +99,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
   const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
   const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
-  for (let t = 1; t <= 6; t++) {
+  for (let t = 1; t <= 7; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
