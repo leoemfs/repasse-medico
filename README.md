@@ -53,6 +53,7 @@ node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node
 node test/bench_motor.mjs       # desempenho do motor com 27 mil laudos fictícios e assinatura do resultado (precisa do --harness)
 node test/consolidacao_v3.mjs   # v3.0: armazenamento, configuração entre dois usuários, backup, títulos do Apolo, exportação
 node test/pwa.mjs               # v3.0: site com manifest instalável e aviso de versão nova
+node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com ou sem pasta) e nome sem partícula forma par
 ```
 
 ## Publicação (GitHub Pages)
