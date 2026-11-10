@@ -1,16 +1,31 @@
 // Monta o site do GitHub Pages a partir de publicacao/versoes.json (versões lançadas, a primeira é a atual):
-// index.html = versão atual; versoes/ = as anteriores da linha 2.1.0-alpha, só para baixar
+// index.html = versão atual (com manifest do PWA); versoes/ = as anteriores (2.1.0-alpha e 3.x), só para baixar
 // (abertas no mesmo site, misturariam os dados guardados no navegador).
 import { execSync } from 'child_process';
 import fs from 'fs';
 const saida = process.argv[2] || 'site', sh = c => execSync(c, { encoding: 'utf8', maxBuffer: 64 << 20 });
-const LINHA = /^2\.1\.0-alpha(\.\d+)?$/;   // versões que importam; as anteriores à 2.1.0-alpha não entram
+const LINHA = /^(2\.1\.0-alpha(\.\d+)?|3\.\d+\.\d+(-(alpha|beta|rc)(\.\d+)?)?)$/;   // 2.1.0-alpha e a linha 3.x; as anteriores não entram
 const { versoes } = JSON.parse(fs.readFileSync(new URL('../publicacao/versoes.json', import.meta.url)));
 const lista = versoes.filter(v => LINHA.test(v.versao));
-if (!lista.length) throw new Error('nenhuma versão 2.1.0-alpha em publicacao/versoes.json');
+if (!lista.length) throw new Error('nenhuma versão publicável em publicacao/versoes.json');
 const pagina = v => { const h = sh(`git show ${v.commit}:dist/Repasse_Medico_v${v.versao}.html`); if (!h.includes(`'${v.versao}'`) && !h.includes(v.versao)) throw new Error(`a página do commit ${v.commit} não é a versão ${v.versao}`); return h; };
 fs.rmSync(saida, { recursive: true, force: true }); fs.mkdirSync(saida + '/versoes', { recursive: true });
-fs.writeFileSync(`${saida}/index.html`, pagina(lista[0]));
+/* v3.0 — PWA para o Edge no computador: manifest, ícones e versao.json (aviso de versão nova dentro da ferramenta).
+ * O manifest só entra na página publicada; o HTML aberto pelo arquivo (file://) continua sem dependências.
+ * Sem service worker: a página nunca fica presa numa versão antiga em cache. */
+const atual = lista[0], manifest = {
+  name: 'Repasse Médico', short_name: 'Repasse', description: 'Conferência do repasse médico: MV × Apolo, equivalências TUSS, correção de prestador e fechamento.',
+  id: './', start_url: './', scope: './', display: 'standalone', display_override: ['window-controls-overlay', 'standalone'], orientation: 'any',
+  background_color: '#f3f6fa', theme_color: '#172536', lang: 'pt-BR',
+  icons: [{ src: 'icones/icone-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icones/icone-512.png', sizes: '512x512', type: 'image/png' }, { src: 'icones/icone-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
+};
+fs.mkdirSync(`${saida}/icones`, { recursive: true });
+for (const f of fs.readdirSync(new URL('../publicacao/icones/', import.meta.url))) fs.copyFileSync(new URL(`../publicacao/icones/${f}`, import.meta.url), `${saida}/icones/${f}`);
+fs.writeFileSync(`${saida}/manifest.webmanifest`, JSON.stringify(manifest, null, 1));
+fs.writeFileSync(`${saida}/versao.json`, JSON.stringify({ versao: atual.versao, data: atual.data, commit: atual.commit }));
+const cabecalhoPWA = '<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172536"><link rel="apple-touch-icon" href="icones/icone-192.png">';
+const comPWA = h => h.includes('rel="manifest"') ? h : h.replace('</head>', cabecalhoPWA + '</head>');
+fs.writeFileSync(`${saida}/index.html`, comPWA(pagina(lista[0])));
 for (const v of lista.slice(1)) fs.writeFileSync(`${saida}/versoes/Repasse_Medico_v${v.versao}.html`, pagina(v));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const dataBR = d => d.split('-').reverse().join('/');

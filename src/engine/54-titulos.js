@@ -19,8 +19,10 @@ function situacaoTitulo(idx, titulo, modalidade = '') {
   const comp = (idx.compostas || []).find(c => escopoCobre(c.escopo, '', modalidade) && compostaCasaTitulo(c, titulo) > 0);
   const val = [...new Set(rel.filter(e => e.status === 'validada').map(e => e.codigo))];
   const situacao = comp ? 'composta' : val.length > 1 ? 'conflito' : val.length === 1 ? 'validada' : rel.some(e => e.status === 'pendente' || e.status === 'coberta') ? 'pendente' : 'sem-cadastro';
-  return { situacao, codigos: comp ? codigosDaRegra(comp) : val, composta: comp || null, relacoes: rel };
+  return { situacao, codigos: comp ? codigosDaRegra(comp) : val, composta: comp || null, relacoes: rel, destino: comp ? descreverComposta(comp) : val.join(', ') };
 }
+// «A + B ×2» para «juntos»; «A ou B» para alternativas na mesma posição.
+const descreverComposta = c => regraComposta(c).itens.map(it => `${(it.codigos || []).join(' ou ')}${(+it.qtd || 1) > 1 ? ` ×${it.qtd}` : ''}`).join(' + ');
 /* Títulos distintos da planilha (opcional: só de uma unidade). Exemplos sem nome de paciente. */
 function titulosDoApolo(apolo, eqBase, cfg, { unidade = '*' } = {}) {
   if (!apolo?.laudos) return [];

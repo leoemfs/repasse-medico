@@ -21,7 +21,7 @@ function montarBackup(partes, meta = {}) {
   const b = { schema: SCHEMA_BACKUP, versaoSchema: VERSAO_BACKUP, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, ...meta, partes: [], integridade: {} };
   for (const [k, v] of Object.entries(partes)) {
     if (v === undefined || !PARTES_BACKUP[k]) continue;
-    b[k] = v; b.partes.push(k); b.integridade[k] = hashParte(v);
+    b[k] = clone(v); b.partes.push(k); b.integridade[k] = hashParte(b[k]);   // cópia: o backup não muda com o estado depois
   }
   return b;
 }

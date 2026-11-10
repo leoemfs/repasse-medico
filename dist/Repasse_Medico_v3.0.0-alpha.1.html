@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v2.1.0-alpha.19</title>
+<title>Repasse Médico v3.0.0-alpha.1</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -30,7 +30,7 @@ body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;b
 .nav{display:flex;flex-direction:column;gap:4px}
 .nav a{position:relative;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
 .nav a svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.nav a:hover{background:#223349;color:#fff}.nav a.ativo{background:#2a5d8c;color:#fff}
+.nav a:hover{background:#223349;color:#fff}.nav a.ativo{background:var(--nav-ativo,#2a5d8c);color:#fff}
 .nav .curto,.nav .dica{display:none}
 .pill{margin-left:auto;flex:none;background:#d97b29;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
 .side-note{margin-top:auto;background:#1f2f42;border:1px solid #2f4258;border-radius:10px;padding:10px 12px;font-size:11.5px}.side-note strong{color:#fff}.side-note p{margin:4px 0 0}
@@ -349,13 +349,35 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cp-como{background:var(--okbg);border:1px solid var(--ok);border-radius:10px;padding:8px 12px;font-size:13px;margin-top:6px}
 .cp-mais{margin-top:6px}.cp-mais summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:12.5px}
 @media (max-width:700px){.cp-modo{grid-template-columns:1fr}}
+/* v3.0 — Configurações em categorias, cor de destaque, modelos de exportação e aviso de versão */
+.cfg-abas{margin:0 0 14px}
+.acentos{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.acento{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:var(--card)}
+.acento input{position:absolute;opacity:0;pointer-events:none}
+.acento i{width:18px;height:18px;border-radius:50%;display:block}
+.acento.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.acento:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.ex-cols{columns:3 260px;padding-left:22px;margin:8px 0}
+.ex-cols li{break-inside:avoid;display:flex;align-items:center;gap:6px;justify-content:space-between;padding:2px 0}
+.ex-cols li.off{color:var(--muted)}
+.ex-mov{display:inline-flex;gap:2px}.ex-mov .mini{padding:0 7px;min-width:0}
+.aviso-versao{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--warnbg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.aviso-versao span{color:var(--text)}.aviso-versao button{margin-left:auto}
+.tt-lista{max-height:62vh;overflow:auto}
+.tt-titulo{cursor:pointer}.tt-titulo.on td{background:var(--infobg)}
+.tt-painel{position:sticky;top:12px}
+.tt-sug{list-style:none;padding:0;margin:6px 0}
+.tt-sug li{display:flex;gap:8px;align-items:baseline;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.tt-sug li:last-child{border-bottom:0}
+.tt-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){.tt-grid{grid-template-columns:minmax(0,1fr)}.tt-painel{position:static}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v2.1.0-alpha.19 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.1 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -364,12 +386,12 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
       <a href="#fluxo" data-pag="fluxo" aria-label="Fluxo mensal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg><span class="rot">Fluxo mensal</span><span class="curto" aria-hidden="true">Fluxo</span><b id="navFluxo" class="pill" hidden></b><span class="dica" aria-hidden="true">Fluxo mensal</span></a>
       <a href="#conferencia" data-pag="conferencia" aria-label="Conferência cruzada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13"/><path d="M14 4l4 4-4 4"/><path d="M20 16H7"/><path d="M10 12l-4 4 4 4"/></svg><span class="rot">Conferência cruzada</span><span class="curto" aria-hidden="true">Conferir</span><span class="dica" aria-hidden="true">Conferência cruzada</span></a>
       <a href="#correcao" data-pag="correcao" aria-label="Correção de prestador"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l2 2 4-4"/></svg><span class="rot">Correção de prestador</span><span class="curto" aria-hidden="true">Prestador</span><span class="dica" aria-hidden="true">Correção de prestador</span></a>
+      <a href="#equivalencias" data-pag="equivalencias" aria-label="Equivalências TUSS"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><path d="M10 7h4a3 3 0 0 1 3 3v4"/><path d="M15 12l2 2 2-2"/></svg><span class="rot">Equivalências TUSS</span><span class="curto" aria-hidden="true">TUSS</span><b id="navPend" class="pill" hidden></b><span class="dica" aria-hidden="true">Equivalências TUSS</span></a>
       <a href="#nc" data-pag="nc" aria-label="Não conformidades"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5L2.8 19.5h18.4z"/><path d="M12 10v4.5"/><path d="M12 17.2v.1"/></svg><span class="rot">Não conformidades</span><span class="curto" aria-hidden="true">NCs</span><b id="navNC" class="pill" hidden></b><span class="dica" aria-hidden="true">Não conformidades</span></a>
       <a href="#fechamento" data-pag="fechamento" aria-label="Fechamento"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/><path d="M8.5 16.5l1.8 1.8 3.7-3.7"/></svg><span class="rot">Fechamento</span><span class="curto" aria-hidden="true">Fechar</span><span class="dica" aria-hidden="true">Fechamento</span></a>
       <a href="#rodadas" data-pag="rodadas" aria-label="Rodadas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg><span class="rot">Rodadas</span><span class="curto" aria-hidden="true">Rodadas</span><span class="dica" aria-hidden="true">Rodadas</span></a>
-      <h4 class="grupo-nav">BASES E AJUSTES</h4>
-      <a href="#equivalencias" data-pag="equivalencias" aria-label="Equivalências TUSS"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><path d="M10 7h4a3 3 0 0 1 3 3v4"/><path d="M15 12l2 2 2-2"/></svg><span class="rot">Equivalências TUSS</span><span class="curto" aria-hidden="true">TUSS</span><b id="navPend" class="pill" hidden></b><span class="dica" aria-hidden="true">Equivalências TUSS</span></a>
-      <a href="#bases" data-pag="bases" aria-label="Bases"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="rot">Bases</span><span class="curto" aria-hidden="true">Bases</span><span class="dica" aria-hidden="true">Bases</span></a>
+      <h4 class="grupo-nav">CONFIGURAÇÕES</h4>
+      <a href="#bases" data-pag="bases" aria-label="Bases e regras"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="rot">Bases e regras</span><span class="curto" aria-hidden="true">Bases</span><span class="dica" aria-hidden="true">Bases e regras</span></a>
       <a href="#configuracoes" data-pag="configuracoes" aria-label="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="rot">Configurações</span><span class="curto" aria-hidden="true">Ajustes</span><span class="dica" aria-hidden="true">Configurações</span></a>
       <div class="gaveta-rod"><span id="operadorGaveta"></span><br>Modo local: nada é enviado à internet.</div>
     </nav>
@@ -406,7 +428,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.19';
+const MOTOR_VERSAO = '3.0.0-alpha.1';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -432,7 +454,14 @@ const norm = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUppe
   .replace(/[^A-Z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
 const PARTICULAS = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'E']);
-const tokensNome = n => n.split(' ').filter(t => t && !PARTICULAS.has(t));
+// Tokens e semelhança entre tokens ficam em cache (os mesmos nomes e sobrenomes se repetem milhares de vezes
+// numa conferência). Os arrays devolvidos são só para leitura.
+const _cacheTokens = new Map(), _cacheSimToken = new Map();
+const tokensNome = n => {
+  let t = _cacheTokens.get(n); if (t) return t;
+  if (_cacheTokens.size > 200000) _cacheTokens.clear();
+  t = n.split(' ').filter(x => x && !PARTICULAS.has(x)); _cacheTokens.set(n, t); return t;
+};
 
 function lev(a, b) {
   const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
@@ -444,7 +473,12 @@ function lev(a, b) {
   }
   return p[n];
 }
-const simToken = (a, b) => a === b ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
+const simToken = (a, b) => {
+  if (a === b) return 1;
+  const k = a < b ? a + '|' + b : b + '|' + a; let v = _cacheSimToken.get(k); if (v !== undefined) return v;
+  if (_cacheSimToken.size > 500000) _cacheSimToken.clear();
+  v = 1 - lev(a, b) / Math.max(a.length, b.length); _cacheSimToken.set(k, v); return v;
+};
 
 // Semelhança aproximada (0..1). Serve só para mostrar evidência: nunca confirma sozinha.
 function nomeSemelhanca(a, b) {
@@ -471,6 +505,41 @@ function nivelNome(a, b, minTrunc = 20) {
   const [c, l] = a.length <= b.length ? [a, b] : [b, a];
   if (l.startsWith(c) && (l[c.length] === ' ' || c.length >= minTrunc) && tokensNome(c).length >= 2) return 2;
   return nomeSemelhanca(a, b) >= 0.66 ? 1 : 0;
+}
+
+/* Índice de nomes por dia (v3.0): nivelNome(a, b) > 0 exige que o primeiro token significativo dos dois nomes
+ * tenha semelhança ≥ 0,8 (idêntico e truncado começam pelo mesmo token; «apenas semelhante» exige isso em
+ * nomeSemelhanca). Então basta visitar, em cada dia, os grupos de primeiro nome compatível, em vez de todos os
+ * registros de ±tol dias. O resultado é idêntico ao da varredura completa, na mesma ordem (dia, posição na lista).
+ * Medido com 27 mil laudos e relatório de 2.000 linhas: de ~9 s para menos de 1 s (test/bench_motor.mjs). */
+const primeiroTokenNome = n => { for (const t of String(n || '').split(' ')) if (t && !PARTICULAS.has(t)) return t; return ''; };
+function indiceNomes(itens, diaDe, pnDe) {
+  const porDia = new Map(), toks = new Set(), compat = new Map(), ord = new Map();
+  let n = 0;
+  for (const x of itens) {
+    const d = diaDe(x); if (d === null || d === undefined) continue;
+    const t = primeiroTokenNome(pnDe(x)); if (!t) continue;   // sem nome: nivelNome daria 0
+    toks.add(t); ord.set(x, n++);
+    let m = porDia.get(d); if (!m) porDia.set(d, m = new Map());
+    let a = m.get(t); if (!a) m.set(t, a = []); a.push(x);
+  }
+  const compativeis = a => {
+    let c = compat.get(a); if (c) return c; c = [];
+    for (const b of toks) { const mx = Math.max(a.length, b.length); if (Math.abs(a.length - b.length) * 5 > mx) continue; if (simToken(a, b) >= 0.8) c.push(b); }
+    compat.set(a, c); return c;
+  };
+  // Registros de [dia − tol, dia + tol] que podem ter nivelNome > 0 com pn, na ordem da varredura completa.
+  function candidatos(pn, dia, tol = 0) {
+    const t = primeiroTokenNome(pn), out = []; if (!t || dia === null || dia === undefined) return out;
+    const cs = compativeis(t);
+    for (let d = dia - tol; d <= dia + tol; d++) {
+      const m = porDia.get(d); if (!m) continue;
+      const k = out.length; for (const b of cs) { const a = m.get(b); if (a) for (const x of a) out.push(x); }
+      if (cs.length > 1 && out.length - k > 1) { const parte = out.splice(k).sort((x, y) => ord.get(x) - ord.get(y)); for (const x of parte) out.push(x); }
+    }
+    return out;
+  }
+  return { candidatos, tamanho: n };
 }
 
 // Convênio: o MV costuma truncar; compatível se um for prefixo do outro.
@@ -1026,6 +1095,7 @@ function validarConfig(c) {
     if (!Array.isArray(c.prestadores)) erros.push('tabela de prestadores inválida');
     if (c.faturistas !== undefined && (!Array.isArray(c.faturistas) || c.faturistas.some(f => !f.nome))) erros.push('tabela de faturistas inválida');
     if (p && p.retencaoNC !== undefined && !(+p.retencaoNC >= 1 && +p.retencaoNC <= 366)) erros.push('retenção de dados das NCs fora de 1 a 366 dias');
+    if (c.modelosExportacao !== undefined && (!Array.isArray(c.modelosExportacao) || c.modelosExportacao.some(m => !m || !m.id || !Array.isArray(m.colunas)))) erros.push('modelos de exportação inválidos');
     if (!Array.isArray(c.classificacao)) erros.push('regras de classificação inválidas');
     else for (const r of c.classificacao) { try { new RegExp(r.padrao); } catch (e) { erros.push(`regra «${r.id}» com padrão inválido`); } if (!TIPOS_ITEM[r.tipo]) erros.push(`regra «${r.id}» com tipo desconhecido`); }
     const cods = contar(c.unidades || [], u => String(u.cod));
@@ -1048,6 +1118,9 @@ function migrarConfig(c) {
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
   if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
+  // v3.0: nomes das pastas e modelos de exportação da equipe (vão com a configuração compartilhada).
+  if (!c.pastas || typeof c.pastas !== 'object' || Array.isArray(c.pastas)) { c.pastas = {}; mudou = true; }
+  if (!Array.isArray(c.modelosExportacao)) { c.modelosExportacao = []; mudou = true; }
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.
@@ -2250,6 +2323,228 @@ function itensNoModo(c0, modo) {
   return cods.map(cd => ({ rotulo: '', codigos: [cd], qtd: 1, excecoes: [] }));
 }
 
+/* ---- src/engine/54-titulos.js ---- */
+/* ============================================================
+ * v3.0 — Equivalência por título do Apolo (manutenção da base em uma tela).
+ * 1. A planilha do Apolo vira uma lista de TÍTULOS DISTINTOS (não de laudos), com quantas vezes cada um aparece,
+ *    modalidades, unidades e exemplos sem nome de paciente.
+ * 2. Cada título tem a sua situação na base: validado, coberto por regra composta, em conflito, pendente ou sem cadastro.
+ * 3. As sugestões combinam semelhança de texto (título × descrição do procedimento), reaproveitamento de títulos
+ *    parecidos já validados e compatibilidade de modalidade. Sugestão nunca valida nada: quem confirma é a pessoa.
+ * ============================================================ */
+const SITUACAO_TITULO = {
+  'sem-cadastro': { nome: 'Sem equivalência', ordem: 0, cls: 'err' },
+  conflito: { nome: 'Em conflito', ordem: 1, cls: 'err' },
+  pendente: { nome: 'Pendente de validação', ordem: 2, cls: 'warn' },
+  composta: { nome: 'Regra composta', ordem: 3, cls: 'info' },
+  validada: { nome: 'Validada', ordem: 4, cls: 'ok' }
+};
+// Situação de um título na base (todas as relações não desativadas do título, em qualquer escopo).
+function situacaoTitulo(idx, titulo, modalidade = '') {
+  const kt = chaveTitulo(titulo), rel = idx.porTitulo.get(kt) || [];
+  const comp = (idx.compostas || []).find(c => escopoCobre(c.escopo, '', modalidade) && compostaCasaTitulo(c, titulo) > 0);
+  const val = [...new Set(rel.filter(e => e.status === 'validada').map(e => e.codigo))];
+  const situacao = comp ? 'composta' : val.length > 1 ? 'conflito' : val.length === 1 ? 'validada' : rel.some(e => e.status === 'pendente' || e.status === 'coberta') ? 'pendente' : 'sem-cadastro';
+  return { situacao, codigos: comp ? codigosDaRegra(comp) : val, composta: comp || null, relacoes: rel, destino: comp ? descreverComposta(comp) : val.join(', ') };
+}
+// «A + B ×2» para «juntos»; «A ou B» para alternativas na mesma posição.
+const descreverComposta = c => regraComposta(c).itens.map(it => `${(it.codigos || []).join(' ou ')}${(+it.qtd || 1) > 1 ? ` ×${it.qtd}` : ''}`).join(' + ');
+/* Títulos distintos da planilha (opcional: só de uma unidade). Exemplos sem nome de paciente. */
+function titulosDoApolo(apolo, eqBase, cfg, { unidade = '*' } = {}) {
+  if (!apolo?.laudos) return [];
+  const idx = indiceEquivalencias(eqBase), nomesUn = unidade && unidade !== '*' ? nomesApoloDaUnidade(cfg, unidade) : null;
+  const g = new Map();
+  for (const l of apolo.laudos) {
+    if (nomesUn && !nomesUn.has(norm(l.unidade))) continue;
+    const k = chaveTitulo(l.titulo); if (!k) continue;
+    let e = g.get(k);
+    if (!e) g.set(k, e = { chave: k, variantes: new Map(), n: 0, modalidades: new Map(), unidades: new Map(), medicos: new Set(), exemplos: [] });
+    e.n++; e.variantes.set(l.titulo, (e.variantes.get(l.titulo) || 0) + 1);
+    if (l.modalidade) e.modalidades.set(l.modalidade, (e.modalidades.get(l.modalidade) || 0) + 1);
+    e.unidades.set(l.unidade, (e.unidades.get(l.unidade) || 0) + 1);
+    if (l.mn) e.medicos.add(l.mn);
+    if (e.exemplos.length < 4) e.exemplos.push({ data: l.data, unidade: l.unidade, medico: l.medico, convenio: l.convenio, descricao: l.descricao, modalidade: l.modalidade });
+  }
+  const mais = m => [...m].sort((a, b) => b[1] - a[1]);
+  return [...g.values()].map(e => {
+    const titulo = mais(e.variantes)[0][0], modalidade = mais(e.modalidades)[0]?.[0] || '', s = situacaoTitulo(idx, titulo, modalidade);
+    return { chave: e.chave, titulo, variantes: mais(e.variantes).map(([t]) => t), n: e.n, modalidade, modalidades: mais(e.modalidades), unidades: mais(e.unidades), nMedicos: e.medicos.size, exemplos: e.exemplos, ...s };
+  }).sort((a, b) => SITUACAO_TITULO[a.situacao].ordem - SITUACAO_TITULO[b.situacao].ordem || b.n - a.n || a.titulo.localeCompare(b.titulo));
+}
+
+/* ---------- Sugestões ---------- */
+// Palavras que não ajudam a distinguir procedimentos, e sinônimos comuns entre o Apolo e o MV.
+const VAZIAS_EQ = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'E', 'COM', 'SEM', 'EM', 'A', 'O', 'AS', 'OS', 'PARA', 'POR', 'NA', 'NO', 'OU', 'OP', 'HM', 'EXAME', 'ESTUDO']);
+const SINONIMOS_EQ = { USG: 'ULTRASSONOGRAFIA', US: 'ULTRASSONOGRAFIA', ULTRASSOM: 'ULTRASSONOGRAFIA', ECOGRAFIA: 'ULTRASSONOGRAFIA', ULTRASONOGRAFIA: 'ULTRASSONOGRAFIA', TC: 'TOMOGRAFIA', TOMO: 'TOMOGRAFIA', RM: 'RESSONANCIA', RNM: 'RESSONANCIA', RMN: 'RESSONANCIA', RX: 'RADIOGRAFIA', RAIO: 'RADIOGRAFIA', MMG: 'MAMOGRAFIA', MAMA: 'MAMAS', ABD: 'ABDOME', ABDOMEN: 'ABDOME', ABDOMINAL: 'ABDOME', TRANSVAG: 'TRANSVAGINAL', TV: 'TRANSVAGINAL', DOPPLERFLUXOMETRIA: 'DOPPLER', COLORIDO: 'DOPPLER', BILATERAL: 'BILATERAL' };
+const tokensEq = s => [...new Set(norm(s).split(' ').filter(t => t && !VAZIAS_EQ.has(t) && !/^\d+$/.test(t)).map(t => SINONIMOS_EQ[t] || t))];
+const tokenCasa = (a, b) => a === b || (a.length >= 5 && b.length >= 5 && (a.startsWith(b.slice(0, 5)) && b.startsWith(a.slice(0, 5)))) || (a.length >= 6 && b.length >= 6 && simToken(a, b) >= 0.85);
+// Semelhança (0..1) entre os tokens do título e da descrição: Dice com casamento aproximado de palavras.
+function semelhancaTexto(ta, tb) {
+  if (!ta.length || !tb.length) return 0;
+  const usados = new Set(); let comuns = 0;
+  for (const a of ta) { const j = tb.findIndex((b, i) => !usados.has(i) && tokenCasa(a, b)); if (j >= 0) { usados.add(j); comuns++; } }
+  return (2 * comuns) / (ta.length + tb.length);
+}
+/* Sugere procedimentos para o título. catalogoTuss: [{cod, nome, info(grupo), origem}] (catalogo('tuss')).
+ * Devolve até `limite` sugestões: {codigo, desc, grupo, nota, motivos:[...]}, da mais forte para a mais fraca. */
+function sugerirCodigos(titulo, catalogoTuss, eqBase, { modalidade = '', limite = 8 } = {}) {
+  const tt = tokensEq(titulo), kt = chaveTitulo(titulo), sug = new Map();
+  const pegar = (codigo, desc, grupo) => sug.get(codigo) || sug.set(codigo, { codigo, desc: desc || '', grupo: grupo || '', texto: 0, reuso: 0, motivos: [] }).get(codigo);
+  for (const it of catalogoTuss || []) {
+    if (!it.cod || !/^\d{5,}$/.test(String(it.cod))) continue;
+    const s = semelhancaTexto(tt, tokensEq(it.nome)); if (s < 0.25) continue;
+    const e = pegar(String(it.cod), it.nome, it.info); e.texto = Math.max(e.texto, s);
+  }
+  // Reaproveitamento: títulos parecidos já validados indicam o código (com quem validou).
+  const vistos = new Map();
+  for (const e of eqBase?.itens || []) {
+    if (e.status !== 'validada' || chaveTitulo(e.titulo) === kt) continue;
+    const s = semelhancaTexto(tt, tokensEq(e.titulo)); if (s < 0.6) continue;
+    const x = pegar(e.codigo, e.descMV, ''); if (s > x.reuso) { x.reuso = s; vistos.set(e.codigo, e); }
+  }
+  for (const [cod, e] of vistos) pegar(cod).motivos.push(`título parecido já validado: «${e.titulo}»${e.responsavel ? ` (${e.responsavel})` : ''}`);
+  const descDe = new Map((catalogoTuss || []).map(it => [String(it.cod), it]));
+  return [...sug.values()].map(e => {
+    const c = descDe.get(e.codigo); if (!e.desc && c) e.desc = c.nome; if (!e.grupo && c) e.grupo = c.info || '';
+    const mods = e.grupo ? modalidadesDoGrupo(e.grupo) : null, incompat = !!(modalidade && mods && !mods.includes(modalidade));
+    if (e.texto >= 0.25) e.motivos.unshift(`texto ${Math.round(e.texto * 100)}% parecido com a descrição`);
+    if (incompat) e.motivos.push(`grupo «${e.grupo}» não é da modalidade ${modalidade}`);
+    const nota = Math.max(e.texto, e.reuso * 0.95) * (incompat ? 0.4 : 1) + (e.texto && e.reuso ? 0.05 : 0);
+    return { ...e, nota: Math.min(1, Math.round(nota * 100) / 100), incompat };
+  }).filter(e => e.nota >= 0.3).sort((a, b) => b.nota - a.nota || a.codigo.localeCompare(b.codigo)).slice(0, limite);
+}
+/* Confirma a equivalência simples título → código, com responsável e histórico. Reaproveita a relação existente
+ * (pendente/coberta/desativada) em vez de duplicar. Não mexe em outros códigos validados do título: o chamador
+ * decide (substituir, regra composta…) e a conferência continua apontando conflito enquanto houver dois. */
+function confirmarEquivalenciaTitulo(eqBase, { titulo, codigo, descMV = '', modalidade = '*', responsavel, motivo = '', competencia = '' }) {
+  if (!responsavel) throw new Error('Informe o responsável antes de validar equivalências.');
+  if (!/^\d{5,}$/.test(String(codigo))) throw new Error(`Código TUSS inválido «${codigo}».`);
+  const escopo = { unidade: '*', modalidade: modalidade || '*' };
+  let rel = eqBase.itens.find(e => e.codigo === String(codigo) && chaveTitulo(e.titulo) === chaveTitulo(titulo) && (e.escopo?.unidade || '*') === '*' && (e.escopo?.modalidade || '*') === escopo.modalidade);
+  if (!rel) { rel = novaRelacao({ codigo: String(codigo), titulo, descMV, escopo, origem: `Títulos do Apolo (${responsavel})`, justificativa: motivo }); eqBase.itens.push(rel); eqBase.revisao++; eqBase.atualizadoEm = agoraISO(); }
+  else if (!rel.descMV && descMV) rel.descMV = descMV;
+  alterarStatusEq(eqBase, [rel.id], 'validada', responsavel, motivo || 'confirmada em Títulos do Apolo', competencia);
+  return rel;
+}
+
+/* ---- src/engine/56-cfg-sync.js ---- */
+/* ============================================================
+ * v3.0 — Configuração compartilhada pela pasta da rede: mescla de três vias, como o Fluxo e as equivalências.
+ * Vai para a pasta só o que é da equipe (Bases: unidades, prestadores e aliases, regras, faturistas, convênios,
+ * classes, faixas, descontos, regras de classificação, parâmetros, pastas e modelos de exportação). Preferências
+ * de cada pessoa (operador, tema, cor, menu, competência aberta) ficam no navegador (CHAVES_INDIVIDUAIS).
+ * Cada lista com chave natural vira um item por chave (prestador pelo código, unidade pelo código, faturista e
+ * convênio pelo nome…): duas pessoas mexendo em prestadores diferentes não conflitam.
+ * ============================================================ */
+const SCHEMA_CFG_SYNC = 'repasse-medico/configuracao-sync';
+const LISTAS_CFG = {
+  unidades: u => String(u.cod), prestadores: p => String(p.cod), faturistas: f => norm(f.nome), convenios: c => norm(c.nome || ''),
+  classificacao: r => r.id, descontos: d => d.id, faixasUSG: f => f.id, modelosExportacao: m => m.id
+};
+const MAPAS_CFG = ['parametros', 'fechamento', 'pastas'];   // cada chave é um item da mescla
+const FORA_DA_MESCLA_CFG = new Set(['schema', 'versaoSchema', 'revisao', 'atualizadoEm']);
+
+function unidadesCfg(cfg) {
+  const m = new Map(); if (!cfg) return m;
+  for (const [k, v] of Object.entries(cfg)) {
+    if (FORA_DA_MESCLA_CFG.has(k) || v === undefined) continue;
+    if (LISTAS_CFG[k] && Array.isArray(v)) { m.set(`${k}|`, []); v.forEach((x, i) => m.set(`${k}|${LISTAS_CFG[k](x) || '#' + i}`, x)); }
+    else if (MAPAS_CFG.includes(k) && v && typeof v === 'object' && !Array.isArray(v)) { m.set(`${k}|`, {}); for (const [ek, ev] of Object.entries(v)) m.set(`${k}|${ek}`, ev); }
+    else m.set(k, v);
+  }
+  return m;
+}
+// Remonta a configuração; as listas guardam a ordem da versão local e depois a da pasta.
+function montarCfg(m, ordem) {
+  const c = {};
+  for (const [p, v] of m) {
+    if (v === undefined) continue;
+    const i = p.indexOf('|');
+    if (i < 0) { c[p] = clone(v); continue; }
+    const k = p.slice(0, i), sub = p.slice(i + 1);
+    if (LISTAS_CFG[k]) { c[k] = c[k] || []; if (sub) c[k].push(clone(v)); }
+    else { c[k] = c[k] || {}; if (sub) c[k][sub] = clone(v); }
+  }
+  for (const k of Object.keys(LISTAS_CFG)) if (c[k] && ordem?.[k]) { const pos = new Map(ordem[k].map((x, i) => [x, i])); c[k].sort((a, b) => (pos.get(LISTAS_CFG[k](a)) ?? 1e9) - (pos.get(LISTAS_CFG[k](b)) ?? 1e9)); }
+  return c;
+}
+// Sem «última versão sincronizada» (primeira vez, ou depois de restaurar um backup): junta o que der sem perder nada.
+// Objetos: campo que só um lado tem entra; listas de objetos com id/código/nome viram união; marcas de tempo e
+// origem não contam como diferença. Valores realmente diferentes viram conflito para a pessoa escolher.
+const IGNORAR_SEM_BASE = new Set(['em', 'origem', 'atualizadoEm', 'importadoEm']);
+const chaveItemLista = x => x && typeof x === 'object' ? (x.id ?? x.cod ?? (x.nome !== undefined ? norm(x.nome) : undefined)) : undefined;
+function juntarSemBase(l, r) {
+  if (json(l) === json(r)) return { v: l, conflito: false };
+  if (l === undefined || l === null || l === '') return { v: r, conflito: false };
+  if (r === undefined || r === null || r === '') return { v: l, conflito: false };
+  if (Array.isArray(l) && Array.isArray(r)) {
+    const objs = [...l, ...r].every(x => chaveItemLista(x) !== undefined), prim = [...l, ...r].every(x => x === null || typeof x !== 'object');
+    if (prim) return { v: [...new Set([...l, ...r])], conflito: false };
+    if (!objs) return { v: l, conflito: true };
+    const out = [], idx = new Map(); let conflito = false;
+    for (const x of l) { idx.set(String(chaveItemLista(x)), out.length); out.push(x); }
+    for (const x of r) { const k = String(chaveItemLista(x)); if (!idx.has(k)) { idx.set(k, out.length); out.push(x); continue; } const j = juntarSemBase(out[idx.get(k)], x); out[idx.get(k)] = j.v; conflito ||= j.conflito; }
+    return { v: out, conflito };
+  }
+  if (typeof l === 'object' && typeof r === 'object' && !Array.isArray(l) && !Array.isArray(r)) {
+    const v = {}; let conflito = false;
+    for (const k of new Set([...Object.keys(l), ...Object.keys(r)])) {
+      if (IGNORAR_SEM_BASE.has(k)) { v[k] = l[k] ?? r[k]; continue; }
+      const j = juntarSemBase(l[k], r[k]); v[k] = j.v; conflito ||= j.conflito;
+    }
+    return { v, conflito };
+  }
+  return { v: l, conflito: true };
+}
+/* local × remoto × base. Devolve {cfg, conflitos:[{p, rotulo, local, remoto}]}; no conflito fica a versão local
+ * até a escolha (aplicarEscolhasCfg). Nunca troca em silêncio um valor que os dois mudaram. */
+function mesclarCfg(local, remoto, base) {
+  if (!remoto) return { cfg: clone(local), conflitos: [] };
+  if (!local) return { cfg: clone(remoto), conflitos: [] };
+  const L = unidadesCfg(local), R = unidadesCfg(remoto), B = unidadesCfg(base), out = new Map(), conflitos = [];
+  for (const p of new Set([...L.keys(), ...R.keys(), ...(base ? B.keys() : [])])) {
+    const l = L.get(p), r = R.get(p), jl = json(l), jr = json(r);
+    if (jl === jr) { out.set(p, l); continue; }
+    if (base) {
+      const jb = json(B.get(p));
+      if (jl === jb) { out.set(p, r); continue; }   // só a pasta mudou
+      if (jr === jb) { out.set(p, l); continue; }   // só eu mudei
+    } else {
+      const j = juntarSemBase(l, r);
+      if (!j.conflito) { out.set(p, j.v); continue; }
+    }
+    out.set(p, l); conflitos.push({ p, rotulo: rotuloUnidadeCfg(local, remoto, p), local: l, remoto: r });
+  }
+  const ordem = {};
+  for (const k of Object.keys(LISTAS_CFG)) ordem[k] = [...(local[k] || []), ...(remoto[k] || [])].map(LISTAS_CFG[k]);
+  const cfg = { ...clone(local), ...montarCfg(out, ordem) };
+  for (const k of Object.keys(cfg)) if (!FORA_DA_MESCLA_CFG.has(k) && !out.has(k) && !out.has(`${k}|`)) delete cfg[k];
+  cfg.revisao = Math.max(+local.revisao || 0, +remoto.revisao || 0) + 1;
+  return { cfg, conflitos };
+}
+function aplicarEscolhasCfg(cfg, conflitos, escolhas) {
+  const m = unidadesCfg(cfg), ordem = {};
+  conflitos.forEach((c, i) => m.set(c.p, clone(escolhas[i] === 'remoto' ? c.remoto : c.local)));
+  for (const k of Object.keys(LISTAS_CFG)) ordem[k] = (cfg[k] || []).map(LISTAS_CFG[k]);
+  return { ...clone(cfg), ...montarCfg(m, ordem) };
+}
+const ROTULO_CFG = { unidades: 'Unidade', prestadores: 'Prestador', faturistas: 'Faturista', convenios: 'Convênio', classificacao: 'Regra de classificação', descontos: 'Desconto', faixasUSG: 'Faixa de USG', modelosExportacao: 'Modelo de exportação', parametros: 'Parâmetro', fechamento: 'Fechamento', pastas: 'Pasta', classes: 'Classes A/B/C/D' };
+function rotuloUnidadeCfg(local, remoto, p) {
+  const i = p.indexOf('|'), k = i < 0 ? p : p.slice(0, i), sub = i < 0 ? '' : p.slice(i + 1);
+  if (!sub) return ROTULO_CFG[k] || k;
+  const x = (local?.[k] || remoto?.[k]);
+  if (LISTAS_CFG[k] && Array.isArray(x)) { const it = [...(local?.[k] || []), ...(remoto?.[k] || [])].find(y => LISTAS_CFG[k](y) === sub); return `${ROTULO_CFG[k] || k} ${it?.cod ? it.cod + ' — ' : ''}${it?.nomeMV || it?.nome || sub}`; }
+  return `${ROTULO_CFG[k] || k}: ${sub}`;
+}
+function resumoValorCfg(v) {
+  if (v === undefined) return 'apagado';
+  if (v && typeof v === 'object' && !Array.isArray(v)) {
+    if ('nomeMV' in v) return `${v.nomeMV} · ${(v.aliases || []).filter(a => a.status === 'validado').length} alias(es) validado(s)${v.regras?.faixaUSG ? ` · faixa ${v.regras.faixaUSG}` : ''}${v.naoRealizaRepasse ? ' · não realiza repasse' : ''}`;
+    if ('apolo' in v) return `${v.nome} · Apolo: ${(v.apolo || []).join(', ') || '—'}`;
+  }
+  const t = typeof v === 'string' ? v : JSON.stringify(v); return t.length > 140 ? t.slice(0, 137) + '…' : t;
+}
+
 /* ---- src/engine/60-conferencia.js ---- */
 /* ============================================================
  * Motor de conferência cruzada MV × Apolo
@@ -2311,8 +2606,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const idx = indiceEquivalencias(eqBase), unidadeV3 = !!opc.unidadeCod && opc.unidadeCod !== '*' && ehUnidadeV3(cfg, opc.unidadeCod);
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
-  const porDia = new Map();
-  for (const l of Lun) if (l.dia !== null) (porDia.get(l.dia) || porDia.set(l.dia, []).get(l.dia)).push(l);
+  const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
@@ -2327,7 +2621,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   for (const b of procs) {
     b.cands = [];
     if (!b.pn || b.dia === null) continue;
-    for (let d = b.dia - tol; d <= b.dia + tol; d++) for (const l of porDia.get(d) || []) {
+    for (const l of ixNome.candidatos(b.pn, b.dia, tol)) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
       const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
       const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });
@@ -2580,8 +2874,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
   const tol = +opc.tol, minTrunc = +cfg.parametros.minTruncamento;
   const idx = indiceEquivalencias(eqBase), idxPrest = indicePrestadores(cfg);
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
-  const porDia = new Map();
-  for (const l of Lun) if (l.dia !== null) (porDia.get(l.dia) || porDia.set(l.dia, []).get(l.dia)).push(l);
+  const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   const linhas = [], ocorrencias = new Map(), usoLaudo = new Map();
 
   for (const r of relatorio.regs) {
@@ -2592,7 +2885,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     const pn = norm(r.paciente), dia = diaSerial(r.data), mods = modalidadesDoGrupo(r.grupoNome);
     if (!pn || dia === null || !r.codigo) { o.estado = 'insuficiente'; o.motivo = 'mv-incompleto'; o.detalhe = 'A linha do MV não traz paciente, data ou código legível.'; continue; }
     const seguros = [], semelhantes = [];
-    for (let d = dia - tol; d <= dia + tol; d++) for (const l of porDia.get(d) || []) {
+    for (const l of ixNome.candidatos(pn, dia, tol)) {
       if (mods && !mods.includes(l.modalidade)) continue;
       const nm = nivelNome(pn, l.pn, minTrunc);
       if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, convenio: r.convenio, modalidade: l.modalidade }) });
@@ -2607,7 +2900,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
       else {
         // Evidência objetiva, sem nomear médico: existe laudo do paciente em outra data próxima?
         let perto = null;
-        for (let d = 1; d <= 7 && !perto; d++) for (const s of [dia - d, dia + d]) for (const l of porDia.get(s) || []) if (!perto && nivelNome(pn, l.pn, minTrunc) >= 2 && (!mods || mods.includes(l.modalidade))) perto = d;
+        for (let d = 1; d <= 7 && !perto; d++) for (const s of [dia - d, dia + d]) for (const l of ixNome.candidatos(pn, s, 0)) if (!perto && nivelNome(pn, l.pn, minTrunc) >= 2 && (!mods || mods.includes(l.modalidade))) perto = d;
         o.motivo = perto ? 'outra-data' : 'sem-laudo';
         o.detalhe = perto ? `Há laudo do paciente a ${perto} dia(s) da data do MV, fora da tolerância de ${tol} dia(s).` : `Nenhum laudo do paciente na unidade em ±${tol} dia(s) com modalidade compatível.`;
       }
@@ -3410,6 +3703,7 @@ function validarNC(b) {
 // Mesma NC = mesma categoria, paciente (ID ou nome), data e título (+ médico, na correção de prestador).
 const chaveNC = x => [x.categoria, norm(x.idAtendimento) || norm(x.paciente), x.data || '', chaveTitulo(x.titulo || x.tituloEstudo || ''), x.categoria === 'prestador' ? norm(x.medico) : ''].join('|');
 const ncDaUnidade = (cfg, nome) => (cfg.unidades.find(u => (u.apolo || []).some(a => norm(a) === norm(nome)) || norm(u.nome) === norm(nome)) || {}).cod || '';
+const CAMPOS_PACIENTE_NC = ['paciente', 'idAtendimento'];
 const CAMPOS_NC = ['unidade', 'unidadeCod', 'paciente', 'idAtendimento', 'data', 'tituloEstudo', 'titulo', 'convenio', 'modalidade', 'medico', 'prestadorIncorreto', 'prestadorCorrigido', 'responsavel', 'codigo', 'conta', 'detalhe', 'obs'];
 
 // Categoria e natureza andam juntas: correção de prestador é sempre «prestador incorreto».
@@ -3448,13 +3742,17 @@ function registrarNCs(base, lista, operador = '') {
   return { novas, repetidas };
 }
 function alterarNC(nc, mudancas, operador = '') {
-  const d = ajustarCategoria({ ...nc, ...mudancas }), alterados = [];
+  const d = ajustarCategoria({ ...nc, ...mudancas }), alterados = [], mudou = [];
   for (const k of ['competencia', 'categoria', 'natureza', ...CAMPOS_NC, 'impactaPagamento', 'valor']) {
-    if (d[k] === undefined || d[k] === nc[k]) continue;
-    alterados.push(k); nc[k] = typeof nc[k] === 'string' ? String(d[k]).trim() : d[k];
+    if (d[k] === undefined) continue;
+    const novo = typeof nc[k] === 'string' || typeof d[k] === 'string' ? String(d[k] ?? '').trim() : d[k];
+    if (novo === nc[k] || (novo === '' && (nc[k] === undefined || nc[k] === null))) continue;
+    // v3.0: o histórico guarda o valor anterior e o novo (menos nome e ID do paciente, que seguem a retenção).
+    mudou.push(CAMPOS_PACIENTE_NC.includes(k) ? { campo: k } : { campo: k, de: nc[k] ?? '', para: novo });
+    alterados.push(k); nc[k] = novo;
   }
   if (mudancas.situacao && mudancas.situacao !== nc.situacao) mudarSituacaoNC(nc, mudancas.situacao, operador);
-  if (alterados.length) nc.historico.push({ em: agoraISO(), por: operador, acao: `alterou ${alterados.join(', ')}` });
+  if (alterados.length) { nc.historico.push({ em: agoraISO(), por: operador, acao: `alterou ${alterados.join(', ')}`, mudancas: mudou }); nc.atualizadaEm = agoraISO(); }
   return alterados.length > 0;
 }
 function mudarSituacaoNC(nc, nova, operador = '', data = '') {
@@ -4078,20 +4376,19 @@ const SITUACAO_PBI = {
   'lancado': { nome: 'Lançado (depois da geração do repasse?)', natureza: 'apos-geracao' }
 };
 const contaFechadaPBI = v => /^(S|SIM|Y|YES|TRUE|1|FECHADA)$/i.test(String(v || '').trim());
-// Índice por dia (lançamentos com paciente e data).
-function indicePBIPorDia(pbi) {
-  if (pbi._porDia) return pbi._porDia;
-  const m = new Map();
-  for (const l of pbi.linhas) { if (!l.pn || !l.data) continue; const d = diaSerial(l.data); (m.get(d) || m.set(d, []).get(d)).push(l); }
-  Object.defineProperty(pbi, '_porDia', { value: m, enumerable: false });
-  return m;
+// Índice por dia e primeiro nome (mesmo resultado da varredura completa; ver indiceNomes).
+function indicePBINomes(pbi) {
+  if (pbi._ixNome) return pbi._ixNome;
+  const ix = indiceNomes(pbi.linhas.filter(l => l.pn && l.data), l => diaSerial(l.data), l => l.pn);
+  Object.defineProperty(pbi, '_ixNome', { value: ix, enumerable: false });
+  return ix;
 }
 /* Procura o atendimento do laudo no Power BI.
  * laudo: {pn, dia, titulo, modalidade}; opc: {unidadeCod, tol, prestadorCod, cfg, idxEq} */
 function conciliarLaudo(pbi, laudo, opc) {
   if (!pbi || !laudo?.pn || laudo.dia === null || laudo.dia === undefined) return null;
-  const porDia = indicePBIPorDia(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
-  for (let d = laudo.dia - tol; d <= laudo.dia + tol; d++) for (const l of porDia.get(d) || []) {
+  const ix = indicePBINomes(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
+  for (const l of ix.candidatos(laudo.pn, laudo.dia, tol)) {
     if (opc.unidadeCod && opc.unidadeCod !== '*' && String(l.unidadeCod) !== String(opc.unidadeCod)) continue;
     const nm = nivelNome(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;
     const mods = modalidadesDoGrupo(l.grupo);
@@ -4181,22 +4478,17 @@ function xlsxConferencia(res, ctx) {
   const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
   // Ordem de quem confere (SOL-F40): situação → paciente → data → o que o MV lançou → o que o laudo diz → o que falta.
   const CZ = causasDaConferencia(res, ctx.compostas || []);
-  const cabPrincipal = [...cabecalho(['Situação', 'Decisão na competência'], SIT), ...cabecalho(['Paciente', 'Data']),
-    ...cabecalho(['Cód. TUSS MV', 'Procedimento no MV']), ...cabecalho(['Laudo (TITLE)'], AP), ...cabecalho(['O que falta / por quê'], OBS), ...cabecalho(['Vl Repasse']),
-    ...cabecalho(['Convênio MV', 'Unidade MV', 'Grupo de procedimento MV', 'Médico MV', 'Paciente MV']),
-    ...cabecalho(['Paciente Apolo', 'Data Apolo', 'Descrição do estudo (STUDY)', 'Convênio Apolo', 'Unidade Apolo', 'Modalidade Apolo', 'Médico Apolo'], AP),
-    ...cabecalho(['Ressalvas', 'Observações e análise'], OBS)];
+  // v3.0: a aba principal segue o modelo de exportação escolhido (Configurações → Exportação). O modelo «Padrão»
+  // tem exatamente as colunas e a ordem de antes; os outros só escolhem e ordenam colunas do catálogo.
+  const cols = colunasDoModelo(ctx.colunasExportacao), GRUPO = { sit: SIT, ap: AP, obs: OBS };
+  const cabPrincipal = cols.map(c => ({ v: c.rotulo, st: GRUPO[c.grupo] || CAB }));
   const textoDecisao = d => d ? `${TIPOS_DECISAO[d.tipo]}${d.justificativa ? ': ' + d.justificativa : ''}${d.tipo === 'nc' && d.situacao ? ` (${SITUACAO_NC[d.situacao] || d.situacao})` : ''}` : '';
-  const linhaPrincipal = x => {
-    const r = x.r, l = x.l, f = st(x.status), dec = x.decisao;
-    const i = res.linhas.indexOf(x), falta = dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '');
-    return [{ v: STATUS_CONF[x.status].nome, st: { ...f, b: true } }, { v: textoDecisao(dec), st: dec ? { fill: COR_DECISAO[dec.tipo], b: true } : {} },
-      r?.paciente || l?.paciente || '', r?.data || l?.data || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', l?.titulo || '', { v: falta, st: { wrap: true } }, r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '',
-      r?.convenio || '', r ? ctx.unidadeNome : '', r?.grupoNome || '', r ? r.prestadorNome : '', r?.paciente || '',
-      l?.paciente || '', l?.data || '', l?.descricao || '', l?.convenio || '', l?.unidade || '', l?.modalidade || '', l?.medico || '',
-      { v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { wrap: true } }, { v: x.motivos.join(' | '), st: { wrap: true } }];
+  const linhaPrincipal = (x, n) => {
+    const dec = x.decisao, i = res.linhas[n] === x ? n : res.linhas.indexOf(x);
+    const aux = { f: st(x.status), dec, textoDecisao, falta: dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '') };
+    return cols.map(c => c.valor(x, ctx, aux));
   };
-  const largP = [22, 28, 32, 11, 12, 40, 40, 44, 12, 24, 24, 24, 28, 30, 30, 11, 40, 24, 22, 10, 28, 34, 80];
+  const largP = cols.map(c => c.larg);
   // «O que falta decidir»: uma linha por pendência, agrupada pela decisão que a resolve.
   const F = [cabecalho(['Decisão', 'O que decidir', 'Ação sugerida', 'Linhas na decisão', 'Paciente', 'Data', 'Cód. TUSS MV', 'Procedimento no MV', 'Laudo (TITLE)', 'Convênio MV', 'Convênio laudo', 'Vl Repasse', 'Por quê'])];
   [...CZ.grupos, ...CZ.umaUma].forEach((c, n) => {
@@ -4353,6 +4645,147 @@ function xlsxNC(itens, chave, meta = {}) {
   return criarXlsx([...abas, { nome: 'Indicadores', larguras: [52, 40, 10], linhas: linhasInd, filtro: false, congelar: false }]);
 }
 
+/* ---- src/engine/91-modelos-exportacao.js ---- */
+/* ============================================================
+ * v3.0 — Modelos de exportação: catálogo de colunas da aba principal do Excel da conferência.
+ * «Padrão (ordem de quem confere)» reproduz exatamente o layout operacional em uso (SOL-F40); «Completo» acrescenta
+ * as colunas técnicas que já existem nos dados. A equipe pode criar, editar e salvar modelos próprios
+ * (cfg.modelosExportacao, compartilhados pela pasta); cada pessoa escolhe o seu (preferência local).
+ * O modelo só escolhe e ordena colunas: os dados da conferência não mudam para caber no layout.
+ * ============================================================ */
+const TXT = { fmt: 'text' };
+const COLUNAS_EXPORT_CONF = [
+  { id: 'situacao', rotulo: 'Situação', grupo: 'sit', larg: 22, valor: (x, c, a) => ({ v: STATUS_CONF[x.status].nome, st: { ...a.f, b: true } }) },
+  { id: 'decisao', rotulo: 'Decisão na competência', grupo: 'sit', larg: 28, valor: (x, c, a) => ({ v: a.textoDecisao(a.dec), st: a.dec ? { fill: COR_DECISAO[a.dec.tipo], b: true } : {} }) },
+  { id: 'paciente', rotulo: 'Paciente', larg: 32, valor: x => x.r?.paciente || x.l?.paciente || '' },
+  { id: 'data', rotulo: 'Data', larg: 11, valor: x => x.r?.data || x.l?.data || '' },
+  { id: 'codigo', rotulo: 'Cód. TUSS MV', larg: 12, valor: x => ({ v: x.r?.codigo || '', st: TXT }) },
+  { id: 'procMV', rotulo: 'Procedimento no MV', larg: 40, valor: x => x.r?.procDesc || '' },
+  { id: 'titulo', rotulo: 'Laudo (TITLE)', grupo: 'ap', larg: 40, valor: x => x.l?.titulo || '' },
+  { id: 'falta', rotulo: 'O que falta / por quê', grupo: 'obs', larg: 44, valor: (x, c, a) => ({ v: a.falta, st: { wrap: true } }) },
+  { id: 'vlRepasse', rotulo: 'Vl Repasse', larg: 12, valor: x => x.r ? { v: x.r.vlRepasse, st: { fmt: 'money' } } : '' },
+  { id: 'convenioMV', rotulo: 'Convênio MV', larg: 24, valor: x => x.r?.convenio || '' },
+  { id: 'unidadeMV', rotulo: 'Unidade MV', larg: 24, valor: (x, c) => x.r ? c.unidadeNome : '' },
+  { id: 'grupoMV', rotulo: 'Grupo de procedimento MV', larg: 24, valor: x => x.r?.grupoNome || '' },
+  { id: 'medicoMV', rotulo: 'Médico MV', larg: 28, valor: x => x.r ? x.r.prestadorNome : '' },
+  { id: 'pacienteMV', rotulo: 'Paciente MV', larg: 30, valor: x => x.r?.paciente || '' },
+  { id: 'pacienteApolo', rotulo: 'Paciente Apolo', grupo: 'ap', larg: 30, valor: x => x.l?.paciente || '' },
+  { id: 'dataApolo', rotulo: 'Data Apolo', grupo: 'ap', larg: 11, valor: x => x.l?.data || '' },
+  { id: 'estudo', rotulo: 'Descrição do estudo (STUDY)', grupo: 'ap', larg: 40, valor: x => x.l?.descricao || '' },
+  { id: 'convenioApolo', rotulo: 'Convênio Apolo', grupo: 'ap', larg: 24, valor: x => x.l?.convenio || '' },
+  { id: 'unidadeApolo', rotulo: 'Unidade Apolo', grupo: 'ap', larg: 22, valor: x => x.l?.unidade || '' },
+  { id: 'modalidade', rotulo: 'Modalidade Apolo', grupo: 'ap', larg: 10, valor: x => x.l?.modalidade || '' },
+  { id: 'medicoApolo', rotulo: 'Médico Apolo', grupo: 'ap', larg: 28, valor: x => x.l?.medico || '' },
+  { id: 'ressalvas', rotulo: 'Ressalvas', grupo: 'obs', larg: 34, valor: x => ({ v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { wrap: true } }) },
+  { id: 'observacoes', rotulo: 'Observações e análise', grupo: 'obs', larg: 80, valor: x => ({ v: x.motivos.join(' | '), st: { wrap: true } }) },
+  // Colunas que já existem nos dados e não estão no padrão (aba «Técnico» / «MV original»).
+  { id: 'conta', rotulo: 'Conta', larg: 11, valor: x => ({ v: x.r?.conta || '', st: TXT }) },
+  { id: 'atendimento', rotulo: 'Atendimento', larg: 12, valor: x => ({ v: x.r?.atendimento || '', st: TXT }) },
+  { id: 'remessa', rotulo: 'Remessa', larg: 10, valor: x => ({ v: x.r?.remessa || '', st: TXT }) },
+  { id: 'vlTotal', rotulo: 'Vl Total', larg: 12, valor: x => x.r ? { v: x.r.vlTotal, st: { fmt: 'money' } } : '' },
+  { id: 'quant', rotulo: 'Quant.', larg: 7, valor: x => x.r?.quant ?? '' },
+  { id: 'linhaMV', rotulo: 'Linha MV', larg: 8, valor: x => x.r?.seq || '' },
+  { id: 'paginaMV', rotulo: 'Página MV', larg: 7, valor: x => x.r?.pagina || '' },
+  { id: 'tipoItem', rotulo: 'Tipo de item', larg: 22, valor: x => TIPOS_ITEM[x.tipo] || x.tipo || '' },
+  { id: 'idLaudo', rotulo: 'Laudo: ID', grupo: 'ap', larg: 12, valor: x => ({ v: x.l?.idLaudo || '', st: TXT }) },
+  { id: 'linhaPlanilha', rotulo: 'Laudo: linha da planilha', grupo: 'ap', larg: 10, valor: x => x.l?.linhaPlanilha || '' },
+  { id: 'origem', rotulo: 'Origem (MV/Apolo)', larg: 8, valor: x => x.origem || '' }
+];
+const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes'];
+const MODELOS_EXPORT_FIXOS = [
+  { id: 'padrao', nome: 'Padrão — ordem de quem confere (layout operacional atual)', alvo: 'conferencia', colunas: IDS_PADRAO_CONF, fixo: true },
+  { id: 'completo', nome: 'Completo — padrão + colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: [...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
+];
+const colunaExport = id => COLUNAS_EXPORT_CONF.find(c => c.id === id);
+// Colunas válidas do modelo (ids desconhecidos são ignorados; sem colunas válidas, vale o padrão).
+function colunasDoModelo(ids) {
+  const cols = (Array.isArray(ids) ? ids : []).map(colunaExport).filter(Boolean);
+  return cols.length ? cols : IDS_PADRAO_CONF.map(colunaExport);
+}
+const modelosExportacao = cfg => [...MODELOS_EXPORT_FIXOS, ...(cfg?.modelosExportacao || []).filter(m => m && m.id && Array.isArray(m.colunas))];
+const modeloExportacao = (cfg, id) => modelosExportacao(cfg).find(m => m.id === id) || MODELOS_EXPORT_FIXOS[0];
+
+/* ---- src/engine/92-backup.js ---- */
+/* ============================================================
+ * v3.0 — Backup completo, versionado e verificável.
+ * Partes: configuração compartilhada (Bases, regras, parâmetros, pastas, modelos de exportação), equivalências,
+ * fluxo mensal, registro das competências, controle de prestadores por unidade, preferências de quem exportou,
+ * e, quando marcado, não conformidades (dados de pacientes) e rodadas.
+ * Cada parte leva a sua impressão digital: arquivo truncado ou editado à mão é recusado antes de restaurar.
+ * ============================================================ */
+const VERSAO_BACKUP = 2;
+const PARTES_BACKUP = {
+  configuracao: 'Configuração (Bases, regras, parâmetros, pastas e modelos de exportação)',
+  equivalencias: 'Equivalências TUSS e regras compostas',
+  fluxo: 'Fluxo mensal',
+  competencias: 'Competências (abertas/fechadas e alterações)',
+  controleUnidades: 'Controle de prestadores por unidade',
+  preferencias: 'Preferências de quem exportou (tema, cor, menu)',
+  nc: 'Não conformidades (contém nomes de pacientes)',
+  rodadas: 'Rodadas de conferência e correção'
+};
+const hashParte = v => hashTexto(JSON.stringify(v ?? null)) + ':' + JSON.stringify(v ?? null).length;
+function montarBackup(partes, meta = {}) {
+  const b = { schema: SCHEMA_BACKUP, versaoSchema: VERSAO_BACKUP, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, ...meta, partes: [], integridade: {} };
+  for (const [k, v] of Object.entries(partes)) {
+    if (v === undefined || !PARTES_BACKUP[k]) continue;
+    b[k] = clone(v); b.partes.push(k); b.integridade[k] = hashParte(b[k]);   // cópia: o backup não muda com o estado depois
+  }
+  return b;
+}
+// Resumo legível de cada parte (para a prévia antes de restaurar).
+function resumoParteBackup(k, v) {
+  if (!v) return '';
+  if (k === 'configuracao') return `revisão ${v.revisao ?? '—'} · ${(v.unidades || []).length} unidades · ${(v.prestadores || []).length} prestadores · ${(v.faturistas || []).length} faturistas`;
+  if (k === 'equivalencias') return `revisão ${v.revisao ?? '—'} · ${(v.itens || []).filter(e => e.status === 'validada').length} validadas · ${(v.itens || []).filter(e => e.status === 'pendente').length} pendentes · ${(v.compostas || []).length} regras compostas`;
+  if (k === 'fluxo') return `${Object.keys(v.competencias || {}).length} competência(s)`;
+  if (k === 'competencias') return `${Object.keys(v.itens || {}).length} competência(s) registradas`;
+  if (k === 'controleUnidades') return `${Object.keys(v || {}).length} competência(s)`;
+  if (k === 'nc') return `${(v.itens || []).length} NC(s)`;
+  if (k === 'rodadas') return `${(v || []).length} rodada(s)`;
+  if (k === 'preferencias') return Object.keys(v).join(', ');
+  return '';
+}
+// a > b? «3.0.0-alpha.2» > «3.0.0-alpha.1» > «2.1.0-alpha.19»; versão final > pré-versão com o mesmo número.
+function versaoMaior(a, b) {
+  const p = s => { const [nucleo, pre] = String(s || '0').split('-'); return { n: nucleo.split('.').map(x => +x || 0), pre: pre === undefined ? null : pre.split('.').map(x => (/^\d+$/.test(x) ? +x : x)) }; };
+  const A = p(a), B = p(b);
+  for (let i = 0; i < 3; i++) if ((A.n[i] || 0) !== (B.n[i] || 0)) return (A.n[i] || 0) > (B.n[i] || 0);
+  if (!A.pre || !B.pre) return !A.pre && !!B.pre;
+  for (let i = 0; i < Math.max(A.pre.length, B.pre.length); i++) {
+    const x = A.pre[i], y = B.pre[i]; if (x === y) continue; if (x === undefined) return false; if (y === undefined) return true;
+    if (typeof x === typeof y) return x > y; return typeof x === 'string';
+  }
+  return false;
+}
+/* Valida antes de qualquer restauração. validadores: {configuracao: fn, equivalencias: fn, fluxo: fn, competencias: fn, nc: fn}
+ * (cada um devolve lista de erros). Devolve {erros, avisos, partes:[{k, nome, resumo, ok, erros}]}. */
+function validarBackup(b, validadores = {}) {
+  const erros = [], avisos = [], partes = [];
+  if (!b || b.schema !== SCHEMA_BACKUP) return { erros: ['o arquivo não é um backup do Repasse Médico'], avisos, partes };
+  if (![1, VERSAO_BACKUP].includes(b.versaoSchema)) erros.push(`versão de backup ${b.versaoSchema} não suportada por esta versão da ferramenta`);
+  if (b.motor && versaoMaior(b.motor, MOTOR_VERSAO)) avisos.push(`backup gerado por uma versão mais nova (${b.motor}); esta é a ${MOTOR_VERSAO}. Atualize a ferramenta antes de restaurar, se possível.`);
+  const lista = b.versaoSchema === 1 ? Object.keys(PARTES_BACKUP).filter(k => b[k] !== undefined) : (b.partes || []);
+  if (b.versaoSchema === 1) avisos.push('backup no formato antigo (v1): sem verificação de integridade por parte.');
+  for (const k of lista) {
+    if (!PARTES_BACKUP[k]) continue;
+    const v = b[k], pe = [];
+    if (v === undefined) pe.push('parte listada, mas ausente do arquivo (arquivo incompleto)');
+    else {
+      if (b.versaoSchema === VERSAO_BACKUP && b.integridade?.[k] !== hashParte(v)) pe.push('impressão digital não confere (arquivo incompleto ou alterado)');
+      if (validadores[k]) pe.push(...validadores[k](v));
+      if (k === 'rodadas' && !Array.isArray(v)) pe.push('lista de rodadas inválida');
+    }
+    partes.push({ k, nome: PARTES_BACKUP[k], resumo: resumoParteBackup(k, v), ok: !pe.length, erros: pe });
+  }
+  if (!partes.length) erros.push('o backup não tem nenhuma parte reconhecida');
+  return { erros, avisos, partes };
+}
+// Nome do arquivo: data e hora, quem gravou e se foi automático (para a limpeza só mexer nos automáticos).
+const nomeArquivoBackup = (operador, auto) => `backup_repasse_${carimboBackup()}_${nomeSeguroBackup(operador || 'sem-operador')}${auto ? '_auto' : ''}.json`;
+const carimboBackup = () => { const d = new Date(), z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`; };
+const nomeSeguroBackup = s => norm(s).replace(/\s+/g, '_').slice(0, 40) || 'x';
+
 /* ---- src/ui/00-base.js ---- */
 /* ============================================================
  * Interface — base: estado da sessão, armazenamento local, navegação e componentes
@@ -4386,12 +4819,62 @@ const S = {
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias' };
-function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
-// Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
-function gravarLocal(k, v) {
-  try { const j = JSON.stringify(v); localStorage.setItem(k, j); return localStorage.getItem(k) === j; } catch (e) { return false; }
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias',
+  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar' };
+// Preferências de cada pessoa (ficam neste navegador e não vão para a pasta compartilhada).
+const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta'];
+// Modelo de exportação escolhido por esta pessoa (Configurações → Exportação).
+const idModeloExportacao = () => (lerLocal(CHAVES.exportModelo) || {}).conferencia || 'padrao';
+const colunasExportacaoAtuais = () => modeloExportacao(S.cfg, idModeloExportacao()).colunas;
+/* v3.0 — o localStorage tem cerca de 5 MB por endereço e recusa a gravação quando enche (base de equivalências,
+ * fluxo, NCs e as cópias «anterior» e de sincronização somam rápido). Toda gravação vai também para o IndexedDB
+ * («repasse-medico-kv»); se o localStorage recusar, o valor antigo sai dele e fica só um marcador, e a leitura
+ * passa a vir do IndexedDB. Os valores do IndexedDB são carregados na memória antes da primeira leitura. */
+const KV = { db: null, cache: new Map(), erros: 0, ultimoErro: '', persistente: null, estimativa: null };
+const MARCA_KV = '{"__kv":1}';
+function abrirKV() {
+  return new Promise(res => {
+    try {
+      const rq = indexedDB.open('repasse-medico-kv', 1);
+      rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+      rq.onerror = () => res(false);
+      rq.onsuccess = () => {
+        KV.db = rq.result;
+        try {
+          const st = KV.db.transaction('kv').objectStore('kv'), cur = st.openCursor();
+          cur.onsuccess = () => { const c = cur.result; if (c) { KV.cache.set(c.key, c.value); c.continue(); } else res(true); };
+          cur.onerror = () => res(true);
+        } catch (e) { res(true); }
+      };
+    } catch (e) { res(false); }
+  }).then(ok => {
+    // Pede ao navegador para não apagar os dados sozinho (Edge concede para app instalado ou site muito usado).
+    try { navigator.storage?.persist?.().then(p => { KV.persistente = p; }).catch(() => {}); navigator.storage?.estimate?.().then(e => { KV.estimativa = e; }).catch(() => {}); } catch (e) { }
+    return ok;
+  });
 }
+function kvGravar(k, j) {
+  if (!KV.db) return false;
+  KV.cache.set(k, j);
+  try { const tx = KV.db.transaction('kv', 'readwrite'); j === null ? tx.objectStore('kv').delete(k) : tx.objectStore('kv').put(j, k); tx.onerror = () => { KV.erros++; KV.ultimoErro = String(tx.error?.message || tx.error); }; }
+  catch (e) { KV.erros++; KV.ultimoErro = e.message; return false; }
+  return true;
+}
+function lerLocal(k) {
+  let s = null; try { s = localStorage.getItem(k); } catch (e) { }
+  if (s && s !== MARCA_KV) { try { return JSON.parse(s); } catch (e) { } }
+  const j = KV.cache.get(k); if (j) { try { return JSON.parse(j); } catch (e) { } }
+  return null;
+}
+// Grava e confere a gravação; devolve falso só se nem o localStorage nem o IndexedDB aceitarem (o usuário é avisado).
+function gravarLocal(k, v) {
+  const j = JSON.stringify(v); let ok = false;
+  try { localStorage.setItem(k, j); ok = localStorage.getItem(k) === j; } catch (e) { }
+  if (!ok) { try { localStorage.removeItem(k); localStorage.setItem(k, MARCA_KV); } catch (e) { } }
+  const okKV = kvGravar(k, j);
+  return ok || okKV;
+}
+function apagarLocal(k) { try { localStorage.removeItem(k); } catch (e) { } kvGravar(k, null); KV.cache.delete(k); }
 // Alterações nas bases valem para todas as competências e ficam registradas na competência do topo.
 function registrarAlteracaoBase(motivo, tipo) {
   if (!motivo || !S.compReg) return;
@@ -4410,7 +4893,14 @@ function salvarEq(motivo = '') {
   atualizarNavPendencias();
 }
 // Cópia de segurança antes de substituir uma base inteira (RN-215).
-function backupAntesDeSubstituir(chaveAnterior, valor) { gravarLocal(chaveAnterior, { em: agoraISO(), valor }); }
+// v3.0: a base inteira vai ser trocada (backup, desfazer, substituir): a próxima sincronização com a pasta compara
+// SEM a «última versão sincronizada». Sem isso, a versão antiga parecia «mudança minha» na mescla de três vias e
+// passava por cima das decisões mais novas da outra pessoa; assim, decisões diferentes viram escolha explícita.
+function backupAntesDeSubstituir(chaveAnterior, valor) {
+  gravarLocal(chaveAnterior, { em: agoraISO(), valor });
+  const base = { [CHAVES.eqAnterior]: CHAVES.eqSyncBase, [CHAVES.fluxoAnterior]: CHAVES.fluxoSyncBase, [CHAVES.cfgAnterior]: CHAVES.cfgSyncBase }[chaveAnterior];
+  if (base) apagarLocal(base);
+}
 
 // Rodadas em IndexedDB (sem nomes de pacientes); se indisponível, ficam só na memória.
 const DB = { db: null, ok: false };
@@ -4543,7 +5033,7 @@ function desenharSeletorCompetencia() {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';
@@ -4788,7 +5278,7 @@ function estadoGuardada(tipo, obj) {
   const g = obj.guardada;
   return `<div class="guardada small">${g ? `💾 Guardada nesta competência desde ${new Date(g.em).toLocaleString('pt-BR')}${g.por ? ` · ${esc(g.por)}` : ''}. Para trocar, carregue outra. <button class="sec mini" data-desguardar="${tipo}">Remover da competência</button>`
     : `<span class="muted">Só nesta sessão (some ao recarregar).</span> <button class="sec mini" data-guardar="${tipo}">Guardar nesta competência</button>`}
-    <label class="small" style="display:block;margin-top:4px"><input type="checkbox" data-guardarauto="${tipo}"${guardarPlanilhasAtivo(tipo) ? ' checked' : ''}> guardar automaticamente quando eu carregar uma ${tipo === 'apolo' ? 'planilha de laudos' : 'planilha do Power BI'}</label></div>`;
+    <span class="small muted" style="display:block;margin-top:4px">Guardar automaticamente ao carregar: <b>${guardarPlanilhasAtivo(tipo) ? 'sim' : 'não'}</b> · <a href="#configuracoes" data-cfg-ir="conferencia">mudar em Configurações</a></span></div>`;
 }
 function ligarPlanilhasGuardadas(raiz) {
   raiz.querySelectorAll('[data-desguardar]').forEach(b => b.onclick = async () => {
@@ -4803,10 +5293,7 @@ function ligarPlanilhasGuardadas(raiz) {
     if (await guardarPlanilha(tipo, obj)) avisar(`${TIPOS_GUARDADOS[tipo]} guardada para ${rotuloCompetencia(S.comp)}.`, 'ok');
     S.cfg.parametros.guardarPlanilhas[tipo] = antes; RENDER.inicio();
   });
-  raiz.querySelectorAll('[data-guardarauto]').forEach(ch => ch.onchange = () => {
-    S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
-    salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
-  });
+  raiz.querySelectorAll('[data-cfg-ir]').forEach(a => a.onclick = () => { CF.sub = a.dataset.cfgIr; });   // v3.0: a opção fica em Configurações
 }
 
 /* ---- src/ui/10-inicio.js ---- */
@@ -5360,7 +5847,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; S.conf.filtroLinhas = null; desenharConferencia(); };
-  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [] }), nomeArquivoAnalise('conferencia', ctx));
+  $('cfExcel').onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp);
   if ($('cfIrCausas')) $('cfIrCausas').onclick = () => $('cfCausas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('cfVerTodas').onclick = () => { S.conf.soFalta = false; S.conf.filtroLinhas = null; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
   $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
@@ -5663,7 +6150,7 @@ async function tornarAlternante(regraId) {
  * Quem laudou na planilha de laudos × quem já tem relatório, conferência e aceite, por unidade e grupo.
  * ============================================================ */
 const CU = { sub: 'conferir', unidade: '', grupo: '', soFalta: true };
-const CHAVE_CONTROLE_UN = 'rm2.controleUnidades', fmtN = n => (+n || 0).toLocaleString('pt-BR');
+const CHAVE_CONTROLE_UN = CHAVES.controleUn, fmtN = n => (+n || 0).toLocaleString('pt-BR');
 const marcasControle = () => { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; return t[S.comp] || (t[S.comp] = { gerado: {}, dispensado: {} }); };
 function gravarMarcasControle(m) { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; t[S.comp] = m; if (!gravarLocal(CHAVE_CONTROLE_UN, t)) avisar('Não foi possível gravar a marca neste navegador.', 'err'); }
 // PDFs da sessão (para «relatório sem conferência»).
@@ -6321,7 +6808,7 @@ function sugestaoDaTarefa(sugs, gId, tId, atual) {
  * Só o Fluxo vai para a pasta: nada de paciente, PDF ou planilha.
  * ============================================================ */
 const SY = { handle: null, status: 'off', erro: '', conferidoEm: 0, lm: 0, meta: null, ocupado: false, pendente: false, conflitos: 0, timer: null, aviso: new Set() };
-const CHAVE_SYNC_BASE = 'rm2.fluxoSyncBase';
+const CHAVE_SYNC_BASE = CHAVES.fluxoSyncBase;
 const arquivoSync = chave => `fluxo_comp_${chave.slice(5)}-${chave.slice(0, 4)}.json`;
 const suportaPasta = () => typeof window.showDirectoryPicker === 'function';
 
@@ -6374,7 +6861,7 @@ async function sincronizarFluxo({ interativo = false } = {}) {
   if (!(await temPermissaoPasta(interativo))) { SY.status = 'permissao'; atualizarBarraSync(); return; }
   SY.ocupado = true;
   try {
-    for (let tentativa = 0; tentativa < 2; tentativa++) {
+    for (let tentativa = 0; tentativa < 3; tentativa++) {
       const nome = arquivoSync(chave); let remoto = null, lm = 0;
       try { const f = await (await (await dirFluxo()).getFileHandle(nome)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_FLUXO_SYNC || d.chave !== chave) throw new Error(`${nome} não é o Fluxo desta competência`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
@@ -6392,13 +6879,17 @@ async function sincronizarFluxo({ interativo = false } = {}) {
         const fh = await (await dirFluxo()).getFileHandle(nome, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;   // alguém gravou enquanto eu mesclava: mescla de novo
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
-        const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp })); await w.close();
-        SY.lm = (await fh.getFile()).lastModified; SY.meta = meta;
+        const texto = JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp });
+        const w = await fh.createWritable(); await w.write(texto); await w.close();
+        // v3.0: confere o que ficou gravado; se a outra pessoa gravou no mesmo instante, mescla de novo com a versão dela.
+        const gravado = await fh.getFile(); if (await gravado.text() !== texto) continue;
+        SY.lm = gravado.lastModified; SY.meta = meta;
       } else { SY.lm = lm; SY.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SY.meta; }
       bases[chave] = comp; gravarLocal(CHAVE_SYNC_BASE, bases);
       SY.status = 'ok'; SY.erro = ''; SY.conflitos = 0; SY.conferidoEm = Date.now();
       return;
     }
+    SY.status = 'erro'; SY.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';
   } catch (e) { SY.status = 'erro'; SY.erro = e.message || String(e); }
   finally { SY.ocupado = false; atualizarBarraSync(); if (SY.pendente) { SY.pendente = false; setTimeout(() => sincronizarFluxo(), 50); } }
 }
@@ -6587,7 +7078,11 @@ const nomePastaUnidade = u => limparNomePasta(`Unidade ${u.cod} - ${u.nome}`);
 // Subpasta pelo nome (sem diferença de maiúsculas, acentos ou espaços); cria com o nome padrão se faltar.
 async function subpasta(dir, alvo, criar = false) {
   const re = typeof alvo === 'string' ? new RegExp('^' + norm(alvo).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$') : alvo.re, nome = typeof alvo === 'string' ? alvo : alvo.nome;
-  for await (const h of dir.values()) if (h.kind === 'directory' && re.test(norm(h.name))) return h;
+  // v3.0: o nome configurado vale primeiro; nomes padrão/antigos só são aceitos na leitura, ou ao criar quando o
+  // nome não foi personalizado (assim, trocar o nome da pasta de backups grava na pasta nova, e nada se perde ao ler).
+  let parecida = null;
+  for await (const h of dir.values()) if (h.kind === 'directory') { if (norm(h.name) === norm(nome)) return h; if (!parecida && re.test(norm(h.name))) parecida = h; }
+  if (parecida && !(criar && alvo.personalizado)) return parecida;
   return criar ? dir.getDirectoryHandle(nome, { create: true }) : null;
 }
 async function caminho(partes, criar = false) {
@@ -6605,7 +7100,7 @@ const dirEq = () => caminho([PASTAS_RAIZ.eq], true);
 function estruturaCompetencia(chave) {
   const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod), comp = pastaComp(chave);
   const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), cam = [];
-  for (const k of ['fluxo', 'eq', 'backups']) cam.push([PASTAS_RAIZ[k]]);
+  for (const k of ['fluxo', 'eq', 'cfg', 'backups']) if (PASTAS_RAIZ[k]) cam.push([PASTAS_RAIZ[k]]);
   cam.push([PASTAS_RAIZ.bases, comp]);
   const base = [PASTAS_RAIZ.comps, comp];
   const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
@@ -6705,14 +7200,14 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
 
 /* ---------- Equivalências sincronizadas (SOL-F37) ---------- */
 const SYQ = { status: 'off', erro: '', lm: 0, meta: null, ocupado: false, pendente: false, conferidoEm: 0, conflitos: 0 };
-const CHAVE_SYNC_EQ = 'rm2.eqSyncBase', ARQ_EQ = 'equivalencias.json';
+const CHAVE_SYNC_EQ = CHAVES.eqSyncBase, ARQ_EQ = 'equivalencias.json';
 async function sincronizarEq({ interativo = false } = {}) {
   if (!SY.handle || SY.legado) return;
   if (SYQ.ocupado) { SYQ.pendente = true; return; }
   if (!(await temPermissaoPasta(interativo))) { SYQ.status = 'permissao'; atualizarBarraEq(); return; }
   SYQ.ocupado = true;
   try {
-    for (let t = 0; t < 2; t++) {
+    for (let t = 0; t < 3; t++) {
       const dir = await dirEq(); let remoto = null, lm = 0;
       try { const f = await (await dir.getFileHandle(ARQ_EQ)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_EQ_SYNC) throw new Error(`${ARQ_EQ} não é a base de equivalências`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
@@ -6746,13 +7241,16 @@ async function sincronizarEq({ interativo = false } = {}) {
         const fh = await dir.getFileHandle(ARQ_EQ, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
-        const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_EQ_SYNC, versaoSchema: 1, motor: MOTOR_VERSAO, ...meta, eq: S.eq })); await w.close();
-        SYQ.lm = (await fh.getFile()).lastModified; SYQ.meta = meta;
+        const texto = JSON.stringify({ schema: SCHEMA_EQ_SYNC, versaoSchema: 1, motor: MOTOR_VERSAO, ...meta, eq: S.eq });
+        const w = await fh.createWritable(); await w.write(texto); await w.close();
+        const gravado = await fh.getFile(); if (await gravado.text() !== texto) continue;   // gravação simultânea: mescla de novo
+        SYQ.lm = gravado.lastModified; SYQ.meta = meta;
       } else { SYQ.lm = lm; SYQ.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SYQ.meta; }
       gravarLocal(CHAVE_SYNC_EQ, S.eq);
       SYQ.status = 'ok'; SYQ.erro = ''; SYQ.conflitos = 0; SYQ.conferidoEm = Date.now();
       return;
     }
+    SYQ.status = 'erro'; SYQ.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';
   } catch (e) { SYQ.status = 'erro'; SYQ.erro = e.message || String(e); }
   finally { SYQ.ocupado = false; atualizarBarraEq(); if (SYQ.pendente) { SYQ.pendente = false; setTimeout(() => sincronizarEq(), 50); } }
 }
@@ -6773,8 +7271,6 @@ function barraEq() {
 }
 function atualizarBarraEq() { const b = $('eqSync'); if (!b) return; b.outerHTML = barraEq(); ligarBarraEq(); }
 function ligarBarraEq() { document.querySelectorAll('#eqSync [data-syq]').forEach(b => b.onclick = () => sincronizarEq({ interativo: true })); }
-const _renderEq = RENDER.equivalencias;
-RENDER.equivalencias = (...a) => { const r = _renderEq(...a); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
 window.addEventListener('hashchange', () => { if (location.hash === '#equivalencias' && SY.handle && !SY.legado && SYQ.status !== 'permissao') sincronizarEq({ interativo: true }); });
 
 /* ---------- Início: pasta raiz ---------- */
@@ -6810,6 +7306,148 @@ RENDER.inicio = (...a) => {
   if (html) { alvo ? alvo.insertAdjacentHTML('afterend', html) : pg.insertAdjacentHTML('afterbegin', html); ligarPastaRaiz(); }
   return r;
 };
+
+/* ---- src/ui/29b-cfg-sync.js ---- */
+/* ============================================================
+ * v3.0 — Configuração compartilhada pela pasta raiz (Configuração compartilhada/configuracao.json).
+ * Mesmo modelo do Fluxo e das equivalências: mescla de três vias com a última versão sincronizada, conferência
+ * do que ficou gravado e escolha explícita quando os dois mudaram o mesmo item. Preferências individuais
+ * (operador, tema, cor, menu) não vão para a pasta.
+ * ============================================================ */
+PASTAS_RAIZ.cfg = { nome: 'Configuração compartilhada', re: /^CONFIGURACAO/ };
+const SYC = { status: 'off', erro: '', lm: 0, meta: null, ocupado: false, pendente: false, conferidoEm: 0, conflitos: 0 };
+const ARQ_CFG = 'configuracao.json';
+const dirCfg = () => caminho([PASTAS_RAIZ.cfg], true);
+const cfgGravadaLocal = () => lerLocal(CHAVES.cfg);
+const cfgSemSalvar = () => { try { return JSON.stringify(S.cfg) !== JSON.stringify(cfgGravadaLocal()); } catch (e) { return false; } };
+
+async function sincronizarCfg({ interativo = false } = {}) {
+  if (!SY.handle || SY.legado) { SYC.status = 'off'; return; }
+  if (SYC.ocupado) { SYC.pendente = true; return; }
+  if (!(await temPermissaoPasta(interativo))) { SYC.status = 'permissao'; atualizarBarraCfg(); return; }
+  // Edição em andamento nas Bases (S.cfg diferente do que está gravado): não mistura com a versão da pasta.
+  if (cfgSemSalvar()) {
+    if (!interativo) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
+    if (!await confirmar('Alterações não salvas', 'A configuração tem alterações que ainda não foram salvas. Salvar agora e sincronizar com a pasta?', 'Salvar e sincronizar')) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
+    salvarCfgSemSync('Configuração salva.');
+  }
+  SYC.ocupado = true;
+  try {
+    for (let t = 0; t < 3; t++) {
+      const dir = await dirCfg(); let remoto = null, lm = 0;
+      try { const f = await (await dir.getFileHandle(ARQ_CFG)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_CFG_SYNC || !d.cfg) throw new Error(`${ARQ_CFG} não é a configuração compartilhada`); remoto = d; }
+      catch (e) { if (e.name !== 'NotFoundError') throw e; }
+      if (remoto && validarConfig(remoto.cfg).length) throw new Error(`${ARQ_CFG} inválido: ${validarConfig(remoto.cfg).slice(0, 3).join('; ')}`);
+      const local = cfgGravadaLocal() || S.cfg, base = lerLocal(CHAVES.cfgSyncBase);
+      let { cfg, conflitos } = mesclarCfg(local, remoto?.cfg || null, base);
+      if (conflitos.length) {
+        if (!interativo && !['#configuracoes', '#bases'].includes(location.hash)) { SYC.status = 'conflito'; SYC.conflitos = conflitos.length; return; }
+        const quem = remoto?.atualizadoPor || 'outra pessoa';
+        const r = await dialogo(`${conflitos.length} item(ns) da configuração mudados pelos dois`, `<p class="small">Você e ${esc(quem)} mudaram os mesmos itens${base ? ' desde a última sincronização' : ' (primeira sincronização ou backup restaurado)'}. Escolha qual versão fica em cada um; nada é trocado sem a sua escolha.</p>
+          ${conflitos.map((x, i) => `<div class="sy-conf"><b>${esc(x.rotulo)}</b><label class="small"><input type="radio" name="c${i}" value="local" checked> A minha: ${esc(resumoValorCfg(x.local))}</label><label class="small"><input type="radio" name="c${i}" value="remoto"> A de ${esc(quem)}: ${esc(resumoValorCfg(x.remoto))}</label></div>`).join('')}`, [['', 'Decidir depois', 'sec'], ['ok', 'Aplicar escolhas']]);
+        if (r.botao !== 'ok') { SYC.status = 'conflito'; SYC.conflitos = conflitos.length; return; }
+        cfg = aplicarEscolhasCfg(cfg, conflitos, conflitos.map((x, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local'));
+      }
+      migrarConfig(cfg);
+      const erros = validarConfig(cfg); if (erros.length) throw new Error(`a mescla não passou na validação (${erros.slice(0, 3).join('; ')}); nada foi gravado`);
+      const sem = c => JSON.stringify({ ...c, revisao: 0, atualizadoEm: '' });
+      if (sem(cfg) !== sem(local)) {
+        if (!base) backupAntesDeSubstituirSemReset(CHAVES.cfgAnterior, local);
+        S.cfg = cfg; gravarLocal(CHAVES.cfg, S.cfg); aplicarPastasConfig?.();
+        if (remoto) avisar(`Configuração atualizada com as mudanças de ${remoto.atualizadoPor || 'outra pessoa'} (pasta compartilhada).`, 'ok');
+        if (['#configuracoes', '#bases'].includes(location.hash)) RENDER[location.hash.slice(1)]();
+      }
+      if (!remoto || sem(remoto.cfg) !== sem(S.cfg)) {
+        const fh = await dir.getFileHandle(ARQ_CFG, { create: true });
+        if (lm && (await fh.getFile()).lastModified !== lm) continue;
+        const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
+        const texto = JSON.stringify({ schema: SCHEMA_CFG_SYNC, versaoSchema: 1, motor: MOTOR_VERSAO, ...meta, cfg: S.cfg });
+        const w = await fh.createWritable(); await w.write(texto); await w.close();
+        const gravado = await fh.getFile(); if (await gravado.text() !== texto) continue;
+        SYC.lm = gravado.lastModified; SYC.meta = meta;
+      } else { SYC.lm = lm; SYC.meta = { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor }; }
+      gravarLocal(CHAVES.cfgSyncBase, S.cfg);
+      SYC.status = 'ok'; SYC.erro = ''; SYC.conflitos = 0; SYC.conferidoEm = Date.now();
+      return;
+    }
+    SYC.status = 'erro'; SYC.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';
+  } catch (e) { SYC.status = 'erro'; SYC.erro = e.message || String(e); }
+  finally { SYC.ocupado = false; atualizarBarraCfg(); if (SYC.pendente) { SYC.pendente = false; setTimeout(() => sincronizarCfg(), 50); } }
+}
+// Cópia de segurança sem apagar a base de sincronização (usada pela própria sincronização).
+function backupAntesDeSubstituirSemReset(chave, valor) { gravarLocal(chave, { em: agoraISO(), valor }); }
+async function checarCfgPasta() {
+  if (!SY.handle || SY.legado || SYC.ocupado || SYC.status === 'permissao') return;
+  if (SYC.status === 'edicao' && !cfgSemSalvar()) SYC.status = 'ok';
+  try { const f = await (await (await dirCfg()).getFileHandle(ARQ_CFG)).getFile(); if (f.lastModified !== SYC.lm) sincronizarCfg(); } catch (e) { if (e.name === 'NotFoundError') sincronizarCfg(); }
+}
+// Toda gravação da configuração agenda a sincronização.
+const salvarCfgSemSync = salvarCfg;
+let syncCfgAgendada = 0;
+salvarCfg = function (...a) { salvarCfgSemSync(...a); if (SY.handle && !SY.legado && SYC.status !== 'permissao') { clearTimeout(syncCfgAgendada); syncCfgAgendada = setTimeout(() => sincronizarCfg(), 800); } };
+const _checarEqPastaCfg = checarEqPasta;
+checarEqPasta = async function () { _checarEqPastaCfg(); checarCfgPasta(); };
+const _definirPastaSyncCfg = definirPastaSync;
+definirPastaSync = async function (h) { await _definirPastaSyncCfg(h); if (h) await sincronizarCfg({ interativo: true }); else { SYC.status = 'off'; } };
+const _restaurarPastaSyncCfg = restaurarPastaSync;
+restaurarPastaSync = async function () { await _restaurarPastaSyncCfg(); if (SY.handle && SY.status === 'ok') await sincronizarCfg(); };
+
+const TXT_SYNC = { ok: 'sincronizada', permissao: 'acesso precisa ser liberado', erro: 'sem acesso', conflito: 'mudanças dos dois para escolher', edicao: 'alterações não salvas (sincroniza ao salvar)', off: 'só neste navegador' };
+function barraCfg() {
+  if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="cfgSync"><span class="sy-dot"></span><b>Configuração só neste navegador.</b><span class="muted">Conecte a pasta raiz (Configurações → Pastas e sincronização) para dividir unidades, prestadores, aliases e regras com a outra pessoa.</span></div>`;
+  const cls = SYC.status === 'ok' ? 'ok' : 'warn', ult = SYC.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYC.meta.atualizadoPor || '—')}</b> em ${new Date(SYC.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
+  const txt = SYC.ocupado ? 'Sincronizando…' : SYC.status === 'erro' ? `Sem acesso à pasta — mudanças guardadas neste navegador (${esc(SYC.erro)})` : `Configuração ${TXT_SYNC[SYC.status] || SYC.status}`;
+  return `<div class="sy-barra ${cls}" id="cfgSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(PASTAS_RAIZ.cfg.nome)}\\${ARQ_CFG}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syc="agora">${SYC.status === 'conflito' ? 'Resolver' : SYC.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
+}
+function atualizarBarraCfg() { const b = $('cfgSync'); if (!b) return; b.outerHTML = barraCfg(); ligarBarraCfg(); }
+function ligarBarraCfg() { document.querySelectorAll('#cfgSync [data-syc]').forEach(b => b.onclick = () => sincronizarCfg({ interativo: true })); }
+window.addEventListener('hashchange', () => { if (['#bases', '#configuracoes'].includes(location.hash) && SY.handle && !SY.legado && SYC.status !== 'permissao') sincronizarCfg({ interativo: SYC.status === 'conflito' }); });
+
+/* ---------- Nomes das pastas, configuráveis (Configurações → Pastas e sincronização) ----------
+ * Ficam em cfg.pastas e valem para os dois (vão com a configuração compartilhada). Ao ler, a ferramenta continua
+ * reconhecendo também os nomes padrão e os que a equipe já usava; ao criar, usa o nome configurado. */
+// As pastas de sincronização (Fluxo, Equivalências, Configuração) têm nome fixo: é por elas que os dois navegadores se
+// encontram, e renomear de um lado só dividiria os dados. As demais são configuráveis.
+const PASTAS_FIXAS = { fluxo: [PASTAS_RAIZ.fluxo, 'Fluxo mensal sincronizado (um arquivo por competência)'], eq: [PASTAS_RAIZ.eq, 'Base de equivalências TUSS compartilhada'], cfg: [PASTAS_RAIZ.cfg, 'Configuração compartilhada (Bases, regras, parâmetros, modelos)'] };
+const PASTAS_EDITAVEIS = {
+  backups: [PASTAS_RAIZ.backups, 'Backups gravados pela ferramenta'],
+  bases: [PASTAS_RAIZ.bases, 'Planilhas do mês: laudos do Apolo e Power BI (dentro: Comp_MM-AAAA)'],
+  comps: [PASTAS_RAIZ.comps, 'Pastas das competências (dentro: Comp_MM-AAAA)'],
+  rel: [PASTA_REL, 'No mês: PDFs do MV para conferência (USG, IMG, Curitiba)'],
+  corr: [PASTA_CORR, 'No mês: PDFs do prestador genérico para correção'],
+  plan: [PASTA_PLAN, 'No mês: planilhas usadas na conferência (alternativa a Bases de dados)'],
+  conf: [PASTA_CONF, 'No mês: Excel das conferências gravados pela ferramenta'],
+  nc: [PASTA_NC, 'No mês: planilhas de não conformidades']
+};
+const PADRAO_PASTAS = Object.fromEntries(Object.entries(PASTAS_EDITAVEIS).map(([k, [p]]) => [k, { nome: p.nome, re: p.re }]));
+function aplicarPastasConfig() {
+  const c = S.cfg?.pastas || {};
+  for (const [k, [p]] of Object.entries(PASTAS_EDITAVEIS)) {
+    const nome = limparNomePasta(c[k] || '') || PADRAO_PASTAS[k].nome, padrao = PADRAO_PASTAS[k];
+    const reNome = new RegExp('^' + norm(nome).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
+    p.nome = nome; p.personalizado = !!limparNomePasta(c[k] || ''); p.re = { test: s => reNome.test(s) || padrao.re.test(s) };
+  }
+}
+
+/* ---------- Onde gravar o que a ferramenta gera (v3.0) ----------
+ * Com a pasta raiz conectada e a opção ligada (Configurações → Pastas e sincronização), os Excel da conferência,
+ * da correção e das NCs vão direto para a pasta da competência (Comp_MM-AAAA › Conferência cruzada | Não
+ * conformidades), sem passar por Downloads. Sem pasta, sem permissão ou com erro, o arquivo é baixado como antes. */
+const exportarNaPasta = () => !!SY.handle && !SY.legado && S.cfg?.parametros?.exportarNaPasta !== false;
+async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp) {
+  const blob = zipOuBlob instanceof Blob ? zipOuBlob : await zipOuBlob.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
+  if (exportarNaPasta() && await temPermissaoPasta(true)) {
+    try {
+      const dC = await dirCompetencia(chave, true), alvo = { conf: PASTA_CONF, nc: PASTA_NC }[destino] || PASTA_CONF;
+      const d = await subpasta(dC, alvo, true), fh = await d.getFileHandle(nome, { create: true });
+      const w = await fh.createWritable(); await w.write(blob); await w.close();
+      if ((await fh.getFile()).size !== blob.size) throw new Error('o arquivo gravado ficou com tamanho diferente');
+      avisar(`Gravado na pasta: ${nomeCompPasta(chave)} › ${alvo.nome} › ${nome}`, 'ok');
+      return 'pasta';
+    } catch (e) { avisar(`Não foi possível gravar na pasta (${e.message}); o arquivo foi baixado.`, 'warn'); }
+  }
+  baixarBlob(blob, nome); return 'download';
+}
 
 /* ---- src/ui/30-correcao.js ---- */
 /* ============================================================
@@ -6863,7 +7501,7 @@ function desenharCorrecao() {
     <div class="card"><h2>Equivalências desta rodada</h2><div id="coEq"></div></div></div>`;
   ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.corr.filtro; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharCorrecao(); });
-  $('coExcel').onclick = () => baixarZip(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx));
+  $('coExcel').onclick = () => entregarArquivo(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx), 'conf', ctx.chaveCompetencia || S.comp);
   const filtrar = () => {
     const q = norm(S.corr.busca);
     return res.linhas.filter(o => (!S.corr.filtro.size || S.corr.filtro.has(o.estado)) && (!q || norm([o.r.paciente, o.r.codigo, o.r.procDesc, o.medico].join(' ')).includes(q)));
@@ -7179,7 +7817,7 @@ async function editarNC(nc) {
   if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   const d = nc ? { ...nc } : { competencia: NCV.chave, categoria: NCV.aba !== 'todas' ? NCV.aba : 'convenio', natureza: NCV.aba === 'prestador' ? 'prestador-incorreto' : 'nao-lancado', situacao: 'aberta', impactaPagamento: true };
-  const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length})</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
+  const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length}) · criada em ${nc.criadaEm ? new Date(nc.criadaEm).toLocaleString('pt-BR') : '—'}${nc.atualizadaEm ? ` · atualizada em ${new Date(nc.atualizadaEm).toLocaleString('pt-BR')}` : ''}</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${(h.mudancas || []).filter(m => 'de' in m).map(m => `<br><span class="muted">${esc(m.campo)}: «${esc(String(m.de))}» → «${esc(String(m.para))}»</span>`).join('')}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
   const r = await dialogo(nc ? 'Editar não conformidade' : 'Nova não conformidade', formNC(d) + hist, nc ? [['', 'Cancelar', 'sec'], ['ok', 'Salvar']] : [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return;
   const e = r.campos;
@@ -7254,7 +7892,7 @@ async function importarPlanilhaNC(f) {
 async function exportarNC(itens, pr) {
   if (!itens.length) return avisar('Nenhuma NC nesta competência para exportar.', 'warn');
   const prazos = Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data]));
-  await baixarZip(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`);
+  await entregarArquivo(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`, 'nc', NCV.chave);
   const abertas = itens.filter(x => x.situacao === 'aberta');
   if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;
@@ -7619,6 +8257,7 @@ const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: n
 
 RENDER.equivalencias = () => {
   if (FE.sub === 'destrava') return desenharDestrava();
+  if (FE.sub === 'titulos') return desenharTitulos();   // v3.0: manutenção por título do Apolo
   if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
@@ -7633,6 +8272,7 @@ RENDER.equivalencias = () => {
     <div class="grid4">
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
+    ${S.apolo ? (() => { const n = titulosDoApolo(S.apolo, S.eq, S.cfg).filter(t => ['sem-cadastro', 'pendente', 'conflito'].includes(t.situacao)).length; return n ? `<p class="small"><span class="badge warn">${n}</span> título(s) da planilha do Apolo carregada ainda sem equivalência validada — <button class="mini" data-esub="titulos">Abrir «Títulos do Apolo»</button></p>` : ''; })() : ''}
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqXlsx">Exportar planilha (.xlsx)</button><button id="eqExp" class="sec">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
@@ -8079,7 +8719,7 @@ function descTussUI(cd) {
  * a ferramenta roda de novo as conferências afetadas que estiverem carregadas nesta sessão.
  * ============================================================ */
 const DV = { unidade: '*', sel: new Set(), abertos: new Set() };
-const abasEq = () => `<div class="subabas" role="tablist">${[['base', 'Base de equivalências'], ['destrava', 'O que mais destrava']].map(([k, t]) => `<button role="tab" class="${(FE.sub || 'base') === k ? 'on' : ''}" aria-selected="${(FE.sub || 'base') === k}" data-esub="${k}">${t}</button>`).join('')}</div>`;
+const abasEq = () => `<div class="subabas" role="tablist">${[['titulos', 'Títulos do Apolo'], ['base', 'Base de equivalências'], ['destrava', 'O que mais destrava']].map(([k, t]) => `<button role="tab" class="${(FE.sub || 'base') === k ? 'on' : ''}" aria-selected="${(FE.sub || 'base') === k}" data-esub="${k}">${t}</button>`).join('')}</div>`;
 function ligarAbasEq(raiz) { raiz.querySelectorAll('[data-esub]').forEach(b => b.onclick = () => { FE.sub = b.dataset.esub; RENDER.equivalencias(); }); }
 // Atalho do Início («o que mais destrava»).
 document.addEventListener('click', e => { if (e.target.closest('[data-destrava]')) FE.sub = 'destrava'; });
@@ -8151,6 +8791,119 @@ async function naoCorrespondem(pares) {
   }
   S.eq.revisao++; S.eq.atualizadoEm = agoraISO();
   salvarEq(`${pares.length} par(es) marcados como «não correspondem».`); DV.sel.clear(); desenharDestrava();
+}
+
+/* ---- src/ui/43-titulos.js ---- */
+/* ============================================================
+ * v3.0 — Equivalências → «Títulos do Apolo»: manutenção da base por título, numa tela só.
+ * Esquerda: os títulos distintos da planilha de laudos carregada (com quantos laudos, modalidade e situação),
+ * pendentes primeiro e os mais frequentes no topo. Direita: o título escolhido lado a lado com o procedimento
+ * de destino — sugestões, busca no catálogo, o que já existe na base — e a confirmação (simples, «juntos» ou
+ * «um ou outro»). Depois de confirmar, o próximo título pendente já fica selecionado.
+ * ============================================================ */
+const TT = { busca: '', sit: 'pendentes', mod: '*', unidade: '*', sel: '', escolhidos: [], escopoMod: '*', motivo: '', limite: 200 };
+const FILTRO_SIT_TT = { pendentes: ['sem-cadastro', 'conflito', 'pendente'], todos: null, 'sem-cadastro': ['sem-cadastro'], pendente: ['pendente'], conflito: ['conflito'], validada: ['validada'], composta: ['composta'] };
+function desenharTitulos() {
+  const pg = $('pag-equivalencias');
+  if (!S.apolo) {
+    pg.innerHTML = `<div class="card"><h2>Títulos do Apolo</h2>${abasEq()}<p class="lead">Carregue a planilha de laudos do Apolo (Início, ou «Atualizar da pasta») para listar os títulos distintos e indicar a equivalência de cada um.</p></div>`;
+    ligarAbasEq(pg); return;
+  }
+  const todos = titulosDoApolo(S.apolo, S.eq, S.cfg, { unidade: TT.unidade }), q = norm(TT.busca), fs = FILTRO_SIT_TT[TT.sit];
+  const lista = todos.filter(t => (!fs || fs.includes(t.situacao)) && (TT.mod === '*' || t.modalidade === TT.mod) && (!q || norm(t.variantes.join(' ')).includes(q) || t.codigos.some(c => c.includes(q))));
+  const nLaudos = todos.reduce((a, t) => a + t.n, 0), nOk = todos.filter(t => t.situacao === 'validada' || t.situacao === 'composta').reduce((a, t) => a + t.n, 0);
+  const cont = k => todos.filter(t => t.situacao === k).length;
+  if (!TT.sel || !todos.some(t => t.chave === TT.sel)) { TT.sel = lista[0]?.chave || ''; TT.escolhidos = []; }
+  const t = todos.find(x => x.chave === TT.sel), mods = [...new Set(todos.map(x => x.modalidade).filter(Boolean))].sort();
+  pg.innerHTML = `<div class="card"><h2>Títulos do Apolo <span class="muted small">${esc(S.apolo.nome || '')}</span></h2>${abasEq()}
+    <p class="lead">Um título por linha (não um laudo por linha). <b>${todos.length}</b> títulos distintos em ${nLaudos.toLocaleString('pt-BR')} laudos: <b>${Math.round(nOk / Math.max(1, nLaudos) * 1000) / 10}%</b> dos laudos já têm título validado ou coberto por regra composta.</p>
+    <div class="grid4"><div><span class="badge err">${cont('sem-cadastro')}</span> sem equivalência</div><div><span class="badge warn">${cont('pendente')}</span> pendentes de validação</div><div><span class="badge err">${cont('conflito')}</span> em conflito</div><div><span class="badge ok">${cont('validada') + cont('composta')}</span> validados (${cont('composta')} por regra composta)</div></div>
+    <div class="filtros">
+      <label class="campo">Buscar título<input type="search" id="ttBuscaTit" value="${esc(TT.busca)}" placeholder="parte do título ou código"></label>
+      <label class="campo">Situação<select id="ttSit">${opcoes([['pendentes', 'A resolver (sem, pendentes e conflitos)'], ['sem-cadastro', 'Sem equivalência'], ['pendente', 'Pendentes de validação'], ['conflito', 'Em conflito'], ['validada', 'Validados'], ['composta', 'Por regra composta'], ['todos', 'Todos']], TT.sit)}</select></label>
+      <label class="campo">Modalidade<select id="ttMod">${opcoes([['*', 'Todas'], ...mods.map(m => [m, `${m} — ${NOME_MODALIDADE[m] || m}`])], TT.mod)}</select></label>
+      <label class="campo">Unidade<select id="ttUn">${opcoes([['*', 'Todas'], ...S.cfg.unidades.filter(u => (u.apolo || []).length).map(u => [u.cod, `${u.cod} — ${u.nome}`])], TT.unidade)}</select></label></div></div>
+  <div class="tt-grid">
+    <div class="card"><div class="tw tt-lista"><table><thead><tr><th>Título do laudo</th><th class="n">Laudos</th><th>Mod.</th><th>Situação</th></tr></thead><tbody>
+      ${lista.slice(0, TT.limite).map(x => `<tr class="tt-titulo${x.chave === TT.sel ? ' on' : ''}" data-tt="${esc(x.chave)}" tabindex="0"><td>${esc(x.titulo)}${x.variantes.length > 1 ? ` <span class="small muted">(+${x.variantes.length - 1} grafia${x.variantes.length > 2 ? 's' : ''})</span>` : ''}${x.destino ? `<br><span class="small muted">${esc(x.destino)}</span>` : ''}</td><td class="n">${x.n.toLocaleString('pt-BR')}</td><td>${esc(x.modalidade)}</td><td><span class="badge ${SITUACAO_TITULO[x.situacao].cls}">${SITUACAO_TITULO[x.situacao].nome}</span></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Nenhum título neste filtro.</td></tr>'}
+    </tbody></table></div>${lista.length > TT.limite ? `<div class="acoes"><button class="sec mini" id="ttMais">Mostrar mais ${Math.min(200, lista.length - TT.limite)} de ${lista.length - TT.limite}</button></div>` : ''}</div>
+    <div class="card tt-painel" id="ttPainel">${t ? painelTitulo(t) : '<p class="muted">Escolha um título na lista.</p>'}</div>
+  </div>`;
+  ligarAbasEq(pg); ligarBuscas(pg);
+  let tm = 0; $('ttBuscaTit').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { TT.busca = e.target.value; TT.sel = ''; desenharTitulos(); const i = $('ttBuscaTit'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
+  $('ttSit').onchange = e => { TT.sit = e.target.value; TT.sel = ''; desenharTitulos(); };
+  $('ttMod').onchange = e => { TT.mod = e.target.value; TT.sel = ''; desenharTitulos(); };
+  $('ttUn').onchange = e => { TT.unidade = e.target.value; TT.sel = ''; desenharTitulos(); };
+  if ($('ttMais')) $('ttMais').onclick = () => { TT.limite += 200; desenharTitulos(); };
+  pg.querySelectorAll('[data-tt]').forEach(tr => { const ir = () => { TT.sel = tr.dataset.tt; TT.escolhidos = []; TT.motivo = ''; desenharTitulos(); }; tr.onclick = ir; tr.onkeydown = e => { if (e.key === 'Enter') ir(); }; });
+  if (t) ligarPainelTitulo(t, lista);
+}
+function painelTitulo(t) {
+  const cat = catalogo('tuss', S.cfg, contextoCatalogo()), desc = c => cat.find(x => String(x.cod) === String(c))?.nome || '';
+  const sug = sugerirCodigos(t.titulo, cat, S.eq, { modalidade: t.modalidade });
+  const fmtEx = e => `${e.data ? fmtData(e.data) : 'sem data'} · ${esc(e.unidade)} · ${esc(e.medico || 'sem médico')} · ${esc(e.convenio || '—')}${e.descricao && norm(e.descricao) !== norm(t.titulo) ? ` · «${esc(e.descricao)}»` : ''}`;
+  const rel = t.relacoes.filter((x, i, a) => a.findIndex(y => y.id === x.id) === i);
+  if (!TT.escopoMod || (TT.escopoMod !== '*' && TT.escopoMod !== t.modalidade)) TT.escopoMod = '*';
+  return `<h3 style="margin-top:0">«${esc(t.titulo)}»</h3>
+    <p class="small"><span class="badge ${SITUACAO_TITULO[t.situacao].cls}">${SITUACAO_TITULO[t.situacao].nome}</span> · <b>${t.n.toLocaleString('pt-BR')}</b> laudo(s) · ${t.modalidades.map(([m, n]) => `${esc(m)} ${n}`).join(', ') || 'sem modalidade'} · ${t.nMedicos} médico(s) · ${t.unidades.slice(0, 3).map(([u, n]) => `${esc(u)} (${n})`).join(', ')}${t.unidades.length > 3 ? '…' : ''}</p>
+    ${t.variantes.length > 1 ? `<p class="small muted">Grafias no Apolo: ${t.variantes.slice(0, 5).map(v => `«${esc(v)}»`).join(', ')}</p>` : ''}
+    <details class="small"><summary>Exemplos de laudos (sem nome de paciente)</summary><ul>${t.exemplos.map(e => `<li>${fmtEx(e)}</li>`).join('')}</ul></details>
+    ${t.composta ? `<div class="linha-ini small" style="margin:8px 0"><b>Regra composta validada:</b> «${esc(nomeComposta(t.composta))}» = ${esc(textoEsperados(esperadosDaComposta(t.composta, '')))} <button class="sec mini" id="ttAbrirRegra">Abrir regra…</button></div>` : ''}
+    <h4>Na base hoje</h4>
+    ${rel.length ? `<ul class="tt-sug small">${rel.map(e => `<li><span><b>${esc(e.codigo)}</b> ${esc(e.descMV || desc(e.codigo))} <span class="muted">· ${STATUS_EQ[e.status]}${e.escopo?.modalidade && e.escopo.modalidade !== '*' ? ` · só ${esc(e.escopo.modalidade)}` : ''}${e.responsavel ? ` · ${esc(e.responsavel)}` : ''}</span></span><span>${e.status !== 'validada' ? `<button class="mini" data-ttval="${esc(e.id)}">Validar</button>` : ''}${e.status !== 'desativada' ? `<button class="sec mini" data-ttdes="${esc(e.id)}">Desativar</button>` : ''}</span></li>`).join('')}</ul>` : '<p class="small muted">Nenhuma relação cadastrada para este título.</p>'}
+    <h4>Indicar o procedimento</h4>
+    ${sug.length ? `<p class="small muted">Sugestões (nunca validam sozinhas — confira antes):</p><ul class="tt-sug small">${sug.map(s => `<li><label><input type="checkbox" data-ttcod="${esc(s.codigo)}"${TT.escolhidos.includes(s.codigo) ? ' checked' : ''}> <b>${esc(s.codigo)}</b> ${esc(s.desc)} <span class="muted">· ${esc(s.motivos.join(' · '))}</span></label><span class="badge ${s.nota >= 0.7 && !s.incompat ? 'ok' : s.nota >= 0.5 ? 'warn' : 'info'}">${Math.round(s.nota * 100)}%</span></li>`).join('')}</ul>` : '<p class="small muted">Sem sugestão por semelhança: procure pelo código ou pelo nome.</p>'}
+    ${campoBusca({ nome: 'ttProc', rotulo: 'Procurar procedimento (código ou descrição do MV/TUSS)', fonte: 'tuss', valorCodigo: true, livre: true })}
+    <div class="small" id="ttEscolhidos">${TT.escolhidos.length ? `Escolhido(s): ${TT.escolhidos.map(c => `<span class="cp-chip"><b>${esc(c)}</b> ${esc(desc(c))}<button type="button" data-ttrm="${esc(c)}" aria-label="Tirar">✕</button></span>`).join(' ')}` : '<span class="muted">Nenhum procedimento escolhido.</span>'}</div>
+    <div class="grid2" style="margin-top:8px"><label class="campo">Vale para<select id="ttEscopo">${opcoes([['*', 'Qualquer modalidade'], ...(t.modalidade ? [[t.modalidade, `Só ${t.modalidade} (${NOME_MODALIDADE[t.modalidade] || t.modalidade})`]] : [])], TT.escopoMod)}</select></label>
+      <label class="campo">Observação (opcional)<input type="text" id="ttMotivo" value="${esc(TT.motivo)}" placeholder="ex.: conferido com o faturamento"></label></div>
+    <div class="acoes">${TT.escolhidos.length <= 1 ? `<button id="ttConfirmar"${TT.escolhidos.length ? '' : ' disabled'}>Confirmar equivalência</button>` : `<button id="ttJuntos">Juntos — regra composta…</button><button class="sec" id="ttOu">Um ou outro</button>`}<button class="sec" id="ttPular">Pular</button></div>
+    ${TT.escolhidos.length > 1 ? '<p class="small muted">«Juntos»: o laudo sustenta uma linha de cada código (ex.: abdome total = superior + inferior; articular + Doppler). «Um ou outro»: qualquer um dos códigos confirma o laudo.</p>' : ''}`;
+}
+function ligarPainelTitulo(t, lista) {
+  const pn = $('ttPainel'), proximo = () => { const i = lista.findIndex(x => x.chave === t.chave), nx = lista.slice(i + 1).find(x => FILTRO_SIT_TT.pendentes.includes(x.situacao)) || lista.find(x => x.chave !== t.chave && FILTRO_SIT_TT.pendentes.includes(x.situacao)); TT.sel = nx?.chave || ''; TT.escolhidos = []; TT.motivo = ''; };
+  const guardarCampos = () => { TT.escopoMod = $('ttEscopo').value; TT.motivo = $('ttMotivo').value; };
+  pn.querySelectorAll('[data-ttcod]').forEach(c => c.onchange = () => { guardarCampos(); TT.escolhidos = c.checked ? [...new Set([...TT.escolhidos, c.dataset.ttcod])] : TT.escolhidos.filter(x => x !== c.dataset.ttcod); desenharTitulos(); });
+  pn.querySelectorAll('[data-ttrm]').forEach(b => b.onclick = () => { guardarCampos(); TT.escolhidos = TT.escolhidos.filter(x => x !== b.dataset.ttrm); desenharTitulos(); });
+  pn.querySelector('[name="ttProc"]').addEventListener('busca-escolha', e => { const v = String(e.detail?.cod || e.target.value || '').replace(/\D/g, ''); if (v.length < 5) return avisar('Escolha um procedimento com código TUSS (5 dígitos ou mais).', 'warn'); guardarCampos(); TT.escolhidos = [...new Set([...TT.escolhidos, v])]; desenharTitulos(); });
+  if ($('ttAbrirRegra')) $('ttAbrirRegra').onclick = () => editarComposta(t.composta.id);
+  pn.querySelectorAll('[data-ttval]').forEach(b => b.onclick = async () => { const op = await exigirOperador(); if (!op) return; alterarStatusEq(S.eq, [b.dataset.ttval], 'validada', op, 'validada em Títulos do Apolo', S.comp); salvarEq('Equivalência validada.'); desenharTitulos(); });
+  pn.querySelectorAll('[data-ttdes]').forEach(b => b.onclick = async () => {
+    const e = S.eq.itens.find(x => x.id === b.dataset.ttdes); if (!e) return;
+    const r = await dialogo('Desativar equivalência?', `<p class="small">«${esc(e.titulo)}» → <b>${esc(e.codigo)}</b> deixa de valer nas próximas conferências (fica no histórico).</p><label class="campo">Motivo (obrigatório)<input type="text" name="m"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Desativar', 'perigo']]);
+    if (r.botao !== 'ok') return; if (!r.campos.m?.trim()) return avisar('Informe o motivo.', 'warn');
+    const op = await exigirOperador(); if (!op) return;
+    alterarStatusEq(S.eq, [e.id], 'desativada', op, r.campos.m.trim(), S.comp); aplicarCobertas(S.eq, op, S.comp); salvarEq('Equivalência desativada.'); desenharTitulos();
+  });
+  $('ttPular').onclick = () => { proximo(); desenharTitulos(); };
+  const cat = () => catalogo('tuss', S.cfg, contextoCatalogo()), desc = c => cat().find(x => String(x.cod) === String(c))?.nome || '';
+  if ($('ttConfirmar')) $('ttConfirmar').onclick = async () => {
+    guardarCampos(); const op = await exigirOperador(); if (!op) return;
+    const codigo = TT.escolhidos[0], outros = t.codigos.filter(c => c !== codigo && t.situacao !== 'composta');
+    let substituir = false;
+    if (t.situacao === 'composta') { if (!await confirmar('Título coberto por regra composta', `«${esc(t.titulo)}» já é resolvido pela regra «${esc(nomeComposta(t.composta))}», que vale por cima das relações simples. A relação simples fica registrada, mas a regra continua valendo. Confirmar mesmo assim?`, 'Confirmar')) return; }
+    else if (outros.length) {
+      const r = await dialogo('O título já está validado para outro código', `<p class="small">«${esc(t.titulo)}» já confirma <b>${esc(outros.join(', '))}</b>. Dois códigos validados para o mesmo título viram <b>conflito</b> e o título deixa de confirmar.</p>
+        <label class="small" style="display:block"><input type="radio" name="o" value="sub" checked> Substituir: desativar ${esc(outros.join(', '))} e validar ${esc(codigo)}</label>
+        <label class="small" style="display:block"><input type="radio" name="o" value="comp"> São válidos juntos ou um ou outro: montar regra composta com os ${outros.length + 1} códigos</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Continuar']]);
+      if (r.botao !== 'ok') return;
+      if (r.campos.o === 'comp') { TT.escolhidos = [...new Set([...outros, codigo])]; return desenharTitulos(); }
+      substituir = true;
+    }
+    try {
+      confirmarEquivalenciaTitulo(S.eq, { titulo: t.titulo, codigo, descMV: desc(codigo), modalidade: TT.escopoMod, responsavel: op, motivo: TT.motivo, competencia: S.comp });
+      if (substituir) { const ids = S.eq.itens.filter(e => e.status === 'validada' && chaveTitulo(e.titulo) === t.chave && e.codigo !== codigo).map(e => e.id); alterarStatusEq(S.eq, ids, 'desativada', op, `substituída por ${codigo} em Títulos do Apolo`, S.comp); }
+    } catch (e) { return avisar(e.message, 'err'); }
+    salvarEq(`«${t.titulo}» → ${codigo} validada. Rode de novo as conferências da competência para usar a nova equivalência.`); proximo(); desenharTitulos();
+  };
+  if ($('ttOu')) $('ttOu').onclick = async () => {
+    guardarCampos(); const op = await exigirOperador(); if (!op) return;
+    if (!await confirmar('Regra «um ou outro»', `«${esc(t.titulo)}» passa a confirmar <b>uma</b> linha com qualquer um destes códigos: ${esc(TT.escolhidos.join(', '))}. A regra fica validada por ${esc(op)}.`, 'Criar regra')) return;
+    const nova = novaComposta({ nome: `${t.titulo.slice(0, 50)} (um ou outro)`, titulos: [t.titulo], escopo: { unidade: '*', modalidade: TT.escopoMod || '*' }, itens: [{ rotulo: 'um dos códigos', codigos: [...TT.escolhidos], qtd: 1, excecoes: [] }], justificativa: TT.motivo || 'criada em Títulos do Apolo', origem: 'Títulos do Apolo' });
+    S.eq.compostas = S.eq.compostas || []; S.eq.compostas.push(nova); alterarStatusComposta(S.eq, nova.id, 'validada', op, TT.motivo || 'criada em Títulos do Apolo', S.comp); aplicarCobertas(S.eq, op, S.comp);
+    salvarEq(`Regra «um ou outro» criada para «${t.titulo}».`); proximo(); desenharTitulos();
+  };
+  if ($('ttJuntos')) $('ttJuntos').onclick = () => { guardarCampos(); editarComposta(null, novaComposta({ nome: t.titulo.slice(0, 60), titulos: [t.titulo], escopo: { unidade: '*', modalidade: TT.escopoMod || '*' }, itens: TT.escolhidos.map(c => ({ rotulo: (desc(c) || c).replace(/\s*-\s*OP$/, '').slice(0, 40), codigos: [c], qtd: 1, excecoes: [] })), origem: 'Títulos do Apolo' })); };
 }
 
 /* ---- src/ui/50-bases.js ---- */
@@ -8864,7 +9617,7 @@ async function exportarPastaCompetencia(ch = S.comp) {
       const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: rod.unidadeCod, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
       const ctx = { chaveCompetencia: ch, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: rod.unidadeCod, unidadeNome: `${rod.unidadeCod} - ${unidadePorCod(S.cfg, rod.unidadeCod)?.nome || ''}`,
         medicosNomes: medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '', parametros: rod.parametros || {}, operador: S.operador, rodadaId: rod.id };
-      add(`Conferência cruzada/${tipo}/Unidade ${unRot}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, ctx)));
+      add(`Conferência cruzada/${tipo}/Unidade ${unRot}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() })));
     } else semRodada.push(`${x.nome} (${tipo}${S.apolo ? ', sem conferência nesta competência' : ', Apolo não carregado'})`);
   }
   leia.push(`Relatórios do MV: ${S.relatorios.length} PDF(s) carregado(s) nesta sessão.`);
@@ -8887,17 +9640,71 @@ async function exportarPastaCompetencia(ch = S.comp) {
 
 /* ---- src/ui/70-configuracoes.js ---- */
 /* ============================================================
- * Configurações: operador, parâmetros, tema, backup e dados locais
+ * Configurações (v3.0): tudo o que é ajuste permanente fica aqui, em categorias.
+ * As páginas operacionais (Conferência, Correção, NCs, Fechamento…) só têm a atividade do dia.
+ *   Geral · Conferência · Bases e regras (página Bases) · Pastas e sincronização · Exportação · Backup e dados · Sobre
+ * O que é da equipe vai com a configuração compartilhada (pasta da rede); o que é de cada pessoa fica no navegador.
  * ============================================================ */
+const CF = { sub: 'geral', colunas: null, modelo: '' };
+const ABAS_CONFIG = [['geral', 'Geral'], ['conferencia', 'Conferência'], ['bases', 'Bases e regras'], ['pastas', 'Pastas e sincronização'], ['exportacao', 'Exportação'], ['backup', 'Backup e dados'], ['sobre', 'Sobre']];
+const abasConfiguracoes = atual => `<div class="subabas cfg-abas" role="tablist" aria-label="Categorias de configuração">${ABAS_CONFIG.map(([k, t]) => `<button role="tab" class="${atual === k ? 'on' : ''}" aria-selected="${atual === k}" data-cfsub="${k}">${t}</button>`).join('')}</div>`;
+function ligarAbasConfiguracoes(raiz) {
+  raiz.querySelectorAll('[data-cfsub]').forEach(b => b.onclick = () => {
+    const k = b.dataset.cfsub;
+    if (k === 'bases') { if (location.hash !== '#bases') location.hash = '#bases'; return; }
+    CF.sub = k; if (location.hash !== '#configuracoes') location.hash = '#configuracoes'; else RENDER.configuracoes();
+  });
+}
+
+/* ---------- Cor de destaque (tema leve): no máximo cinco cores sérias, com contraste ≥ 4,5:1 ---------- */
+const ACENTOS = {
+  azul: { nome: 'Azul institucional', claro: ['#1f5f99', '#2b74b8'], escuro: ['#5fa3e3', '#7db7ee'] },
+  petroleo: { nome: 'Petróleo', claro: ['#0e6670', '#13808b'], escuro: ['#4fb3bd', '#72c7cf'] },
+  verde: { nome: 'Verde', claro: ['#2d6a3e', '#388450'], escuro: ['#6cc28a', '#8fd3a6'] },
+  grafite: { nome: 'Grafite', claro: ['#44505f', '#56657a'], escuro: ['#a3b1c2', '#bcc8d6'] },
+  vinho: { nome: 'Vinho', claro: ['#8c2f45', '#a63b55'], escuro: ['#e08a9e', '#eaa5b5'] }
+};
+function aplicarTema() {
+  const t = lerLocal(CHAVES.tema) || 'auto', el = document.documentElement;
+  if (t === 'auto') el.removeAttribute('data-theme'); else el.setAttribute('data-theme', t);
+  const a = ACENTOS[lerLocal(CHAVES.acento)] || ACENTOS.azul;
+  const escuro = t === 'dark' || (t === 'auto' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
+  const [c1, c2] = escuro ? a.escuro : a.claro;
+  el.style.setProperty('--accent', c1); el.style.setProperty('--accent2', c2); el.style.setProperty('--info', c1);
+  el.style.setProperty('--nav-ativo', a.claro[0]);
+}
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => aplicarTema()); } catch (e) { }
+
 RENDER.configuracoes = () => {
-  const p = S.cfg.parametros, tema = lerLocal(CHAVES.tema) || 'auto';
-  $('pag-configuracoes').innerHTML = `
-  <div class="grid2">
-    <div class="card"><h2>Operador</h2><p class="lead">Nome registrado nas validações, aliases, aceites e rodadas.</p>
+  const pg = $('pag-configuracoes'), corpo = ({ geral: cfgGeral, conferencia: cfgConferencia, pastas: cfgPastas, exportacao: cfgExportacao, backup: cfgBackup, sobre: cfgSobre }[CF.sub] || cfgGeral)();
+  pg.innerHTML = abasConfiguracoes(CF.sub) + corpo;
+  ligarAbasConfiguracoes(pg);
+  ({ geral: ligarGeral, conferencia: ligarConferencia, pastas: ligarPastas, exportacao: ligarExportacao, backup: ligarBackup, sobre: ligarSobre }[CF.sub] || ligarGeral)(pg);
+};
+const notaEscopo = (compartilhado) => `<span class="badge ${compartilhado ? 'info' : 'ok'}" title="${compartilhado ? 'Vai com a configuração compartilhada na pasta da rede: vale para os dois.' : 'Fica só neste navegador: cada pessoa tem a sua.'}">${compartilhado ? 'da equipe' : 'só sua'}</span>`;
+
+/* ---------- Geral ---------- */
+function cfgGeral() {
+  const tema = lerLocal(CHAVES.tema) || 'auto', acento = lerLocal(CHAVES.acento) || 'azul';
+  return `<div class="grid2">
+    <div class="card"><h2>Operador ${notaEscopo(false)}</h2><p class="lead">Nome registrado nas validações, aliases, aceites, NCs e rodadas.</p>
       <label class="campo">Nome<input type="text" id="cfgOp" value="${esc(S.operador)}"></label><div class="acoes"><button id="cfgOpSalvar">Salvar</button></div></div>
-    <div class="card"><h2>Aparência</h2><label class="campo">Tema<select id="cfgTema">${opcoes([['auto', 'Automático (sistema)'], ['light', 'Claro'], ['dark', 'Escuro']], tema)}</select></label></div>
-  </div>
-  <div class="card"><h2>Parâmetros de conferência</h2><p class="lead">Padrões usados ao abrir as análises; cada rodada registra o valor efetivamente usado.</p>
+    <div class="card"><h2>Aparência ${notaEscopo(false)}</h2>
+      <label class="campo">Tema<select id="cfgTema">${opcoes([['auto', 'Automático (sistema)'], ['light', 'Claro'], ['dark', 'Escuro']], tema)}</select></label>
+      <div class="campo"><span>Cor de destaque</span><div class="acentos" role="radiogroup" aria-label="Cor de destaque">${Object.entries(ACENTOS).map(([k, a]) => `<label class="acento${k === acento ? ' on' : ''}" title="${esc(a.nome)}"><input type="radio" name="acento" value="${k}"${k === acento ? ' checked' : ''}><i style="background:${a.claro[0]}"></i><span class="small">${esc(a.nome)}</span></label>`).join('')}</div>
+      <span class="small muted">Cores com contraste adequado no tema claro e no escuro. As cores de situação (conferido, pendente, só no laudo…) não mudam: elas têm significado.</span></div></div>
+  </div>`;
+}
+function ligarGeral() {
+  $('cfgOpSalvar').onclick = () => { S.operador = $('cfgOp').value.trim(); gravarLocal(CHAVES.operador, S.operador); mostrarOperador(); avisar('Operador salvo.', 'ok'); };
+  $('cfgTema').onchange = e => { gravarLocal(CHAVES.tema, e.target.value); aplicarTema(); };
+  document.querySelectorAll('[name="acento"]').forEach(r => r.onchange = () => { gravarLocal(CHAVES.acento, r.value); aplicarTema(); RENDER.configuracoes(); });
+}
+
+/* ---------- Conferência: parâmetros e onde ficam as regras ---------- */
+function cfgConferencia() {
+  const p = S.cfg.parametros;
+  return `<div class="card"><h2>Parâmetros de conferência ${notaEscopo(true)}</h2><p class="lead">Padrões usados ao abrir as análises; cada rodada registra o valor efetivamente usado.</p>
     <div class="grid4">
       <label class="campo">Tolerância — conferência (dias)<input type="number" id="pTolC" min="0" max="60" value="${p.tolConferencia}"><span class="small muted">Data diferente na tolerância = «com ressalva».</span></label>
       <label class="campo">Tolerância — correção de prestador (dias)<input type="number" id="pTolP" min="0" max="60" value="${p.tolCorrecao}"><span class="small muted">0 = mesma data (recomendado).</span></label>
@@ -8906,57 +9713,282 @@ RENDER.configuracoes = () => {
       <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
     <div class="acoes"><button id="pSalvar">Salvar parâmetros</button></div></div>
-  <div class="card"><h2>Regras financeiras</h2><p class="lead">Percentuais de USG por prestador e unidade, classes A/B/C/D, valores fixos por laudo, vigências e descontos estão especificados (RN-180, RN-183), mas <strong>não estão ativos nesta versão</strong>. Nenhum valor é calculado: a conferência é de existência e consistência.</p></div>
-  <div class="card"><h2>Backup e dados locais</h2>
-    <p class="lead">Configuração e equivalências ficam no armazenamento deste navegador; as rodadas, no IndexedDB. Arquivos de backup contêm a configuração, a base de equivalências e o fluxo mensal (sem dados de pacientes); o histórico de rodadas pode ser incluído.</p>
-    <dl class="kv"><dt>Configuração</dt><dd>revisão ${S.cfg.revisao} · ${S.cfg.unidades.length} unidades · ${S.cfg.prestadores.length} prestadores · ${S.cfg.classificacao.length} regras</dd>
-      <dt>Equivalências</dt><dd>revisão ${S.eq.revisao} · ${S.eq.itens.length} relações</dd><dt>Fluxo mensal</dt><dd>modelo rev. ${S.fluxo.modelo.revisao} · ${Object.keys(S.fluxo.competencias).length} competência(s)</dd><dt>Não conformidades</dt><dd>${S.nc.itens.length} NC(s) · retenção de ${retencaoNC()} dias para dados de pacientes</dd><dt>Rodadas</dt><dd>${S.rodadas.length} ${DB.ok ? '(IndexedDB)' : '(só nesta sessão)'}</dd></dl>
-    <div class="acoes"><button id="bkExp">Exportar backup (.json)</button><label class="small"><input type="checkbox" id="bkRod"> incluir rodadas</label><label class="small"><input type="checkbox" id="bkNC"> incluir não conformidades (contém nomes de pacientes)</label><button id="bkImp" class="sec">Restaurar backup</button><input type="file" id="bkArq" accept=".json" hidden>
-      <button id="bkDesfazerEq" class="sec">Desfazer última substituição de equivalências</button><button id="bkApagar" class="perigo">Apagar todos os dados locais</button></div></div>
-  <div class="card"><h2>Sobre</h2><dl class="kv"><dt>Versão</dt><dd>${MOTOR_VERSAO} (alpha)</dd><dt>Especificação</dt><dd>Documentação v1.6 — RN-178 a RN-215</dd><dt>Bibliotecas</dt><dd>pdf.js (Apache-2.0) e JSZip (MIT/GPLv3), embutidas</dd></dl></div>`;
-  $('cfgOpSalvar').onclick = () => { S.operador = $('cfgOp').value.trim(); gravarLocal(CHAVES.operador, S.operador); mostrarOperador(); avisar('Operador salvo.', 'ok'); };
-  $('cfgTema').onchange = e => { gravarLocal(CHAVES.tema, e.target.value); aplicarTema(); };
+  <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
+    ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
+  <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
+    <dl class="kv"><dt>Equivalências TUSS</dt><dd>${S.eq.itens.filter(e => e.status === 'validada').length} validadas · ${S.eq.itens.filter(e => e.status === 'pendente').length} pendentes · ${(S.eq.compostas || []).filter(c => c.status === 'validada').length} regras compostas validadas — <a href="#equivalencias">Equivalências TUSS</a> (títulos do Apolo, base, regras compostas, o que mais destrava)</dd>
+      <dt>Unidades e nomes no Apolo</dt><dd>${S.cfg.unidades.length} unidades — <a href="#bases" data-bsub-link="unidades">Bases e regras</a></dd>
+      <dt>Prestadores, aliases e regras de repasse</dt><dd>${S.cfg.prestadores.length} prestadores · ${S.cfg.prestadores.reduce((n, p) => n + (p.aliases || []).filter(a => a.status === 'validado').length, 0)} alias(es) validado(s) — <a href="#bases">Bases e regras</a></dd>
+      <dt>Classificação do tipo de item</dt><dd>${S.cfg.classificacao.filter(r => r.ativa).length} regras ativas (HM, taxa, material…) — <a href="#bases">Bases e regras</a></dd>
+      <dt>Convênios e faturistas</dt><dd>${S.cfg.convenios.length} convênios · ${S.cfg.faturistas.length} faturistas — <a href="#bases">Bases e regras</a></dd></dl></div>`;
+}
+function ligarConferencia() {
+  document.querySelectorAll('[data-guardarauto]').forEach(ch => ch.onchange = () => {
+    S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
+    salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
+  });
   $('pSalvar').onclick = () => {
-    const n = { tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
-    if (Object.entries(n).some(([k, v]) => k !== 'prestadorGenerico' && (!Number.isFinite(v) || v < 0)) || n.retencaoNC < 1 || n.retencaoNC > 366) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
-    S.cfg.parametros = n; salvarCfg('Parâmetros salvos.');
+    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
+    if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
+    S.cfg.parametros = n; salvarCfg('Parâmetros salvos.', 'parametros');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
   };
-  $('bkExp').onclick = async () => baixarJSON({ schema: SCHEMA_BACKUP, versaoSchema: 1, exportadoEm: agoraISO(), motor: MOTOR_VERSAO, configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, competencias: S.compReg, nc: $('bkNC').checked ? S.nc : undefined, rodadas: $('bkRod').checked ? await dbTodas() : undefined }, `backup_repasse_medico_${carimbo()}.json`);
-  $('bkImp').onclick = () => $('bkArq').click();
-  $('bkArq').onchange = async e => {
-    const f = e.target.files[0]; if (!f) return;
-    try {
-      const b = JSON.parse(await f.text());
-      if (b.schema !== SCHEMA_BACKUP) throw new Error('não é um backup do Repasse Médico');
-      const erros = [...validarConfig(b.configuracao), ...validarEq(b.equivalencias)];
-      if (erros.length) throw new Error(erros.join('; '));
-      if (!await confirmar('Restaurar backup?', `Configuração rev. ${b.configuracao.revisao} e equivalências rev. ${b.equivalencias.revisao} (${b.equivalencias.itens.length} relações) substituirão as atuais. Uma cópia das atuais será guardada.`, 'Restaurar')) return;
-      backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq);
-      S.cfg = b.configuracao; S.eq = b.equivalencias; salvarCfg(); salvarEq();
-      if (b.fluxo && !validarFluxo(b.fluxo).length) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = b.fluxo; salvarFluxo(); }
-      if (b.competencias && !validarRegistroCompetencias(b.competencias).length) { S.compReg = b.competencias; salvarCompReg(); }
-      if (b.nc && !validarNC(b.nc).length) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = b.nc; aplicarRetencaoNC(S.nc, retencaoNC()); S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos; S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave)); salvarNC(); }
-      if (migrarConfig(S.cfg)) salvarCfg();
-      if (Array.isArray(b.rodadas)) for (const r of b.rodadas) await guardarRodada(r);
-      avisar('Backup restaurado.', 'ok'); RENDER.configuracoes();
-    } catch (err) { avisar(`Backup não restaurado: ${err.message}`, 'err'); }
-    e.target.value = '';
+}
+
+/* ---------- Pastas e sincronização ---------- */
+function cfgPastas() {
+  const p = S.cfg.parametros, st = (s, mapa) => `<b>${esc(mapa[s] || s)}</b>`;
+  const MAPA = { ok: 'sincronizado', erro: 'sem acesso', conflito: 'mudanças dos dois para escolher', permissao: 'liberar acesso', juntar: 'falta juntar com a pasta', edicao: 'alterações não salvas', off: '—' };
+  const conectada = SY.handle && !SY.legado;
+  return `<div class="card"><h2>Pasta raiz na rede ${notaEscopo(false)}</h2>
+    <p class="lead">Uma pasta raiz (ex.: <code>\\\\servidor\\Repasse Médico</code>, mapeada ou não) com as subpastas abaixo. O Edge guarda a pasta escolhida neste navegador e pede para <b>liberar o acesso</b> a cada sessão, a menos que você marque «Permitir sempre» no aviso do Edge. Nenhum caminho fica fixo no código: os nomes das subpastas se configuram aqui.</p>
+    ${suportaPasta() ? `<dl class="kv"><dt>Pasta conectada</dt><dd>${SY.handle ? `<b>${esc(SY.handle.name)}</b>${SY.legado ? ' (só a pasta do Fluxo — conecte a raiz)' : ''}` : 'nenhuma'}</dd>
+      ${conectada ? `<dt>Fluxo mensal</dt><dd>${st(SY.status, MAPA)}</dd><dt>Equivalências TUSS</dt><dd>${st(SYQ.status, MAPA)}</dd><dt>Configuração compartilhada</dt><dd>${st(SYC.status, MAPA)}${SYC.erro ? ` <span class="small muted">(${esc(SYC.erro)})</span>` : ''}</dd>` : ''}</dl>
+    <div class="acoes"><button id="psConectar">${SY.handle ? 'Trocar pasta raiz…' : 'Conectar a pasta raiz…'}</button>${SY.handle ? `<button class="sec" id="psLiberar">Liberar acesso / sincronizar agora</button><button class="sec" id="psDesc">Desconectar</button>` : ''}</div>`
+    : '<p class="small">Este navegador não grava em pastas. Use o Edge (ou o Chrome) no computador.</p>'}</div>
+  <div class="card"><h2>Comportamento ${notaEscopo(true)}</h2>
+    <label class="small"><input type="checkbox" id="psLerAbrir"${p.lerPastaAoAbrir !== false ? ' checked' : ''}> Ler os PDFs e as planilhas da competência ao abrir a ferramenta</label><br>
+    <label class="small"><input type="checkbox" id="psExport"${p.exportarNaPasta !== false ? ' checked' : ''}> Gravar os Excel gerados (conferência, correção e NCs) na pasta da competência, em vez de Downloads</label>
+    <div class="acoes"><button id="psSalvarComp">Salvar</button></div></div>
+  <div class="card"><h2>Nomes das pastas ${notaEscopo(true)}</h2><p class="lead">A ferramenta cria as pastas com estes nomes e, ao ler, reconhece também os nomes padrão e os que a equipe já usava. Deixe em branco para usar o padrão.</p>
+    <table><thead><tr><th>Finalidade</th><th>Nome da pasta</th><th>Padrão</th></tr></thead><tbody>
+    ${Object.values(PASTAS_FIXAS).map(([p, desc]) => `<tr><td class="small">${esc(desc)}</td><td><code>${esc(p.nome)}</code> <span class="small muted">fixo: é por ele que os dois navegadores se encontram</span></td><td class="small muted">${esc(p.nome)}</td></tr>`).join('')}
+    ${Object.entries(PASTAS_EDITAVEIS).map(([k, [, desc]]) => `<tr><td class="small">${esc(desc)}</td><td><input type="text" data-pasta="${k}" value="${esc(S.cfg.pastas?.[k] || '')}" placeholder="${esc(PADRAO_PASTAS[k].nome)}"></td><td class="small muted">${esc(PADRAO_PASTAS[k].nome)}</td></tr>`).join('')}</tbody></table>
+    <p class="small muted">Hierarquia: raiz › (Fluxo, Equivalências, Configuração, Backups, Bases de dados › Comp_MM-AAAA, Competências › Comp_MM-AAAA › Relatórios para conferência › USG | IMG › Unidade N…, Correção de prestador, Conferência cruzada, Não conformidades).</p>
+    <div class="acoes"><button id="psSalvarNomes">Salvar nomes</button><button class="sec" id="psPadrao">Voltar aos nomes padrão</button>${conectada ? `<button class="sec" id="psCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button>` : ''}</div></div>`;
+}
+function ligarPastas() {
+  if ($('psConectar')) $('psConectar').onclick = async () => { await escolherPastaSync(); RENDER.configuracoes(); };
+  if ($('psLiberar')) $('psLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await sincronizarCfg({ interativo: true }); } else avisar('O acesso à pasta não foi liberado.', 'warn'); RENDER.configuracoes(); };
+  if ($('psDesc')) $('psDesc').onclick = async () => { if (await confirmar('Desconectar da pasta?', 'Os dados continuam neste navegador; a pasta e os arquivos não são apagados.', 'Desconectar')) { await definirPastaSync(null); RENDER.configuracoes(); } };
+  if ($('psCriar')) $('psCriar').onclick = () => criarEstrutura(S.comp);
+  $('psSalvarComp').onclick = () => { S.cfg.parametros = { ...S.cfg.parametros, lerPastaAoAbrir: $('psLerAbrir').checked, exportarNaPasta: $('psExport').checked }; salvarCfg('Preferências de pasta salvas.', 'parametros'); };
+  $('psSalvarNomes').onclick = () => {
+    const n = {}; document.querySelectorAll('[data-pasta]').forEach(i => { const v = limparNomePasta(i.value); if (v) n[i.dataset.pasta] = v; });
+    const nomes = [...Object.keys(PASTAS_EDITAVEIS).map(k => norm(n[k] || PADRAO_PASTAS[k].nome)), ...Object.values(PASTAS_FIXAS).map(([p]) => norm(p.nome))], rep = nomes.find((x, i) => nomes.indexOf(x) !== i);
+    if (rep) return avisar(`Dois destinos com o mesmo nome de pasta («${rep}»).`, 'err');
+    S.cfg.pastas = n; aplicarPastasConfig(); PRI.verifComp = ''; salvarCfg('Nomes das pastas salvos.', 'parametros'); RENDER.configuracoes();
   };
+  $('psPadrao').onclick = async () => { if (await confirmar('Voltar aos nomes padrão?', 'Os nomes das subpastas voltam ao padrão. Nenhuma pasta é renomeada ou apagada.', 'Voltar')) { S.cfg.pastas = {}; aplicarPastasConfig(); salvarCfg('Nomes das pastas: padrão.', 'parametros'); RENDER.configuracoes(); } };
+}
+
+/* ---------- Exportação: modelos e colunas ---------- */
+function cfgExportacao() {
+  const modelos = modelosExportacao(S.cfg), escolhido = idModeloExportacao();
+  if (!CF.modelo || !modelos.some(m => m.id === CF.modelo)) CF.modelo = escolhido;
+  const m = modeloExportacao(S.cfg, CF.modelo);
+  if (!CF.colunas || CF.colunasDe !== m.id) { CF.colunas = [...m.colunas]; CF.colunasDe = m.id; }
+  const sel = new Set(CF.colunas), ordem = [...CF.colunas, ...COLUNAS_EXPORT_CONF.map(c => c.id).filter(id => !sel.has(id))];
+  const amostra = S.conf?.res?.linhas?.slice(0, 5) || [];
+  const prev = amostra.length ? amostra.map(x => `<tr>${CF.colunas.map(id => { const v = colunaExport(id).valor(x, { unidadeNome: S.conf.ctx?.unidadeNome || '' }, { f: {}, dec: x.decisao, textoDecisao: d => d ? TIPOS_DECISAO[d.tipo] : '', falta: x.motivos?.[0] || '' }); const t = v && typeof v === 'object' && !(v instanceof Date) ? v.v : v; return `<td class="small">${esc(t instanceof Date ? fmtData(t) : typeof t === 'number' ? fmtBR(t) : String(t ?? '')).slice(0, 60)}</td>`; }).join('')}</tr>`).join('')
+    : `<tr><td class="small muted" colspan="${CF.colunas.length}">Rode uma conferência nesta sessão para ver a prévia com dados (sem dados, só os cabeçalhos).</td></tr>`;
+  return `<div class="card"><h2>Modelo usado ao exportar ${notaEscopo(false)}</h2><p class="lead">Vale para a aba principal («Conferência») do Excel da conferência cruzada. As demais abas (O que falta decidir, Resumo, Técnico, MV original…) não mudam. Os dados da conferência nunca são alterados para caber no layout.</p>
+    <label class="campo">Meu modelo<select id="exModeloUso">${opcoes(modelos.map(x => [x.id, x.nome]), escolhido)}</select></label></div>
+  <div class="card"><h2>Editar modelos ${notaEscopo(true)}</h2>
+    <div class="grid2"><label class="campo">Modelo<select id="exModelo">${opcoes(modelos.map(x => [x.id, x.nome + (x.fixo ? ' (predefinido)' : '')]), CF.modelo)}</select></label>
+      <div class="acoes" style="align-self:end"><button class="sec" id="exRestaurar">Restaurar colunas do modelo</button>${m.fixo ? '' : '<button class="perigo" id="exExcluir">Excluir modelo</button>'}</div></div>
+    <p class="small muted">Marque as colunas e use ↑ ↓ para mudar a ordem. ${m.fixo ? 'Modelos predefinidos não mudam: salve como um modelo novo.' : ''}</p>
+    <ol class="ex-cols">${ordem.map(id => { const c = colunaExport(id), on = sel.has(id), i = CF.colunas.indexOf(id); return `<li class="${on ? '' : 'off'}"><label><input type="checkbox" data-excol="${id}"${on ? ' checked' : ''}> ${esc(c.rotulo)}</label>${on ? `<span class="ex-mov"><button class="sec mini" data-exup="${id}" ${i === 0 ? 'disabled' : ''} aria-label="Subir">↑</button><button class="sec mini" data-exdn="${id}" ${i === CF.colunas.length - 1 ? 'disabled' : ''} aria-label="Descer">↓</button></span>` : ''}</li>`; }).join('')}</ol>
+    <div class="acoes">${m.fixo ? '' : '<button id="exSalvar">Salvar alterações no modelo</button>'}<button class="${m.fixo ? '' : 'sec'}" id="exSalvarComo">Salvar como novo modelo…</button></div>
+    <h3>Prévia (${CF.colunas.length} colunas)</h3><div class="tw"><table><thead><tr>${CF.colunas.map(id => `<th class="small">${esc(colunaExport(id).rotulo)}</th>`).join('')}</tr></thead><tbody>${prev}</tbody></table></div></div>
+  <div class="card"><h2>Formatos fixos</h2><p class="small">Seguem os layouts operacionais já usados e não têm seleção de colunas: Excel da correção de prestador (aba «Corrigir no MV»), planilha de não conformidades (abas PARTICULAR, CONVENIOS (FAT) e Correção de prestadores), controle do fechamento (planilha de controle) e Fluxo mensal.</p></div>`;
+}
+function ligarExportacao(pg) {
+  $('exModeloUso').onchange = e => { const p = lerLocal(CHAVES.exportModelo) || {}; p.conferencia = e.target.value; gravarLocal(CHAVES.exportModelo, p); avisar('Modelo de exportação escolhido.', 'ok'); };
+  $('exModelo').onchange = e => { CF.modelo = e.target.value; CF.colunas = null; RENDER.configuracoes(); };
+  $('exRestaurar').onclick = () => { CF.colunas = null; RENDER.configuracoes(); };
+  pg.querySelectorAll('[data-excol]').forEach(c => c.onchange = () => { const id = c.dataset.excol; CF.colunas = c.checked ? [...CF.colunas, id] : CF.colunas.filter(x => x !== id); if (!CF.colunas.length) { CF.colunas = [id]; avisar('O modelo precisa de ao menos uma coluna.', 'warn'); } RENDER.configuracoes(); });
+  const mover = (id, d) => { const i = CF.colunas.indexOf(id), j = i + d; if (j < 0 || j >= CF.colunas.length) return; [CF.colunas[i], CF.colunas[j]] = [CF.colunas[j], CF.colunas[i]]; RENDER.configuracoes(); };
+  pg.querySelectorAll('[data-exup]').forEach(b => b.onclick = () => mover(b.dataset.exup, -1));
+  pg.querySelectorAll('[data-exdn]').forEach(b => b.onclick = () => mover(b.dataset.exdn, 1));
+  if ($('exSalvar')) $('exSalvar').onclick = () => { const m = S.cfg.modelosExportacao.find(x => x.id === CF.modelo); if (!m) return; m.colunas = [...CF.colunas]; m.alteradoEm = agoraISO(); m.alteradoPor = S.operador; salvarCfg(`Modelo «${m.nome}» salvo.`, 'parametros'); RENDER.configuracoes(); };
+  if ($('exExcluir')) $('exExcluir').onclick = async () => { const m = S.cfg.modelosExportacao.find(x => x.id === CF.modelo); if (!m || !await confirmar('Excluir modelo?', `«${esc(m.nome)}» deixa de existir para os dois. Quem usava volta ao Padrão.`, 'Excluir')) return; S.cfg.modelosExportacao = S.cfg.modelosExportacao.filter(x => x !== m); CF.modelo = 'padrao'; CF.colunas = null; salvarCfg('Modelo excluído.', 'parametros'); RENDER.configuracoes(); };
+  $('exSalvarComo').onclick = async () => {
+    const r = await dialogo('Novo modelo de exportação', `<label class="campo">Nome do modelo<input type="text" name="nome" autofocus></label><label class="small"><input type="checkbox" name="usar" checked> Usar este modelo nas minhas exportações</label>`, [['', 'Cancelar', 'sec'], ['ok', 'Salvar']]);
+    const nome = (r.campos.nome || '').trim(); if (r.botao !== 'ok' || !nome) return;
+    const m = { id: novoId('mx'), nome, alvo: 'conferencia', colunas: [...CF.colunas], criadoEm: agoraISO(), criadoPor: S.operador };
+    S.cfg.modelosExportacao.push(m); CF.modelo = m.id; CF.colunasDe = m.id;
+    if (r.campos.usar) { const p = lerLocal(CHAVES.exportModelo) || {}; p.conferencia = m.id; gravarLocal(CHAVES.exportModelo, p); }
+    salvarCfg(`Modelo «${nome}» criado.`, 'parametros'); RENDER.configuracoes();
+  };
+}
+
+/* ---------- Backup e dados ---------- */
+const prefBackup = () => ({ auto: true, manter: 30, incluirNC: true, ...(lerLocal(CHAVES.bkPasta) || {}) });
+function partesAtuaisBackup({ nc = false, rodadas = null, preferencias = true } = {}) {
+  return {
+    configuracao: S.cfg, equivalencias: S.eq, fluxo: S.fluxo, competencias: S.compReg, controleUnidades: lerLocal(CHAVES.controleUn) || {},
+    preferencias: preferencias ? Object.fromEntries(['tema', 'acento', 'menu', 'exportModelo'].map(k => [k, lerLocal(CHAVES[k])]).filter(([, v]) => v !== null)) : undefined,
+    nc: nc ? S.nc : undefined, rodadas: rodadas || undefined
+  };
+}
+const VALIDADORES_BACKUP = { configuracao: validarConfig, equivalencias: validarEq, fluxo: validarFluxo, competencias: validarRegistroCompetencias, nc: validarNC };
+function cfgBackup() {
+  const pb = prefBackup(), est = KV.estimativa, mb = n => (n / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  return `<div class="card"><h2>Backup</h2>
+    <p class="lead">O backup leva a configuração (Bases, regras, parâmetros, pastas e modelos de exportação), as equivalências e regras compostas, o fluxo mensal, as competências, o controle de prestadores por unidade e as preferências de quem exportou. Cada parte tem a sua impressão digital: arquivo incompleto ou alterado é recusado antes de restaurar.</p>
+    <div class="acoes"><button id="bkExp">Baixar backup (.json)</button><label class="small"><input type="checkbox" id="bkRod" checked> incluir rodadas</label><label class="small"><input type="checkbox" id="bkNC"> incluir não conformidades (contém nomes de pacientes)</label></div>
+    ${SY.handle && !SY.legado ? `<h3>Na pasta da rede (${esc(PASTAS_RAIZ.backups.nome)})</h3>
+    <div class="acoes"><button id="bkPastaAgora">Gravar backup na pasta agora</button><label class="small"><input type="checkbox" id="bkAuto"${pb.auto ? ' checked' : ''}> backup automático uma vez por dia, ao abrir</label><label class="small">manter os últimos <input type="number" id="bkManter" min="3" max="365" value="${pb.manter}" style="width:64px"> automáticos</label><label class="small"><input type="checkbox" id="bkPastaNC"${pb.incluirNC ? ' checked' : ''}> incluir NCs (a pasta da rede já guarda os PDFs com dados de pacientes)</label><button class="sec mini" id="bkPrefSalvar">Salvar</button></div>
+    <div id="bkLista" class="small muted">Lendo os backups da pasta…</div>` : '<p class="small muted">Conecte a pasta raiz (Pastas e sincronização) para gravar backups automáticos na rede.</p>'}</div>
+  <div class="card"><h2>Restaurar</h2><p class="lead">Antes de restaurar, a ferramenta mostra o que tem no arquivo, confere a integridade, e você escolhe as partes. O estado atual vira uma cópia de segurança. Com a pasta conectada, a próxima sincronização compara a versão restaurada com a da pasta <b>sem</b> sobrescrever as decisões mais novas: o que divergir vira escolha sua.</p>
+    <div class="acoes"><button id="bkImp" class="sec">Restaurar de um arquivo…</button><input type="file" id="bkArq" accept=".json" hidden><button id="bkDesfazerEq" class="sec">Desfazer última substituição de equivalências</button></div></div>
+  <div class="card"><h2>Dados neste navegador</h2>
+    <dl class="kv"><dt>Configuração</dt><dd>revisão ${S.cfg.revisao} · ${S.cfg.unidades.length} unidades · ${S.cfg.prestadores.length} prestadores · ${S.cfg.classificacao.length} regras</dd>
+      <dt>Equivalências</dt><dd>revisão ${S.eq.revisao} · ${S.eq.itens.length} relações · ${(S.eq.compostas || []).length} regras compostas</dd><dt>Fluxo mensal</dt><dd>modelo rev. ${S.fluxo.modelo.revisao} · ${Object.keys(S.fluxo.competencias).length} competência(s)</dd><dt>Não conformidades</dt><dd>${S.nc.itens.length} NC(s) · retenção de ${retencaoNC()} dias para dados de pacientes</dd><dt>Rodadas</dt><dd>${S.rodadas.length} ${DB.ok ? '(IndexedDB)' : '(só nesta sessão)'}</dd>
+      <dt>Armazenamento</dt><dd>${KV.db ? 'IndexedDB + localStorage' : 'só localStorage (IndexedDB indisponível)'}${est?.usage ? ` · ${mb(est.usage)} MB em uso de ${mb(est.quota)} MB` : ''} · ${KV.persistente === true ? '<span class="badge ok">persistente</span>' : KV.persistente === false ? '<span class="badge warn">o navegador pode apagar se faltar espaço — mantenha backups</span>' : ''}${KV.erros ? ` · <span class="badge err">${KV.erros} falha(s) de gravação (${esc(KV.ultimoErro)})</span>` : ''}</dd></dl>
+    <div class="acoes"><button id="bkApagar" class="perigo">Apagar todos os dados locais</button></div></div>`;
+}
+async function restaurarBackup(b, origem) {
+  const v = validarBackup(b, VALIDADORES_BACKUP);
+  if (v.erros.length) return avisar(`Backup não restaurado: ${v.erros.join('; ')}`, 'err');
+  const r = await dialogo('Restaurar backup', `<p class="small">Arquivo: <b>${esc(origem)}</b> · gerado em ${b.exportadoEm ? new Date(b.exportadoEm).toLocaleString('pt-BR') : '—'}${b.operador ? ` por ${esc(b.operador)}` : ''} · versão ${esc(b.motor || '—')}</p>
+    ${v.avisos.map(a => `<p class="small"><span class="badge warn">atenção</span> ${esc(a)}</p>`).join('')}
+    <p class="small">Marque o que restaurar (o resto continua como está):</p>
+    ${v.partes.map(p => `<label class="small" style="display:block;margin:4px 0"><input type="checkbox" name="p_${p.k}"${p.ok && p.k !== 'preferencias' ? ' checked' : ''}${p.ok ? '' : ' disabled'}> <b>${esc(p.nome)}</b> — ${esc(p.resumo)}${p.ok ? '' : ` <span class="badge err">${esc(p.erros.join('; '))}</span>`}</label>`).join('')}
+    <p class="small muted">O estado atual de cada parte marcada fica guardado como cópia de segurança antes de ser substituído.</p>`, [['', 'Cancelar', 'sec'], ['ok', 'Restaurar']]);
+  if (r.botao !== 'ok') return;
+  const quer = k => r.campos[`p_${k}`] === true && v.partes.find(p => p.k === k)?.ok;
+  if (!v.partes.some(p => quer(p.k))) return avisar('Nada marcado para restaurar.', 'warn');
+  // Cópia de segurança completa do estado atual (na pasta, se conectada; senão no navegador).
+  const atual = montarBackup(partesAtuaisBackup({ nc: true, rodadas: await dbTodas() }), { operador: S.operador, motivo: `antes de restaurar ${origem}` });
+  if (!(await gravarBackupPasta(atual, { auto: false, silencioso: true }))) gravarLocal(CHAVES.bkAntes, atual);
+  const feito = [];
+  if (quer('configuracao')) { backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); S.cfg = clone(b.configuracao); migrarConfig(S.cfg); aplicarPastasConfig(); salvarCfgSemSync(); feito.push('configuração'); }
+  if (quer('equivalencias')) { backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq); S.eq = clone(b.equivalencias); salvarEq(); feito.push('equivalências'); }
+  if (quer('fluxo')) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = clone(b.fluxo); salvarFluxo(); feito.push('fluxo'); }
+  if (quer('competencias')) { S.compReg = clone(b.competencias); salvarCompReg(); feito.push('competências'); }
+  if (quer('controleUnidades')) { gravarLocal(CHAVES.controleUn, b.controleUnidades); feito.push('controle por unidade'); }
+  if (quer('preferencias')) { for (const [k, x] of Object.entries(b.preferencias || {})) if (CHAVES[k] && CHAVES_INDIVIDUAIS.includes(k)) gravarLocal(CHAVES[k], x); aplicarTema(); feito.push('preferências'); }
+  if (quer('nc')) { backupAntesDeSubstituir(CHAVES.ncAnterior, S.nc); S.nc = clone(b.nc); aplicarRetencaoNC(S.nc, retencaoNC()); S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos; S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave)); salvarNC(); feito.push('NCs'); }
+  if (quer('rodadas')) { for (const x of b.rodadas) await guardarRodada(x); feito.push(`${b.rodadas.length} rodada(s)`); }
+  avisar(`Backup restaurado: ${feito.join(', ')}.${SY.handle && !SY.legado ? ' Na próxima sincronização, o que divergir da pasta vira escolha sua.' : ''}`, 'ok');
+  RENDER.configuracoes();
+  if (SY.handle && !SY.legado) { sincronizarCfg({ interativo: true }).then(() => sincronizarEq({ interativo: true })); }
+}
+// Grava um backup na pasta da rede, confere o que ficou gravado e apaga os automáticos mais antigos.
+async function gravarBackupPasta(b, { auto = false, silencioso = false } = {}) {
+  if (!SY.handle || SY.legado || !(await temPermissaoPasta(!silencioso))) return false;
+  try {
+    const d = await caminho([PASTAS_RAIZ.backups], true), nome = nomeArquivoBackup(S.operador, auto), texto = JSON.stringify(b);
+    const fh = await d.getFileHandle(nome, { create: true }), w = await fh.createWritable(); await w.write(texto); await w.close();
+    const lido = JSON.parse(await (await fh.getFile()).text()), v = validarBackup(lido, VALIDADORES_BACKUP);
+    if (v.erros.length || v.partes.some(p => !p.ok)) throw new Error('o arquivo gravado não passou na conferência');
+    if (auto) {
+      const pb = prefBackup(), meus = [];
+      for await (const h of d.values()) if (h.kind === 'file' && h.name.endsWith(`_${nomeSeguroBackup(S.operador || 'sem-operador')}_auto.json`)) meus.push(h.name);
+      meus.sort(); for (const n of meus.slice(0, Math.max(0, meus.length - Math.max(3, +pb.manter || 30)))) await d.removeEntry(n).catch(() => {});
+    }
+    if (!silencioso) avisar(`Backup gravado e conferido: ${PASTAS_RAIZ.backups.nome} › ${nome}`, 'ok');
+    return nome;
+  } catch (e) { if (!silencioso) avisar(`Backup na pasta não gravado (${e.message}). Baixe um backup pelo botão.`, 'err'); return false; }
+}
+async function backupAutomaticoDiario() {
+  const pb = prefBackup(), hoje = new Date().toISOString().slice(0, 10);
+  if (!pb.auto || pb.ultimoAuto === hoje || !SY.handle || SY.legado || SY.status === 'permissao') return;
+  const b = montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbTodas() }), { operador: S.operador, motivo: 'automático diário' });
+  if (await gravarBackupPasta(b, { auto: true, silencioso: true })) gravarLocal(CHAVES.bkPasta, { ...pb, ultimoAuto: hoje });
+}
+const _restaurarPastaSyncBk = restaurarPastaSync;
+restaurarPastaSync = async function () { await _restaurarPastaSyncBk(); setTimeout(() => backupAutomaticoDiario().catch(() => {}), 3000); };
+async function listarBackupsPasta() {
+  const d = await caminho([PASTAS_RAIZ.backups]); if (!d) return [];
+  const l = []; for await (const h of d.values()) if (h.kind === 'file' && /\.json$/i.test(h.name)) { const f = await h.getFile(); l.push({ h, nome: h.name, em: f.lastModified, tam: f.size }); }
+  return l.sort((a, b) => b.em - a.em);
+}
+function ligarBackup() {
+  $('bkExp').onclick = async () => baixarJSON(montarBackup(partesAtuaisBackup({ nc: $('bkNC').checked, rodadas: $('bkRod').checked ? await dbTodas() : null }), { operador: S.operador }), `backup_repasse_medico_${carimbo()}.json`);
+  $('bkImp').onclick = () => $('bkArq').click();
+  $('bkArq').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; let b; try { b = JSON.parse(await f.text()); } catch (err) { return avisar('Backup não restaurado: o arquivo não é um JSON válido (incompleto?).', 'err'); } restaurarBackup(b, f.name); };
   $('bkDesfazerEq').onclick = async () => {
     const ant = lerLocal(CHAVES.eqAnterior); if (!ant) return avisar('Não há cópia anterior da base de equivalências.', 'warn');
     if (!await confirmar('Voltar à base anterior?', `Cópia de ${new Date(ant.em).toLocaleString('pt-BR')}, revisão ${ant.valor.revisao}, ${ant.valor.itens.length} relações.`, 'Voltar')) return;
     const atual = S.eq; S.eq = ant.valor; backupAntesDeSubstituir(CHAVES.eqAnterior, atual); salvarEq('Base anterior restaurada.'); RENDER.configuracoes();
   };
   $('bkApagar').onclick = async () => {
-    if (!await confirmar('Apagar todos os dados locais?', 'Configuração, equivalências, fluxo mensal, não conformidades, operador e rodadas deste navegador serão apagados. Exporte um backup antes.', 'Apagar tudo')) return;
-    for (const k of Object.values(CHAVES)) try { localStorage.removeItem(k); } catch (e) { }
+    if (!await confirmar('Apagar todos os dados locais?', 'Configuração, equivalências, fluxo mensal, não conformidades, operador e rodadas deste navegador serão apagados. A pasta da rede não é apagada. Exporte um backup antes.', 'Apagar tudo')) return;
+    for (const k of Object.values(CHAVES)) apagarLocal(k);
     await dbApagar(null); location.reload();
   };
+  if ($('bkPastaAgora')) {
+    $('bkPastaAgora').onclick = async () => { const pb = prefBackup(); await gravarBackupPasta(montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbTodas() }), { operador: S.operador, motivo: 'manual' })); RENDER.configuracoes(); };
+    $('bkPrefSalvar').onclick = () => { gravarLocal(CHAVES.bkPasta, { ...prefBackup(), auto: $('bkAuto').checked, manter: Math.min(365, Math.max(3, +$('bkManter').value || 30)), incluirNC: $('bkPastaNC').checked }); avisar('Preferências de backup salvas.', 'ok'); };
+    listarBackupsPasta().then(l => {
+      const el = $('bkLista'); if (!el) return;
+      el.innerHTML = l.length ? `<table><thead><tr><th>Arquivo</th><th>Gravado em</th><th>Tamanho</th><th></th></tr></thead><tbody>${l.slice(0, 15).map((x, i) => `<tr><td>${esc(x.nome)}</td><td>${new Date(x.em).toLocaleString('pt-BR')}</td><td>${(x.tam / 1024).toFixed(0)} KB</td><td><button class="sec mini" data-bkr="${i}">Restaurar…</button></td></tr>`).join('')}</tbody></table>${l.length > 15 ? `<p>… e mais ${l.length - 15} arquivo(s).</p>` : ''}` : 'Nenhum backup na pasta ainda.';
+      el.querySelectorAll('[data-bkr]').forEach(bt => bt.onclick = async () => { const x = l[+bt.dataset.bkr]; let b; try { b = JSON.parse(await (await x.h.getFile()).text()); } catch (e) { return avisar('Arquivo de backup ilegível (incompleto?).', 'err'); } restaurarBackup(b, x.nome); });
+    }).catch(e => { const el = $('bkLista'); if (el) el.textContent = `Não foi possível ler a pasta de backups (${e.message}).`; });
+  }
+}
+
+/* ---------- Sobre ---------- */
+function cfgSobre() {
+  return `<div class="card"><h2>Sobre</h2><dl class="kv"><dt>Versão</dt><dd>${MOTOR_VERSAO}</dd><dt>Atualização</dt><dd id="sbAtual">${esc(textoAtualizacao())}</dd><dt>Instalação</dt><dd>No Edge, abra o site e use <b>…</b> → <b>Aplicativos</b> → <b>Instalar este site como aplicativo</b>: a ferramenta abre em janela própria. Os dados e a pasta conectada continuam os mesmos do site.</dd><dt>Especificação</dt><dd>Documentação v1.6 — RN-178 a RN-215; auditoria da v3.0 em docs/v3.0-auditoria.md</dd><dt>Bibliotecas</dt><dd>pdf.js (Apache-2.0) e JSZip (MIT/GPLv3), embutidas</dd><dt>Privacidade</dt><dd>Os arquivos são lidos só no navegador; nada é enviado à internet. A pasta da rede é a única cópia compartilhada.</dd></dl>
+    <div class="acoes"><button class="sec" id="sbVerificar">Verificar atualização agora</button></div></div>`;
+}
+function ligarSobre() { $('sbVerificar').onclick = async () => { await verificarAtualizacao(true); const e = $('sbAtual'); if (e) e.textContent = textoAtualizacao(); }; }
+
+/* ---- src/ui/97-decoracoes.js ---- */
+/* ============================================================
+ * Complementos de tela aplicados depois que TODAS as telas foram definidas (v3.0).
+ * Antes, 29-pasta-raiz.js envolvia RENDER.equivalencias antes de 40-equivalencias.js defini-la, e a definição
+ * posterior apagava o complemento: a barra de sincronização das equivalências nunca aparecia. Aqui a ordem é garantida.
+ * ============================================================ */
+// Equivalências: barra de sincronização da base compartilhada (SOL-F37).
+const _renderEqSync = RENDER.equivalencias;
+RENDER.equivalencias = (...a) => { const r = _renderEqSync(...a); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
+// Bases e regras = categoria das Configurações: mesmas abas no topo e a barra da configuração compartilhada.
+const _renderBasesV3 = RENDER.bases;
+RENDER.bases = (...a) => {
+  const r = _renderBasesV3(...a), pg = $('pag-bases');
+  if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
+  if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); }
+  return r;
 };
-function aplicarTema() {
-  const t = lerLocal(CHAVES.tema) || 'auto';
-  if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+
+/* ---- src/ui/98-atualizacao.js ---- */
+/* ============================================================
+ * v3.0 — Atualização controlada (site publicado e app instalado pelo Edge).
+ * O site publica versao.json com a versão atual. A ferramenta confere ao abrir, a cada 30 minutos e ao voltar para
+ * a janela; havendo versão nova, mostra um aviso fixo «Nova versão publicada — Atualizar agora», que não some sozinho.
+ * Antes de recarregar, espera as sincronizações com a pasta terminarem (nada se perde na troca de versão).
+ * Não há service worker: nenhuma versão antiga fica presa em cache, e a pasta conectada (guardada no IndexedDB
+ * do endereço) continua a mesma depois da atualização — o Edge só pode pedir para liberar o acesso de novo.
+ * ============================================================ */
+const ATU = { remota: null, data: '', verificadoEm: 0, erro: '', timer: null };
+const ehSitePublicado = () => location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+function textoAtualizacao() {
+  if (!ehSitePublicado()) return 'aberta pelo arquivo: atualize baixando a versão nova do site.';
+  if (ATU.erro) return `não foi possível verificar (${ATU.erro})`;
+  if (!ATU.remota) return 'verificando…';
+  return versaoMaior(ATU.remota, MOTOR_VERSAO) ? `versão ${ATU.remota} publicada — recarregue para usar` : `em dia (conferido às ${new Date(ATU.verificadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})`;
+}
+async function verificarAtualizacao(manual = false) {
+  if (!ehSitePublicado()) return;
+  try {
+    const r = await fetch(new URL('versao.json', location.href), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(); ATU.remota = String(j.versao || ''); ATU.data = j.data || ''; ATU.verificadoEm = Date.now(); ATU.erro = '';
+    if (ATU.remota && versaoMaior(ATU.remota, MOTOR_VERSAO)) mostrarAvisoAtualizacao();
+    else if (manual) avisar(`Você está na versão mais nova (${MOTOR_VERSAO}).`, 'ok');
+  } catch (e) { ATU.erro = e.message || String(e); if (manual) avisar(`Não foi possível verificar a atualização (${ATU.erro}).`, 'warn'); }
+}
+function mostrarAvisoAtualizacao() {
+  let el = $('avisoVersao');
+  if (!el) { el = document.createElement('div'); el.id = 'avisoVersao'; el.className = 'aviso-versao'; el.setAttribute('role', 'alert'); document.querySelector('.main')?.prepend(el); }
+  el.innerHTML = `<b>Nova versão ${esc(ATU.remota)} publicada${ATU.data ? ` em ${esc(ATU.data.split('-').reverse().join('/'))}` : ''}.</b> <span>Você está usando a ${esc(MOTOR_VERSAO)}. Atualize para não trabalhar com regras antigas.</span> <button id="btAtualizar">Atualizar agora</button>`;
+  $('btAtualizar').onclick = async () => {
+    const b = $('btAtualizar'); b.disabled = true; b.textContent = 'Terminando a sincronização…';
+    // Espera gravações pendentes na pasta (até 15 s) antes de recarregar.
+    for (let i = 0; i < 30 && ((typeof SY !== 'undefined' && SY.ocupado) || (typeof SYQ !== 'undefined' && SYQ.ocupado) || (typeof SYC !== 'undefined' && SYC.ocupado)); i++) await new Promise(r => setTimeout(r, 500));
+    location.reload();
+  };
+}
+function iniciarVerificacaoAtualizacao() {
+  if (!ehSitePublicado()) return;
+  verificarAtualizacao();
+  clearInterval(ATU.timer); ATU.timer = setInterval(() => verificarAtualizacao(), 30 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - ATU.verificadoEm > 5 * 60 * 1000) verificarAtualizacao(); });
 }
 
 /* ---- src/ui/99-inicializacao.js ---- */
@@ -8964,10 +9996,12 @@ function aplicarTema() {
  * Inicialização
  * ============================================================ */
 (async () => {
+  await abrirKV();   // valores guardados no IndexedDB entram antes da primeira leitura (v3.0)
   aplicarTema();
   S.cfg = lerLocal(CHAVES.cfg);
   if (!S.cfg || validarConfig(S.cfg).length) { S.cfg = configPadrao(); gravarLocal(CHAVES.cfg, S.cfg); }
   else if (migrarConfig(S.cfg)) gravarLocal(CHAVES.cfg, S.cfg);
+  aplicarPastasConfig();   // nomes das pastas configurados (v3.0)
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   S.operador = lerLocal(CHAVES.operador) || '';
@@ -8986,12 +10020,14 @@ function aplicarTema() {
     const nRest = await restaurarPlanilhasDaCompetencia(); S.restaurando = false;
     if (nRest) irPara(location.hash.slice(1) || 'inicio', true); else if ((location.hash.slice(1) || 'inicio') === 'inicio') RENDER.inicio();
     restaurarPastaSync();   // Fluxo compartilhado pela pasta da rede (SOL-F36)
+    iniciarVerificacaoAtualizacao();   // aviso de versão nova publicada (v3.0)
     const st = $('stInit'); st.className = 'badge ok'; st.textContent = 'Pronto · processamento local';
   } catch (e) {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }) } };   // usado pelos testes automatizados
+  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
+    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 
 </script>

@@ -59,7 +59,7 @@ function estadoGuardada(tipo, obj) {
   const g = obj.guardada;
   return `<div class="guardada small">${g ? `💾 Guardada nesta competência desde ${new Date(g.em).toLocaleString('pt-BR')}${g.por ? ` · ${esc(g.por)}` : ''}. Para trocar, carregue outra. <button class="sec mini" data-desguardar="${tipo}">Remover da competência</button>`
     : `<span class="muted">Só nesta sessão (some ao recarregar).</span> <button class="sec mini" data-guardar="${tipo}">Guardar nesta competência</button>`}
-    <label class="small" style="display:block;margin-top:4px"><input type="checkbox" data-guardarauto="${tipo}"${guardarPlanilhasAtivo(tipo) ? ' checked' : ''}> guardar automaticamente quando eu carregar uma ${tipo === 'apolo' ? 'planilha de laudos' : 'planilha do Power BI'}</label></div>`;
+    <span class="small muted" style="display:block;margin-top:4px">Guardar automaticamente ao carregar: <b>${guardarPlanilhasAtivo(tipo) ? 'sim' : 'não'}</b> · <a href="#configuracoes" data-cfg-ir="conferencia">mudar em Configurações</a></span></div>`;
 }
 function ligarPlanilhasGuardadas(raiz) {
   raiz.querySelectorAll('[data-desguardar]').forEach(b => b.onclick = async () => {
@@ -74,8 +74,5 @@ function ligarPlanilhasGuardadas(raiz) {
     if (await guardarPlanilha(tipo, obj)) avisar(`${TIPOS_GUARDADOS[tipo]} guardada para ${rotuloCompetencia(S.comp)}.`, 'ok');
     S.cfg.parametros.guardarPlanilhas[tipo] = antes; RENDER.inicio();
   });
-  raiz.querySelectorAll('[data-guardarauto]').forEach(ch => ch.onchange = () => {
-    S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
-    salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
-  });
+  raiz.querySelectorAll('[data-cfg-ir]').forEach(a => a.onclick = () => { CF.sub = a.dataset.cfgIr; });   // v3.0: a opção fica em Configurações
 }

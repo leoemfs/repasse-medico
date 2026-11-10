@@ -14,9 +14,6 @@ function ligarAbasConfiguracoes(raiz) {
     CF.sub = k; if (location.hash !== '#configuracoes') location.hash = '#configuracoes'; else RENDER.configuracoes();
   });
 }
-// A página Bases é a categoria «Bases e regras» das Configurações: mesmas abas no topo.
-const _renderBasesAbas = RENDER.bases;
-RENDER.bases = (...a) => { const r = _renderBasesAbas(...a), pg = $('pag-bases'); if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); } return r; };
 
 /* ---------- Cor de destaque (tema leve): no máximo cinco cores sérias, com contraste ≥ 4,5:1 ---------- */
 const ACENTOS = {
@@ -75,6 +72,8 @@ function cfgConferencia() {
       <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
     <div class="acoes"><button id="pSalvar">Salvar parâmetros</button></div></div>
+  <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
+    ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
   <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
     <dl class="kv"><dt>Equivalências TUSS</dt><dd>${S.eq.itens.filter(e => e.status === 'validada').length} validadas · ${S.eq.itens.filter(e => e.status === 'pendente').length} pendentes · ${(S.eq.compostas || []).filter(c => c.status === 'validada').length} regras compostas validadas — <a href="#equivalencias">Equivalências TUSS</a> (títulos do Apolo, base, regras compostas, o que mais destrava)</dd>
       <dt>Unidades e nomes no Apolo</dt><dd>${S.cfg.unidades.length} unidades — <a href="#bases" data-bsub-link="unidades">Bases e regras</a></dd>
@@ -83,6 +82,10 @@ function cfgConferencia() {
       <dt>Convênios e faturistas</dt><dd>${S.cfg.convenios.length} convênios · ${S.cfg.faturistas.length} faturistas — <a href="#bases">Bases e regras</a></dd></dl></div>`;
 }
 function ligarConferencia() {
+  document.querySelectorAll('[data-guardarauto]').forEach(ch => ch.onchange = () => {
+    S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
+    salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
+  });
   $('pSalvar').onclick = () => {
     const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
     if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
@@ -108,6 +111,7 @@ function cfgPastas() {
     <div class="acoes"><button id="psSalvarComp">Salvar</button></div></div>
   <div class="card"><h2>Nomes das pastas ${notaEscopo(true)}</h2><p class="lead">A ferramenta cria as pastas com estes nomes e, ao ler, reconhece também os nomes padrão e os que a equipe já usava. Deixe em branco para usar o padrão.</p>
     <table><thead><tr><th>Finalidade</th><th>Nome da pasta</th><th>Padrão</th></tr></thead><tbody>
+    ${Object.values(PASTAS_FIXAS).map(([p, desc]) => `<tr><td class="small">${esc(desc)}</td><td><code>${esc(p.nome)}</code> <span class="small muted">fixo: é por ele que os dois navegadores se encontram</span></td><td class="small muted">${esc(p.nome)}</td></tr>`).join('')}
     ${Object.entries(PASTAS_EDITAVEIS).map(([k, [, desc]]) => `<tr><td class="small">${esc(desc)}</td><td><input type="text" data-pasta="${k}" value="${esc(S.cfg.pastas?.[k] || '')}" placeholder="${esc(PADRAO_PASTAS[k].nome)}"></td><td class="small muted">${esc(PADRAO_PASTAS[k].nome)}</td></tr>`).join('')}</tbody></table>
     <p class="small muted">Hierarquia: raiz › (Fluxo, Equivalências, Configuração, Backups, Bases de dados › Comp_MM-AAAA, Competências › Comp_MM-AAAA › Relatórios para conferência › USG | IMG › Unidade N…, Correção de prestador, Conferência cruzada, Não conformidades).</p>
     <div class="acoes"><button id="psSalvarNomes">Salvar nomes</button><button class="sec" id="psPadrao">Voltar aos nomes padrão</button>${conectada ? `<button class="sec" id="psCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button>` : ''}</div></div>`;
@@ -120,7 +124,7 @@ function ligarPastas() {
   $('psSalvarComp').onclick = () => { S.cfg.parametros = { ...S.cfg.parametros, lerPastaAoAbrir: $('psLerAbrir').checked, exportarNaPasta: $('psExport').checked }; salvarCfg('Preferências de pasta salvas.', 'parametros'); };
   $('psSalvarNomes').onclick = () => {
     const n = {}; document.querySelectorAll('[data-pasta]').forEach(i => { const v = limparNomePasta(i.value); if (v) n[i.dataset.pasta] = v; });
-    const nomes = Object.keys(PASTAS_EDITAVEIS).map(k => norm(n[k] || PADRAO_PASTAS[k].nome)), rep = nomes.find((x, i) => nomes.indexOf(x) !== i);
+    const nomes = [...Object.keys(PASTAS_EDITAVEIS).map(k => norm(n[k] || PADRAO_PASTAS[k].nome)), ...Object.values(PASTAS_FIXAS).map(([p]) => norm(p.nome))], rep = nomes.find((x, i) => nomes.indexOf(x) !== i);
     if (rep) return avisar(`Dois destinos com o mesmo nome de pasta («${rep}»).`, 'err');
     S.cfg.pastas = n; aplicarPastasConfig(); PRI.verifComp = ''; salvarCfg('Nomes das pastas salvos.', 'parametros'); RENDER.configuracoes();
   };

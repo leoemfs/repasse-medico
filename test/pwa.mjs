@@ -1,0 +1,37 @@
+// v3.0 — PWA no Edge/Chromium: o site montado por tools/site-pages.mjs tem manifest instalável, ícones e versao.json;
+// a página publicada avisa quando há versão nova (sem service worker). Servidor local em http://127.0.0.1.
+import { createRequire } from 'module';
+import fs from 'fs';
+import http from 'http';
+import { execFileSync } from 'child_process';
+const { chromium } = createRequire(import.meta.url)('playwright');
+const raiz = new URL('..', import.meta.url).pathname, site = raiz + 'test/saida/site/';
+const ok = (cond, msg) => { console.log((cond ? '✔ ' : '✘ ') + msg); if (!cond) process.exitCode = 1; };
+execFileSync('node', [raiz + 'tools/site-pages.mjs', site], { cwd: raiz, stdio: 'pipe' });
+ok(['manifest.webmanifest', 'versao.json', 'icones/icone-192.png', 'icones/icone-512.png', 'icones/icone-512-maskable.png'].every(f => fs.existsSync(site + f)), 'site com manifest, versao.json e ícones');
+ok(/rel="manifest"/.test(fs.readFileSync(site + 'index.html', 'utf8')), 'index.html publicado aponta para o manifest');
+// A página atual (dist) no lugar do index, como ficará quando esta versão for lançada.
+const dist = raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
+const versao = fs.readFileSync(dist, 'utf8').match(/MOTOR_VERSAO = '([^']+)'/)[1];
+fs.writeFileSync(site + 'index.html', fs.readFileSync(dist, 'utf8').replace('</head>', '<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172536"></head>'));
+fs.writeFileSync(site + 'versao.json', JSON.stringify({ versao, data: '2026-11-10' }));
+const tipos = { '.html': 'text/html; charset=utf-8', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png' };
+const srv = http.createServer((q, r) => { const f = site + decodeURIComponent(q.url.split('?')[0]).replace(/^\/+/, '') + (q.url.endsWith('/') ? 'index.html' : ''); if (!f.startsWith(site) || !fs.existsSync(f)) { r.writeHead(404); return r.end(); } r.writeHead(200, { 'content-type': tipos[f.slice(f.lastIndexOf('.'))] || 'application/octet-stream' }); r.end(fs.readFileSync(f)); }).listen(0, '127.0.0.1');
+await new Promise(r => srv.once('listening', r));
+const url = `http://127.0.0.1:${srv.address().port}/`;
+const b = await chromium.launch(), erros = [];
+const p = await b.newPage(); p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
+await p.goto(url); await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
+const cdp = await p.context().newCDPSession(p);
+const man = await cdp.send('Page.getAppManifest'), inst = await cdp.send('Page.getInstallabilityErrors');
+ok(!man.errors.length && /"standalone"/.test(man.data), `manifest lido sem erros (${man.errors.map(e => e.message).join('; ') || 'ok'})`);
+ok(!inst.installabilityErrors.length, `instalável pelo navegador (${inst.installabilityErrors.map(e => e.errorId).join(', ') || 'sem impedimentos'})`);
+await p.waitForTimeout(500);
+ok(!(await p.isVisible('#avisoVersao')), 'na versão publicada atual, nenhum aviso de atualização');
+fs.writeFileSync(site + 'versao.json', JSON.stringify({ versao: '9.9.9', data: '2026-12-01' }));
+await p.evaluate(() => window.__RM.irPara('configuracoes')); await p.locator('[data-cfsub="sobre"]:visible').click(); await p.click('#sbVerificar');
+await p.waitForSelector('#avisoVersao', { timeout: 5000 }).catch(() => {});
+ok(/Nova versão 9\.9\.9/.test(await p.textContent('#avisoVersao').catch(() => '')) && await p.isVisible('#btAtualizar'), 'versão nova publicada: aviso fixo com «Atualizar agora»');
+await p.screenshot({ path: raiz + 'test/saida/pwa_aviso_versao.png' });
+ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
+await b.close(); srv.close();

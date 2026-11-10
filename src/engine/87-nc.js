@@ -82,6 +82,7 @@ function validarNC(b) {
 // Mesma NC = mesma categoria, paciente (ID ou nome), data e título (+ médico, na correção de prestador).
 const chaveNC = x => [x.categoria, norm(x.idAtendimento) || norm(x.paciente), x.data || '', chaveTitulo(x.titulo || x.tituloEstudo || ''), x.categoria === 'prestador' ? norm(x.medico) : ''].join('|');
 const ncDaUnidade = (cfg, nome) => (cfg.unidades.find(u => (u.apolo || []).some(a => norm(a) === norm(nome)) || norm(u.nome) === norm(nome)) || {}).cod || '';
+const CAMPOS_PACIENTE_NC = ['paciente', 'idAtendimento'];
 const CAMPOS_NC = ['unidade', 'unidadeCod', 'paciente', 'idAtendimento', 'data', 'tituloEstudo', 'titulo', 'convenio', 'modalidade', 'medico', 'prestadorIncorreto', 'prestadorCorrigido', 'responsavel', 'codigo', 'conta', 'detalhe', 'obs'];
 
 // Categoria e natureza andam juntas: correção de prestador é sempre «prestador incorreto».
@@ -120,13 +121,17 @@ function registrarNCs(base, lista, operador = '') {
   return { novas, repetidas };
 }
 function alterarNC(nc, mudancas, operador = '') {
-  const d = ajustarCategoria({ ...nc, ...mudancas }), alterados = [];
+  const d = ajustarCategoria({ ...nc, ...mudancas }), alterados = [], mudou = [];
   for (const k of ['competencia', 'categoria', 'natureza', ...CAMPOS_NC, 'impactaPagamento', 'valor']) {
-    if (d[k] === undefined || d[k] === nc[k]) continue;
-    alterados.push(k); nc[k] = typeof nc[k] === 'string' ? String(d[k]).trim() : d[k];
+    if (d[k] === undefined) continue;
+    const novo = typeof nc[k] === 'string' || typeof d[k] === 'string' ? String(d[k] ?? '').trim() : d[k];
+    if (novo === nc[k] || (novo === '' && (nc[k] === undefined || nc[k] === null))) continue;
+    // v3.0: o histórico guarda o valor anterior e o novo (menos nome e ID do paciente, que seguem a retenção).
+    mudou.push(CAMPOS_PACIENTE_NC.includes(k) ? { campo: k } : { campo: k, de: nc[k] ?? '', para: novo });
+    alterados.push(k); nc[k] = novo;
   }
   if (mudancas.situacao && mudancas.situacao !== nc.situacao) mudarSituacaoNC(nc, mudancas.situacao, operador);
-  if (alterados.length) nc.historico.push({ em: agoraISO(), por: operador, acao: `alterou ${alterados.join(', ')}` });
+  if (alterados.length) { nc.historico.push({ em: agoraISO(), por: operador, acao: `alterou ${alterados.join(', ')}`, mudancas: mudou }); nc.atualizadaEm = agoraISO(); }
   return alterados.length > 0;
 }
 function mudarSituacaoNC(nc, nova, operador = '', data = '') {

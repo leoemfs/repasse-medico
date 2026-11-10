@@ -91,17 +91,15 @@ function barraCfg() {
 }
 function atualizarBarraCfg() { const b = $('cfgSync'); if (!b) return; b.outerHTML = barraCfg(); ligarBarraCfg(); }
 function ligarBarraCfg() { document.querySelectorAll('#cfgSync [data-syc]').forEach(b => b.onclick = () => sincronizarCfg({ interativo: true })); }
-const _renderBasesCfg = RENDER.bases;
-RENDER.bases = (...a) => { const r = _renderBasesCfg(...a); const pg = $('pag-bases'); if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); } return r; };
 window.addEventListener('hashchange', () => { if (['#bases', '#configuracoes'].includes(location.hash) && SY.handle && !SY.legado && SYC.status !== 'permissao') sincronizarCfg({ interativo: SYC.status === 'conflito' }); });
 
 /* ---------- Nomes das pastas, configuráveis (Configurações → Pastas e sincronização) ----------
  * Ficam em cfg.pastas e valem para os dois (vão com a configuração compartilhada). Ao ler, a ferramenta continua
  * reconhecendo também os nomes padrão e os que a equipe já usava; ao criar, usa o nome configurado. */
+// As pastas de sincronização (Fluxo, Equivalências, Configuração) têm nome fixo: é por elas que os dois navegadores se
+// encontram, e renomear de um lado só dividiria os dados. As demais são configuráveis.
+const PASTAS_FIXAS = { fluxo: [PASTAS_RAIZ.fluxo, 'Fluxo mensal sincronizado (um arquivo por competência)'], eq: [PASTAS_RAIZ.eq, 'Base de equivalências TUSS compartilhada'], cfg: [PASTAS_RAIZ.cfg, 'Configuração compartilhada (Bases, regras, parâmetros, modelos)'] };
 const PASTAS_EDITAVEIS = {
-  fluxo: [PASTAS_RAIZ.fluxo, 'Fluxo mensal sincronizado (um arquivo por competência)'],
-  eq: [PASTAS_RAIZ.eq, 'Base de equivalências TUSS compartilhada'],
-  cfg: [PASTAS_RAIZ.cfg, 'Configuração compartilhada (Bases, regras, parâmetros, modelos)'],
   backups: [PASTAS_RAIZ.backups, 'Backups gravados pela ferramenta'],
   bases: [PASTAS_RAIZ.bases, 'Planilhas do mês: laudos do Apolo e Power BI (dentro: Comp_MM-AAAA)'],
   comps: [PASTAS_RAIZ.comps, 'Pastas das competências (dentro: Comp_MM-AAAA)'],
@@ -117,7 +115,7 @@ function aplicarPastasConfig() {
   for (const [k, [p]] of Object.entries(PASTAS_EDITAVEIS)) {
     const nome = limparNomePasta(c[k] || '') || PADRAO_PASTAS[k].nome, padrao = PADRAO_PASTAS[k];
     const reNome = new RegExp('^' + norm(nome).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
-    p.nome = nome; p.re = { test: s => reNome.test(s) || padrao.re.test(s) };
+    p.nome = nome; p.personalizado = !!limparNomePasta(c[k] || ''); p.re = { test: s => reNome.test(s) || padrao.re.test(s) };
   }
 }
 

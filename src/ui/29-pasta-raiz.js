@@ -38,7 +38,11 @@ const nomePastaUnidade = u => limparNomePasta(`Unidade ${u.cod} - ${u.nome}`);
 // Subpasta pelo nome (sem diferença de maiúsculas, acentos ou espaços); cria com o nome padrão se faltar.
 async function subpasta(dir, alvo, criar = false) {
   const re = typeof alvo === 'string' ? new RegExp('^' + norm(alvo).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$') : alvo.re, nome = typeof alvo === 'string' ? alvo : alvo.nome;
-  for await (const h of dir.values()) if (h.kind === 'directory' && re.test(norm(h.name))) return h;
+  // v3.0: o nome configurado vale primeiro; nomes padrão/antigos só são aceitos na leitura, ou ao criar quando o
+  // nome não foi personalizado (assim, trocar o nome da pasta de backups grava na pasta nova, e nada se perde ao ler).
+  let parecida = null;
+  for await (const h of dir.values()) if (h.kind === 'directory') { if (norm(h.name) === norm(nome)) return h; if (!parecida && re.test(norm(h.name))) parecida = h; }
+  if (parecida && !(criar && alvo.personalizado)) return parecida;
   return criar ? dir.getDirectoryHandle(nome, { create: true }) : null;
 }
 async function caminho(partes, criar = false) {
@@ -227,8 +231,6 @@ function barraEq() {
 }
 function atualizarBarraEq() { const b = $('eqSync'); if (!b) return; b.outerHTML = barraEq(); ligarBarraEq(); }
 function ligarBarraEq() { document.querySelectorAll('#eqSync [data-syq]').forEach(b => b.onclick = () => sincronizarEq({ interativo: true })); }
-const _renderEq = RENDER.equivalencias;
-RENDER.equivalencias = (...a) => { const r = _renderEq(...a); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
 window.addEventListener('hashchange', () => { if (location.hash === '#equivalencias' && SY.handle && !SY.legado && SYQ.status !== 'permissao') sincronizarEq({ interativo: true }); });
 
 /* ---------- Início: pasta raiz ---------- */
