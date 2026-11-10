@@ -56,7 +56,7 @@ const dirEq = () => caminho([PASTAS_RAIZ.eq], true);
 function estruturaCompetencia(chave) {
   const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod), comp = pastaComp(chave);
   const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), cam = [];
-  for (const k of ['fluxo', 'eq', 'backups']) cam.push([PASTAS_RAIZ[k]]);
+  for (const k of ['fluxo', 'eq', 'cfg', 'backups']) if (PASTAS_RAIZ[k]) cam.push([PASTAS_RAIZ[k]]);
   cam.push([PASTAS_RAIZ.bases, comp]);
   const base = [PASTAS_RAIZ.comps, comp];
   const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
@@ -156,14 +156,14 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
 
 /* ---------- Equivalências sincronizadas (SOL-F37) ---------- */
 const SYQ = { status: 'off', erro: '', lm: 0, meta: null, ocupado: false, pendente: false, conferidoEm: 0, conflitos: 0 };
-const CHAVE_SYNC_EQ = 'rm2.eqSyncBase', ARQ_EQ = 'equivalencias.json';
+const CHAVE_SYNC_EQ = CHAVES.eqSyncBase, ARQ_EQ = 'equivalencias.json';
 async function sincronizarEq({ interativo = false } = {}) {
   if (!SY.handle || SY.legado) return;
   if (SYQ.ocupado) { SYQ.pendente = true; return; }
   if (!(await temPermissaoPasta(interativo))) { SYQ.status = 'permissao'; atualizarBarraEq(); return; }
   SYQ.ocupado = true;
   try {
-    for (let t = 0; t < 2; t++) {
+    for (let t = 0; t < 3; t++) {
       const dir = await dirEq(); let remoto = null, lm = 0;
       try { const f = await (await dir.getFileHandle(ARQ_EQ)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_EQ_SYNC) throw new Error(`${ARQ_EQ} não é a base de equivalências`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
@@ -197,13 +197,16 @@ async function sincronizarEq({ interativo = false } = {}) {
         const fh = await dir.getFileHandle(ARQ_EQ, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
-        const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_EQ_SYNC, versaoSchema: 1, motor: MOTOR_VERSAO, ...meta, eq: S.eq })); await w.close();
-        SYQ.lm = (await fh.getFile()).lastModified; SYQ.meta = meta;
+        const texto = JSON.stringify({ schema: SCHEMA_EQ_SYNC, versaoSchema: 1, motor: MOTOR_VERSAO, ...meta, eq: S.eq });
+        const w = await fh.createWritable(); await w.write(texto); await w.close();
+        const gravado = await fh.getFile(); if (await gravado.text() !== texto) continue;   // gravação simultânea: mescla de novo
+        SYQ.lm = gravado.lastModified; SYQ.meta = meta;
       } else { SYQ.lm = lm; SYQ.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SYQ.meta; }
       gravarLocal(CHAVE_SYNC_EQ, S.eq);
       SYQ.status = 'ok'; SYQ.erro = ''; SYQ.conflitos = 0; SYQ.conferidoEm = Date.now();
       return;
     }
+    SYQ.status = 'erro'; SYQ.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';
   } catch (e) { SYQ.status = 'erro'; SYQ.erro = e.message || String(e); }
   finally { SYQ.ocupado = false; atualizarBarraEq(); if (SYQ.pendente) { SYQ.pendente = false; setTimeout(() => sincronizarEq(), 50); } }
 }

@@ -366,7 +366,7 @@ async function importarPlanilhaNC(f) {
 async function exportarNC(itens, pr) {
   if (!itens.length) return avisar('Nenhuma NC nesta competência para exportar.', 'warn');
   const prazos = Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data]));
-  await baixarZip(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`);
+  await entregarArquivo(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`, 'nc', NCV.chave);
   const abertas = itens.filter(x => x.situacao === 'aberta');
   if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;

@@ -192,7 +192,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; S.conf.filtroLinhas = null; desenharConferencia(); };
-  $('cfExcel').onclick = () => baixarZip(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [] }), nomeArquivoAnalise('conferencia', ctx));
+  $('cfExcel').onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp);
   if ($('cfIrCausas')) $('cfIrCausas').onclick = () => $('cfCausas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   $('cfVerTodas').onclick = () => { S.conf.soFalta = false; S.conf.filtroLinhas = null; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
   $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };

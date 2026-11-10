@@ -78,7 +78,7 @@ async function exportarPastaCompetencia(ch = S.comp) {
       const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: rod.unidadeCod, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
       const ctx = { chaveCompetencia: ch, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: rod.unidadeCod, unidadeNome: `${rod.unidadeCod} - ${unidadePorCod(S.cfg, rod.unidadeCod)?.nome || ''}`,
         medicosNomes: medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '', parametros: rod.parametros || {}, operador: S.operador, rodadaId: rod.id };
-      add(`Conferência cruzada/${tipo}/Unidade ${unRot}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, ctx)));
+      add(`Conferência cruzada/${tipo}/Unidade ${unRot}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() })));
     } else semRodada.push(`${x.nome} (${tipo}${S.apolo ? ', sem conferência nesta competência' : ', Apolo não carregado'})`);
   }
   leia.push(`Relatórios do MV: ${S.relatorios.length} PDF(s) carregado(s) nesta sessão.`);

@@ -18,8 +18,8 @@ ok(await p.getAttribute('#btnMenu', 'aria-expanded') === 'false', 'aria-expanded
 await p.hover('.nav a[data-pag="equivalencias"]');
 ok(await p.isVisible('.nav a[data-pag="equivalencias"] .dica'), 'dica aparece ao passar o mouse');
 await p.screenshot({ path: out + 'menu_recolhido.png' });
-await p.click('.nav a[data-pag="bases"]'); await p.waitForFunction(() => document.getElementById('titulo').textContent === 'Bases', null, { timeout: 3000 }).catch(() => {});
-ok(await p.textContent('#titulo') === 'Bases', 'ícone recolhido funciona como atalho');
+await p.click('.nav a[data-pag="bases"]'); await p.waitForFunction(() => document.getElementById('titulo').textContent === 'Bases e regras', null, { timeout: 3000 }).catch(() => {});
+ok(await p.textContent('#titulo') === 'Bases e regras', 'ícone recolhido funciona como atalho');
 await p.reload(); await p.waitForFunction(() => window.__RM, null, { polling: 200, timeout: 30000 });
 ok(await larg() === 64, 'escolha lembrada após recarregar');
 await p.keyboard.press('Control+b');
@@ -38,10 +38,10 @@ await m.tap('.barra-cel a[data-pag="correcao"]'); await m.waitForFunction(() => 
 ok(await m.textContent('#titulo') === 'Correção de prestador', 'toque na barra navega');
 await m.tap('#btnMenu'); await m.waitForTimeout(350);
 const gav = await m.evaluate(() => ({ x: Math.round(document.querySelector('.nav').getBoundingClientRect().left), n: [...document.querySelectorAll('.nav a[data-pag]')].filter(a => a.querySelector('.rot').offsetParent).length, grupos: [...document.querySelectorAll('.grupo-nav')].map(e => e.textContent).join('|'), veu: !document.getElementById('veuGaveta').hidden }));
-ok(gav.x === 0 && gav.n === 10 && gav.veu && gav.grupos === 'TRABALHO DO MÊS|BASES E AJUSTES', `☰ abre a gaveta com as 10 abas em dois grupos (${JSON.stringify(gav)})`);
+ok(gav.x === 0 && gav.n === 10 && gav.veu && gav.grupos === 'TRABALHO DO MÊS|CONFIGURAÇÕES', `☰ abre a gaveta com as 10 abas em dois grupos (${JSON.stringify(gav)})`);
 await m.screenshot({ path: out + 'menu_gaveta.png' });
 await m.tap('.nav a[data-pag="bases"]'); await m.waitForTimeout(350);
-ok(await m.textContent('#titulo') === 'Bases' && await m.evaluate(() => document.querySelector('.nav').getBoundingClientRect().right <= 0 && document.getElementById('veuGaveta').hidden), 'tocar numa aba da gaveta navega e fecha a gaveta');
+ok(await m.textContent('#titulo') === 'Bases e regras' && await m.evaluate(() => document.querySelector('.nav').getBoundingClientRect().right <= 0 && document.getElementById('veuGaveta').hidden), 'tocar numa aba da gaveta navega e fecha a gaveta');
 await m.tap('#btnMenu'); await m.waitForTimeout(300); await m.mouse.click(370, 400); await m.waitForTimeout(300);
 ok(await m.evaluate(() => document.querySelector('.nav').getBoundingClientRect().right <= 0), 'tocar fora fecha a gaveta');
 await m.evaluate(() => { const p = document.getElementById('navPend'); p.hidden = false; p.textContent = '3'; window.__RM.irPara('inicio'); });
