@@ -3,7 +3,7 @@
  * Quem laudou na planilha de laudos × quem já tem relatório, conferência e aceite, por unidade e grupo.
  * ============================================================ */
 const CU = { sub: 'conferir', unidade: '', grupo: '', soFalta: true };
-const CHAVE_CONTROLE_UN = 'rm2.controleUnidades', fmtN = n => (+n || 0).toLocaleString('pt-BR');
+const CHAVE_CONTROLE_UN = CHAVES.controleUn, fmtN = n => (+n || 0).toLocaleString('pt-BR');
 const marcasControle = () => { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; return t[S.comp] || (t[S.comp] = { gerado: {}, dispensado: {} }); };
 function gravarMarcasControle(m) { const t = lerLocal(CHAVE_CONTROLE_UN) || {}; t[S.comp] = m; if (!gravarLocal(CHAVE_CONTROLE_UN, t)) avisar('Não foi possível gravar a marca neste navegador.', 'err'); }
 // PDFs da sessão (para «relatório sem conferência»).

@@ -4,7 +4,7 @@
  * Só o Fluxo vai para a pasta: nada de paciente, PDF ou planilha.
  * ============================================================ */
 const SY = { handle: null, status: 'off', erro: '', conferidoEm: 0, lm: 0, meta: null, ocupado: false, pendente: false, conflitos: 0, timer: null, aviso: new Set() };
-const CHAVE_SYNC_BASE = 'rm2.fluxoSyncBase';
+const CHAVE_SYNC_BASE = CHAVES.fluxoSyncBase;
 const arquivoSync = chave => `fluxo_comp_${chave.slice(5)}-${chave.slice(0, 4)}.json`;
 const suportaPasta = () => typeof window.showDirectoryPicker === 'function';
 
@@ -57,7 +57,7 @@ async function sincronizarFluxo({ interativo = false } = {}) {
   if (!(await temPermissaoPasta(interativo))) { SY.status = 'permissao'; atualizarBarraSync(); return; }
   SY.ocupado = true;
   try {
-    for (let tentativa = 0; tentativa < 2; tentativa++) {
+    for (let tentativa = 0; tentativa < 3; tentativa++) {
       const nome = arquivoSync(chave); let remoto = null, lm = 0;
       try { const f = await (await (await dirFluxo()).getFileHandle(nome)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_FLUXO_SYNC || d.chave !== chave) throw new Error(`${nome} não é o Fluxo desta competência`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
@@ -75,13 +75,17 @@ async function sincronizarFluxo({ interativo = false } = {}) {
         const fh = await (await dirFluxo()).getFileHandle(nome, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;   // alguém gravou enquanto eu mesclava: mescla de novo
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
-        const w = await fh.createWritable(); await w.write(JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp })); await w.close();
-        SY.lm = (await fh.getFile()).lastModified; SY.meta = meta;
+        const texto = JSON.stringify({ schema: SCHEMA_FLUXO_SYNC, versaoSchema: 1, chave, motor: MOTOR_VERSAO, ...meta, comp });
+        const w = await fh.createWritable(); await w.write(texto); await w.close();
+        // v3.0: confere o que ficou gravado; se a outra pessoa gravou no mesmo instante, mescla de novo com a versão dela.
+        const gravado = await fh.getFile(); if (await gravado.text() !== texto) continue;
+        SY.lm = gravado.lastModified; SY.meta = meta;
       } else { SY.lm = lm; SY.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SY.meta; }
       bases[chave] = comp; gravarLocal(CHAVE_SYNC_BASE, bases);
       SY.status = 'ok'; SY.erro = ''; SY.conflitos = 0; SY.conferidoEm = Date.now();
       return;
     }
+    SY.status = 'erro'; SY.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';
   } catch (e) { SY.status = 'erro'; SY.erro = e.message || String(e); }
   finally { SY.ocupado = false; atualizarBarraSync(); if (SY.pendente) { SY.pendente = false; setTimeout(() => sincronizarFluxo(), 50); } }
 }

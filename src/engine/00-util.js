@@ -1,7 +1,7 @@
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '2.1.0-alpha.19';
+const MOTOR_VERSAO = '3.0.0-alpha.1';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -27,7 +27,14 @@ const norm = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUppe
   .replace(/[^A-Z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
 
 const PARTICULAS = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'E']);
-const tokensNome = n => n.split(' ').filter(t => t && !PARTICULAS.has(t));
+// Tokens e semelhança entre tokens ficam em cache (os mesmos nomes e sobrenomes se repetem milhares de vezes
+// numa conferência). Os arrays devolvidos são só para leitura.
+const _cacheTokens = new Map(), _cacheSimToken = new Map();
+const tokensNome = n => {
+  let t = _cacheTokens.get(n); if (t) return t;
+  if (_cacheTokens.size > 200000) _cacheTokens.clear();
+  t = n.split(' ').filter(x => x && !PARTICULAS.has(x)); _cacheTokens.set(n, t); return t;
+};
 
 function lev(a, b) {
   const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
@@ -39,7 +46,12 @@ function lev(a, b) {
   }
   return p[n];
 }
-const simToken = (a, b) => a === b ? 1 : 1 - lev(a, b) / Math.max(a.length, b.length);
+const simToken = (a, b) => {
+  if (a === b) return 1;
+  const k = a < b ? a + '|' + b : b + '|' + a; let v = _cacheSimToken.get(k); if (v !== undefined) return v;
+  if (_cacheSimToken.size > 500000) _cacheSimToken.clear();
+  v = 1 - lev(a, b) / Math.max(a.length, b.length); _cacheSimToken.set(k, v); return v;
+};
 
 // Semelhança aproximada (0..1). Serve só para mostrar evidência: nunca confirma sozinha.
 function nomeSemelhanca(a, b) {
@@ -66,6 +78,41 @@ function nivelNome(a, b, minTrunc = 20) {
   const [c, l] = a.length <= b.length ? [a, b] : [b, a];
   if (l.startsWith(c) && (l[c.length] === ' ' || c.length >= minTrunc) && tokensNome(c).length >= 2) return 2;
   return nomeSemelhanca(a, b) >= 0.66 ? 1 : 0;
+}
+
+/* Índice de nomes por dia (v3.0): nivelNome(a, b) > 0 exige que o primeiro token significativo dos dois nomes
+ * tenha semelhança ≥ 0,8 (idêntico e truncado começam pelo mesmo token; «apenas semelhante» exige isso em
+ * nomeSemelhanca). Então basta visitar, em cada dia, os grupos de primeiro nome compatível, em vez de todos os
+ * registros de ±tol dias. O resultado é idêntico ao da varredura completa, na mesma ordem (dia, posição na lista).
+ * Medido com 27 mil laudos e relatório de 2.000 linhas: de ~9 s para menos de 1 s (test/bench_motor.mjs). */
+const primeiroTokenNome = n => { for (const t of String(n || '').split(' ')) if (t && !PARTICULAS.has(t)) return t; return ''; };
+function indiceNomes(itens, diaDe, pnDe) {
+  const porDia = new Map(), toks = new Set(), compat = new Map(), ord = new Map();
+  let n = 0;
+  for (const x of itens) {
+    const d = diaDe(x); if (d === null || d === undefined) continue;
+    const t = primeiroTokenNome(pnDe(x)); if (!t) continue;   // sem nome: nivelNome daria 0
+    toks.add(t); ord.set(x, n++);
+    let m = porDia.get(d); if (!m) porDia.set(d, m = new Map());
+    let a = m.get(t); if (!a) m.set(t, a = []); a.push(x);
+  }
+  const compativeis = a => {
+    let c = compat.get(a); if (c) return c; c = [];
+    for (const b of toks) { const mx = Math.max(a.length, b.length); if (Math.abs(a.length - b.length) * 5 > mx) continue; if (simToken(a, b) >= 0.8) c.push(b); }
+    compat.set(a, c); return c;
+  };
+  // Registros de [dia − tol, dia + tol] que podem ter nivelNome > 0 com pn, na ordem da varredura completa.
+  function candidatos(pn, dia, tol = 0) {
+    const t = primeiroTokenNome(pn), out = []; if (!t || dia === null || dia === undefined) return out;
+    const cs = compativeis(t);
+    for (let d = dia - tol; d <= dia + tol; d++) {
+      const m = porDia.get(d); if (!m) continue;
+      const k = out.length; for (const b of cs) { const a = m.get(b); if (a) for (const x of a) out.push(x); }
+      if (cs.length > 1 && out.length - k > 1) { const parte = out.splice(k).sort((x, y) => ord.get(x) - ord.get(y)); for (const x of parte) out.push(x); }
+    }
+    return out;
+  }
+  return { candidatos, tamanho: n };
 }
 
 // Convênio: o MV costuma truncar; compatível se um for prefixo do outro.

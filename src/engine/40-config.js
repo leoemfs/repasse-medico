@@ -70,6 +70,7 @@ function validarConfig(c) {
     if (!Array.isArray(c.prestadores)) erros.push('tabela de prestadores inválida');
     if (c.faturistas !== undefined && (!Array.isArray(c.faturistas) || c.faturistas.some(f => !f.nome))) erros.push('tabela de faturistas inválida');
     if (p && p.retencaoNC !== undefined && !(+p.retencaoNC >= 1 && +p.retencaoNC <= 366)) erros.push('retenção de dados das NCs fora de 1 a 366 dias');
+    if (c.modelosExportacao !== undefined && (!Array.isArray(c.modelosExportacao) || c.modelosExportacao.some(m => !m || !m.id || !Array.isArray(m.colunas)))) erros.push('modelos de exportação inválidos');
     if (!Array.isArray(c.classificacao)) erros.push('regras de classificação inválidas');
     else for (const r of c.classificacao) { try { new RegExp(r.padrao); } catch (e) { erros.push(`regra «${r.id}» com padrão inválido`); } if (!TIPOS_ITEM[r.tipo]) erros.push(`regra «${r.id}» com tipo desconhecido`); }
     const cods = contar(c.unidades || [], u => String(u.cod));
@@ -92,6 +93,9 @@ function migrarConfig(c) {
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
   if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
+  // v3.0: nomes das pastas e modelos de exportação da equipe (vão com a configuração compartilhada).
+  if (!c.pastas || typeof c.pastas !== 'object' || Array.isArray(c.pastas)) { c.pastas = {}; mudou = true; }
+  if (!Array.isArray(c.modelosExportacao)) { c.modelosExportacao = []; mudou = true; }
   return mudou;
 }
 // Inclui responsáveis novos (ex.: lidos da planilha manual ou do Power BI); devolve quantos entraram.

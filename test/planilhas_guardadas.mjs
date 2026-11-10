@@ -44,10 +44,12 @@ await p.click('[data-desguardar="pbi"]'); await okDlg();
 await p.reload(); await pronto(); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
 ok(await S(() => !window.__RM.S.pbi && !!window.__RM.S.apolo), '«Remover da competência»: o Power BI não volta; o Apolo continua');
 // 5) Guardar automaticamente desmarcado: o Power BI fica só na sessão.
-await p.uncheck('[data-guardarauto="apolo"]'); await p.waitForTimeout(200);
+// v3.0: a opção fica em Configurações → Conferência.
+const opcaoGuardar = async (tipo) => { await S(() => window.__RM.irPara('configuracoes')); await p.locator('[data-cfsub="conferencia"]:visible').click(); await p.uncheck(`[data-guardarauto="${tipo}"]`); await p.waitForTimeout(200); await S(() => window.__RM.irPara('inicio')); };
+await opcaoGuardar('apolo');
 await p.setInputFiles('#inPBI', d('powerbi_09-2026.xlsx'));
 ok(await p.waitForFunction(() => !!window.__RM.S.pbi?.guardada, null, { timeout: 120000 }).then(() => true, () => false), 'a opção é por planilha: desmarcar a do Apolo não muda a do Power BI');
-await p.uncheck('[data-guardarauto="pbi"]'); await p.click('[data-desguardar="pbi"]'); await okDlg();
+await opcaoGuardar('pbi'); await p.click('[data-desguardar="pbi"]'); await okDlg();
 await p.setInputFiles('#inPBI', d('powerbi_09-2026.xlsx')); await p.waitForTimeout(3000);
 ok(await S(() => !window.__RM.S.pbi.guardada) && /Só nesta sessão/.test(await p.textContent('#stPBI')), 'com «guardar automaticamente» desmarcado, o Power BI fica só na sessão');
 // 6) Outra competência: as planilhas de 10/2026 voltam quando você volta para 10/2026.

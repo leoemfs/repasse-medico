@@ -58,8 +58,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const idx = indiceEquivalencias(eqBase), unidadeV3 = !!opc.unidadeCod && opc.unidadeCod !== '*' && ehUnidadeV3(cfg, opc.unidadeCod);
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
-  const porDia = new Map();
-  for (const l of Lun) if (l.dia !== null) (porDia.get(l.dia) || porDia.set(l.dia, []).get(l.dia)).push(l);
+  const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
@@ -74,7 +73,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   for (const b of procs) {
     b.cands = [];
     if (!b.pn || b.dia === null) continue;
-    for (let d = b.dia - tol; d <= b.dia + tol; d++) for (const l of porDia.get(d) || []) {
+    for (const l of ixNome.candidatos(b.pn, b.dia, tol)) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
       const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
       const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });

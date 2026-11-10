@@ -30,12 +30,62 @@ const S = {
 };
 
 /* ---------- Armazenamento local ---------- */
-const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias' };
-function lerLocal(k) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
-// Grava e confere a gravação; devolve falso se o navegador bloquear (o usuário é avisado).
-function gravarLocal(k, v) {
-  try { const j = JSON.stringify(v); localStorage.setItem(k, j); return localStorage.getItem(k) === j; } catch (e) { return false; }
+const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias',
+  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar' };
+// Preferências de cada pessoa (ficam neste navegador e não vão para a pasta compartilhada).
+const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta'];
+// Modelo de exportação escolhido por esta pessoa (Configurações → Exportação).
+const idModeloExportacao = () => (lerLocal(CHAVES.exportModelo) || {}).conferencia || 'padrao';
+const colunasExportacaoAtuais = () => modeloExportacao(S.cfg, idModeloExportacao()).colunas;
+/* v3.0 — o localStorage tem cerca de 5 MB por endereço e recusa a gravação quando enche (base de equivalências,
+ * fluxo, NCs e as cópias «anterior» e de sincronização somam rápido). Toda gravação vai também para o IndexedDB
+ * («repasse-medico-kv»); se o localStorage recusar, o valor antigo sai dele e fica só um marcador, e a leitura
+ * passa a vir do IndexedDB. Os valores do IndexedDB são carregados na memória antes da primeira leitura. */
+const KV = { db: null, cache: new Map(), erros: 0, ultimoErro: '', persistente: null, estimativa: null };
+const MARCA_KV = '{"__kv":1}';
+function abrirKV() {
+  return new Promise(res => {
+    try {
+      const rq = indexedDB.open('repasse-medico-kv', 1);
+      rq.onupgradeneeded = () => rq.result.createObjectStore('kv');
+      rq.onerror = () => res(false);
+      rq.onsuccess = () => {
+        KV.db = rq.result;
+        try {
+          const st = KV.db.transaction('kv').objectStore('kv'), cur = st.openCursor();
+          cur.onsuccess = () => { const c = cur.result; if (c) { KV.cache.set(c.key, c.value); c.continue(); } else res(true); };
+          cur.onerror = () => res(true);
+        } catch (e) { res(true); }
+      };
+    } catch (e) { res(false); }
+  }).then(ok => {
+    // Pede ao navegador para não apagar os dados sozinho (Edge concede para app instalado ou site muito usado).
+    try { navigator.storage?.persist?.().then(p => { KV.persistente = p; }).catch(() => {}); navigator.storage?.estimate?.().then(e => { KV.estimativa = e; }).catch(() => {}); } catch (e) { }
+    return ok;
+  });
 }
+function kvGravar(k, j) {
+  if (!KV.db) return false;
+  KV.cache.set(k, j);
+  try { const tx = KV.db.transaction('kv', 'readwrite'); j === null ? tx.objectStore('kv').delete(k) : tx.objectStore('kv').put(j, k); tx.onerror = () => { KV.erros++; KV.ultimoErro = String(tx.error?.message || tx.error); }; }
+  catch (e) { KV.erros++; KV.ultimoErro = e.message; return false; }
+  return true;
+}
+function lerLocal(k) {
+  let s = null; try { s = localStorage.getItem(k); } catch (e) { }
+  if (s && s !== MARCA_KV) { try { return JSON.parse(s); } catch (e) { } }
+  const j = KV.cache.get(k); if (j) { try { return JSON.parse(j); } catch (e) { } }
+  return null;
+}
+// Grava e confere a gravação; devolve falso só se nem o localStorage nem o IndexedDB aceitarem (o usuário é avisado).
+function gravarLocal(k, v) {
+  const j = JSON.stringify(v); let ok = false;
+  try { localStorage.setItem(k, j); ok = localStorage.getItem(k) === j; } catch (e) { }
+  if (!ok) { try { localStorage.removeItem(k); localStorage.setItem(k, MARCA_KV); } catch (e) { } }
+  const okKV = kvGravar(k, j);
+  return ok || okKV;
+}
+function apagarLocal(k) { try { localStorage.removeItem(k); } catch (e) { } kvGravar(k, null); KV.cache.delete(k); }
 // Alterações nas bases valem para todas as competências e ficam registradas na competência do topo.
 function registrarAlteracaoBase(motivo, tipo) {
   if (!motivo || !S.compReg) return;
@@ -54,7 +104,14 @@ function salvarEq(motivo = '') {
   atualizarNavPendencias();
 }
 // Cópia de segurança antes de substituir uma base inteira (RN-215).
-function backupAntesDeSubstituir(chaveAnterior, valor) { gravarLocal(chaveAnterior, { em: agoraISO(), valor }); }
+// v3.0: a base inteira vai ser trocada (backup, desfazer, substituir): a próxima sincronização com a pasta compara
+// SEM a «última versão sincronizada». Sem isso, a versão antiga parecia «mudança minha» na mescla de três vias e
+// passava por cima das decisões mais novas da outra pessoa; assim, decisões diferentes viram escolha explícita.
+function backupAntesDeSubstituir(chaveAnterior, valor) {
+  gravarLocal(chaveAnterior, { em: agoraISO(), valor });
+  const base = { [CHAVES.eqAnterior]: CHAVES.eqSyncBase, [CHAVES.fluxoAnterior]: CHAVES.fluxoSyncBase, [CHAVES.cfgAnterior]: CHAVES.cfgSyncBase }[chaveAnterior];
+  if (base) apagarLocal(base);
+}
 
 // Rodadas em IndexedDB (sem nomes de pacientes); se indisponível, ficam só na memória.
 const DB = { db: null, ok: false };
@@ -187,7 +244,7 @@ function desenharSeletorCompetencia() {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Rodadas', configuracoes: 'Configurações' };
 const RENDER = {};
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';

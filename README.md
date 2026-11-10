@@ -1,16 +1,19 @@
-# Repasse Médico v2 (alpha)
+# Repasse Médico v3 (alpha)
 
-Aplicação local, em um único HTML, para conferir o repasse médico: relatório do MV (PDF) × laudos do Apolo (xlsx), com base de equivalências TUSS validada e identificação de prestador. Especificação: documentação v1.6 (RN-178 a RN-215).
+Aplicação para navegador de computador (Edge), em um único HTML, instalável como aplicativo (PWA), para conferir o repasse médico: relatório do MV (PDF) × laudos do Apolo (xlsx), com base de equivalências TUSS validada e identificação de prestador. Especificação: documentação v1.6 (RN-178 a RN-215). Auditoria e prioridades da 3.0: [`docs/v3.0-auditoria.md`](docs/v3.0-auditoria.md).
+
+Os dois usuários dividem a mesma **pasta raiz na rede** (Fluxo mensal, equivalências TUSS e configuração compartilhada, com mescla e escolha nos conflitos; backups automáticos). Preferências individuais ficam no navegador de cada um.
 
 ## Estrutura
 
 | Pasta | Conteúdo |
 | --- | --- |
-| `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração, equivalências, conferência, correção de prestador, rodadas e relatórios |
-| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, fechamento, equivalências, bases, rodadas e configurações |
+| `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração (e mescla da configuração compartilhada), equivalências e títulos do Apolo, conferência, correção de prestador, rodadas, relatórios, modelos de exportação e backup |
+| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, fechamento, equivalências (títulos do Apolo, base, o que mais destrava), bases e regras, rodadas, configurações em categorias, sincronização pela pasta e aviso de versão |
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
+| `publicacao/` | Versões lançadas (`versoes.json`) e ícones do PWA |
 | `test/` | `motor.mjs` (motor no Chromium), `e2e.mjs` (ponta a ponta, por file://) `menu.mjs` (navegação), `fluxo.mjs` (fluxo mensal), `nc.mjs` (não conformidades), `competencia.mjs` (competência no topo) e `calendario.mjs` (dias úteis) |
 | `docs/` | Especificações, requisitos em levantamento e guias de uso |
 | `dados/` | Arquivos reais para teste. **Fora do Git** (dados de pacientes) |
@@ -47,6 +50,9 @@ node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
 node test/competencia10.mjs     # competência 10/2026 inteira com os arquivos reais (dados/comp_10-2026)
 node test/calendario.mjs        # dias úteis, feriados nacionais e marcos (Node puro)
+node test/bench_motor.mjs       # desempenho do motor com 27 mil laudos fictícios e assinatura do resultado (precisa do --harness)
+node test/consolidacao_v3.mjs   # v3.0: armazenamento, configuração entre dois usuários, backup, títulos do Apolo, exportação
+node test/pwa.mjs               # v3.0: site com manifest instalável e aviso de versão nova
 ```
 
 ## Publicação (GitHub Pages)
@@ -55,8 +61,9 @@ A ferramenta fica em **https://leoemfs.github.io/repasse-medico/**, sempre na ú
 
 - **Lançar uma versão:** subir `MOTOR_VERSAO`, gerar o `dist/`, commitar e acrescentar a versão no topo de `publicacao/versoes.json` (versão, commit e data). Enviar isso à `main` dispara `.github/workflows/pages.yml`, que monta o site com `tools/site-pages.mjs`.
 - Commits que não mexem em `publicacao/versoes.json` não mudam o site, e versões em teste não aparecem nele.
-- **Versões anteriores:** https://leoemfs.github.io/repasse-medico/versoes/ lista só as da linha 2.1.0-alpha, para baixar e abrir do computador.
-- **Dados:** o navegador guarda os dados separados por endereço. Para passar do arquivo local para o site, use Configurações → «Exportar backup» no arquivo e «Restaurar backup» no site.
+- **Versões anteriores:** https://leoemfs.github.io/repasse-medico/versoes/ lista as da linha 2.1.0-alpha e 3.x, para baixar e abrir do computador.
+- **Instalar (PWA):** no Edge, «…» → Aplicativos → «Instalar este site como aplicativo». O site publica `manifest.webmanifest`, os ícones e `versao.json`; a ferramenta avisa quando há versão nova («Atualizar agora»). Não há service worker: nenhuma versão antiga fica presa em cache.
+- **Dados:** o navegador guarda os dados separados por endereço (localStorage com espelho no IndexedDB). Para passar do arquivo local para o site, use Configurações → Backup e dados → «Baixar backup» no arquivo e «Restaurar de um arquivo…» no site.
 
 ## Regras de desenvolvimento
 

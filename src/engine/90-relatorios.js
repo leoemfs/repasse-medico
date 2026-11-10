@@ -43,22 +43,17 @@ function xlsxConferencia(res, ctx) {
   const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
   // Ordem de quem confere (SOL-F40): situação → paciente → data → o que o MV lançou → o que o laudo diz → o que falta.
   const CZ = causasDaConferencia(res, ctx.compostas || []);
-  const cabPrincipal = [...cabecalho(['Situação', 'Decisão na competência'], SIT), ...cabecalho(['Paciente', 'Data']),
-    ...cabecalho(['Cód. TUSS MV', 'Procedimento no MV']), ...cabecalho(['Laudo (TITLE)'], AP), ...cabecalho(['O que falta / por quê'], OBS), ...cabecalho(['Vl Repasse']),
-    ...cabecalho(['Convênio MV', 'Unidade MV', 'Grupo de procedimento MV', 'Médico MV', 'Paciente MV']),
-    ...cabecalho(['Paciente Apolo', 'Data Apolo', 'Descrição do estudo (STUDY)', 'Convênio Apolo', 'Unidade Apolo', 'Modalidade Apolo', 'Médico Apolo'], AP),
-    ...cabecalho(['Ressalvas', 'Observações e análise'], OBS)];
+  // v3.0: a aba principal segue o modelo de exportação escolhido (Configurações → Exportação). O modelo «Padrão»
+  // tem exatamente as colunas e a ordem de antes; os outros só escolhem e ordenam colunas do catálogo.
+  const cols = colunasDoModelo(ctx.colunasExportacao), GRUPO = { sit: SIT, ap: AP, obs: OBS };
+  const cabPrincipal = cols.map(c => ({ v: c.rotulo, st: GRUPO[c.grupo] || CAB }));
   const textoDecisao = d => d ? `${TIPOS_DECISAO[d.tipo]}${d.justificativa ? ': ' + d.justificativa : ''}${d.tipo === 'nc' && d.situacao ? ` (${SITUACAO_NC[d.situacao] || d.situacao})` : ''}` : '';
-  const linhaPrincipal = x => {
-    const r = x.r, l = x.l, f = st(x.status), dec = x.decisao;
-    const i = res.linhas.indexOf(x), falta = dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '');
-    return [{ v: STATUS_CONF[x.status].nome, st: { ...f, b: true } }, { v: textoDecisao(dec), st: dec ? { fill: COR_DECISAO[dec.tipo], b: true } : {} },
-      r?.paciente || l?.paciente || '', r?.data || l?.data || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', l?.titulo || '', { v: falta, st: { wrap: true } }, r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '',
-      r?.convenio || '', r ? ctx.unidadeNome : '', r?.grupoNome || '', r ? r.prestadorNome : '', r?.paciente || '',
-      l?.paciente || '', l?.data || '', l?.descricao || '', l?.convenio || '', l?.unidade || '', l?.modalidade || '', l?.medico || '',
-      { v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { wrap: true } }, { v: x.motivos.join(' | '), st: { wrap: true } }];
+  const linhaPrincipal = (x, n) => {
+    const dec = x.decisao, i = res.linhas[n] === x ? n : res.linhas.indexOf(x);
+    const aux = { f: st(x.status), dec, textoDecisao, falta: dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '') };
+    return cols.map(c => c.valor(x, ctx, aux));
   };
-  const largP = [22, 28, 32, 11, 12, 40, 40, 44, 12, 24, 24, 24, 28, 30, 30, 11, 40, 24, 22, 10, 28, 34, 80];
+  const largP = cols.map(c => c.larg);
   // «O que falta decidir»: uma linha por pendência, agrupada pela decisão que a resolve.
   const F = [cabecalho(['Decisão', 'O que decidir', 'Ação sugerida', 'Linhas na decisão', 'Paciente', 'Data', 'Cód. TUSS MV', 'Procedimento no MV', 'Laudo (TITLE)', 'Convênio MV', 'Convênio laudo', 'Vl Repasse', 'Por quê'])];
   [...CZ.grupos, ...CZ.umaUma].forEach((c, n) => {

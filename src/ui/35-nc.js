@@ -291,7 +291,7 @@ async function editarNC(nc) {
   if (!exigirAberta(nc ? nc.competencia : S.comp, nc ? 'editar NCs' : 'registrar NCs')) return;
   const op = await exigirOperador(); if (!op) return;
   const d = nc ? { ...nc } : { competencia: NCV.chave, categoria: NCV.aba !== 'todas' ? NCV.aba : 'convenio', natureza: NCV.aba === 'prestador' ? 'prestador-incorreto' : 'nao-lancado', situacao: 'aberta', impactaPagamento: true };
-  const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length})</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
+  const hist = nc ? `<details class="small" style="margin-top:6px"><summary>Histórico (${nc.historico.length}) · criada em ${nc.criadaEm ? new Date(nc.criadaEm).toLocaleString('pt-BR') : '—'}${nc.atualizadaEm ? ` · atualizada em ${new Date(nc.atualizadaEm).toLocaleString('pt-BR')}` : ''}</summary><ul>${nc.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${(h.mudancas || []).filter(m => 'de' in m).map(m => `<br><span class="muted">${esc(m.campo)}: «${esc(String(m.de))}» → «${esc(String(m.para))}»</span>`).join('')}</li>`).join('')}</ul>${nc.origem?.motivo ? `<p>Motivo apontado na análise: ${esc(nc.origem.motivo)}</p>` : ''}</details>` : '';
   const r = await dialogo(nc ? 'Editar não conformidade' : 'Nova não conformidade', formNC(d) + hist, nc ? [['', 'Cancelar', 'sec'], ['ok', 'Salvar']] : [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return;
   const e = r.campos;
@@ -366,7 +366,7 @@ async function importarPlanilhaNC(f) {
 async function exportarNC(itens, pr) {
   if (!itens.length) return avisar('Nenhuma NC nesta competência para exportar.', 'warn');
   const prazos = Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data]));
-  await baixarZip(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`);
+  await entregarArquivo(xlsxNC(itens, NCV.chave, { operador: S.operador, prazos }), `NAO_CONFORMIDADES_${NCV.chave.slice(5)}-${NCV.chave.slice(0, 4)}_${carimbo()}.xlsx`, 'nc', NCV.chave);
   const abertas = itens.filter(x => x.situacao === 'aberta');
   if (abertas.length && !compFechada(NCV.chave) && await confirmar('Marcar como enviadas?', `A planilha tem ${abertas.length} NC(s) abertas. Marcar como «Enviada ao Qualiex» com a data de hoje?`, 'Marcar como enviadas')) {
     const op = await exigirOperador(); if (!op) return;

@@ -26,8 +26,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
   const tol = +opc.tol, minTrunc = +cfg.parametros.minTruncamento;
   const idx = indiceEquivalencias(eqBase), idxPrest = indicePrestadores(cfg);
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
-  const porDia = new Map();
-  for (const l of Lun) if (l.dia !== null) (porDia.get(l.dia) || porDia.set(l.dia, []).get(l.dia)).push(l);
+  const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   const linhas = [], ocorrencias = new Map(), usoLaudo = new Map();
 
   for (const r of relatorio.regs) {
@@ -38,7 +37,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     const pn = norm(r.paciente), dia = diaSerial(r.data), mods = modalidadesDoGrupo(r.grupoNome);
     if (!pn || dia === null || !r.codigo) { o.estado = 'insuficiente'; o.motivo = 'mv-incompleto'; o.detalhe = 'A linha do MV não traz paciente, data ou código legível.'; continue; }
     const seguros = [], semelhantes = [];
-    for (let d = dia - tol; d <= dia + tol; d++) for (const l of porDia.get(d) || []) {
+    for (const l of ixNome.candidatos(pn, dia, tol)) {
       if (mods && !mods.includes(l.modalidade)) continue;
       const nm = nivelNome(pn, l.pn, minTrunc);
       if (nm >= 2) seguros.push({ l, nm, dd: Math.abs(dia - l.dia), proc: avaliarProcedimento(idx, r.codigo, l.titulo, { unidade: opc.unidadeCod, convenio: r.convenio, modalidade: l.modalidade }) });
@@ -53,7 +52,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
       else {
         // Evidência objetiva, sem nomear médico: existe laudo do paciente em outra data próxima?
         let perto = null;
-        for (let d = 1; d <= 7 && !perto; d++) for (const s of [dia - d, dia + d]) for (const l of porDia.get(s) || []) if (!perto && nivelNome(pn, l.pn, minTrunc) >= 2 && (!mods || mods.includes(l.modalidade))) perto = d;
+        for (let d = 1; d <= 7 && !perto; d++) for (const s of [dia - d, dia + d]) for (const l of ixNome.candidatos(pn, s, 0)) if (!perto && nivelNome(pn, l.pn, minTrunc) >= 2 && (!mods || mods.includes(l.modalidade))) perto = d;
         o.motivo = perto ? 'outra-data' : 'sem-laudo';
         o.detalhe = perto ? `Há laudo do paciente a ${perto} dia(s) da data do MV, fora da tolerância de ${tol} dia(s).` : `Nenhum laudo do paciente na unidade em ±${tol} dia(s) com modalidade compatível.`;
       }

@@ -6,6 +6,7 @@ const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: n
 
 RENDER.equivalencias = () => {
   if (FE.sub === 'destrava') return desenharDestrava();
+  if (FE.sub === 'titulos') return desenharTitulos();   // v3.0: manutenção por título do Apolo
   if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
@@ -20,6 +21,7 @@ RENDER.equivalencias = () => {
     <div class="grid4">
       <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
       <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
+    ${S.apolo ? (() => { const n = titulosDoApolo(S.apolo, S.eq, S.cfg).filter(t => ['sem-cadastro', 'pendente', 'conflito'].includes(t.situacao)).length; return n ? `<p class="small"><span class="badge warn">${n}</span> título(s) da planilha do Apolo carregada ainda sem equivalência validada — <button class="mini" data-esub="titulos">Abrir «Títulos do Apolo»</button></p>` : ''; })() : ''}
     <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqXlsx">Exportar planilha (.xlsx)</button><button id="eqExp" class="sec">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
       <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
   ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
