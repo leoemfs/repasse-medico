@@ -55,6 +55,7 @@ node test/consolidacao_v3.mjs   # v3.0: armazenamento, configuração entre dois
 node test/pwa.mjs               # v3.0: site com manifest instalável e aviso de versão nova
 node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com ou sem pasta) e nome sem partícula forma par
 node test/exames.mjs             # v3.0: exame (USG com Doppler em uma ou duas páginas) e «Dispensar laudo»
+node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (complementar e manual)
 ```
 
 ## Publicação (GitHub Pages)

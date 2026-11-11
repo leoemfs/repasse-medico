@@ -36,6 +36,7 @@ const COLUNAS_EXPORT_CONF = [
   { id: 'remessa', rotulo: 'Remessa', larg: 10, valor: x => ({ v: x.r?.remessa || '', st: TXT }) },
   { id: 'vlTotal', rotulo: 'Vl Total', larg: 12, valor: x => x.r ? { v: x.r.vlTotal, st: { fmt: 'money' } } : '' },
   { id: 'quant', rotulo: 'Quant.', larg: 7, valor: x => x.r?.quant ?? '' },
+  { id: 'repasseMV', rotulo: 'Nº do repasse (MV)', larg: 10, valor: x => ({ v: x.r?.repasse || '', st: TXT }) },
   { id: 'linhaMV', rotulo: 'Linha MV', larg: 8, valor: x => x.r?.seq || '' },
   { id: 'paginaMV', rotulo: 'Página MV', larg: 7, valor: x => x.r?.pagina || '' },
   { id: 'tipoItem', rotulo: 'Tipo de item', larg: 22, valor: x => TIPOS_ITEM[x.tipo] || x.tipo || '' },
@@ -46,7 +47,7 @@ const COLUNAS_EXPORT_CONF = [
 const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes'];
 const MODELOS_EXPORT_FIXOS = [
   { id: 'padrao', nome: 'Padrão — ordem de quem confere (layout operacional atual)', alvo: 'conferencia', colunas: IDS_PADRAO_CONF, fixo: true },
-  { id: 'completo', nome: 'Completo — padrão + colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: [...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
+  { id: 'completo', nome: 'Completo — padrão + colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: [...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
 ];
 const colunaExport = id => COLUNAS_EXPORT_CONF.find(c => c.id === id);
 // Colunas válidas do modelo (ids desconhecidos são ignorados; sem colunas válidas, vale o padrão).

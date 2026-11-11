@@ -4,6 +4,8 @@
  * ============================================================ */
 const AVISO_LGPD = 'Este arquivo contém dados pessoais e de saúde (LGPD). Armazene, compartilhe e descarte conforme a política da empresa.';
 const T = { fmt: 'text' };
+// Todos os repasses do PDF (geração original, complementar e lançamentos manuais).
+const textoRepasses = cab => (cab.repasses || []).length > 1 ? cab.repasses.map(x => `${x.numero}${x.data ? ` de ${x.data}` : ''}${x.descricao ? ` · ${x.descricao}` : ''} (${x.linhas} linha(s), R$ ${fmtBR(x.vlRepasse)})`).join('; ') : `${cab.repasse} · ${cab.descricao}`;
 const colunasMV = ['Linha MV', 'Chave da linha', 'Página', 'Código TUSS (MV)', 'Descrição MV', 'Grupo de procedimento', 'Remessa', 'Conta', 'Atendimento', 'Paciente (MV)', 'Convênio (MV)', 'Data (MV)', 'Quant.', 'Vl Repasse', '% Repasse', 'Vl Total', 'Tipo de item'];
 const celulasMV = (r, tipo, f = {}) => r ? [
   { v: r.seq, st: f }, { v: r.chave, st: { ...f, ...T } }, { v: r.pagina, st: f }, { v: r.codigo, st: { ...f, ...T } }, { v: r.procDesc, st: f }, { v: r.grupoNome, st: f },
@@ -22,7 +24,7 @@ function xlsxExtracao(rel) {
   const linhas = [cabecalho([...colunasMV, 'Repetição'])];
   for (const r of rel.regs) linhas.push([...celulasMV(r, ''), r.repeticao ? `repetida ${r.repeticao.i}/${r.repeticao.n}` : '']);
   const meta = [cabecalho(['Item', 'Valor']), ...linhasMeta([
-    ['Arquivo', rel.arquivo], ['Prestador', `${rel.cab.prestadorCod} - ${rel.cab.prestadorNome}`], ['Repasse', `${rel.cab.repasse} · ${rel.cab.descricao}`],
+    ['Arquivo', rel.arquivo], ['Prestador', `${rel.cab.prestadorCod} - ${rel.cab.prestadorNome}`], ['Repasse', textoRepasses(rel.cab)],
     ['Competência', rel.cab.competencia], ['Linhas extraídas', rel.regs.length], ['Conferência de totais', rel.ok ? 'OK — somas iguais aos totais impressos' : 'COM AVISOS'],
     ...rel.avisos.map(a => ['Aviso', a]), ...rel.notas.map(n => ['Nota', n]), ['Privacidade', AVISO_LGPD]])];
   const conf = [cabecalho(['Conferência', 'Vl Repasse (PDF)', 'Vl Total (PDF)', 'Vl Repasse (extraído)', 'Vl Total (extraído)', 'Resultado']),
@@ -80,7 +82,7 @@ function xlsxConferencia(res, ctx) {
   // Informações
   const I = [cabecalho(['Item', 'Valor']), ...linhasMeta([
     ['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', ctx.operador || '(não informado)'], ['Competência', ctx.chaveCompetencia ? rotuloCompetencia(ctx.chaveCompetencia) : ''], ['Relatório MV', ctx.relatorio.arquivo],
-    ['Prestador do relatório', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`], ['Repasse', `${ctx.relatorio.cab.repasse} · ${ctx.relatorio.cab.descricao}`],
+    ['Prestador do relatório', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`], ['Repasse', textoRepasses(ctx.relatorio.cab)],
     ['Competência do repasse (MV)', ctx.relatorio.cab.competencia], ['Planilha de laudos', ctx.apoloNome], ['Unidade (escolhida na sessão)', ctx.unidadeNome],
     ['Médico(s) do laudo no escopo', ctx.medicosNomes || 'Todos os médicos'], ['Período de produção considerado', res.periodo ? `${fmtData(res.periodo[0])} a ${fmtData(res.periodo[1])}` : '—'],
     ['Modalidades do relatório', res.modalidades.join(', ') || '—'], ['Tolerância de data (dias)', ctx.parametros.tol],
@@ -145,7 +147,7 @@ function xlsxCorrecao(res, ctx) {
   for (const m of res.porMedico) R.push([m.medico, { v: m.cod || 'sem cadastro', st: T }, m.n, { v: m.vlRepasse, st: { fmt: 'money' } }]);
   const I = [cabecalho(['Item', 'Valor']), ...linhasMeta([
     ['Gerado em', ctx.em], ['Operador', ctx.operador || '(não informado)'], ['Competência', ctx.chaveCompetencia ? rotuloCompetencia(ctx.chaveCompetencia) : ''], ['Relatório MV', ctx.relatorio.arquivo],
-    ['Prestador do cabeçalho', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`], ['Repasse', `${ctx.relatorio.cab.repasse} · ${ctx.relatorio.cab.descricao}`],
+    ['Prestador do cabeçalho', `${ctx.relatorio.cab.prestadorCod} - ${ctx.relatorio.cab.prestadorNome}`], ['Repasse', textoRepasses(ctx.relatorio.cab)],
     ['Planilha de laudos', ctx.apoloNome], ['Unidade (escolhida na sessão)', ctx.unidadeNome], ['Tolerância de data (dias)', ctx.parametros.tol],
     ['Equivalências validadas (revisão da base)', `${res.eqValidadas} · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
     ['Regra', 'Identificação só com nome idêntico ou truncado, data na tolerância e equivalência TUSS validada. Casos não identificados não recebem prestador sugerido (RN-206).'],
