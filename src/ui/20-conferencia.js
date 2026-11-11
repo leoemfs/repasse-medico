@@ -225,10 +225,11 @@ function desenharConferencia() {
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; t.atualizar(filtrar()); };
   $('cfTab').addEventListener('click', async e => {
-    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar]'); if (!b) return;
+    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar]'); if (!b) return;
     let ok = false;
     if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
     else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
+    else if (b.dataset.dispensar !== undefined) ok = await dispensarLaudos(res, [+b.dataset.dispensar]);
     else ok = await removerDecisaoConsiderar(res.linhas[+b.dataset.desconsiderar]);
     if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
@@ -245,8 +246,8 @@ function resumoComparacao({ ant, grupos }) {
 /* ---------- Decisões por linha (memória da competência) ---------- */
 function botoesDecisao(x, i) {
   if (x.decisao?.tipo === 'nc') return `<span class="small">NC registrada (${esc(SITUACAO_NC[x.decisao.situacao] || '')}) — <a href="#nc">ver na aba Não conformidades</a>. Para desfazer, mude a NC para «Não procede».</span>`;
-  if (x.decisao?.tipo === 'considerar') return `<span class="small">Considerado no repasse por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
-  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}`;
+  if (x.decisao?.tipo === 'considerar' || x.decisao?.tipo === 'dispensado') return `<span class="small">${x.decisao.tipo === 'dispensado' ? 'Laudo dispensado' : 'Considerado no repasse'} por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
+  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}${!x.r && x.l ? ` <button class="sec mini" data-dispensar="${i}">Dispensar laudo…</button>` : ''}`;
 }
 async function considerarNoRepasse(x) {
   if (!exigirAberta(S.comp, 'registrar decisões')) return false;
@@ -258,6 +259,24 @@ async function considerarNoRepasse(x) {
   if (!r.campos.just.trim()) { avisar('Informe a justificativa.', 'warn'); return false; }
   registrarConsiderar(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.just, op, { codigo: x.r.codigo, desc: x.r.procDesc, titulo: x.l?.titulo || '' });
   salvarCompReg(); avisar('Linha considerada no repasse nesta competência.', 'ok');
+  return true;
+}
+// «Só no laudo» que não precisa de lançamento: dispensa com justificativa (como o aceite de uma ressalva). Vale para toda nova
+// rodada da competência, não entra no repasse e deixa de contar como pendência no aceite. «Remover decisão» desfaz.
+const MOTIVOS_DISPENSA = ['2ª página / parte de um exame já lançado', 'Laudo refeito ou retificado (o original já foi lançado)', 'Exame sem cobrança (cortesia, repetição, controle)', 'Laudo de outra competência (já pago ou a pagar em outra)'];
+async function dispensarLaudos(res, idxs) {
+  if (!exigirAberta(S.comp, 'registrar decisões')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const ls = idxs.map(i => res.linhas[i]).filter(x => x && x.l && !x.r && !x.decisao); if (!ls.length) return false;
+  const r = await dialogo(ls.length > 1 ? `Dispensar ${ls.length} laudos` : 'Dispensar o laudo', `${ls.length === 1 ? `<p class="small"><b>«${esc(ls[0].l.titulo)}»</b> · ${esc(fmtData(ls[0].l.data))} · ${esc(ls[0].l.medico || 'sem médico')}</p>` : `<p class="small">${ls.slice(0, 6).map(x => `«${esc(x.l.titulo)}» (${esc(fmtData(x.l.data))})`).join(' · ')}${ls.length > 6 ? ' …' : ''}</p>`}
+    <p class="small muted">O laudo não tem lançamento neste relatório e não precisa ter. Ele deixa de aparecer como pendência (inclusive no aceite) em toda nova rodada da competência ${rotuloCompetencia(S.comp)}. Não vira NC e não entra no repasse. «Remover decisão», na linha, desfaz.</p>
+    <label class="campo">Motivo<select name="mot">${MOTIVOS_DISPENSA.map(m => `<option>${esc(m)}</option>`).join('')}<option value="">Outro (escrever abaixo)</option></select></label>
+    <label class="campo">Justificativa / complemento<input type="text" name="just" placeholder="obrigatório se escolher «Outro»"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Dispensar']]);
+  if (r.botao !== 'ok') return false;
+  const just = [r.campos.mot, r.campos.just.trim()].filter(Boolean).join(': ');
+  if (!just) { avisar('Informe o motivo para dispensar.', 'warn'); return false; }
+  for (const x of ls) registrarConsiderar(S.compReg, S.comp, chavesDaLinha(null, x.l), just, op, { titulo: x.l.titulo, data: isoDia(x.l.data) }, 'dispensado');
+  salvarCompReg(); avisar(`${ls.length} laudo(s) dispensado(s) nesta competência.`, 'ok');
   return true;
 }
 async function removerDecisaoConsiderar(x) {
