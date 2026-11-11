@@ -210,7 +210,8 @@ button.mini{padding:4px 10px;font-size:12px}
 .comp-global[hidden]{display:none}
 .conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
 .st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
-td .st.dec-nc,td .st.dec-considerar{margin-left:4px}
+.st.dec-dispensado,.marc.dec-dispensado{background:var(--line);color:var(--muted)}
+td .st.dec-nc,td .st.dec-considerar,td .st.dec-dispensado{margin-left:4px}
 .card[hidden]{display:none}
 /* ---------- Fechamento ---------- */
 .fs{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}

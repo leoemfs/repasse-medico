@@ -183,6 +183,26 @@ function indiceEquivalencias(base) {
   return { porTitulo, porCodigo, compostas, cacheComp, revisao: base.revisao };
 }
 
+// Regra composta validada que vale para o título (título da lista antes de título por palavras), com cache por índice.
+function compostaDoTitulo(idx, titulo, unidade = '', modalidade = '') {
+  const ck = `${chaveTitulo(titulo)}|${unidade}|${modalidade}`;
+  let comp = idx.cacheComp?.get(ck);
+  if (comp === undefined) {
+    let melhor = null, nota = 0;
+    for (const c of idx.compostas || []) { if (!escopoCobre(c.escopo, unidade, modalidade)) continue; const n = compostaCasaTitulo(c, titulo); if (n > nota) { nota = n; melhor = c; } }
+    comp = melhor; idx.cacheComp?.set(ck, comp);
+  }
+  return comp;
+}
+/* Exame (v3.0.0-alpha.4): o laudo «l» faz parte do mesmo exame de um laudo que fechou a regra composta «c» quando o título
+ * dele está na lista «outros laudos do mesmo exame» da regra, ou está validado (equivalência simples) para um dos códigos da
+ * regra. Ex.: «USG de bolsa escrotal com Doppler» (regra: órgãos + Doppler) e a 2ª página «Doppler de órgãos e estruturas». */
+function parteDoExame(idx, c, l, unidade = '') {
+  const kt = chaveTitulo(l.titulo); if (!kt) return false;
+  if ((c.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === kt)) return true;
+  const cods = new Set(codigosDaRegra(c));
+  return (idx.porTitulo.get(kt) || []).some(e => e.status === 'validada' && cods.has(e.codigo) && escopoCobre(e.escopo, unidade, l.modalidade));
+}
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
  * Resultado: validada · conflito · pendente · divergente (código tem validação, título não) · sem-cadastro */
 function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
@@ -190,13 +210,7 @@ function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
   // Regra composta validada para o título: vale por cima das relações simples (SOL-F5). Título da lista
   // antes de título por palavras.
-  const ck = `${kt}|${unidade}|${modalidade}`;
-  let comp = idx.cacheComp?.get(ck);
-  if (comp === undefined) {
-    let melhor = null, nota = 0;
-    for (const c of idx.compostas || []) { if (!escopoCobre(c.escopo, unidade, modalidade)) continue; const n = compostaCasaTitulo(c, titulo); if (n > nota) { nota = n; melhor = c; } }
-    comp = melhor; idx.cacheComp?.set(ck, comp);
-  }
+  const comp = compostaDoTitulo(idx, titulo, unidade, modalidade);
   if (comp) {
     const esp = esperadosDaComposta(comp, convenio), porConv = esp.some(e => e.qtd !== e.qtdGeral), nome = nomeComposta(comp);
     const item = esp.find(e => e.qtd > 0 && e.codigos.includes(codigo));

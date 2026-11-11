@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.3</title>
+<title>Repasse Médico v3.0.0-alpha.4</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -218,7 +218,8 @@ button.mini{padding:4px 10px;font-size:12px}
 .comp-global[hidden]{display:none}
 .conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
 .st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
-td .st.dec-nc,td .st.dec-considerar{margin-left:4px}
+.st.dec-dispensado,.marc.dec-dispensado{background:var(--line);color:var(--muted)}
+td .st.dec-nc,td .st.dec-considerar,td .st.dec-dispensado{margin-left:4px}
 .card[hidden]{display:none}
 /* ---------- Fechamento ---------- */
 .fs{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
@@ -377,7 +378,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.3 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.4 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -428,7 +429,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.3';
+const MOTOR_VERSAO = '3.0.0-alpha.4';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1875,6 +1876,26 @@ function indiceEquivalencias(base) {
   return { porTitulo, porCodigo, compostas, cacheComp, revisao: base.revisao };
 }
 
+// Regra composta validada que vale para o título (título da lista antes de título por palavras), com cache por índice.
+function compostaDoTitulo(idx, titulo, unidade = '', modalidade = '') {
+  const ck = `${chaveTitulo(titulo)}|${unidade}|${modalidade}`;
+  let comp = idx.cacheComp?.get(ck);
+  if (comp === undefined) {
+    let melhor = null, nota = 0;
+    for (const c of idx.compostas || []) { if (!escopoCobre(c.escopo, unidade, modalidade)) continue; const n = compostaCasaTitulo(c, titulo); if (n > nota) { nota = n; melhor = c; } }
+    comp = melhor; idx.cacheComp?.set(ck, comp);
+  }
+  return comp;
+}
+/* Exame (v3.0.0-alpha.4): o laudo «l» faz parte do mesmo exame de um laudo que fechou a regra composta «c» quando o título
+ * dele está na lista «outros laudos do mesmo exame» da regra, ou está validado (equivalência simples) para um dos códigos da
+ * regra. Ex.: «USG de bolsa escrotal com Doppler» (regra: órgãos + Doppler) e a 2ª página «Doppler de órgãos e estruturas». */
+function parteDoExame(idx, c, l, unidade = '') {
+  const kt = chaveTitulo(l.titulo); if (!kt) return false;
+  if ((c.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === kt)) return true;
+  const cods = new Set(codigosDaRegra(c));
+  return (idx.porTitulo.get(kt) || []).some(e => e.status === 'validada' && cods.has(e.codigo) && escopoCobre(e.escopo, unidade, l.modalidade));
+}
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
  * Resultado: validada · conflito · pendente · divergente (código tem validação, título não) · sem-cadastro */
 function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
@@ -1882,13 +1903,7 @@ function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
   // Regra composta validada para o título: vale por cima das relações simples (SOL-F5). Título da lista
   // antes de título por palavras.
-  const ck = `${kt}|${unidade}|${modalidade}`;
-  let comp = idx.cacheComp?.get(ck);
-  if (comp === undefined) {
-    let melhor = null, nota = 0;
-    for (const c of idx.compostas || []) { if (!escopoCobre(c.escopo, unidade, modalidade)) continue; const n = compostaCasaTitulo(c, titulo); if (n > nota) { nota = n; melhor = c; } }
-    comp = melhor; idx.cacheComp?.set(ck, comp);
-  }
+  const comp = compostaDoTitulo(idx, titulo, unidade, modalidade);
   if (comp) {
     const esp = esperadosDaComposta(comp, convenio), porConv = esp.some(e => e.qtd !== e.qtdGeral), nome = nomeComposta(comp);
     const item = esp.find(e => e.qtd > 0 && e.codigos.includes(codigo));
@@ -2621,6 +2636,18 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const modsDesconhecidas = procs.some(b => !b.mods);
   const periodo = periodoDoRelatorio(procs.map(b => b.r));
 
+  // 0) Exame (v3.0.0-alpha.4): laudos do mesmo paciente, dia, modalidade e médico. Quando um deles fecha uma regra composta
+  // validada, os outros que são parte do mesmo exame (ex.: 2ª página só do Doppler) não disputam as linhas com ele: o exame
+  // cumpre a regra, e eles só pegam linha que sobrar (2ª fase do pareamento). Sem disputa, não há «ambíguo» nem
+  // «composição incompleta» falsa quando o Doppler vem numa página separada.
+  const unEq = opc.unidadeCod === '*' ? '' : opc.unidadeCod, secundarioDe = new Map(), exames = new Map();
+  for (const l of Lun) if (l.dia !== null && l.pn) { const k = `${l.pn}|${l.dia}|${l.modalidade}|${l.mn}`; (exames.get(k) || exames.set(k, []).get(k)).push(l); }
+  for (const g of exames.values()) {
+    if (g.length < 2) continue;
+    const comRegra = g.map(l => ({ l, c: compostaDoTitulo(idx, l.titulo, unEq, l.modalidade) })).filter(x => x.c);
+    if (!comRegra.length) continue;
+    for (const l of g) { if (comRegra.some(x => x.l === l)) continue; const p = comRegra.find(x => parteDoExame(idx, x.c, l, unEq)); if (p) secundarioDe.set(l.i, p.l.i); }
+  }
   // 1) Candidatos: mesmo paciente (nível ≥ 1), data dentro da tolerância, modalidade compatível.
   for (const b of procs) {
     b.cands = [];
@@ -2651,9 +2678,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
   const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
   const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
-  for (let t = 1; t <= 7; t++) {
+  for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
-    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
+    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
     for (const { b, c } of fila) {
       if (b.par) continue;
@@ -2703,7 +2730,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (p.conv === false) { marc.add('convenio-divergente'); motivos.push(`Convênio: MV «${r.convenio}» × laudo «${p.l.convenio}»`); }
       if (p.l.idDuplo) marc.add('id-duplo');
       // Ambiguidade: outro laudo da mesma faixa, materialmente diferente, que não está com uma linha do mesmo código.
-      const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l)
+      const mesmoExame = c => secundarioDe.get(c.l.i) === p.l.i || secundarioDe.get(p.l.i) === c.l.i;
+      const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l) && !mesmoExame(c)
         && !(usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && usado.get(c.l.i) !== b));
       if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
       if (p.proc.composta) {
@@ -2745,7 +2773,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const regra = (idx.compostas || []).find(c => c.id === u.id), cods = [...new Set(u.bs.map(b => b.r.codigo))];
       const naRegra = (regra?.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === chaveTitulo(l.titulo));
       const viaEq = !naRegra && cods.some(cd => { const a = avaliarProcedimento(idx, cd, l.titulo, { unidade: opc.unidadeCod === '*' ? '' : opc.unidadeCod, modalidade: l.modalidade }); return a.estado === 'validada' && !a.composta; });
-      return { L, regra, cods, via: naRegra ? 'regra' : viaEq ? 'eq' : null };
+      // Laudo de outro médico no mesmo dia: pode ser parte do exame, mas quem recebe muda — fica para a pessoa decidir.
+      return { L, regra, cods, via: L.mn !== l.mn ? null : naRegra ? 'regra' : viaEq ? 'eq' : null };
     }
     return null;
   };
@@ -3101,14 +3130,16 @@ const competenciaDaRodada = r => r.chaveCompetencia || (r.em ? r.em.slice(0, 7) 
  * - Linha do MV reconhecida por conta + atendimento + código + data; laudo pelo ID do Apolo.
  *   Nenhuma das chaves leva nome de paciente.
  * ============================================================ */
-const TIPOS_DECISAO = { nc: 'Tratado: NC', considerar: 'Considerado no repasse' };
+// v3.0.0-alpha.4: «Dispensado» — laudo sem lançamento correspondente que não precisa de lançamento (ex.: 2ª página de um
+// exame, laudo refeito, exame sem cobrança). Não entra no repasse e deixa de contar como pendência; justificativa obrigatória.
+const TIPOS_DECISAO = { nc: 'Tratado: NC', considerar: 'Considerado no repasse', dispensado: 'Laudo dispensado' };
 const chaveMVDecisao = r => r ? `M|${r.conta}|${r.atendimento}|${r.codigo}|${isoDia(r.data)}` : '';
 const chaveLaudoDecisao = l => !l ? '' : l.idLaudo ? `L|${l.idLaudo}` : `L|${l.idPac}|${isoDia(l.data)}|${chaveTitulo(l.titulo)}`;
 const chavesDaLinha = (r, l) => [chaveMVDecisao(r), chaveLaudoDecisao(l)].filter(Boolean);
 
 function indiceDecisoes(ncs, considerar) {
   const m = new Map();
-  for (const d of considerar || []) for (const k of d.chaves) m.set(k, { tipo: 'considerar', id: d.id, justificativa: d.justificativa, por: d.por, em: d.em });
+  for (const d of considerar || []) for (const k of d.chaves) m.set(k, { tipo: d.tipo === 'dispensado' ? 'dispensado' : 'considerar', id: d.id, justificativa: d.justificativa, por: d.por, em: d.em });
   for (const nc of ncs || []) {
     if (nc.situacao === 'nao-procede') continue;
     for (const k of nc.origem?.chavesLinha || []) m.set(k, { tipo: 'nc', ncId: nc.id, natureza: nc.natureza, situacao: nc.situacao, por: nc.criadaPor, em: nc.criadaEm });
@@ -3117,16 +3148,16 @@ function indiceDecisoes(ncs, considerar) {
 }
 const decisaoDaLinha = (idx, r, l) => chavesDaLinha(r, l).map(k => idx.get(k)).find(Boolean) || null;
 function aplicarDecisoes(res, idx) {
-  const n = { nc: 0, considerar: 0 };
+  const n = { nc: 0, considerar: 0, dispensado: 0 };
   for (const x of res.linhas) { x.decisao = decisaoDaLinha(idx, x.r, x.l); if (x.decisao) n[x.decisao.tipo]++; }
   res.porDecisao = n;
   return res;
 }
-function registrarConsiderar(reg, chave, chaves, justificativa, por, resumo = {}) {
-  if (!String(justificativa || '').trim()) throw new Error('Informe a justificativa para considerar a linha no repasse.');
+function registrarConsiderar(reg, chave, chaves, justificativa, por, resumo = {}, tipo = 'considerar') {
+  if (!String(justificativa || '').trim()) throw new Error(tipo === 'dispensado' ? 'Informe a justificativa para dispensar o laudo.' : 'Informe a justificativa para considerar a linha no repasse.');
   const c = itemCompetencia(reg, chave);
   c.decisoes = c.decisoes || [];
-  const d = { id: novoId('dec'), chaves, justificativa: justificativa.trim(), por, em: agoraISO(), resumo };
+  const d = { id: novoId('dec'), chaves, justificativa: justificativa.trim(), por, em: agoraISO(), resumo, ...(tipo === 'dispensado' ? { tipo } : {}) };
   c.decisoes.push(d);
   return d;
 }
@@ -4479,7 +4510,7 @@ function xlsxExtracao(rel) {
 /* Excel da conferência cruzada (SOL-F23). Aba principal com o MV lado a lado com o Apolo e a
  * decisão da competência; o técnico (faixa, equivalência, chaves, candidatos) fica em abas à parte.
  * As decisões (NC, considerar no repasse) são tomadas na ferramenta; aqui só aparecem. */
-const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC' };
+const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC', dispensado: 'EDEDED' };
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
   const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
@@ -5887,10 +5918,11 @@ function desenharConferencia() {
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; t.atualizar(filtrar()); };
   $('cfTab').addEventListener('click', async e => {
-    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar]'); if (!b) return;
+    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar]'); if (!b) return;
     let ok = false;
     if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
     else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
+    else if (b.dataset.dispensar !== undefined) ok = await dispensarLaudos(res, [+b.dataset.dispensar]);
     else ok = await removerDecisaoConsiderar(res.linhas[+b.dataset.desconsiderar]);
     if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
@@ -5907,8 +5939,8 @@ function resumoComparacao({ ant, grupos }) {
 /* ---------- Decisões por linha (memória da competência) ---------- */
 function botoesDecisao(x, i) {
   if (x.decisao?.tipo === 'nc') return `<span class="small">NC registrada (${esc(SITUACAO_NC[x.decisao.situacao] || '')}) — <a href="#nc">ver na aba Não conformidades</a>. Para desfazer, mude a NC para «Não procede».</span>`;
-  if (x.decisao?.tipo === 'considerar') return `<span class="small">Considerado no repasse por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
-  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}`;
+  if (x.decisao?.tipo === 'considerar' || x.decisao?.tipo === 'dispensado') return `<span class="small">${x.decisao.tipo === 'dispensado' ? 'Laudo dispensado' : 'Considerado no repasse'} por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
+  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}${!x.r && x.l ? ` <button class="sec mini" data-dispensar="${i}">Dispensar laudo…</button>` : ''}`;
 }
 async function considerarNoRepasse(x) {
   if (!exigirAberta(S.comp, 'registrar decisões')) return false;
@@ -5920,6 +5952,24 @@ async function considerarNoRepasse(x) {
   if (!r.campos.just.trim()) { avisar('Informe a justificativa.', 'warn'); return false; }
   registrarConsiderar(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.just, op, { codigo: x.r.codigo, desc: x.r.procDesc, titulo: x.l?.titulo || '' });
   salvarCompReg(); avisar('Linha considerada no repasse nesta competência.', 'ok');
+  return true;
+}
+// «Só no laudo» que não precisa de lançamento: dispensa com justificativa (como o aceite de uma ressalva). Vale para toda nova
+// rodada da competência, não entra no repasse e deixa de contar como pendência no aceite. «Remover decisão» desfaz.
+const MOTIVOS_DISPENSA = ['2ª página / parte de um exame já lançado', 'Laudo refeito ou retificado (o original já foi lançado)', 'Exame sem cobrança (cortesia, repetição, controle)', 'Laudo de outra competência (já pago ou a pagar em outra)'];
+async function dispensarLaudos(res, idxs) {
+  if (!exigirAberta(S.comp, 'registrar decisões')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const ls = idxs.map(i => res.linhas[i]).filter(x => x && x.l && !x.r && !x.decisao); if (!ls.length) return false;
+  const r = await dialogo(ls.length > 1 ? `Dispensar ${ls.length} laudos` : 'Dispensar o laudo', `${ls.length === 1 ? `<p class="small"><b>«${esc(ls[0].l.titulo)}»</b> · ${esc(fmtData(ls[0].l.data))} · ${esc(ls[0].l.medico || 'sem médico')}</p>` : `<p class="small">${ls.slice(0, 6).map(x => `«${esc(x.l.titulo)}» (${esc(fmtData(x.l.data))})`).join(' · ')}${ls.length > 6 ? ' …' : ''}</p>`}
+    <p class="small muted">O laudo não tem lançamento neste relatório e não precisa ter. Ele deixa de aparecer como pendência (inclusive no aceite) em toda nova rodada da competência ${rotuloCompetencia(S.comp)}. Não vira NC e não entra no repasse. «Remover decisão», na linha, desfaz.</p>
+    <label class="campo">Motivo<select name="mot">${MOTIVOS_DISPENSA.map(m => `<option>${esc(m)}</option>`).join('')}<option value="">Outro (escrever abaixo)</option></select></label>
+    <label class="campo">Justificativa / complemento<input type="text" name="just" placeholder="obrigatório se escolher «Outro»"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Dispensar']]);
+  if (r.botao !== 'ok') return false;
+  const just = [r.campos.mot, r.campos.just.trim()].filter(Boolean).join(': ');
+  if (!just) { avisar('Informe o motivo para dispensar.', 'warn'); return false; }
+  for (const x of ls) registrarConsiderar(S.compReg, S.comp, chavesDaLinha(null, x.l), just, op, { titulo: x.l.titulo, data: isoDia(x.l.data) }, 'dispensado');
+  salvarCompReg(); avisar(`${ls.length} laudo(s) dispensado(s) nesta competência.`, 'ok');
   return true;
 }
 async function removerDecisaoConsiderar(x) {
@@ -6037,11 +6087,11 @@ function botoesCausa(c, n) {
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
     case 'composta-falta': { const r0 = (S.eq.compostas || []).find(x => x.id === c.regraId), alt = r0 && modoComposta(r0) === 'juntos' && regraComposta(r0).itens.flatMap(it => it.codigos).length > 1;
       return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Considerar no repasse') + ver; }
-    case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + ver;
-    case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + ver;
-    case 'sl-outro-relatorio': return ver + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
-    case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo estudo (incluir na regra)', false) + b('nc', 'Não é → NC') + ver;
-    case 'so-laudo': return b('corrprest', 'Apontar correção de prestador…') + b('nc', 'Registrar NC (não lançado)') + b('ncs', 'Candidatos a NC') + ver;
+    case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + b('dispensar', 'Dispensar…') + ver;
+    case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + ver;
+    case 'sl-outro-relatorio': return ver + b('dispensar', 'Dispensar (está no relatório do outro médico)…') + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
+    case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo exame (incluir na regra)', false) + b('dispensar', 'Dispensar só este…') + b('nc', 'Não é → NC') + ver;
+    case 'so-laudo': return b('corrprest', 'Apontar correção de prestador…') + b('nc', 'Registrar NC (não lançado)') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + b('ncs', 'Candidatos a NC') + ver;
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
     case 'nome-semelhante': return b('aceitar', 'É o mesmo paciente', false) + b('nc', 'Não é → NC') + ver;
@@ -6120,6 +6170,7 @@ function ligarCausas(raiz, CZ, res, ctx) {
     if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => { const x = res.linhas[i], cd = candidatoDaLinhaConferencia(x, ctx, S.cfg); const nat = x.pbi && SITUACAO_PBI[x.pbi.situacao]?.natureza; if (nat && nat !== 'prestador-incorreto') { cd.natureza = nat; cd.categoria = categoriaSugerida(cd.campos, nat); cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria }); } return cd; }));
     if (ac === 'corrprest') ok = await abrirRegistroNC(c.linhas.map(i => candidatoCorrecaoPrestador(res.linhas[i], ctx)));
     if (ac === 'alternante') { await tornarAlternante(c.regraId); return; }
+    if (ac === 'dispensar') ok = await dispensarLaudos(res, c.linhas);
     if (ac === 'aceitar') {
       const sug = c.tipo === 'convenio' ? `Mesmo convênio escrito de outro jeito: MV «${c.mv}» × laudo «${c.laudo}»` : c.tipo === 'data' ? 'Data do laudo dentro do esperado para o atendimento' : c.tipo === 'nome-semelhante' ? 'Mesmo paciente: nome escrito de outro jeito' : c.tipo === 'repetida' ? 'As duas linhas estão certas (dois exames)' : '';
       ok = await considerarLinhas(res, c.linhas, c.rotulo, sug);

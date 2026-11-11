@@ -69,6 +69,18 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const modsDesconhecidas = procs.some(b => !b.mods);
   const periodo = periodoDoRelatorio(procs.map(b => b.r));
 
+  // 0) Exame (v3.0.0-alpha.4): laudos do mesmo paciente, dia, modalidade e médico. Quando um deles fecha uma regra composta
+  // validada, os outros que são parte do mesmo exame (ex.: 2ª página só do Doppler) não disputam as linhas com ele: o exame
+  // cumpre a regra, e eles só pegam linha que sobrar (2ª fase do pareamento). Sem disputa, não há «ambíguo» nem
+  // «composição incompleta» falsa quando o Doppler vem numa página separada.
+  const unEq = opc.unidadeCod === '*' ? '' : opc.unidadeCod, secundarioDe = new Map(), exames = new Map();
+  for (const l of Lun) if (l.dia !== null && l.pn) { const k = `${l.pn}|${l.dia}|${l.modalidade}|${l.mn}`; (exames.get(k) || exames.set(k, []).get(k)).push(l); }
+  for (const g of exames.values()) {
+    if (g.length < 2) continue;
+    const comRegra = g.map(l => ({ l, c: compostaDoTitulo(idx, l.titulo, unEq, l.modalidade) })).filter(x => x.c);
+    if (!comRegra.length) continue;
+    for (const l of g) { if (comRegra.some(x => x.l === l)) continue; const p = comRegra.find(x => parteDoExame(idx, x.c, l, unEq)); if (p) secundarioDe.set(l.i, p.l.i); }
+  }
   // 1) Candidatos: mesmo paciente (nível ≥ 1), data dentro da tolerância, modalidade compatível.
   for (const b of procs) {
     b.cands = [];
@@ -99,9 +111,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
   const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
   const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
-  for (let t = 1; t <= 7; t++) {
+  for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
-    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
+    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
     for (const { b, c } of fila) {
       if (b.par) continue;
@@ -151,7 +163,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (p.conv === false) { marc.add('convenio-divergente'); motivos.push(`Convênio: MV «${r.convenio}» × laudo «${p.l.convenio}»`); }
       if (p.l.idDuplo) marc.add('id-duplo');
       // Ambiguidade: outro laudo da mesma faixa, materialmente diferente, que não está com uma linha do mesmo código.
-      const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l)
+      const mesmoExame = c => secundarioDe.get(c.l.i) === p.l.i || secundarioDe.get(p.l.i) === c.l.i;
+      const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l) && !mesmoExame(c)
         && !(usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && usado.get(c.l.i) !== b));
       if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
       if (p.proc.composta) {
@@ -193,7 +206,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const regra = (idx.compostas || []).find(c => c.id === u.id), cods = [...new Set(u.bs.map(b => b.r.codigo))];
       const naRegra = (regra?.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === chaveTitulo(l.titulo));
       const viaEq = !naRegra && cods.some(cd => { const a = avaliarProcedimento(idx, cd, l.titulo, { unidade: opc.unidadeCod === '*' ? '' : opc.unidadeCod, modalidade: l.modalidade }); return a.estado === 'validada' && !a.composta; });
-      return { L, regra, cods, via: naRegra ? 'regra' : viaEq ? 'eq' : null };
+      // Laudo de outro médico no mesmo dia: pode ser parte do exame, mas quem recebe muda — fica para a pessoa decidir.
+      return { L, regra, cods, via: L.mn !== l.mn ? null : naRegra ? 'regra' : viaEq ? 'eq' : null };
     }
     return null;
   };

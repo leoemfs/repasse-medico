@@ -15,11 +15,11 @@ function botoesCausa(c, n) {
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
     case 'composta-falta': { const r0 = (S.eq.compostas || []).find(x => x.id === c.regraId), alt = r0 && modoComposta(r0) === 'juntos' && regraComposta(r0).itens.flatMap(it => it.codigos).length > 1;
       return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Considerar no repasse') + ver; }
-    case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + ver;
-    case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + ver;
-    case 'sl-outro-relatorio': return ver + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
-    case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo estudo (incluir na regra)', false) + b('nc', 'Não é → NC') + ver;
-    case 'so-laudo': return b('corrprest', 'Apontar correção de prestador…') + b('nc', 'Registrar NC (não lançado)') + b('ncs', 'Candidatos a NC') + ver;
+    case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + b('dispensar', 'Dispensar…') + ver;
+    case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + ver;
+    case 'sl-outro-relatorio': return ver + b('dispensar', 'Dispensar (está no relatório do outro médico)…') + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
+    case 'mesmo-estudo': return b('mesmo-estudo', 'É o mesmo exame (incluir na regra)', false) + b('dispensar', 'Dispensar só este…') + b('nc', 'Não é → NC') + ver;
+    case 'so-laudo': return b('corrprest', 'Apontar correção de prestador…') + b('nc', 'Registrar NC (não lançado)') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + b('ncs', 'Candidatos a NC') + ver;
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
     case 'nome-semelhante': return b('aceitar', 'É o mesmo paciente', false) + b('nc', 'Não é → NC') + ver;
@@ -98,6 +98,7 @@ function ligarCausas(raiz, CZ, res, ctx) {
     if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => { const x = res.linhas[i], cd = candidatoDaLinhaConferencia(x, ctx, S.cfg); const nat = x.pbi && SITUACAO_PBI[x.pbi.situacao]?.natureza; if (nat && nat !== 'prestador-incorreto') { cd.natureza = nat; cd.categoria = categoriaSugerida(cd.campos, nat); cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria }); } return cd; }));
     if (ac === 'corrprest') ok = await abrirRegistroNC(c.linhas.map(i => candidatoCorrecaoPrestador(res.linhas[i], ctx)));
     if (ac === 'alternante') { await tornarAlternante(c.regraId); return; }
+    if (ac === 'dispensar') ok = await dispensarLaudos(res, c.linhas);
     if (ac === 'aceitar') {
       const sug = c.tipo === 'convenio' ? `Mesmo convênio escrito de outro jeito: MV «${c.mv}» × laudo «${c.laudo}»` : c.tipo === 'data' ? 'Data do laudo dentro do esperado para o atendimento' : c.tipo === 'nome-semelhante' ? 'Mesmo paciente: nome escrito de outro jeito' : c.tipo === 'repetida' ? 'As duas linhas estão certas (dois exames)' : '';
       ok = await considerarLinhas(res, c.linhas, c.rotulo, sug);

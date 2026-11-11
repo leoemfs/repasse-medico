@@ -37,7 +37,7 @@ function xlsxExtracao(rel) {
 /* Excel da conferência cruzada (SOL-F23). Aba principal com o MV lado a lado com o Apolo e a
  * decisão da competência; o técnico (faixa, equivalência, chaves, candidatos) fica em abas à parte.
  * As decisões (NC, considerar no repasse) são tomadas na ferramenta; aqui só aparecem. */
-const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC' };
+const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC', dispensado: 'EDEDED' };
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
   const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' };
