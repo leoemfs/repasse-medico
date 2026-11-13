@@ -1,8 +1,94 @@
 # Próximas funções — requisitos registrados
 
-**Próximas melhorias urgentes, logo abaixo:** SOL-F42 (NC sai do cálculo do fechamento e a reconferência confirma a correção no MV) e SOL-F41 (conferência autossuficiente: filtros, observação, «Resolvido no MV»). As duas usam o mesmo mecanismo de confirmação na rodada seguinte; o ideal é implementá-las juntas.
+**Próxima melhoria urgente: SOL-F43, logo abaixo.** Ela transforma a prévia de conferência na conferência oficial (só Devido + Aceito compõem o fechamento) e consolida a SOL-F42 (NC fora do cálculo e reconferência) e a SOL-F41 (filtros, observação, «Resolvido no MV»).
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — A FAZER · **URGENTE** (pedido de 13/11/2026)
+
+**Consolida a SOL-F41 e a SOL-F42** num plano só, e responde à pergunta que estava em aberto: **pendente de análise NÃO compõe o fechamento.**
+
+**Diretriz do usuário:**
+- A ferramenta centraliza as decisões, registra as justificativas, controla as correções e determina quais procedimentos estão autorizados a compor o fechamento.
+- O fechamento reflete **exclusivamente** o que é devido ou expressamente aceito, **nunca** simplesmente tudo o que consta no relatório do MV.
+
+### 1. Classificação de cada procedimento (linha do MV) e o que já existe por trás de cada uma
+
+**Princípio de implementação: não criar um motor novo.** As quatro classes são uma **leitura** da situação da conferência mais as decisões que já existem. As regras do motor (faixas, equivalências, regras compostas, exame) não mudam.
+
+| Classe (nova, na tela e no fechamento) | Entra no fechamento? | Vem de (o que já existe) |
+|---|---|---|
+| **Devido** | **sim** | situação «Conferido» (par único, nome seguro, mesma data, equivalência validada ou regra composta/exame) |
+| **Aceito** | **sim** | decisão «Considerado no repasse», que passa a se chamar **«Aceito para pagamento»**. Justificativa obrigatória, com quem e quando. Vale para a linha e para os grupos de «O que falta decidir» («Aceitar as N», «Considerar no repasse») |
+| **Não conformidade** | **não** | decisão «Tratado: NC» (NC registrada e não «não procede»). Na reconferência entra a SOL-F42: aguardando, corrigida ou não corrigida no MV, com alerta |
+| **Pendente de análise** | **não** | tudo o que não é nenhuma das anteriores: ressalva sem decisão, pendente/ambíguo, só no faturamento, equivalência não validada, composição incompleta… |
+
+Laudos «Só no laudo» não têm valor no MV e não entram na conta do fechamento. Eles continuam nas decisões (NC, correção de prestador, dispensar).
+
+**A confirmar com o usuário antes de implementar:**
+- **a) «Conferido com ressalva»** (data dentro da tolerância, convênio escrito diferente, composição completa com observação): **Pendente até aceitar** (proposta)? Ou Devido direto? A proposta segue a definição «Devido = sem divergências». O aceite em lote por causa, que já existe («Aceitar as 2 (mesmo convênio)»), resolve em um clique.
+- **b) Itens não procedimentais** (taxa, material, medicamento, pacote) e **HM**: hoje ficam fora do cruzamento. Propostas: Devido automático para os itens com regra de tipo validada; HM segue a regra da V3 onde existir; o resto fica Pendente.
+- **c) «Resolvido no MV»** (SOL-F41): a linha fica **Pendente** até a reconferência confirmar. Se a linha **sumiu** do novo PDF, não há o que pagar. Se **mudou** (ex.: o código foi corrigido), ela é reavaliada como qualquer linha.
+
+### 2. A prévia como ambiente oficial
+- **Totais sempre visíveis** no topo:
+  - **Devido R$** · **Aceito R$** · **= Valor para pagamento R$**;
+  - ao lado, **Pendente R$** (falta decidir) e **NC R$** (excluído);
+  - e o total do MV, para conferir que a soma bate (Devido + Aceito + Pendente + NC = total do relatório).
+- **Classe por linha** na tabela, em coluna própria, com filtro por classe. Também entram os filtros da SOL-F41: procedimento, data, convênio, título, médico e com observação, com ações em lote sobre o filtrado.
+- **Decisões na própria tela**, sempre com justificativa e rastreabilidade:
+  - Aceitar para pagamento;
+  - Registrar NC;
+  - Resolvido no MV (F41);
+  - Escolher o laudo certo (F41);
+  - Dispensar laudo (já existe);
+  - Observação (F41).
+- **Reconferência** (F42): ao importar o novo PDF, a ferramenta mostra as NCs corrigidas, as NCs que continuam no MV (alerta, com o valor que continua sendo pago pelo MV) e os resolvidos no MV que não apareceram corrigidos.
+- **«Aceite do relatório»** (o que hoje é «Registrar aceite») continua sendo o **encerramento** da conferência do relatório, e não a aprovação de linhas. Os nomes ficam distintos para não confundir: «Aceito para pagamento» é a linha; «Aceite do relatório» é o fechamento da conferência.
+  - Com pendências, o aceite do relatório continua permitido com observação. As linhas pendentes **não entram** no valor.
+
+### 3. Fechamento
+- O valor de cada prestador × unidade passa a ser **Devido + Aceito** da rodada com aceite do relatório (ou da última, como prévia), e não mais a soma de todas as linhas (`88-fechamento.js`, `somaLinhas`). A mesma regra vale para:
+  - a produção de USG e a classe A/B/C/D;
+  - a contagem de exames da V3/Curitiba;
+  - a planilha de controle;
+  - a prévia do e-mail.
+- **Coluna/aba com o valor aberto por classe** (Devido, Aceito, Pendente, NC), com a lista das linhas, para conferir.
+- **Sem quebrar o que já existe:**
+  - **Competências fechadas e rodadas antigas** mantêm o cálculo antigo (total do MV). A regra nova vale para as rodadas feitas a partir da versão que a implementar, e a rodada guarda qual regra usou (`versoes.motor`).
+  - Na competência aberta, a regra nova vale ao **conferir de novo**. Até lá, o Fechamento mostra o aviso «calculado pela regra antiga: confira de novo».
+  - Decisões já registradas («Considerado no repasse», NCs, «Dispensado») continuam valendo e já se encaixam nas classes novas: considerado = Aceito, NC = Não conformidade.
+
+### 4. Navegação por abas na Conferência
+O resultado da conferência hoje é uma página longa: frase e barra, Detalhes da rodada, «O que falta decidir», Aceite, Linhas (a prévia), Candidatos a NC e Equivalências desta rodada. Passa a ter uma barra de abas fixa no topo do resultado:
+
+| Aba | Conteúdo |
+|---|---|
+| **Prévia de conferência** (padrão, em destaque) | totais por classe, tabela de linhas com classe, filtros e ações |
+| **O que falta decidir** | as causas agrupadas, como hoje, com o número de decisões no rótulo |
+| **NCs e correções no MV** | candidatos a NC, NCs desta rodada e status da correção no MV (F42) |
+| **Aceite do relatório** | quadro do aceite, com o resumo Devido/Aceito/Pendente/NC |
+| **Detalhes e equivalências** | detalhes da rodada, comparação com a anterior e equivalências desta rodada |
+
+- A aba escolhida fica lembrada durante a sessão.
+- As decisões tomadas em qualquer aba atualizam os totais na hora.
+- Os botões de ir direto («Começar pelas decisões», «Ir para o aceite») trocam de aba em vez de rolar a página.
+
+### 5. Critérios de aceite
+1. Num relatório com linhas conferidas, aceitas, com NC e pendentes, o topo mostra os quatro valores. **Valor para pagamento = Devido + Aceito**, e a soma das quatro classes = total do MV.
+2. O Fechamento do prestador usa o Valor para pagamento da rodada, não o total do MV. A planilha de controle e a prévia do e-mail mostram o mesmo número.
+3. Aceitar uma linha (ou um grupo) move o valor de Pendente para Aceito na hora, com justificativa, quem e quando.
+4. Registrar NC move o valor para NC (excluído). «Não procede» devolve a linha para a classe anterior.
+5. Reimportar o PDF: NC que continua no MV → alerta com o valor; NC que sumiu → «corrigida no MV».
+6. Competência fechada antes da mudança: o Fechamento continua com os mesmos valores de antes.
+7. As abas trocam sem recarregar; a «Prévia de conferência» abre primeiro, logo depois de conferir.
+
+### Ordem sugerida de implementação
+1. Classes e totais na prévia (só leitura, nada muda no fechamento): dá para validar com os relatórios reais.
+2. Abas na Conferência.
+3. Decisões novas da F41 (Resolvido no MV, escolher o laudo, filtros, lote, observação).
+4. Fechamento pela regra nova, com a proteção das competências antigas.
+5. Reconferência e alertas de NC (F42).
 
 ## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — A FAZER · **URGENTE** (pedido de 13/11/2026)
 
@@ -48,7 +134,7 @@ Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada 
 
 ### Ligações
 - **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
-- **Pergunta da F41 (pendente sai ou não do valor):** o princípio acima indica que **só o devido** deve compor o fechamento. A confirmar com o usuário se linhas **pendentes sem decisão** também saem do valor, ou só impedem o aceite.
+- **Pergunta da F41 (pendente sai ou não do valor): respondida na SOL-F43.** Pendente de análise **não** compõe o fechamento.
 
 ## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
 
