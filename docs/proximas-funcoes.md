@@ -1,6 +1,85 @@
 # Próximas funções — requisitos registrados
 
+**Próxima melhoria urgente: SOL-F41 (conferência autossuficiente — filtros e observação por linha), logo abaixo.**
+
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
+
+**Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
+
+**Problema:** a conferência ainda é finalizada no Excel. O que se ajusta na planilha não volta para a ferramenta. Com isso:
+- as NCs não nascem;
+- a produção e a classe não usam o ajuste;
+- o Fechamento fica com o resultado sem os ajustes.
+
+O Excel deve virar só uma cópia do que foi feito no app, não o lugar do trabalho.
+
+**O que já existe na tabela de linhas (Conferência → Linhas)**, para não duplicar:
+- busca livre (paciente, código, título, médico);
+- filtro por situação (cartões Conferido, Pendente…);
+- filtro por marcador (ressalvas e decisões);
+- «só o que falta decidir»;
+- «Ver todas as linhas».
+
+No detalhe da linha:
+- motivo e evidências, candidatos, linha do MV e laudo;
+- botões «Apontar como NC…», «Considerar no repasse…» e «Dispensar laudo…».
+
+### 1. Filtros na tabela de linhas
+- **Procedimento (código TUSS do MV):** lista dos códigos presentes no relatório, com descrição e quantidade de linhas; escolha de um ou vários.
+- **Data:** um dia específico ou um intervalo (de… até…); atalho para os dias presentes no relatório.
+- Também úteis no mesmo painel:
+  - convênio;
+  - título do laudo (Apolo);
+  - médico do laudo;
+  - «com observação» / «sem observação».
+- Os filtros combinam entre si e com os que já existem (situação, marcador, busca, só o que falta).
+- No topo do resultado, aparecem a **quantidade de linhas e a soma do Vl Repasse do filtro**.
+- Botão «Limpar filtros» (já existe) passa a limpar todos.
+- Os filtros ficam enquanto a conferência está aberta na sessão.
+- **Ações em lote sobre o que está filtrado:** «Considerar no repasse», «Apontar como NC», «Dispensar laudos» e «Observação» para as linhas visíveis, com confirmação e a contagem.
+
+### 2. Observação por linha (no card de detalhe)
+- Campo de texto livre no card da linha, com «Salvar».
+- A observação guarda:
+  - quem escreveu (operador);
+  - data e hora;
+  - histórico de alterações (editar não apaga o texto anterior).
+- **Fica na competência**, como as decisões («memória das decisões», SOL-F6): vale para toda nova rodada do mesmo relatório. A chave da linha não leva nome de paciente.
+- Se o texto tiver dado de paciente, a observação segue a mesma retenção das NCs (`retencaoNC`).
+- **Onde aparece:**
+  - ícone na tabela;
+  - filtro «com observação»;
+  - coluna «Observação» no Excel (catálogo de colunas e modelo «Padrão»);
+  - no quadro do aceite («N linhas com observação»);
+  - levada para a NC quando a linha virar NC.
+- A observação **não muda a situação** da linha. Para mudar a situação, continuam as decisões (NC, considerar, dispensar).
+
+### 3. Tudo o que hoje se ajusta no Excel deve existir no app
+Para fechar o ciclo (conferência → NCs → produção → fechamento), cada ajuste feito hoje na planilha precisa de uma ação equivalente na ferramenta, que alimente os outros módulos.
+- **A levantar com o usuário:** a lista dos ajustes que ele faz hoje no Excel depois de exportar. Exemplos a confirmar:
+  - marcar uma linha como certa;
+  - anotar o motivo;
+  - excluir uma linha da produção;
+  - mudar o médico;
+  - ajustar o valor;
+  - separar o que vai para NC.
+- Cada ajuste vira:
+  - uma decisão que já existe (NC, considerar no repasse, dispensar);
+  - ou uma decisão nova (ex.: «não entra na produção», «valor ajustado» — sem alterar o dado original do MV, só registrar o ajuste com justificativa);
+  - ou uma observação.
+- O Fechamento e os indicadores de produção passam a ler essas decisões. Hoje o Fechamento usa o valor do relatório do MV e só conta as pendências.
+
+### Critérios de aceite
+1. Filtrar por um procedimento e por um dia mostra só essas linhas, com contagem e soma; as ações em lote valem só para elas.
+2. A observação digitada no card continua lá depois de rodar a conferência de novo, aparece no Excel e no filtro «com observação», e tem autor e data.
+3. Uma conferência pode ser terminada, com NCs registradas e aceite, sem abrir o Excel. O Fechamento reflete as decisões tomadas na tela.
+
+### Perguntas em aberto
+- Quais ajustes exatamente são feitos hoje na planilha (item 3)? Um print de uma planilha já ajustada ajuda.
+- A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?
+- Ajuste de valor: existe? Se existir, ele muda o repasse do prestador no Fechamento (com justificativa) ou só vira NC?
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
 
