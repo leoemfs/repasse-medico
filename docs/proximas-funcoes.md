@@ -1,8 +1,54 @@
 # Próximas funções — requisitos registrados
 
-**Próxima melhoria urgente: SOL-F41 (conferência autossuficiente — filtros e observação por linha), logo abaixo.**
+**Próximas melhorias urgentes, logo abaixo:** SOL-F42 (NC sai do cálculo do fechamento e a reconferência confirma a correção no MV) e SOL-F41 (conferência autossuficiente: filtros, observação, «Resolvido no MV»). As duas usam o mesmo mecanismo de confirmação na rodada seguinte; o ideal é implementá-las juntas.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — A FAZER · **URGENTE** (pedido de 13/11/2026)
+
+**Princípio (do usuário):** «a ferramenta precisa ser o reflexo fiel do que realmente está sendo pago ao prestador. Não basta identificar uma divergência: é necessário garantir que ela tenha sido tratada e que o cálculo do fechamento considere somente os procedimentos efetivamente devidos.»
+
+**Fluxo descrito pelo usuário** (ex.: exame lançado na conta do MV, sem laudo no Apolo):
+1. Investigar nos sistemas.
+2. Confirmado que não há laudo → **registrar a NC na ferramenta**.
+3. No MV, **retirar o procedimento** da conta do paciente.
+4. Na ferramenta, o registro continua como NC e **deixa de compor a base de cálculo do fechamento**.
+5. Gerar um novo PDF, importar e conferir de novo. A ferramenta **confronta com os registros anteriores** e verifica se as NCs foram corrigidas.
+6. Se um procedimento com NC **ainda estiver no novo relatório**, a ferramenta **alerta**: não foi retirado do MV e continua compondo a produção que será paga.
+
+**Como funciona hoje (conferido no código):**
+- **Valor:** o Fechamento soma **todas** as linhas da rodada (com aceite ou a última), inclusive as que têm NC (`88-fechamento.js`, `somaLinhas`).
+- **Decisão «Tratado: NC»:** fica na memória da competência pelas chaves da linha, sem nome de paciente (`84-decisoes.js`). Na nova rodada, se a linha **continua** no MV, ela aparece como «Tratado: NC» e **não há alerta**. Se a linha saiu, o laudo aparece como «Só no laudo», reconhecido como NC.
+- **Comparação de rodadas:** já existe (passaram a conferido, continuam pendentes, saíram da extração…), mas não olha as NCs.
+
+### O que fazer
+1. **NC fora do valor.**
+   - Linha do MV com NC registrada (natureza que significa «não devido»: não lançado/sem laudo, lançamento indevido, prestador incorreto…) **sai da base de cálculo** do fechamento do prestador: Vl Repasse, produção de USG e classe.
+   - NC «não procede» volta para o valor.
+   - Quais naturezas tiram do valor fica configurável em Configurações → Conferência. As que **não** tiram (ex.: só informativa) continuam somando.
+2. **Status da correção no MV, por NC.** Estados:
+   - **Aguardando correção no MV:** registrada, e a linha ainda está no último relatório importado;
+   - **Corrigida no MV:** a linha não aparece mais no relatório reimportado; data da rodada que confirmou;
+   - **Não corrigida, com alerta:** reimportou depois do registro e a linha continua lá.
+   - A NC guarda a rodada em que foi registrada e a rodada que confirmou a correção (rastreabilidade).
+3. **Alerta na reconferência.** Ao conferir de novo um relatório do mesmo prestador × unidade na competência, a ferramenta compara as linhas com NC pela chave da linha: conta, atendimento, código e data. O alerta aparece:
+   - no resultado da conferência: cartão vermelho «N procedimento(s) com NC continuam no MV — R$ X ainda compõem a produção», com a lista e um link para cada NC;
+   - em «O que falta decidir», como causa própria, com ações «Retirar do MV e reimportar» (só lembrete) ou «Não procede» (a NC estava errada);
+   - no Fechamento: aviso no prestador e bloqueio do aceite sem observação;
+   - na aba Não conformidades: filtro «aguardando correção no MV» e «não corrigidas».
+4. **Fechamento fiel ao que será pago.** Por prestador, o valor aberto por situação: conferido, considerado no repasse, **NC (fora do valor)**, dispensado e pendente. Uma NC que continua no MV aparece destacada, porque a ferramenta tira do valor, mas o MV ainda vai pagar.
+5. **Sem planilha.** NC, retirada no MV, reimportação e confirmação acontecem na ferramenta. O Excel só leva uma cópia.
+
+### Critérios de aceite
+1. Registrar NC numa linha «Só no faturamento» tira o Vl Repasse dela do Fechamento do prestador (e da produção de USG), e a planilha de controle mostra o valor sem ela.
+2. Reimportar o PDF sem o procedimento → a NC passa a «Corrigida no MV», com a data da rodada.
+3. Reimportar o PDF **com** o procedimento ainda lançado → alerta na conferência, no Fechamento e na aba NCs, com o valor que continua compondo a produção.
+4. NC marcada «não procede» → a linha volta a somar no valor.
+5. Tudo sem nome de paciente nas chaves; histórico com quem registrou, quem confirmou e quando.
+
+### Ligações
+- **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
+- **Pergunta da F41 (pendente sai ou não do valor):** o princípio acima indica que **só o devido** deve compor o fechamento. A confirmar com o usuário se linhas **pendentes sem decisão** também saem do valor, ou só impedem o aceite.
 
 ## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
 
