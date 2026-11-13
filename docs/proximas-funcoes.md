@@ -71,15 +71,45 @@ Para fechar o ciclo (conferência → NCs → produção → fechamento), cada a
   - ou uma observação.
 - O Fechamento e os indicadores de produção passam a ler essas decisões. Hoje o Fechamento usa o valor do relatório do MV e só conta as pendências.
 
+### 3.1 Respostas do usuário (13/11/2026) e o que isso significa
+**Como é feito hoje, fora da ferramenta:**
+- As **ambiguidades** são conferidas, **resolvidas no MV** e marcadas como «resolvido» na planilha.
+- Procedimentos são **considerados** na planilha quando convém, **sem dar aceite** na ferramenta.
+- «Ajuste de valor» = um procedimento considerado na planilha, mas sem aceite na ferramenta, que por isso não aparece no fechamento do app.
+
+**Como a ferramenta calcula hoje (conferido no código, `88-fechamento.js`):**
+- **O valor:** o Fechamento soma **todas** as linhas do relatório do MV da rodada com aceite (ou da última rodada, se não houver aceite), sem olhar a situação da linha. Ambíguas e pendentes entram no valor.
+- **O efeito de não ter aceite:**
+  - o prestador fica na situação **«Verificar»**;
+  - a planilha de controle sai como **PRÉVIA**;
+  - as decisões tomadas só no Excel (resolvido, considerado) não viram NC nem indicador.
+- **Conclusão:** não é um «ajuste de valor» que falta. O que falta é **registrar na ferramenta** o que hoje é decidido no Excel e **dar o aceite**.
+
+**O que entra na SOL-F41 por causa disso:**
+- **Nova decisão «Resolvido no MV»** para linhas ambíguas ou pendentes:
+  - com observação obrigatória («o que foi corrigido no MV»);
+  - deixa de ser pendência;
+  - na próxima extração/rodada, a ferramenta confere se a correção apareceu e avisa se não apareceu (a comparação de rodadas já existe).
+- **«Escolher o laudo certo»** na linha ambígua: um clique em um dos candidatos resolve o par, com registro de quem escolheu.
+- **«Considerar no repasse» em lote** pelas linhas filtradas (item 1). É o equivalente, na ferramenta, do «considerado» da planilha.
+- **Fechamento transparente:** em cada prestador, mostrar valor do relatório, valor conferido, valor considerado, valor pendente e valor dispensado/NC, com a lista das linhas. Assim fica claro o que entra e o que falta decidir antes do aceite.
+- **Aceite como último passo da conferência na tela:** com tudo resolvido, «Registrar aceite» não pede observação. A planilha de controle deixa de ser PRÉVIA para aquele prestador.
+
+**Pergunta nova (decide a regra de cálculo):**
+- Linha que **ficou pendente** (sem resolver e sem considerar) deve **sair do valor** do fechamento, pagando só conferido + considerado?
+- Ou o fechamento paga o **total do MV** e a pendência só impede o aceite, como hoje?
+
 ### Critérios de aceite
 1. Filtrar por um procedimento e por um dia mostra só essas linhas, com contagem e soma; as ações em lote valem só para elas.
 2. A observação digitada no card continua lá depois de rodar a conferência de novo, aparece no Excel e no filtro «com observação», e tem autor e data.
 3. Uma conferência pode ser terminada, com NCs registradas e aceite, sem abrir o Excel. O Fechamento reflete as decisões tomadas na tela.
+4. Ambiguidade resolvida no MV é registrada como «Resolvido no MV» e não bloqueia o aceite. Na rodada seguinte, a ferramenta diz se a correção apareceu.
+5. O Fechamento mostra, por prestador, quanto do valor é conferido, considerado, pendente e dispensado/NC.
 
 ### Perguntas em aberto
-- Quais ajustes exatamente são feitos hoje na planilha (item 3)? Um print de uma planilha já ajustada ajuda.
+- ~~Quais ajustes são feitos hoje na planilha?~~ Respondido em 13/11 (item 3.1).
 - A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?
-- Ajuste de valor: existe? Se existir, ele muda o repasse do prestador no Fechamento (com justificativa) ou só vira NC?
+- ~~Ajuste de valor existe?~~ Respondido em 13/11: é consideração sem aceite (item 3.1). Fica a pergunta nova do item 3.1 (pendente sai ou não do valor).
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
 
