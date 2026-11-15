@@ -21,20 +21,40 @@ Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada 
 | **Devido** | **sim** | situação «Conferido» (par único, nome seguro, mesma data, equivalência validada ou regra composta/exame) |
 | **Aceito** | **sim** | decisão «Considerado no repasse», que passa a se chamar **«Aceito para pagamento»**. Justificativa obrigatória, com quem e quando. Vale para a linha e para os grupos de «O que falta decidir» («Aceitar as N», «Considerar no repasse») |
 | **Não conformidade** | **não** | decisão «Tratado: NC» (NC registrada e não «não procede»). Na reconferência entra a SOL-F42: aguardando, corrigida ou não corrigida no MV, com alerta |
-| **Pendente de análise** | **não** | tudo o que não é nenhuma das anteriores: ressalva sem decisão, pendente/ambíguo, só no faturamento, equivalência não validada, composição incompleta… |
+| **Pendente de análise** | **não** | tudo o que não é nenhuma das anteriores: ressalva sem decisão, pendente/ambíguo, só no faturamento, equivalência não validada, composição incompleta, «Resolvido no MV» ainda não confirmado… |
+| **Excluído (não compõe repasse)** | **não** | item não procedimental: taxa, material e medicamento sempre; HM quando a regra do prestador não o inclui (sinalizado «Excluir do MV») |
 
 Laudos «Só no laudo» não têm valor no MV e não entram na conta do fechamento. Eles continuam nas decisões (NC, correção de prestador, dispensar).
 
-**A confirmar com o usuário antes de implementar:**
-- **a) «Conferido com ressalva»** (data dentro da tolerância, convênio escrito diferente, composição completa com observação): **Pendente até aceitar** (proposta)? Ou Devido direto? A proposta segue a definição «Devido = sem divergências». O aceite em lote por causa, que já existe («Aceitar as 2 (mesmo convênio)»), resolve em um clique.
-- **b) Itens não procedimentais** (taxa, material, medicamento, pacote) e **HM**: hoje ficam fora do cruzamento. Propostas: Devido automático para os itens com regra de tipo validada; HM segue a regra da V3 onde existir; o resto fica Pendente.
-- **c) «Resolvido no MV»** (SOL-F41): a linha fica **Pendente** até a reconferência confirmar. Se a linha **sumiu** do novo PDF, não há o que pagar. Se **mudou** (ex.: o código foi corrigido), ela é reavaliada como qualquer linha.
+**Decisões do usuário (13/11/2026):**
+- **a) «Conferido com ressalva»** (convênio escrito de outro jeito, data na tolerância, composição com observação) é **Pendente de análise** até ser **aceito** («Aceito para pagamento»). Só «Conferido» é Devido direto. O aceite em lote por causa («Aceitar as N (mesmo convênio)») continua sendo o caminho rápido.
+- **b) Itens não procedimentais e HM:**
+  - **Taxa, material e medicamento nunca compõem o repasse,** em nenhuma situação. Classe nova **«Excluído (não compõe repasse)»**:
+    - fora do fechamento;
+    - não é pendência e não precisa de decisão;
+    - mostrado só no total «Excluído do fechamento».
+  - **HM só compõe** quando a **regra do prestador** indica (hoje: V3 — HM de USG/Doppler do convênio Unimed — e as regras de repasse do prestador em Bases). Nesse caso o HM é Devido.
+  - **HM sem regra que o inclua:**
+    - não entra no fechamento;
+    - é sinalizado **«Excluir do MV»** (lista própria);
+    - **na reconferência, se o HM continuar no novo PDF, a ferramenta notifica** para ser excluído, no mesmo mecanismo do alerta de NC que continua no MV (F42).
+  - **Pacote / agrupador e «Desconhecido»** (classificação pendente) continuam **Pendente** até alguém decidir ou cadastrar a regra de classificação. Não houve decisão do usuário sobre esses dois; a proposta é manter assim.
+- **c) «Resolvido no MV»** fica **Pendente** até:
+  - a ferramenta **reconferir** e confirmar (a linha sumiu ou foi corrigida no novo PDF);
+  - **ou** o usuário **aceitar manualmente** («Aceito para pagamento»).
+
+**Classes finais:** Devido · Aceito · Não conformidade · Excluído (não compõe repasse: taxa, material, medicamento, HM sem regra) · Pendente de análise.
+- **Valor para pagamento = Devido + Aceito.**
+- **Conferência da soma:** Devido + Aceito + NC + Excluído + Pendente = total do relatório do MV.
+
+**Protótipo visual (sem código da ferramenta):** `docs/prototipos/conferencia-oficial.html`. Abre no navegador, com as abas, os totais por classe, os filtros, o card da linha com observação e decisões, a reconferência e o aceite do relatório. Os dados são fictícios.
 
 ### 2. A prévia como ambiente oficial
 - **Totais sempre visíveis** no topo:
   - **Devido R$** · **Aceito R$** · **= Valor para pagamento R$**;
   - ao lado, **Pendente R$** (falta decidir) e **NC R$** (excluído);
-  - e o total do MV, para conferir que a soma bate (Devido + Aceito + Pendente + NC = total do relatório).
+  - **Excluído R$** (taxas, materiais, medicamentos, HM sem regra);
+  - e o total do MV, para conferir que a soma bate (Devido + Aceito + Pendente + NC + Excluído = total do relatório).
 - **Classe por linha** na tabela, em coluna própria, com filtro por classe. Também entram os filtros da SOL-F41: procedimento, data, convênio, título, médico e com observação, com ações em lote sobre o filtrado.
 - **Decisões na própria tela**, sempre com justificativa e rastreabilidade:
   - Aceitar para pagamento;
@@ -43,7 +63,11 @@ Laudos «Só no laudo» não têm valor no MV e não entram na conta do fechamen
   - Escolher o laudo certo (F41);
   - Dispensar laudo (já existe);
   - Observação (F41).
-- **Reconferência** (F42): ao importar o novo PDF, a ferramenta mostra as NCs corrigidas, as NCs que continuam no MV (alerta, com o valor que continua sendo pago pelo MV) e os resolvidos no MV que não apareceram corrigidos.
+- **Reconferência** (F42): ao importar o novo PDF, a ferramenta mostra:
+  - as NCs corrigidas;
+  - as NCs que continuam no MV (alerta, com o valor que continua sendo pago pelo MV);
+  - os «Resolvidos no MV» confirmados e os não confirmados;
+  - os **HM sinalizados para exclusão que continuam no MV**.
 - **«Aceite do relatório»** (o que hoje é «Registrar aceite») continua sendo o **encerramento** da conferência do relatório, e não a aprovação de linhas. Os nomes ficam distintos para não confundir: «Aceito para pagamento» é a linha; «Aceite do relatório» é o fechamento da conferência.
   - Com pendências, o aceite do relatório continua permitido com observação. As linhas pendentes **não entram** no valor.
 
