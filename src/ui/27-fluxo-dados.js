@@ -22,7 +22,7 @@ function sincronizarDocumentalComBases(comp) {
 
 /* ---------- F13: classificação ---------- */
 function fechamentoDoFluxo(comp) {
-  try { return comp.chave === S.comp ? fechamentoAtual() : montarFechamento({ rodadas: S.rodadas, cfg: S.cfg, chave: comp.chave, fech: fechDaCompetencia(comp.chave), fluxoComp: comp }); } catch (e) { return null; }
+  try { return comp.chave === S.comp ? fechamentoAtual() : montarFechamento({ rodadas: S.rodadas, cfg: S.cfg, chave: comp.chave, decisoes: indiceDecisoesComp(comp.chave), fechada: compFechada(comp.chave), fech: fechDaCompetencia(comp.chave), fluxoComp: comp }); } catch (e) { return null; }
 }
 function linhasClassificacao(comp) {
   const f = fechamentoDoFluxo(comp), cl = comp.grupos.classif?.classificacao || {};

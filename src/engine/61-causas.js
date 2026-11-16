@@ -19,9 +19,9 @@ const CAUSAS = {
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
   repetida: { acao: 'Decidir qual lançamento vale; o outro vira NC (ou as duas estão certas)', titulo: () => 'Linha repetida no MV' },
   'nome-semelhante': { acao: 'Confirmar se é o mesmo paciente', titulo: () => 'Nome apenas semelhante' },
-  ambiguo: { acao: 'Escolher o laudo certo (ou considerar no repasse)', titulo: () => 'Mais de um laudo plausível' },
+  ambiguo: { acao: 'Escolher o laudo certo (ou aceitar para pagamento)', titulo: () => 'Mais de um laudo plausível' },
   'outro-medico': { acao: 'Confirmar o médico (correção de prestador ou NC)', titulo: () => 'Laudo assinado por outro médico' },
-  'so-faturamento': { acao: 'Registrar NC ou considerar no repasse', titulo: () => 'Só no faturamento: linha sem laudo' },
+  'so-faturamento': { acao: 'Registrar NC ou aceitar para pagamento', titulo: () => 'Só no faturamento: linha sem laudo' },
   outro: { acao: 'Revisar a linha', titulo: () => 'Revisar' }
 };
 const LINHA_A_LINHA = new Set(['repetida', 'nome-semelhante', 'ambiguo', 'outro-medico', 'so-faturamento', 'outro']);
@@ -31,7 +31,8 @@ function causasDaConferencia(res, compostas = []) {
   const add = (k, base, i) => { const c = g.get(k) || g.set(k, { k, ...base, linhas: [] }).get(k); c.linhas.push(i); };
   const nomeCp = id => { const c = compostas.find(x => x.id === id); return c ? nomeComposta(c) : 'regra composta'; };
   res.linhas.forEach((x, i) => {
-    if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental') return;
+    // SOL-F43: taxa, material, medicamento e HM sem regra são «Excluído» (não compõem repasse): não há o que decidir.
+    if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental' || classeDaLinhaConf(x) === 'excluido') return;
     const m = x.marcadores, p = x.par, r = x.r, l = x.l, base = r && l ? { codigo: r.codigo, desc: r.procDesc || '', titulo: l.titulo } : {};
     if (x.status === 'so-laudo' && x.mesmoEstudoPossivel) return add(`me|${x.mesmoEstudoPossivel.regraId}|${chaveTitulo(l.titulo)}`, { tipo: 'mesmo-estudo', titulo: l.titulo, ...x.mesmoEstudoPossivel }, i);
     if (x.status === 'so-laudo') {

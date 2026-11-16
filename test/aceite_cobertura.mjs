@@ -30,6 +30,7 @@ await p.selectOption('#cfUn', '1'); await p.click('#cfRodar'); await p.waitForSe
 const box = await p.textContent('#cfAceite');
 ok(/sem aceite/.test(box) && /pendente\(s\)/.test(box) && !!(await p.$('#cfAceitarProx')), `quadro de aceite no resultado (${box.replace(/\s+/g, ' ').slice(0, 110)}…)`);
 await p.screenshot({ path: out + 'aceite_conferencia.png' });
+await p.click('[data-cfaba="aceite"]');   // v3.0.0-alpha.6: aceite na aba «Aceite do relatório»
 await p.click('#cfAceitar'); await p.waitForTimeout(200);
 ok(await S(() => !window.__RM.S.rodadas.at(-1).aceite) && /observação/.test(await p.textContent('#aviso')), 'com pendências, a observação é obrigatória');
 await p.fill('#cfAceiteObs', 'pendências por equivalência ainda não validada'); await p.click('#cfAceitar'); await p.waitForSelector('.aceite-box.feito');

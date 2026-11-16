@@ -1,6 +1,271 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
+
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — **IMPLEMENTADA na v3.0.0-alpha.6** (pedido de 13/11/2026; guia em `como-usar-conferencia-oficial.md`)
+
+**Consolida a SOL-F41 e a SOL-F42** num plano só, e responde à pergunta que estava em aberto: **pendente de análise NÃO compõe o fechamento.**
+
+**Diretriz do usuário:**
+- A ferramenta centraliza as decisões, registra as justificativas, controla as correções e determina quais procedimentos estão autorizados a compor o fechamento.
+- O fechamento reflete **exclusivamente** o que é devido ou expressamente aceito, **nunca** simplesmente tudo o que consta no relatório do MV.
+
+### 1. Classificação de cada procedimento (linha do MV) e o que já existe por trás de cada uma
+
+**Princípio de implementação: não criar um motor novo.** As quatro classes são uma **leitura** da situação da conferência mais as decisões que já existem. As regras do motor (faixas, equivalências, regras compostas, exame) não mudam.
+
+| Classe (nova, na tela e no fechamento) | Entra no fechamento? | Vem de (o que já existe) |
+|---|---|---|
+| **Devido** | **sim** | situação «Conferido» (par único, nome seguro, mesma data, equivalência validada ou regra composta/exame) |
+| **Aceito** | **sim** | decisão «Considerado no repasse», que passa a se chamar **«Aceito para pagamento»**. Justificativa obrigatória, com quem e quando. Vale para a linha e para os grupos de «O que falta decidir» («Aceitar as N», «Considerar no repasse») |
+| **Não conformidade** | **não** | decisão «Tratado: NC» (NC registrada e não «não procede»). Na reconferência entra a SOL-F42: aguardando, corrigida ou não corrigida no MV, com alerta |
+| **Pendente de análise** | **não** | tudo o que não é nenhuma das anteriores: ressalva sem decisão, pendente/ambíguo, só no faturamento, equivalência não validada, composição incompleta, «Resolvido no MV» ainda não confirmado… |
+| **Excluído (não compõe repasse)** | **não** | item não procedimental: taxa, material e medicamento sempre; HM quando a regra do prestador não o inclui (sinalizado «Excluir do MV») |
+
+Laudos «Só no laudo» não têm valor no MV e não entram na conta do fechamento. Eles continuam nas decisões (NC, correção de prestador, dispensar).
+
+**Decisões do usuário (13/11/2026):**
+- **a) «Conferido com ressalva»** (convênio escrito de outro jeito, data na tolerância, composição com observação) é **Pendente de análise** até ser **aceito** («Aceito para pagamento»). Só «Conferido» é Devido direto. O aceite em lote por causa («Aceitar as N (mesmo convênio)») continua sendo o caminho rápido.
+- **b) Itens não procedimentais e HM:**
+  - **Taxa, material e medicamento nunca compõem o repasse,** em nenhuma situação. Classe nova **«Excluído (não compõe repasse)»**:
+    - fora do fechamento;
+    - não é pendência e não precisa de decisão;
+    - mostrado só no total «Excluído do fechamento».
+  - **HM só compõe** quando a **regra do prestador** indica (hoje: V3 — HM de USG/Doppler do convênio Unimed — e as regras de repasse do prestador em Bases). Nesse caso o HM é Devido.
+  - **HM sem regra que o inclua:**
+    - não entra no fechamento;
+    - é sinalizado **«Excluir do MV»** (lista própria);
+    - **na reconferência, se o HM continuar no novo PDF, a ferramenta notifica** para ser excluído, no mesmo mecanismo do alerta de NC que continua no MV (F42).
+  - **Pacote / agrupador e «Desconhecido»** (classificação pendente) continuam **Pendente** até alguém decidir ou cadastrar a regra de classificação. Não houve decisão do usuário sobre esses dois; a proposta é manter assim.
+- **c) «Resolvido no MV»** fica **Pendente** até:
+  - a ferramenta **reconferir** e confirmar (a linha sumiu ou foi corrigida no novo PDF);
+  - **ou** o usuário **aceitar manualmente** («Aceito para pagamento»).
+
+**Classes finais:** Devido · Aceito · Não conformidade · Excluído (não compõe repasse: taxa, material, medicamento, HM sem regra) · Pendente de análise.
+- **Valor para pagamento = Devido + Aceito.**
+- **Conferência da soma:** Devido + Aceito + NC + Excluído + Pendente = total do relatório do MV.
+
+**Protótipo visual (sem código da ferramenta):** `docs/prototipos/conferencia-oficial.html`. Abre no navegador, com as abas, os totais por classe, os filtros, o card da linha com observação e decisões, a reconferência e o aceite do relatório. Os dados são fictícios.
+
+### 2. A prévia como ambiente oficial
+- **Totais sempre visíveis** no topo:
+  - **Devido R$** · **Aceito R$** · **= Valor para pagamento R$**;
+  - ao lado, **Pendente R$** (falta decidir) e **NC R$** (excluído);
+  - **Excluído R$** (taxas, materiais, medicamentos, HM sem regra);
+  - e o total do MV, para conferir que a soma bate (Devido + Aceito + Pendente + NC + Excluído = total do relatório).
+- **Classe por linha** na tabela, em coluna própria, com filtro por classe. Também entram os filtros da SOL-F41: procedimento, data, convênio, título, médico e com observação, com ações em lote sobre o filtrado.
+- **Decisões na própria tela**, sempre com justificativa e rastreabilidade:
+  - Aceitar para pagamento;
+  - Registrar NC;
+  - Resolvido no MV (F41);
+  - Escolher o laudo certo (F41);
+  - Dispensar laudo (já existe);
+  - Observação (F41).
+- **Reconferência** (F42): ao importar o novo PDF, a ferramenta mostra:
+  - as NCs corrigidas;
+  - as NCs que continuam no MV (alerta, com o valor que continua sendo pago pelo MV);
+  - os «Resolvidos no MV» confirmados e os não confirmados;
+  - os **HM sinalizados para exclusão que continuam no MV**.
+- **«Aceite do relatório»** (o que hoje é «Registrar aceite») continua sendo o **encerramento** da conferência do relatório, e não a aprovação de linhas. Os nomes ficam distintos para não confundir: «Aceito para pagamento» é a linha; «Aceite do relatório» é o fechamento da conferência.
+  - Com pendências, o aceite do relatório continua permitido com observação. As linhas pendentes **não entram** no valor.
+
+### 3. Fechamento
+- O valor de cada prestador × unidade passa a ser **Devido + Aceito** da rodada com aceite do relatório (ou da última, como prévia), e não mais a soma de todas as linhas (`88-fechamento.js`, `somaLinhas`). A mesma regra vale para:
+  - a produção de USG e a classe A/B/C/D;
+  - a contagem de exames da V3/Curitiba;
+  - a planilha de controle;
+  - a prévia do e-mail.
+- **Coluna/aba com o valor aberto por classe** (Devido, Aceito, Pendente, NC), com a lista das linhas, para conferir.
+- **Sem quebrar o que já existe:**
+  - **Competências fechadas e rodadas antigas** mantêm o cálculo antigo (total do MV). A regra nova vale para as rodadas feitas a partir da versão que a implementar, e a rodada guarda qual regra usou (`versoes.motor`).
+  - Na competência aberta, a regra nova vale ao **conferir de novo**. Até lá, o Fechamento mostra o aviso «calculado pela regra antiga: confira de novo».
+  - Decisões já registradas («Considerado no repasse», NCs, «Dispensado») continuam valendo e já se encaixam nas classes novas: considerado = Aceito, NC = Não conformidade.
+
+### 4. Navegação por abas na Conferência
+O resultado da conferência hoje é uma página longa: frase e barra, Detalhes da rodada, «O que falta decidir», Aceite, Linhas (a prévia), Candidatos a NC e Equivalências desta rodada. Passa a ter uma barra de abas fixa no topo do resultado:
+
+| Aba | Conteúdo |
+|---|---|
+| **Prévia de conferência** (padrão, em destaque) | totais por classe, tabela de linhas com classe, filtros e ações |
+| **O que falta decidir** | as causas agrupadas, como hoje, com o número de decisões no rótulo |
+| **NCs e correções no MV** | candidatos a NC, NCs desta rodada e status da correção no MV (F42) |
+| **Aceite do relatório** | quadro do aceite, com o resumo Devido/Aceito/Pendente/NC |
+| **Detalhes e equivalências** | detalhes da rodada, comparação com a anterior e equivalências desta rodada |
+
+- A aba escolhida fica lembrada durante a sessão.
+- As decisões tomadas em qualquer aba atualizam os totais na hora.
+- Os botões de ir direto («Começar pelas decisões», «Ir para o aceite») trocam de aba em vez de rolar a página.
+
+### 5. Critérios de aceite
+1. Num relatório com linhas conferidas, aceitas, com NC e pendentes, o topo mostra os quatro valores. **Valor para pagamento = Devido + Aceito**, e a soma das quatro classes = total do MV.
+2. O Fechamento do prestador usa o Valor para pagamento da rodada, não o total do MV. A planilha de controle e a prévia do e-mail mostram o mesmo número.
+3. Aceitar uma linha (ou um grupo) move o valor de Pendente para Aceito na hora, com justificativa, quem e quando.
+4. Registrar NC move o valor para NC (excluído). «Não procede» devolve a linha para a classe anterior.
+5. Reimportar o PDF: NC que continua no MV → alerta com o valor; NC que sumiu → «corrigida no MV».
+6. Competência fechada antes da mudança: o Fechamento continua com os mesmos valores de antes.
+7. As abas trocam sem recarregar; a «Prévia de conferência» abre primeiro, logo depois de conferir.
+
+### Ordem sugerida de implementação
+1. Classes e totais na prévia (só leitura, nada muda no fechamento): dá para validar com os relatórios reais.
+2. Abas na Conferência.
+3. Decisões novas da F41 (Resolvido no MV, escolher o laudo, filtros, lote, observação).
+4. Fechamento pela regra nova, com a proteção das competências antigas.
+5. Reconferência e alertas de NC (F42).
+
+## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — A FAZER · **URGENTE** (pedido de 13/11/2026)
+
+**Princípio (do usuário):** «a ferramenta precisa ser o reflexo fiel do que realmente está sendo pago ao prestador. Não basta identificar uma divergência: é necessário garantir que ela tenha sido tratada e que o cálculo do fechamento considere somente os procedimentos efetivamente devidos.»
+
+**Fluxo descrito pelo usuário** (ex.: exame lançado na conta do MV, sem laudo no Apolo):
+1. Investigar nos sistemas.
+2. Confirmado que não há laudo → **registrar a NC na ferramenta**.
+3. No MV, **retirar o procedimento** da conta do paciente.
+4. Na ferramenta, o registro continua como NC e **deixa de compor a base de cálculo do fechamento**.
+5. Gerar um novo PDF, importar e conferir de novo. A ferramenta **confronta com os registros anteriores** e verifica se as NCs foram corrigidas.
+6. Se um procedimento com NC **ainda estiver no novo relatório**, a ferramenta **alerta**: não foi retirado do MV e continua compondo a produção que será paga.
+
+**Como funciona hoje (conferido no código):**
+- **Valor:** o Fechamento soma **todas** as linhas da rodada (com aceite ou a última), inclusive as que têm NC (`88-fechamento.js`, `somaLinhas`).
+- **Decisão «Tratado: NC»:** fica na memória da competência pelas chaves da linha, sem nome de paciente (`84-decisoes.js`). Na nova rodada, se a linha **continua** no MV, ela aparece como «Tratado: NC» e **não há alerta**. Se a linha saiu, o laudo aparece como «Só no laudo», reconhecido como NC.
+- **Comparação de rodadas:** já existe (passaram a conferido, continuam pendentes, saíram da extração…), mas não olha as NCs.
+
+### O que fazer
+1. **NC fora do valor.**
+   - Linha do MV com NC registrada (natureza que significa «não devido»: não lançado/sem laudo, lançamento indevido, prestador incorreto…) **sai da base de cálculo** do fechamento do prestador: Vl Repasse, produção de USG e classe.
+   - NC «não procede» volta para o valor.
+   - Quais naturezas tiram do valor fica configurável em Configurações → Conferência. As que **não** tiram (ex.: só informativa) continuam somando.
+2. **Status da correção no MV, por NC.** Estados:
+   - **Aguardando correção no MV:** registrada, e a linha ainda está no último relatório importado;
+   - **Corrigida no MV:** a linha não aparece mais no relatório reimportado; data da rodada que confirmou;
+   - **Não corrigida, com alerta:** reimportou depois do registro e a linha continua lá.
+   - A NC guarda a rodada em que foi registrada e a rodada que confirmou a correção (rastreabilidade).
+3. **Alerta na reconferência.** Ao conferir de novo um relatório do mesmo prestador × unidade na competência, a ferramenta compara as linhas com NC pela chave da linha: conta, atendimento, código e data. O alerta aparece:
+   - no resultado da conferência: cartão vermelho «N procedimento(s) com NC continuam no MV — R$ X ainda compõem a produção», com a lista e um link para cada NC;
+   - em «O que falta decidir», como causa própria, com ações «Retirar do MV e reimportar» (só lembrete) ou «Não procede» (a NC estava errada);
+   - no Fechamento: aviso no prestador e bloqueio do aceite sem observação;
+   - na aba Não conformidades: filtro «aguardando correção no MV» e «não corrigidas».
+4. **Fechamento fiel ao que será pago.** Por prestador, o valor aberto por situação: conferido, considerado no repasse, **NC (fora do valor)**, dispensado e pendente. Uma NC que continua no MV aparece destacada, porque a ferramenta tira do valor, mas o MV ainda vai pagar.
+5. **Sem planilha.** NC, retirada no MV, reimportação e confirmação acontecem na ferramenta. O Excel só leva uma cópia.
+
+### Critérios de aceite
+1. Registrar NC numa linha «Só no faturamento» tira o Vl Repasse dela do Fechamento do prestador (e da produção de USG), e a planilha de controle mostra o valor sem ela.
+2. Reimportar o PDF sem o procedimento → a NC passa a «Corrigida no MV», com a data da rodada.
+3. Reimportar o PDF **com** o procedimento ainda lançado → alerta na conferência, no Fechamento e na aba NCs, com o valor que continua compondo a produção.
+4. NC marcada «não procede» → a linha volta a somar no valor.
+5. Tudo sem nome de paciente nas chaves; histórico com quem registrou, quem confirmou e quando.
+
+### Ligações
+- **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
+- **Pergunta da F41 (pendente sai ou não do valor): respondida na SOL-F43.** Pendente de análise **não** compõe o fechamento.
+
+## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
+
+**Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
+
+**Problema:** a conferência ainda é finalizada no Excel. O que se ajusta na planilha não volta para a ferramenta. Com isso:
+- as NCs não nascem;
+- a produção e a classe não usam o ajuste;
+- o Fechamento fica com o resultado sem os ajustes.
+
+O Excel deve virar só uma cópia do que foi feito no app, não o lugar do trabalho.
+
+**O que já existe na tabela de linhas (Conferência → Linhas)**, para não duplicar:
+- busca livre (paciente, código, título, médico);
+- filtro por situação (cartões Conferido, Pendente…);
+- filtro por marcador (ressalvas e decisões);
+- «só o que falta decidir»;
+- «Ver todas as linhas».
+
+No detalhe da linha:
+- motivo e evidências, candidatos, linha do MV e laudo;
+- botões «Apontar como NC…», «Considerar no repasse…» e «Dispensar laudo…».
+
+### 1. Filtros na tabela de linhas
+- **Procedimento (código TUSS do MV):** lista dos códigos presentes no relatório, com descrição e quantidade de linhas; escolha de um ou vários.
+- **Data:** um dia específico ou um intervalo (de… até…); atalho para os dias presentes no relatório.
+- Também úteis no mesmo painel:
+  - convênio;
+  - título do laudo (Apolo);
+  - médico do laudo;
+  - «com observação» / «sem observação».
+- Os filtros combinam entre si e com os que já existem (situação, marcador, busca, só o que falta).
+- No topo do resultado, aparecem a **quantidade de linhas e a soma do Vl Repasse do filtro**.
+- Botão «Limpar filtros» (já existe) passa a limpar todos.
+- Os filtros ficam enquanto a conferência está aberta na sessão.
+- **Ações em lote sobre o que está filtrado:** «Considerar no repasse», «Apontar como NC», «Dispensar laudos» e «Observação» para as linhas visíveis, com confirmação e a contagem.
+
+### 2. Observação por linha (no card de detalhe)
+- Campo de texto livre no card da linha, com «Salvar».
+- A observação guarda:
+  - quem escreveu (operador);
+  - data e hora;
+  - histórico de alterações (editar não apaga o texto anterior).
+- **Fica na competência**, como as decisões («memória das decisões», SOL-F6): vale para toda nova rodada do mesmo relatório. A chave da linha não leva nome de paciente.
+- Se o texto tiver dado de paciente, a observação segue a mesma retenção das NCs (`retencaoNC`).
+- **Onde aparece:**
+  - ícone na tabela;
+  - filtro «com observação»;
+  - coluna «Observação» no Excel (catálogo de colunas e modelo «Padrão»);
+  - no quadro do aceite («N linhas com observação»);
+  - levada para a NC quando a linha virar NC.
+- A observação **não muda a situação** da linha. Para mudar a situação, continuam as decisões (NC, considerar, dispensar).
+
+### 3. Tudo o que hoje se ajusta no Excel deve existir no app
+Para fechar o ciclo (conferência → NCs → produção → fechamento), cada ajuste feito hoje na planilha precisa de uma ação equivalente na ferramenta, que alimente os outros módulos.
+- **A levantar com o usuário:** a lista dos ajustes que ele faz hoje no Excel depois de exportar. Exemplos a confirmar:
+  - marcar uma linha como certa;
+  - anotar o motivo;
+  - excluir uma linha da produção;
+  - mudar o médico;
+  - ajustar o valor;
+  - separar o que vai para NC.
+- Cada ajuste vira:
+  - uma decisão que já existe (NC, considerar no repasse, dispensar);
+  - ou uma decisão nova (ex.: «não entra na produção», «valor ajustado» — sem alterar o dado original do MV, só registrar o ajuste com justificativa);
+  - ou uma observação.
+- O Fechamento e os indicadores de produção passam a ler essas decisões. Hoje o Fechamento usa o valor do relatório do MV e só conta as pendências.
+
+### 3.1 Respostas do usuário (13/11/2026) e o que isso significa
+**Como é feito hoje, fora da ferramenta:**
+- As **ambiguidades** são conferidas, **resolvidas no MV** e marcadas como «resolvido» na planilha.
+- Procedimentos são **considerados** na planilha quando convém, **sem dar aceite** na ferramenta.
+- «Ajuste de valor» = um procedimento considerado na planilha, mas sem aceite na ferramenta, que por isso não aparece no fechamento do app.
+
+**Como a ferramenta calcula hoje (conferido no código, `88-fechamento.js`):**
+- **O valor:** o Fechamento soma **todas** as linhas do relatório do MV da rodada com aceite (ou da última rodada, se não houver aceite), sem olhar a situação da linha. Ambíguas e pendentes entram no valor.
+- **O efeito de não ter aceite:**
+  - o prestador fica na situação **«Verificar»**;
+  - a planilha de controle sai como **PRÉVIA**;
+  - as decisões tomadas só no Excel (resolvido, considerado) não viram NC nem indicador.
+- **Conclusão:** não é um «ajuste de valor» que falta. O que falta é **registrar na ferramenta** o que hoje é decidido no Excel e **dar o aceite**.
+
+**O que entra na SOL-F41 por causa disso:**
+- **Nova decisão «Resolvido no MV»** para linhas ambíguas ou pendentes:
+  - com observação obrigatória («o que foi corrigido no MV»);
+  - deixa de ser pendência;
+  - na próxima extração/rodada, a ferramenta confere se a correção apareceu e avisa se não apareceu (a comparação de rodadas já existe).
+- **«Escolher o laudo certo»** na linha ambígua: um clique em um dos candidatos resolve o par, com registro de quem escolheu.
+- **«Considerar no repasse» em lote** pelas linhas filtradas (item 1). É o equivalente, na ferramenta, do «considerado» da planilha.
+- **Fechamento transparente:** em cada prestador, mostrar valor do relatório, valor conferido, valor considerado, valor pendente e valor dispensado/NC, com a lista das linhas. Assim fica claro o que entra e o que falta decidir antes do aceite.
+- **Aceite como último passo da conferência na tela:** com tudo resolvido, «Registrar aceite» não pede observação. A planilha de controle deixa de ser PRÉVIA para aquele prestador.
+
+**Pergunta nova (decide a regra de cálculo):**
+- Linha que **ficou pendente** (sem resolver e sem considerar) deve **sair do valor** do fechamento, pagando só conferido + considerado?
+- Ou o fechamento paga o **total do MV** e a pendência só impede o aceite, como hoje?
+
+### Critérios de aceite
+1. Filtrar por um procedimento e por um dia mostra só essas linhas, com contagem e soma; as ações em lote valem só para elas.
+2. A observação digitada no card continua lá depois de rodar a conferência de novo, aparece no Excel e no filtro «com observação», e tem autor e data.
+3. Uma conferência pode ser terminada, com NCs registradas e aceite, sem abrir o Excel. O Fechamento reflete as decisões tomadas na tela.
+4. Ambiguidade resolvida no MV é registrada como «Resolvido no MV» e não bloqueia o aceite. Na rodada seguinte, a ferramenta diz se a correção apareceu.
+5. O Fechamento mostra, por prestador, quanto do valor é conferido, considerado, pendente e dispensado/NC.
+
+### Perguntas em aberto
+- ~~Quais ajustes são feitos hoje na planilha?~~ Respondido em 13/11 (item 3.1).
+- A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?
+- ~~Ajuste de valor existe?~~ Respondido em 13/11: é consideração sem aceite (item 3.1). Fica a pergunta nova do item 3.1 (pendente sai ou não do valor).
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
 

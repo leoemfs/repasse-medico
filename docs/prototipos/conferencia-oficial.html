@@ -1,0 +1,315 @@
+<title>Conferência oficial — protótipo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Protótipo da SOL-F43 com o visual da ferramenta (mesmas cores, menu lateral, cartões e tabela). Dados fictícios. */
+:root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;--on-accent:#fff;
+  --ok:#17663a;--okbg:#e3f3e8;--warn:#8a5300;--warnbg:#fff3dc;--err:#a8251c;--errbg:#fdecea;--info:#1f5f99;--infobg:#e7f0fa;
+  --c-devido:#c6efce;--c-aceito:#e4dcf5;--c-nc:#ffc7ce;--c-excl:#e4e4e4;--c-pend:#ffeb9c;--c-t:#1d2939;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;--on-accent:#0b1520;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --c-devido:#1d4a2b;--c-aceito:#3a2f55;--c-nc:#4d2126;--c-excl:#333b46;--c-pend:#4d3d10;--c-t:#eef2f7;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;--on-accent:#0b1520;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --c-devido:#1d4a2b;--c-aceito:#3a2f55;--c-nc:#4d2126;--c-excl:#333b46;--c-pend:#4d3d10;--c-t:#eef2f7;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.shell{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:100vh}
+.side{background:var(--side);color:var(--side-t);padding:16px 10px;display:flex;flex-direction:column;gap:4px}
+.side .marca{display:flex;gap:8px;align-items:center;padding:0 6px 14px;border-bottom:1px solid #2c3b4e;margin-bottom:8px}
+.side .marca b{display:block;color:#fff}.side .marca small{color:#93a4b9;font-size:11px}
+.side .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#3fb6f7,#1f6fdc)}
+.side h4{font-size:10px;letter-spacing:1.2px;color:#93a4b9;margin:12px 8px 4px}
+.side a{display:block;padding:8px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px}
+.side a.on{background:#2a5d8c;color:#fff}
+.main{min-width:0;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prot{background:var(--infobg);color:var(--info);border:1px dashed var(--info);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.topo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.topo h1{margin:2px 0 0;font-size:22px}.eyebrow{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--muted)}
+.chip{font-size:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;min-width:0}
+.card h2{margin:0 0 6px;font-size:16px}.card h3{margin:12px 0 6px;font-size:14px}
+.muted{color:var(--muted)}.small{font-size:12.5px}
+button{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:6px 12px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent)}
+button.sec{background:transparent;color:var(--accent)}button.mini{padding:3px 9px;font-size:12px}
+button.perigo{background:transparent;color:var(--err);border-color:var(--err)}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+select,input[type=search],input[type=text],textarea{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text);min-width:0}
+textarea{width:100%;resize:vertical}
+.acoes{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+/* Cabeçalho do relatório + abas fixas */
+.rel{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline}
+.rel h2{margin:0}
+.abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin:0 0 12px;padding-top:6px}
+.abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;margin-bottom:-2px;white-space:nowrap}
+.abas button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.abas .n{display:inline-block;vertical-align:1px;line-height:16px;margin-left:6px;border-radius:999px;padding:0 7px;font-size:11px;background:var(--line);color:var(--text)}
+.abas .n.alerta{background:var(--err);color:#fff}
+.abas .destaque{color:var(--text)}
+/* Totais por classe */
+.totais{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(5,minmax(120px,1fr));gap:8px}
+.tot{border-radius:10px;padding:10px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-align:left;color:var(--text);font-weight:400}
+.tot b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.tot small{display:block;color:var(--muted);font-size:11.5px}
+.tot.pagar{background:var(--accent);border-color:var(--accent);color:var(--on-accent);cursor:default}
+.tot.pagar b{font-size:24px}.tot.pagar small{color:var(--on-accent);opacity:.85}
+.tot .faixa{display:block;height:5px;border-radius:3px;margin-bottom:6px}
+.tot.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.soma{font-size:12px;margin-top:6px}
+.barra{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:8px;background:var(--line)}
+.barra span{display:block;height:100%}
+.cl-devido{background:var(--c-devido)}.cl-aceito{background:var(--c-aceito)}.cl-nc{background:var(--c-nc)}.cl-excl{background:var(--c-excl)}.cl-pend{background:var(--c-pend)}
+/* Filtros */
+.filtros{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:8px;align-items:end}
+.filtros label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);min-width:0}
+.sel-info{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--infobg)}
+/* Tabela */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--accent);color:var(--on-accent);white-space:nowrap;position:sticky;top:0}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.linha{cursor:pointer}tr.linha:hover td{background:var(--infobg)}tr.linha.aberta td{background:var(--infobg)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;color:var(--c-t);white-space:nowrap}
+.sit{font-size:11.5px;color:var(--muted)}
+.obs-i{font-size:11px;color:var(--accent);font-weight:700}
+.alerta-i{font-size:11px;color:var(--err);font-weight:700}
+.det td{background:var(--bg)!important;cursor:default}
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.det h4{margin:6px 0 4px;font-size:12.5px}
+.det ul{margin:0;padding-left:18px}
+.hist{font-size:11.5px;color:var(--muted);margin-top:4px}
+.confirma{border:1px solid var(--accent);border-radius:8px;padding:8px;margin-top:8px;background:var(--card)}
+.aviso{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ok);color:#fff;border-radius:10px;padding:10px 14px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.2);z-index:9}
+/* Causas */
+.causa{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;margin-bottom:8px}
+.causa .q{font-size:20px;font-weight:700;text-align:right}.causa .q small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+/* Alertas da reconferência */
+.alerta{border:1px solid var(--err);background:var(--errbg);color:var(--text);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.alerta b{color:var(--err)}
+.okbox{border:1px solid var(--ok);background:var(--okbg);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0}
+@media (max-width:1100px){.totais{grid-template-columns:repeat(3,minmax(0,1fr))}.tot.pagar{grid-column:1/-1}.filtros{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.shell{grid-template-columns:1fr}.side{display:none}.det-grid{grid-template-columns:1fr}.totais{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+  <aside class="side" aria-label="Menu da ferramenta (ilustrativo)">
+    <div class="marca"><span class="logo" aria-hidden="true"></span><div><b>Repasse Médico</b><small>protótipo · SOL-F43</small></div></div>
+    <h4>TRABALHO DO MÊS</h4>
+    <a href="#">Início</a><a href="#">Fluxo mensal</a><a href="#" class="on">Conferência cruzada</a><a href="#">Correção de prestador</a><a href="#">Equivalências TUSS</a><a href="#">Não conformidades</a><a href="#">Fechamento</a><a href="#">Rodadas</a>
+    <h4>CONFIGURAÇÕES</h4><a href="#">Bases e regras</a><a href="#">Configurações</a>
+  </aside>
+  <main class="main">
+    <div class="prot"><b>Protótipo navegável (SOL-F43)</b> — sem código da ferramenta. Dados fictícios; nada é gravado. Clique nas abas, nos totais, nas linhas e nas decisões para ver como os valores mudam.</div>
+    <div class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Conferência cruzada</h1></div><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">Competência 11/2026</span><span class="chip">Operador: Leo</span></div></div>
+
+    <div class="card">
+      <div class="rel"><h2>15 - MARCELO MIYAZAKI · Unidade 1 - ULTRAMED APUCARANA (HPA)</h2><span class="small muted">Repasse 25022 + 25029 (complementar) · rodada 2 de 13/11/2026 10:42</span></div>
+      <div class="barra" id="barra" aria-hidden="true"></div>
+      <p class="small" id="frase" style="margin:6px 0 0"></p>
+    </div>
+
+    <nav class="abas" role="tablist" aria-label="Áreas da conferência" id="abas"></nav>
+    <section id="aba-previa"></section>
+    <section id="aba-decidir" hidden></section>
+    <section id="aba-nc" hidden></section>
+    <section id="aba-aceite" hidden></section>
+    <section id="aba-detalhes" hidden></section>
+  </main>
+</div>
+<div class="aviso" id="aviso" role="status" hidden></div>
+
+<script>
+const BRL = n => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const CLASSES = {
+  devido: { nome: 'Devido', cor: 'cl-devido', entra: true, def: 'Conferido: par único, nome seguro, mesma data, equivalência validada' },
+  aceito: { nome: 'Aceito', cor: 'cl-aceito', entra: true, def: 'Aceito para pagamento, com justificativa (quem e quando)' },
+  pend: { nome: 'Pendente', cor: 'cl-pend', entra: false, def: 'Sem decisão: não entra no fechamento até ser aceito, virar NC ou ser reconferido' },
+  nc: { nome: 'Não conformidade', cor: 'cl-nc', entra: false, def: 'NC registrada: fora do fechamento; «não procede» devolve a linha' },
+  excl: { nome: 'Excluído', cor: 'cl-excl', entra: false, def: 'Não compõe repasse: taxa, material, medicamento e HM sem regra do prestador' }
+};
+// Linhas fictícias do relatório do MV (as situações são as do motor atual; a classe é a leitura nova).
+const L = [
+  { id: 1, sit: 'Conferido', pac: 'APARECIDA DE FATIMA', data: '03/10', cod: '40901114', proc: 'USG MAMAS - OP', laudo: 'ULTRASSONOGRAFIA DAS MAMAS', conv: 'UNIMED HPA', vl: 8.47 },
+  { id: 2, sit: 'Conferido', pac: 'CLEIRE MUNHOZ GDULLA', data: '02/10', cod: '40901114', proc: 'USG MAMAS - OP', laudo: 'ULTRASSONOGRAFIA DAS MAMAS', conv: 'UNIMED HPA', vl: 8.47 },
+  { id: 3, sit: 'Conferido', pac: 'EDINA DA SILVA PIRES', data: '08/10', cod: '40901114', proc: 'USG MAMAS - OP', laudo: 'ULTRASSONOGRAFIA DAS MAMAS', conv: 'SUS', vl: 8.47 },
+  { id: 4, sit: 'Conferido', pac: 'ELIANE APARECIDA ROZA', data: '13/10', cod: '40901114', proc: 'USG MAMAS - OP', laudo: 'ULTRASSONOGRAFIA DAS MAMAS', conv: 'PARTICULAR', vl: 29.75 },
+  { id: 5, sit: 'Conferido', pac: 'JANETE NASSAR KUMER', data: '08/10', cod: '40901203', proc: 'USG ORGAOS SUPERF. - OP', laudo: 'USG BOLSA ESCROTAL COM DOPPLER', conv: 'CISMEPAR', vl: 17.50, regra: 'Regra composta «Escroto com Doppler»' },
+  { id: 6, sit: 'Conferido', pac: 'JANETE NASSAR KUMER', data: '08/10', cod: '40901386', proc: 'DOPPLER ORGAO ISOLADO - OP', laudo: 'USG BOLSA ESCROTAL COM DOPPLER', conv: 'CISMEPAR', vl: 35.00, regra: 'Regra composta «Escroto com Doppler» (exame em 2 páginas)' },
+  { id: 7, sit: 'Conferido com ressalva', pac: 'LUCIANA GARCIA DOS SANTOS', data: '08/10', cod: '40901220', proc: 'USG ARTICULAR - OP', laudo: 'ULTRASSONOGRAFIA DO JOELHO DIREITO', conv: 'UNIMED HPA', vl: 17.50, falta: 'Convênio diferente: MV «UNIMED HPA» × laudo «HOSPITAL DA PROVIDENCIA»', causa: 'conv' },
+  { id: 8, sit: 'Conferido com ressalva', pac: 'MARCIA APARECIDA DE SOUZA', data: '13/10', cod: '40901220', proc: 'USG ARTICULAR - OP', laudo: 'ULTRASSONOGRAFIA DO OMBRO', conv: 'UNIMED HPA', vl: 2.64, falta: 'Convênio diferente: MV «UNIMED HPA» × laudo «HOSPITAL DA PROVIDENCIA»', causa: 'conv' },
+  { id: 9, sit: 'Pendente / ambíguo', pac: 'ARIANA DO SOCORRO FERRAZ', data: '07/10', cod: '40901130', proc: 'USG ABDOME SUPERIOR - OP', laudo: '2 laudos possíveis', conv: 'SUS', vl: 17.50, falta: 'Mais de um laudo plausível: «USG ABDOME SUPERIOR» (Dr. Marcelo) e «USG ABDOME TOTAL» (Dr. Bruno)', causa: 'amb', cands: ['«ULTRASSONOGRAFIA ABDOME SUPERIOR» · Marcelo Miyazaki · 07/10', '«ULTRASSONOGRAFIA ABDOME TOTAL» · Bruno Seki · 07/10'] },
+  { id: 10, sit: 'Pendente', pac: 'STEFANNY KAWANY OLIVEIRA', data: '02/10', cod: '40901238', proc: 'USG OBSTETRICA - OP', laudo: 'USG OBSTETRICO 1º TRIM (ENDOVAGINAL)', conv: 'SUS', vl: 8.47, falta: 'Equivalência não validada: «USG OBSTETRICO 1º TRIM (ENDOVAGINAL)» × 40901238', causa: 'eq' },
+  { id: 11, sit: 'Conferido com ressalva', pac: 'MARIA DE LOURDES INACIO', data: '02/10', cod: '40901300', proc: 'USG QUADRIL - OP', laudo: 'ULTRASSONOGRAFIA DO QUADRIL ESQUERDO', conv: 'UNIMED HPA', vl: 17.50, falta: 'Composição incompleta: falta 40901386 Doppler (esperado ×1, lançado ×0)', causa: 'comp' },
+  { id: 12, sit: 'Só no faturamento', pac: 'JORGE ASSANUMA', data: '08/10', cod: '40901220', proc: 'USG ARTICULAR - OP', laudo: '—', conv: 'CISVIR', vl: 17.50, falta: 'Nenhum laudo do paciente na unidade em ±7 dia(s)', dec: { tipo: 'nc', por: 'Leo', em: '12/11 16:20', just: 'Sem laudo no Apolo: retirar do MV' }, continua: true },
+  { id: 13, sit: 'Só no faturamento', pac: 'ELUCIMARA DIAS DOS SANTOS', data: '08/10', cod: '40901297', proc: 'USG OBSTETRICA 1º TRIM - OP', laudo: '—', conv: 'SUS', vl: 8.47, falta: 'Laudo do paciente já associado a outra linha', dec: { tipo: 'resolvido', por: 'Leo', em: '12/11 16:31', just: 'Lançamento duplicado: removido do MV' } },
+  { id: 14, sit: 'Pendente', pac: 'EMILLAYNE VITORIA FERREIRA', data: '08/10', cod: '40901211', proc: 'USG EST. SUPERFICIAIS - OP', laudo: 'ULTRASSONOGRAFIA DA PAREDE ABDOMINAL', conv: 'SUS', vl: 35.00, falta: 'Título validado para outro código (40901230)', dec: { tipo: 'considerar', por: 'Leo', em: '12/11 16:40', just: 'Parede abdominal lançada como estruturas superficiais: correto neste convênio' } },
+  { id: 15, sit: 'Item não procedimental', pac: 'APARECIDA DE FATIMA', data: '03/10', cod: '60000015', proc: 'TAXA DE SALA - OP', laudo: '—', conv: 'UNIMED HPA', vl: 4.20, tipo: 'Taxa' },
+  { id: 16, sit: 'HM — regra pendente', pac: 'CLEIRE MUNHOZ GDULLA', data: '02/10', cod: '40901114', proc: 'USG MAMAS - HM', laudo: '—', conv: 'UNIMED HPA', vl: 6.30, tipo: 'HM', hm: 'O prestador não tem regra que inclua HM: excluir do MV', continua: true },
+  { id: 17, sit: 'Conferido', pac: 'ILZA MARIA GUIMARAES', data: '03/10', cod: '40901114', proc: 'USG MAMAS - OP', laudo: 'ULTRASSONOGRAFIA DAS MAMAS', conv: 'UNIMED HPA', vl: 8.47 }
+].map(x => ({ ...x, obs: x.id === 9 ? [{ por: 'Leo', em: '12/11 16:10', txt: 'Conferir com a recepção se o abdome total foi pedido.' }] : [] }));
+const PROC = [...new Set(L.map(x => `${x.cod} · ${x.proc}`))].sort(), DATAS = [...new Set(L.map(x => x.data))].sort((a, b) => a.split('/').reverse().join() < b.split('/').reverse().join() ? -1 : 1), CONVS = [...new Set(L.map(x => x.conv))].sort();
+const S = { aba: 'previa', classe: null, busca: '', proc: '*', data: '*', conv: '*', comObs: false, aberta: null, conf: null };
+// Classe = leitura da situação + decisão (mesma regra da SOL-F43).
+function classe(x) {
+  if (x.dec?.tipo === 'nc') return 'nc';
+  if (x.dec?.tipo === 'considerar') return 'aceito';
+  if (x.tipo === 'Taxa' || x.tipo === 'Material' || x.tipo === 'Medicamento') return 'excl';
+  if (x.tipo === 'HM') return x.hmRegra ? 'devido' : 'excl';
+  if (x.dec?.tipo === 'resolvido') return 'pend';
+  return x.sit === 'Conferido' ? 'devido' : 'pend';
+}
+const tot = () => { const t = { devido: 0, aceito: 0, pend: 0, nc: 0, excl: 0 }; for (const x of L) t[classe(x)] += x.vl; return t; };
+const filtrar = () => L.filter(x => (!S.classe || classe(x) === S.classe) && (S.proc === '*' || `${x.cod} · ${x.proc}` === S.proc) && (S.data === '*' || x.data === S.data) && (S.conv === '*' || x.conv === S.conv) && (!S.comObs || x.obs.length)
+  && (!S.busca || `${x.pac} ${x.cod} ${x.proc} ${x.laudo}`.toUpperCase().includes(S.busca.toUpperCase())));
+const pill = c => `<span class="pill ${CLASSES[c].cor}">${CLASSES[c].nome}</span>`;
+const pendentes = () => L.filter(x => classe(x) === 'pend');
+const alertas = () => L.filter(x => x.continua && (x.dec?.tipo === 'nc' || (x.tipo === 'HM' && !x.hmRegra)));
+let tAviso; function avisar(t) { const a = document.getElementById('aviso'); a.textContent = t; a.hidden = false; clearTimeout(tAviso); tAviso = setTimeout(() => a.hidden = true, 3500); }
+
+function desenharTopo() {
+  const t = tot(), total = Object.values(t).reduce((a, b) => a + b, 0);
+  document.getElementById('barra').innerHTML = ['devido', 'aceito', 'pend', 'nc', 'excl'].map(k => `<span class="${CLASSES[k].cor}" style="width:${t[k] / total * 100}%" title="${CLASSES[k].nome}: R$ ${BRL(t[k])}"></span>`).join('');
+  document.getElementById('frase').innerHTML = `<b>R$ ${BRL(t.devido + t.aceito)} para pagamento</b> de R$ ${BRL(total)} no relatório do MV · ${pendentes().length} linha(s) pendente(s) (R$ ${BRL(t.pend)})${alertas().length ? ` · <b style="color:var(--err)">${alertas().length} item(ns) que deviam ter saído do MV continuam lá</b>` : ''}`;
+  const ab = [['previa', 'Prévia de conferência', '', 'destaque'], ['decidir', 'O que falta decidir', pendentes().length], ['nc', 'NCs e correções no MV', alertas().length, '', alertas().length ? 'alerta' : ''], ['aceite', 'Aceite do relatório'], ['detalhes', 'Detalhes e equivalências']];
+  document.getElementById('abas').innerHTML = ab.map(([k, t, n, cls, ncls]) => `<button role="tab" id="tab-${k}" aria-controls="aba-${k}" aria-selected="${S.aba === k}" class="${S.aba === k ? 'on' : ''} ${cls || ''}" data-aba="${k}">${t}${n !== undefined && n !== '' ? `<span class="n ${ncls || ''}">${n}</span>` : ''}</button>`).join('');
+  document.querySelectorAll('[data-aba]').forEach(b => b.onclick = () => irAba(b.dataset.aba));
+}
+function irAba(k) { S.aba = k; for (const a of ['previa', 'decidir', 'nc', 'aceite', 'detalhes']) document.getElementById('aba-' + a).hidden = a !== k; desenhar(); window.scrollTo({ top: 0 }); }
+
+function desenharPrevia() {
+  const t = tot(), total = Object.values(t).reduce((a, b) => a + b, 0), vis = filtrar(), soma = vis.reduce((a, x) => a + x.vl, 0);
+  const tile = k => `<button class="tot${S.classe === k ? ' sel' : ''}" data-cl="${k}" title="${esc(CLASSES[k].def)}"><span class="faixa ${CLASSES[k].cor}"></span><b>R$ ${BRL(t[k])}</b><small>${CLASSES[k].nome} · ${L.filter(x => classe(x) === k).length} linha(s) · ${CLASSES[k].entra ? 'entra no fechamento' : 'fora do fechamento'}</small></button>`;
+  document.getElementById('aba-previa').innerHTML = `
+  <div class="card"><div class="totais">
+    <div class="tot pagar"><small>VALOR PARA PAGAMENTO (Devido + Aceito)</small><b>R$ ${BRL(t.devido + t.aceito)}</b><small>é o que vai para o Fechamento</small></div>
+    ${['devido', 'aceito', 'pend', 'nc', 'excl'].map(tile).join('')}</div>
+    <div class="soma muted">Conferência da soma: Devido + Aceito + Pendente + NC + Excluído = <b>R$ ${BRL(total)}</b> = total do relatório do MV ✓ · clique num valor para filtrar a tabela.</div></div>
+  <div class="card"><h2>Linhas do relatório</h2>
+    <div class="filtros">
+      <label for="fBusca">Buscar<input type="search" id="fBusca" value="${esc(S.busca)}" placeholder="paciente, código, título…"></label>
+      <label for="fProc">Procedimento<select id="fProc"><option value="*">Todos</option>${PROC.map(p => `<option${S.proc === p ? ' selected' : ''}>${esc(p)}</option>`).join('')}</select></label>
+      <label for="fData">Data<select id="fData"><option value="*">Todas</option>${DATAS.map(d => `<option${S.data === d ? ' selected' : ''}>${d}</option>`).join('')}</select></label>
+      <label for="fConv">Convênio<select id="fConv"><option value="*">Todos</option>${CONVS.map(c => `<option${S.conv === c ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select></label>
+      <label for="fObs" style="flex-direction:row;align-items:center;gap:6px;padding-bottom:6px"><input type="checkbox" id="fObs"${S.comObs ? ' checked' : ''}> com observação</label>
+    </div>
+    <div class="sel-info small"><b>${vis.length} linha(s) no filtro · R$ ${BRL(soma)}</b>${S.classe ? ` · classe ${CLASSES[S.classe].nome}` : ''}
+      <span style="flex:1"></span><button class="mini" id="lAceitar"${vis.some(x => classe(x) === 'pend') ? '' : ' disabled'}>Aceitar as pendentes do filtro…</button><button class="sec mini" id="lNC"${vis.some(x => classe(x) === 'pend') ? '' : ' disabled'}>Registrar NC das pendentes…</button><button class="sec mini" id="lLimpar">Limpar filtros</button></div>
+    <div id="lConf"></div>
+    <div class="tw"><table><thead><tr><th>Classe</th><th>Situação na conferência</th><th>Paciente</th><th>Data</th><th>Procedimento no MV</th><th>Laudo (Apolo)</th><th>O que falta / decisão</th><th class="n">Vl Repasse</th></tr></thead><tbody>
+    ${vis.map(x => linhaTabela(x)).join('') || '<tr><td colspan="8" class="muted">Nenhuma linha neste filtro.</td></tr>'}</tbody></table></div></div>`;
+  const pg = document.getElementById('aba-previa');
+  pg.querySelectorAll('[data-cl]').forEach(b => b.onclick = () => { S.classe = S.classe === b.dataset.cl ? null : b.dataset.cl; desenhar(); });
+  let tm; document.getElementById('fBusca').oninput = e => { clearTimeout(tm); tm = setTimeout(() => { S.busca = e.target.value; desenhar(); const i = document.getElementById('fBusca'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 200); };
+  document.getElementById('fProc').onchange = e => { S.proc = e.target.value; desenhar(); };
+  document.getElementById('fData').onchange = e => { S.data = e.target.value; desenhar(); };
+  document.getElementById('fConv').onchange = e => { S.conv = e.target.value; desenhar(); };
+  document.getElementById('fObs').onchange = e => { S.comObs = e.target.checked; desenhar(); };
+  document.getElementById('lLimpar').onclick = () => { Object.assign(S, { classe: null, busca: '', proc: '*', data: '*', conv: '*', comObs: false }); desenhar(); };
+  const lote = tipo => { const alvo = vis.filter(x => classe(x) === 'pend'); document.getElementById('lConf').innerHTML = `<div class="confirma small"><b>${tipo === 'considerar' ? 'Aceitar para pagamento' : 'Registrar NC de'} ${alvo.length} linha(s) · R$ ${BRL(alvo.reduce((a, x) => a + x.vl, 0))}</b><br><label for="lJust">Justificativa (obrigatória)</label><input type="text" id="lJust" style="width:100%;margin:4px 0" value="${tipo === 'considerar' ? 'Conferido no MV: lançamento correto' : 'Sem laudo correspondente'}"><div class="acoes"><button class="mini" id="lOk">Confirmar</button><button class="sec mini" id="lCanc">Cancelar</button></div></div>`;
+    document.getElementById('lCanc').onclick = () => document.getElementById('lConf').innerHTML = '';
+    document.getElementById('lOk').onclick = () => { const j = document.getElementById('lJust').value.trim(); if (!j) return; alvo.forEach(x => x.dec = { tipo, por: 'Leo', em: 'agora', just: j }); avisar(`${alvo.length} linha(s): ${tipo === 'considerar' ? 'aceitas para pagamento' : 'NC registrada'}.`); desenhar(); }; };
+  document.getElementById('lAceitar').onclick = () => lote('considerar');
+  document.getElementById('lNC').onclick = () => lote('nc');
+  pg.querySelectorAll('tr.linha').forEach(tr => { const abrir = () => { S.aberta = S.aberta === +tr.dataset.id ? null : +tr.dataset.id; S.conf = null; desenhar(); }; tr.onclick = abrir; tr.onkeydown = e => { if (e.key === 'Enter') abrir(); }; });
+  ligarDetalhe();
+}
+function textoDecisao(x) {
+  const d = x.dec; if (!d) return x.hm || x.falta || (x.regra ? x.regra : x.tipo ? `${x.tipo}: não compõe repasse` : '');
+  const nome = { nc: 'NC registrada', considerar: 'Aceito para pagamento', resolvido: 'Resolvido no MV — aguarda reconferência' }[d.tipo];
+  return `<b>${nome}</b> · ${esc(d.por)}, ${esc(d.em)}: «${esc(d.just)}»`;
+}
+function linhaTabela(x) {
+  const c = classe(x), alerta = x.continua && (x.dec?.tipo === 'nc' || (x.tipo === 'HM' && !x.hmRegra));
+  let h = `<tr class="linha${S.aberta === x.id ? ' aberta' : ''}" data-id="${x.id}" tabindex="0" aria-expanded="${S.aberta === x.id}"><td>${pill(c)}</td><td class="sit">${esc(x.sit)}</td><td>${esc(x.pac)}</td><td>${x.data}/2026</td><td>${esc(x.cod)} · ${esc(x.proc)}</td><td>${esc(x.laudo)}</td>
+    <td class="small">${textoDecisao(x)}${x.obs.length ? ` <span class="obs-i" title="${esc(x.obs.at(-1).txt)}">✎ obs.</span>` : ''}${alerta ? ' <span class="alerta-i">⚠ continua no MV</span>' : ''}</td><td class="n">${BRL(x.vl)}</td></tr>`;
+  if (S.aberta === x.id) h += `<tr class="det"><td colspan="8">${cardLinha(x)}</td></tr>`;
+  return h;
+}
+function cardLinha(x) {
+  const c = classe(x), pode = c === 'pend' || x.dec;
+  return `<div class="det-grid"><div>
+      <h4>Por que está ${CLASSES[c].nome.toLowerCase()}</h4><p class="small" style="margin:0">${esc(CLASSES[c].def)}.</p>
+      <h4>Motivo / evidências</h4><ul class="small">${x.falta ? `<li>${esc(x.falta)}</li>` : ''}${x.regra ? `<li>${esc(x.regra)}</li>` : ''}${x.hm ? `<li>${esc(x.hm)}</li>` : ''}${!x.falta && !x.regra && !x.hm ? '<li>Par único: nome idêntico, mesma data, equivalência validada</li>' : ''}</ul>
+      <h4>Linha do MV</h4><p class="small" style="margin:0">${esc(x.cod)} - ${esc(x.proc)} · ${esc(x.conv)} · R$ ${BRL(x.vl)}</p>
+      ${x.cands ? `<h4>Candidatos (escolha o laudo certo)</h4>${x.cands.map((cd, i) => `<label class="small" style="display:block"><input type="radio" name="cand${x.id}" value="${i}"> ${esc(cd)}</label>`).join('')}<div class="acoes"><button class="mini" data-ac="escolher" data-id="${x.id}">Este é o laudo certo</button></div>` : ''}
+    </div><div>
+      <h4>Decisão</h4>
+      ${x.dec ? `<p class="small" style="margin:0">${textoDecisao(x)}</p><div class="acoes"><button class="sec mini" data-ac="remover" data-id="${x.id}">${x.dec.tipo === 'nc' ? 'Não procede (volta para o cálculo)' : 'Remover decisão'}</button>${x.dec.tipo === 'resolvido' ? `<button class="mini" data-ac="considerar" data-id="${x.id}">Aceitar manualmente…</button>` : ''}</div>`
+        : c === 'pend' ? `<div class="acoes"><button class="mini" data-ac="considerar" data-id="${x.id}">Aceitar para pagamento…</button><button class="sec mini" data-ac="nc" data-id="${x.id}">Registrar NC…</button><button class="sec mini" data-ac="resolvido" data-id="${x.id}">Resolvido no MV…</button></div>`
+          : `<p class="small muted" style="margin:0">${c === 'excl' ? 'Não compõe repasse: nenhuma decisão necessária.' : 'Conferido: entra no fechamento sem decisão.'}${c === 'devido' ? ' Se estiver errado, registre NC.' : ''}</p>${c === 'devido' ? `<div class="acoes"><button class="sec mini" data-ac="nc" data-id="${x.id}">Registrar NC…</button></div>` : ''}`}
+      ${S.conf?.id === x.id ? `<div class="confirma small"><b>${{ considerar: 'Aceitar para pagamento', nc: 'Registrar NC', resolvido: 'Resolvido no MV' }[S.conf.tipo]}</b><br><label for="cJust">Justificativa (obrigatória)</label><input type="text" id="cJust" style="width:100%;margin:4px 0" placeholder="${S.conf.tipo === 'resolvido' ? 'o que foi corrigido no MV' : 'por quê'}"><div class="acoes"><button class="mini" id="cOk">Confirmar</button><button class="sec mini" id="cCanc">Cancelar</button></div></div>` : ''}
+      <h4>Observação</h4><textarea id="obs${x.id}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe)"></textarea><div class="acoes"><button class="sec mini" data-ac="obs" data-id="${x.id}">Salvar observação</button></div>
+      ${x.obs.length ? `<div class="hist">${x.obs.map(o => `${esc(o.em)} · ${esc(o.por)}: «${esc(o.txt)}»`).join('<br>')}</div>` : ''}
+    </div></div>`;
+}
+function ligarDetalhe() {
+  document.querySelectorAll('[data-ac]').forEach(b => b.onclick = e => {
+    e.stopPropagation(); const x = L.find(y => y.id === +b.dataset.id), ac = b.dataset.ac;
+    if (ac === 'obs') { const t = document.getElementById('obs' + x.id).value.trim(); if (!t) return; x.obs.push({ por: 'Leo', em: 'agora', txt: t }); avisar('Observação salva na competência.'); return desenhar(); }
+    if (ac === 'remover') { const era = x.dec.tipo; delete x.dec; avisar(era === 'nc' ? 'NC marcada como «não procede»: a linha volta para o cálculo.' : 'Decisão removida.'); return desenhar(); }
+    if (ac === 'escolher') { const r = document.querySelector(`input[name="cand${x.id}"]:checked`); if (!r) return avisar('Escolha um dos candidatos.'); x.sit = 'Conferido'; x.laudo = x.cands[+r.value].split('»')[0].replace('«', ''); x.falta = `Laudo escolhido por Leo entre ${x.cands.length} candidatos`; delete x.cands; avisar('Laudo escolhido: a linha passa a Devido.'); return desenhar(); }
+    S.conf = { id: x.id, tipo: ac }; desenhar();
+    const ok = document.getElementById('cOk'); if (!ok) return; document.getElementById('cJust').focus();
+    document.getElementById('cCanc').onclick = ev => { ev.stopPropagation(); S.conf = null; desenhar(); };
+    ok.onclick = ev => { ev.stopPropagation(); const j = document.getElementById('cJust').value.trim(); if (!j) return avisar('Informe a justificativa.'); x.dec = { tipo: S.conf.tipo, por: 'Leo', em: 'agora', just: j }; S.conf = null; avisar({ considerar: 'Aceito para pagamento: entra no fechamento.', nc: 'NC registrada: sai do fechamento.', resolvido: 'Resolvido no MV: fica pendente até a reconferência.' }[x.dec.tipo]); desenhar(); };
+  });
+}
+function desenharDecidir() {
+  const g = {}, pend = pendentes().filter(x => !x.dec);
+  for (const x of pend) (g[x.causa || 'outros'] ||= []).push(x);
+  const NOME = { conv: ['Convênio diferente: MV «UNIMED HPA» × laudo «HOSPITAL DA PROVIDENCIA»', 'Aceitar se for o mesmo convênio escrito de outro jeito', 'Aceitar as N (mesmo convênio)'], amb: ['Mais de um laudo plausível', 'Abra a linha e escolha o laudo certo', 'Abrir na prévia'], eq: ['Equivalência não validada: «USG OBSTETRICO 1º TRIM (ENDOVAGINAL)» × 40901238', 'Validar a equivalência e conferir de novo', 'Validar e conferir de novo'], comp: ['Composição incompleta: ULTRASSONOGRAFIA DO QUADRIL ESQUERDO', 'Registrar NC do que falta, aceitar, ou tornar a regra alternante', 'Aceitar para pagamento…'], outros: ['Outras pendências', 'Decidir linha a linha', 'Abrir na prévia'] };
+  const resolv = L.filter(x => x.dec?.tipo === 'resolvido');
+  document.getElementById('aba-decidir').innerHTML = `<div class="card"><h2>O que falta decidir <span class="small muted">${pend.length + resolv.length} linha(s) pendente(s) · R$ ${BRL(tot().pend)} fora do fechamento até decidir</span></h2>
+    ${Object.entries(g).map(([k, xs]) => `<div class="causa"><div><b>${esc(NOME[k][0])}</b><div class="small muted">${esc(NOME[k][1])} · R$ ${BRL(xs.reduce((a, x) => a + x.vl, 0))} no MV · ${xs.map(x => esc(x.pac)).join(', ')}</div>
+      <div class="acoes"><button class="mini" data-causa="${k}">${NOME[k][2].replace('N', xs.length)}</button><button class="sec mini" data-ver="${k}">Ver ${xs.length === 1 ? 'a linha' : `as ${xs.length} linhas`}</button></div></div><div class="q">${xs.length}<small>linha(s)</small></div></div>`).join('') || '<p class="muted">Nada falta decidir.</p>'}
+    ${resolv.length ? `<div class="causa"><div><b>Resolvido no MV — aguardando reconferência</b><div class="small muted">Ficam pendentes até o novo PDF confirmar a correção, ou até você aceitar manualmente · ${resolv.map(x => esc(x.pac)).join(', ')}</div><div class="acoes"><button class="sec mini" data-irnc="1">Ver em «NCs e correções no MV»</button></div></div><div class="q">${resolv.length}<small>linha(s)</small></div></div>` : ''}</div>`;
+  const pg = document.getElementById('aba-decidir');
+  pg.querySelectorAll('[data-causa]').forEach(b => b.onclick = () => {
+    const k = b.dataset.causa, xs = g[k];
+    if (k === 'conv' || k === 'comp') { xs.forEach(x => x.dec = { tipo: 'considerar', por: 'Leo', em: 'agora', just: k === 'conv' ? 'Mesmo convênio escrito de outro jeito' : 'Composição conferida no MV' }); avisar(`${xs.length} linha(s) aceitas para pagamento.`); return desenhar(); }
+    if (k === 'eq') { xs.forEach(x => { x.sit = 'Conferido'; delete x.falta; }); avisar('Equivalência validada; conferindo de novo… a linha passa a Devido.'); return desenhar(); }
+    S.aberta = xs[0].id; irAba('previa');
+  });
+  pg.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => { S.aberta = g[b.dataset.ver][0].id; irAba('previa'); });
+  pg.querySelectorAll('[data-irnc]').forEach(b => b.onclick = () => irAba('nc'));
+}
+function desenharNC() {
+  const ncs = L.filter(x => x.dec?.tipo === 'nc'), cont = alertas(), resolv = L.filter(x => x.dec?.tipo === 'resolvido');
+  document.getElementById('aba-nc').innerHTML = `<div class="card"><h2>Reconferência: rodada 2 (PDF reimportado em 13/11 10:42) × rodada 1 (12/11 16:05)</h2>
+    ${cont.length ? `<div class="alerta" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no novo relatório — R$ ${BRL(cont.reduce((a, x) => a + x.vl, 0))} ainda compõem a produção que o MV vai pagar.</b><ul class="small">${cont.map(x => `<li>${esc(x.pac)} · ${x.data} · ${esc(x.cod)} ${esc(x.proc)} · R$ ${BRL(x.vl)} — ${x.dec?.tipo === 'nc' ? `NC de ${esc(x.dec.em)}: «${esc(x.dec.just)}»` : 'HM sem regra do prestador: excluir do MV'}</li>`).join('')}</ul>
+      <div class="small">A ferramenta já tira esses valores do fechamento, mas o MV ainda vai pagar. Retire no MV e reimporte o PDF; ou, se a NC estava errada, marque «não procede».</div></div>` : '<div class="okbox small">Nenhum item que devia ter saído do MV continua no relatório.</div>'}
+    <div class="okbox small"><b>1 NC corrigida no MV nesta rodada:</b> GABRIELA SOUZA · 05/10 · 40901220 USG ARTICULAR · R$ 17,50 — a linha não aparece mais no novo PDF (confirmada na rodada 2).</div>
+    <h3>Situação das NCs desta competência</h3>
+    <div class="tw"><table><thead><tr><th>Paciente</th><th>Procedimento</th><th class="n">Vl</th><th>Registrada</th><th>Correção no MV</th></tr></thead><tbody>
+      ${ncs.map(x => `<tr><td>${esc(x.pac)}</td><td>${esc(x.cod)} ${esc(x.proc)}</td><td class="n">${BRL(x.vl)}</td><td class="small">${esc(x.dec.por)}, ${esc(x.dec.em)}</td><td>${x.continua ? '<span class="pill cl-nc">Não corrigida — continua no MV</span>' : '<span class="pill cl-pend">Aguardando correção no MV</span>'}</td></tr>`).join('')}
+      <tr><td>GABRIELA SOUZA</td><td>40901220 USG ARTICULAR - OP</td><td class="n">17,50</td><td class="small">Leo, 12/11 15:50</td><td><span class="pill cl-devido">Corrigida no MV (rodada 2)</span></td></tr></tbody></table></div>
+    <h3>Resolvidos no MV aguardando confirmação</h3>
+    ${resolv.length ? `<ul class="small">${resolv.map(x => `<li>${esc(x.pac)} · ${esc(x.cod)} ${esc(x.proc)} · R$ ${BRL(x.vl)} — «${esc(x.dec.just)}» (${esc(x.dec.por)}, ${esc(x.dec.em)}). Fica pendente até o próximo PDF confirmar, ou até você aceitar manualmente.</li>`).join('')}</ul>` : '<p class="small muted">Nenhum.</p>'}
+    <h3>HM a excluir do MV</h3><p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM. Os HM ficam fora do fechamento; se continuarem no próximo PDF, a ferramenta avisa de novo.</p>
+    <ul class="small">${L.filter(x => x.tipo === 'HM' && !x.hmRegra).map(x => `<li>${esc(x.pac)} · ${x.data} · ${esc(x.proc)} · R$ ${BRL(x.vl)}${x.continua ? ' — <b style="color:var(--err)">continua no MV</b>' : ''}</li>`).join('')}</ul></div>`;
+}
+function desenharAceite() {
+  const t = tot(), pend = pendentes().length;
+  document.getElementById('aba-aceite').innerHTML = `<div class="card"><h2>Aceite do relatório</h2>
+    <p class="small muted" style="margin-top:0">O aceite encerra a conferência deste relatório e tira o prestador da prévia no Fechamento. É diferente de «Aceito para pagamento», que é a decisão sobre uma linha.</p>
+    <dl class="kv"><dt>Para pagamento</dt><dd><b>R$ ${BRL(t.devido + t.aceito)}</b> (Devido R$ ${BRL(t.devido)} + Aceito R$ ${BRL(t.aceito)})</dd><dt>Fora do fechamento</dt><dd>Pendente R$ ${BRL(t.pend)} · NC R$ ${BRL(t.nc)} · Excluído R$ ${BRL(t.excl)}</dd>
+      <dt>Pendências</dt><dd>${pend ? `<b>${pend}</b> linha(s): ficam fora do valor; o aceite pede observação` : 'nenhuma'}</dd><dt>Alertas</dt><dd>${alertas().length ? `<b style="color:var(--err)">${alertas().length}</b> item(ns) continuam no MV` : 'nenhum'}</dd></dl>
+    <label for="acObs" class="small" style="display:block;margin-top:10px">Observação do aceite ${pend || alertas().length ? '(obrigatória: há pendências ou alertas)' : '(opcional)'}</label><textarea id="acObs" rows="2"></textarea>
+    <div class="acoes"><button id="acOk">Registrar aceite do relatório</button><button class="sec" id="acProx">Registrar aceite e ir para o próximo relatório</button></div></div>`;
+  const ok = () => { if ((pendentes().length || alertas().length) && !document.getElementById('acObs').value.trim()) return avisar('Com pendências ou alertas, informe uma observação.'); avisar(`Aceite registrado: R$ ${BRL(tot().devido + tot().aceito)} vão para o Fechamento.`); };
+  document.getElementById('acOk').onclick = ok; document.getElementById('acProx').onclick = ok;
+}
+function desenharDetalhes() {
+  document.getElementById('aba-detalhes').innerHTML = `<div class="card"><h2>Detalhes da rodada</h2><dl class="kv"><dt>Relatório</dt><dd>15 - MARCELO MIYAZAKI · repasse 25022 de 10/11/2026 + 25029 (complementar, 1 linha)</dd><dt>Unidade</dt><dd>1 - ULTRAMED APUCARANA (HPA)</dd><dt>Período de produção</dt><dd>01/10/2026 a 31/10/2026 · modalidade US</dd><dt>Volume</dt><dd>${L.length} linhas do MV · 4.812 laudos no escopo · 13 pares</dd><dt>Equivalências</dt><dd>612 validadas (revisão 87) · 14 regras compostas</dd><dt>Comparação com a rodada 1</dt><dd>2 passaram a conferido · 1 NC corrigida no MV · 2 itens continuam no MV</dd></dl></div>
+  <div class="card"><h2>Equivalências desta rodada</h2><p class="small muted" style="margin-top:0">Pares título × código usados ou que travaram nesta rodada; valida aqui sem sair da conferência (como hoje).</p>
+    <ul class="small"><li>«ULTRASSONOGRAFIA DAS MAMAS» × 40901114 — validada (victor)</li><li>«USG BOLSA ESCROTAL COM DOPPLER» → regra composta 40901203 + 40901386 — validada</li><li>«USG OBSTETRICO 1º TRIM (ENDOVAGINAL)» × 40901238 — pendente</li></ul></div>`;
+}
+function desenhar() {
+  desenharTopo();
+  ({ previa: desenharPrevia, decidir: desenharDecidir, nc: desenharNC, aceite: desenharAceite, detalhes: desenharDetalhes })[S.aba]();
+}
+desenhar();
+</script>

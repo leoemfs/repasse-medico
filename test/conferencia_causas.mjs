@@ -32,11 +32,13 @@ const frase = async () => (await p.textContent('.cf-frase p')).replace(/\s+/g, '
 const f0 = await frase(); info(f0);
 const conferidas = t => +(t.match(/(\d+) de \d+ linhas/) || [])[1];
 ok(/\d+ de \d+ linhas do MV conferidas/.test(f0) && /Faltam \d+ decisão/.test(f0), 'resultado em uma frase, com barra de progresso');
+const abaConf = k => p.click(`[data-cfaba="${k}"]`).catch(() => {});   // v3.0.0-alpha.6: resultado em abas
+await abaConf('decidir');
 const causas = await p.$$eval('#cfCausas .cz', els => els.map(e => ({ t: e.querySelector('b').textContent, n: +e.querySelector('.cz-n').firstChild.textContent })));
 info(`decisões: ${causas.slice(0, 5).map(c => `${c.n} · ${c.t.slice(0, 70)}`).join(' | ')}`);
 const grupos = causas.filter(c => !/Só no laudo/.test(c.t)), ordenado = grupos.slice(0, grupos.findIndex(c => c.n === 1) >= 0 ? grupos.findIndex(c => c.n === 1) : grupos.length).every((c, i, a) => !i || a[i - 1].n >= c.n);
 ok(causas.length > 0 && ordenado, `«O que falta decidir»: ${causas.length} decisão(ões), da que resolve mais linhas para a que resolve menos`);
-const soma = await p.evaluate(() => { const { S } = window.__RM, res = S.conf.res; return res.linhas.filter(x => !x.decisao && x.status !== 'conferido' && x.status !== 'nao-procedimental').length; });
+const soma = await p.evaluate(() => { const { S } = window.__RM, res = S.conf.res; return res.linhas.filter(x => !x.decisao && window.__RM.t.classeDaLinhaConf(x) !== 'excluido' && x.status !== 'conferido' && x.status !== 'nao-procedimental').length; });
 ok(causas.reduce((s, c) => s + c.n, 0) === soma, `cada linha pendente está em exatamente uma decisão (${soma} linhas)`);
 // «Só no laudo» com o Power BI: separa correção de prestador e NC; apontar correção vira NC «Prestador incorreto».
 const sl = causas.map(c => c.t).filter(t => /Só no laudo|outro prestador|outro relatório/i.test(t));
@@ -51,8 +53,9 @@ await p.locator('#cfCausas [data-cza="ver"]').first().click(); await p.waitForSe
 const nVer = +(await p.textContent('.cf-fl')).match(/(\d+) linha/)[1], nTab = await p.$$eval('#cfTab tbody tr:not(.det-row)', trs => trs.filter(t => !t.classList.contains('detalhe')).length);
 ok(nVer === causas[0].n, `«Ver as linhas» filtra a tabela nas ${nVer} linhas da decisão`);
 const cab = await p.$$eval('#cfTab thead th', ths => ths.map(t => t.textContent.trim()).filter(Boolean));
-ok(cab.slice(0, 6).join('|') === 'Situação|Paciente|Data|Procedimento no MV|Laudo (Apolo)|O que falta / por quê', `colunas na ordem de quem confere (${cab.join(' · ')})`);
+ok(cab.slice(0, 7).join('|') === 'Classe|Situação|Paciente|Data|Procedimento no MV|Laudo (Apolo)|O que falta / por quê', `colunas na ordem de quem confere (${cab.join(' · ')})`);
 // Validar uma equivalência pela causa: a conferência roda de novo e a barra anda.
+await abaConf('decidir');
 const btVal = p.locator('#cfCausas [data-cza="validar"], #cfCausas [data-cza="cadastrar"]').first();
 if (await btVal.count()) {
   const alvo = await btVal.evaluate(b => b.closest('.cz').querySelector('b').textContent), nAlvo = +(await btVal.evaluate(b => b.closest('.cz').querySelector('.cz-n').firstChild.textContent));
@@ -63,6 +66,7 @@ if (await btVal.count()) {
   ok(conferidas(f1) > conferidas(f0) && !ainda.includes(alvo), `validar pela causa confere de novo sozinho: ${conferidas(f0)} → ${conferidas(f1)} conferidas (decisão de ${nAlvo} linha(s) saiu da lista)`);
 } else info('sem decisão de equivalência pendente neste relatório');
 // Aceitar em lote (convênio/data/nome) quando existir.
+await abaConf('decidir');
 const btAc = p.locator('#cfCausas [data-cza="aceitar"]').first();
 if (await btAc.count()) {
   const nAc = +(await btAc.evaluate(b => b.closest('.cz').querySelector('.cz-n').firstChild.textContent)), d0 = await p.evaluate(() => window.__RM.S.conf.res.linhas.filter(x => x.decisao).length);
