@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.5</title>
+<title>Repasse Médico v3.0.0-alpha.6</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -372,13 +372,47 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .tt-sug li:last-child{border-bottom:0}
 .tt-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
 @media (max-width:1100px){.tt-grid{grid-template-columns:minmax(0,1fr)}.tt-painel{position:static}}
+/* SOL-F43 — conferência oficial: classes de fechamento, totais, abas, filtros e correções no MV */
+:root{--cl-devido:#c6efce;--cl-aceito:#e4dcf5;--cl-pend:#ffeb9c;--cl-nc:#ffc7ce;--cl-excluido:#e4e4e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}}
+:root[data-theme="dark"]{--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}
+.cl-devido{background:var(--cl-devido)}.cl-aceito{background:var(--cl-aceito)}.cl-pend{background:var(--cl-pend)}.cl-nc{background:var(--cl-nc)}.cl-excluido{background:var(--cl-excluido)}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{color:var(--s-t)}
+.cf-barra-cl{display:flex}.cf-barra-cl span{display:block;height:100%}
+.cf-abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin:4px 0 12px;padding-top:4px}
+.cf-abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;margin-bottom:-2px;white-space:nowrap;font-weight:600}
+.cf-abas button:hover{color:var(--text);background:transparent}
+.cf-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.cf-abas .n{display:inline-block;vertical-align:1px;line-height:16px;margin-left:6px;border-radius:999px;padding:0 7px;font-size:11px;background:var(--line);color:var(--text)}
+.cf-abas .n.alerta{background:var(--err);color:#fff}
+.totais-cl{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(5,minmax(120px,1fr));gap:8px}
+.tot-cl{border-radius:10px;padding:10px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-align:left;color:var(--text);font-weight:400}
+.tot-cl:hover{background:var(--card);border-color:var(--accent)}
+.tot-cl b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.tot-cl small{display:block;color:var(--muted);font-size:11.5px}
+.tot-cl .faixa{display:block;height:5px;border-radius:3px;margin-bottom:6px}
+.tot-cl.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.tot-cl.pagar{background:var(--accent);border-color:var(--accent);color:var(--on-accent);cursor:default}
+.tot-cl.pagar b{font-size:24px}.tot-cl.pagar small{color:var(--on-accent);opacity:.88}
+.cf-filtros{display:grid;grid-template-columns:2fr 2fr 1fr 1.4fr auto;gap:8px;align-items:end;margin-top:10px}
+.cf-filtros .campo{margin:0;min-width:0}.cf-filtros select{max-width:100%}
+.cf-fchk{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
+.cf-selinfo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--infobg)}
+.aviso-mv{border:1px solid var(--err);background:var(--errbg);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+.aviso-mv b{color:var(--err)}
+.obs-i{color:var(--accent);font-weight:700}
+.cf-obs{width:100%;min-height:52px}
+.st.dec-resolvido,.marc.dec-resolvido{background:var(--warnbg);color:var(--warn)}
+.fh-classes{margin-bottom:2px;white-space:normal}
+@media (max-width:1100px){.totais-cl{grid-template-columns:repeat(3,minmax(0,1fr))}.tot-cl.pagar{grid-column:1/-1}.cf-filtros{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.totais-cl{grid-template-columns:1fr 1fr}.cf-filtros{grid-template-columns:1fr}}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;white-space:nowrap}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.5 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.6 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -429,7 +463,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.5';
+const MOTOR_VERSAO = '3.0.0-alpha.6';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -2851,9 +2885,9 @@ const CAUSAS = {
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
   repetida: { acao: 'Decidir qual lançamento vale; o outro vira NC (ou as duas estão certas)', titulo: () => 'Linha repetida no MV' },
   'nome-semelhante': { acao: 'Confirmar se é o mesmo paciente', titulo: () => 'Nome apenas semelhante' },
-  ambiguo: { acao: 'Escolher o laudo certo (ou considerar no repasse)', titulo: () => 'Mais de um laudo plausível' },
+  ambiguo: { acao: 'Escolher o laudo certo (ou aceitar para pagamento)', titulo: () => 'Mais de um laudo plausível' },
   'outro-medico': { acao: 'Confirmar o médico (correção de prestador ou NC)', titulo: () => 'Laudo assinado por outro médico' },
-  'so-faturamento': { acao: 'Registrar NC ou considerar no repasse', titulo: () => 'Só no faturamento: linha sem laudo' },
+  'so-faturamento': { acao: 'Registrar NC ou aceitar para pagamento', titulo: () => 'Só no faturamento: linha sem laudo' },
   outro: { acao: 'Revisar a linha', titulo: () => 'Revisar' }
 };
 const LINHA_A_LINHA = new Set(['repetida', 'nome-semelhante', 'ambiguo', 'outro-medico', 'so-faturamento', 'outro']);
@@ -2863,7 +2897,8 @@ function causasDaConferencia(res, compostas = []) {
   const add = (k, base, i) => { const c = g.get(k) || g.set(k, { k, ...base, linhas: [] }).get(k); c.linhas.push(i); };
   const nomeCp = id => { const c = compostas.find(x => x.id === id); return c ? nomeComposta(c) : 'regra composta'; };
   res.linhas.forEach((x, i) => {
-    if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental') return;
+    // SOL-F43: taxa, material, medicamento e HM sem regra são «Excluído» (não compõem repasse): não há o que decidir.
+    if (x.decisao || x.status === 'conferido' || x.status === 'nao-procedimental' || classeDaLinhaConf(x) === 'excluido') return;
     const m = x.marcadores, p = x.par, r = x.r, l = x.l, base = r && l ? { codigo: r.codigo, desc: r.procDesc || '', titulo: l.titulo } : {};
     if (x.status === 'so-laudo' && x.mesmoEstudoPossivel) return add(`me|${x.mesmoEstudoPossivel.regraId}|${chaveTitulo(l.titulo)}`, { tipo: 'mesmo-estudo', titulo: l.titulo, ...x.mesmoEstudoPossivel }, i);
     if (x.status === 'so-laudo') {
@@ -2898,6 +2933,89 @@ function causasDaConferencia(res, compostas = []) {
   const porLinha = new Map();
   [...grupos, ...umaUma].forEach((c, n) => { for (const i of c.linhas) porLinha.set(i, `${c.rotulo.split(':')[0]} (decisão ${n + 1})`); });
   return { grupos, umaUma, porLinha, conferidas, totalMV: mv.length, faltam: grupos.length + umaUma.length, ressalvasDecididas: res.linhas.filter(x => x.decisao).length };
+}
+
+/* ---- src/engine/63-classes.js ---- */
+/* ============================================================
+ * SOL-F43 (v3.0.0-alpha.6) — Classes de fechamento: o que a conferência autoriza a pagar.
+ * Não é um motor novo: é a leitura da situação da linha (conferência) + as decisões já registradas.
+ *   Devido      → «Conferido» (par único, nome seguro, mesma data, equivalência validada / regra composta / exame).
+ *                 HM só quando a regra do prestador o inclui (hoje: V3, HM de USG/Doppler Unimed → conferido).
+ *   Aceito      → decisão «Aceito para pagamento» (antes «Considerado no repasse»), com justificativa, quem e quando.
+ *   NC          → NC registrada (menos «não procede»). Fora do fechamento.
+ *   Excluído    → taxa, material e medicamento (nunca compõem repasse) e HM sem regra do prestador (excluir do MV).
+ *   Pendente    → todo o resto: ressalva sem aceite, ambíguo, só no faturamento, equivalência não validada,
+ *                 composição incompleta, pacote, desconhecido e «Resolvido no MV» ainda não reconferido.
+ * Valor para pagamento = Devido + Aceito. Devido + Aceito + Pendente + NC + Excluído = total do relatório do MV.
+ * ============================================================ */
+const CLASSES_FECH = {
+  devido: { nome: 'Devido', entra: true, cor: 'C6EFCE', def: 'Conferido: par único, nome seguro, mesma data e equivalência validada' },
+  aceito: { nome: 'Aceito', entra: true, cor: 'E4DCF5', def: 'Aceito para pagamento, com justificativa (quem e quando)' },
+  pend: { nome: 'Pendente', entra: false, cor: 'FFEB9C', def: 'Sem decisão: não entra no fechamento até ser aceito, virar NC ou ser reconferido' },
+  nc: { nome: 'Não conformidade', entra: false, cor: 'FFC7CE', def: 'NC registrada: fora do fechamento; «não procede» devolve a linha ao cálculo' },
+  excluido: { nome: 'Excluído', entra: false, cor: 'E4E4E4', def: 'Não compõe repasse: taxa, material, medicamento e HM sem regra do prestador' }
+};
+const ORDEM_CLASSES = ['devido', 'aceito', 'pend', 'nc', 'excluido'];
+const TIPOS_NUNCA_REPASSE = new Set(['taxa', 'material', 'medicamento']);
+// Rodadas feitas a partir desta versão guardam a regra de valor; as anteriores continuam com o total do MV.
+const REGRA_VALOR_F43 = 'f43';
+
+/* Classe de uma linha do MV. tipo = tipo do item (procedimento, hm, taxa…); estado = situação da conferência;
+ * decisao = tipo da decisão da competência (nc, considerar, resolvido…) ou ''. */
+function classeDaLinha(tipo, estado, decisao) {
+  if (TIPOS_NUNCA_REPASSE.has(tipo)) return 'excluido';
+  if (decisao === 'nc') return 'nc';
+  if (tipo === 'hm') return estado === 'conferido' ? 'devido' : 'excluido';
+  if (decisao === 'considerar') return 'aceito';
+  if (decisao === 'resolvido') return 'pend';
+  return estado === 'conferido' ? 'devido' : 'pend';
+}
+// Linha do resultado da conferência (só as que vêm do MV têm classe; laudos «Só no laudo» não têm valor).
+const classeDaLinhaConf = x => x.r ? classeDaLinha(x.tipo, x.status, x.decisao?.tipo || '') : null;
+// Linha guardada numa rodada, com as decisões atuais da competência.
+const decisaoDaLinhaRodada = (idx, l) => (idx && (idx.get(l.kd) || (l.kl && idx.get(l.kl)))) || null;
+const classeDaLinhaRodada = (l, idx) => classeDaLinha(l.tipoItem || 'procedimento', l.estado, idx ? (decisaoDaLinhaRodada(idx, l)?.tipo || '') : (l.decisao || ''));
+
+function totaisPorClasse(linhas, classeDe, campo = 'vlRepasse') {
+  const t = Object.fromEntries(ORDEM_CLASSES.map(k => [k, { n: 0, valor: 0 }]));
+  for (const l of linhas) { const k = classeDe(l); if (!k) continue; t[k].n++; t[k].valor += +(l.r ? l.r[campo] : l[campo]) || 0; }
+  for (const k of ORDEM_CLASSES) t[k].valor = r2(t[k].valor);
+  t.pagar = r2(t.devido.valor + t.aceito.valor);
+  t.total = r2(ORDEM_CLASSES.reduce((s, k) => s + t[k].valor, 0));
+  return t;
+}
+const linhasParaPagamento = (rodada, idx) => rodada.linhas.filter(l => CLASSES_FECH[classeDaLinhaRodada(l, idx)]?.entra);
+const usaRegraF43 = r => r?.regraValor === REGRA_VALOR_F43;
+
+/* Reconferência (SOL-F42): o que devia ter saído do MV e continua no relatório.
+ * ncs: NCs da competência; decisoes: registro de decisões da competência; res/ctx: conferência atual; rodadas: todas.
+ * Devolve {ncs:[{nc, situacao, linha}], resolvidos:[{d, situacao, linha}], hm:[{linha, continua}]}. */
+function situacaoCorrecoesMV(res, ctx, ncs, decisoes, rodadas) {
+  const hashAtual = (ctx.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
+  const porKd = new Map(res.linhas.filter(x => x.r).map(x => [chaveMVDecisao(x.r), x]));
+  const hashDaRodada = id => (rodadas.find(r => r.id === id)?.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
+  const doRelatorio = k => String(k).startsWith('M|');
+  const avaliar = (chaves, hashOrigem) => {
+    const kd = (chaves || []).find(doRelatorio); if (!kd) return null;
+    const x = porKd.get(kd);
+    if (!x) return { situacao: 'corrigida', linha: null };
+    return { situacao: hashOrigem && hashOrigem !== hashAtual ? 'continua' : 'aguardando', linha: x };
+  };
+  const out = { ncs: [], resolvidos: [], hm: [] };
+  // Só as NCs deste relatório (prestador × unidade da rodada em que nasceram); sem rodada, só se a linha está aqui.
+  const desteRelatorio = nc => { const r = rodadas.find(y => y.id === nc.origem?.rodadaId); return r ? String(r.prestadorCod) === String(ctx.relatorio.cab.prestadorCod) && String(r.unidadeCod) === String(ctx.unidadeCod) : null; };
+  for (const nc of ncs || []) {
+    if (nc.situacao === 'nao-procede') continue;
+    const a = avaliar(nc.origem?.chavesLinha, hashDaRodada(nc.origem?.rodadaId)); if (!a) continue;
+    const deste = desteRelatorio(nc);
+    if (deste === true || (deste === null && a.linha)) out.ncs.push({ nc, ...a });
+  }
+  for (const d of decisoes || []) if (d.tipo === 'resolvido' && (!d.resumo?.relatorio || d.resumo.relatorio === `${ctx.relatorio.cab.prestadorCod}|${ctx.unidadeCod}`)) { const a = avaliar(d.chaves, d.resumo?.hashMV || ''); if (a) out.resolvidos.push({ d, ...a }); }
+  // HM sem regra: «continua» quando uma rodada anterior do mesmo relatório (outro PDF) já tinha a mesma linha.
+  const anteriores = rodadas.filter(r => r.tipo === 'conferencia' && r.id !== ctx.rodadaId && String(r.prestadorCod) === String(ctx.relatorio.cab.prestadorCod) && String(r.unidadeCod) === String(ctx.unidadeCod) && (r.arquivos || []).find(a => a.papel === 'MV')?.hash !== hashAtual);
+  const kdsAntes = new Set(anteriores.flatMap(r => r.linhas.map(l => l.kd)));
+  for (const x of res.linhas) if (x.r && x.tipo === 'hm' && classeDaLinhaConf(x) === 'excluido') out.hm.push({ linha: x, continua: kdsAntes.has(chaveMVDecisao(x.r)) });
+  return out;
 }
 
 /* ---- src/engine/70-correcao.js ---- */
@@ -3030,6 +3148,7 @@ function registroRodada(res, ctx) {
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
       vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
       kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
+    regraValor: res.tipo === 'conferencia' ? REGRA_VALOR_F43 : undefined,   // SOL-F43: só Devido + Aceito compõem o fechamento
     aceite: null
   };
 }
@@ -3151,14 +3270,16 @@ const competenciaDaRodada = r => r.chaveCompetencia || (r.em ? r.em.slice(0, 7) 
  * ============================================================ */
 // v3.0.0-alpha.4: «Dispensado» — laudo sem lançamento correspondente que não precisa de lançamento (ex.: 2ª página de um
 // exame, laudo refeito, exame sem cobrança). Não entra no repasse e deixa de contar como pendência; justificativa obrigatória.
-const TIPOS_DECISAO = { nc: 'Tratado: NC', considerar: 'Considerado no repasse', dispensado: 'Laudo dispensado' };
+// SOL-F43: «Considerado no repasse» passa a se chamar «Aceito para pagamento» (mesma decisão, mesmos dados).
+// «Resolvido no MV»: a linha foi corrigida no MV; fica pendente até a reconferência confirmar ou o aceite manual.
+const TIPOS_DECISAO = { nc: 'Tratado: NC', considerar: 'Aceito para pagamento', dispensado: 'Laudo dispensado', resolvido: 'Resolvido no MV (aguarda reconferência)' };
 const chaveMVDecisao = r => r ? `M|${r.conta}|${r.atendimento}|${r.codigo}|${isoDia(r.data)}` : '';
 const chaveLaudoDecisao = l => !l ? '' : l.idLaudo ? `L|${l.idLaudo}` : `L|${l.idPac}|${isoDia(l.data)}|${chaveTitulo(l.titulo)}`;
 const chavesDaLinha = (r, l) => [chaveMVDecisao(r), chaveLaudoDecisao(l)].filter(Boolean);
 
 function indiceDecisoes(ncs, considerar) {
   const m = new Map();
-  for (const d of considerar || []) for (const k of d.chaves) m.set(k, { tipo: d.tipo === 'dispensado' ? 'dispensado' : 'considerar', id: d.id, justificativa: d.justificativa, por: d.por, em: d.em });
+  for (const d of considerar || []) for (const k of d.chaves) m.set(k, { tipo: TIPOS_DECISAO[d.tipo] && d.tipo !== 'nc' ? d.tipo : 'considerar', id: d.id, justificativa: d.justificativa, por: d.por, em: d.em });
   for (const nc of ncs || []) {
     if (nc.situacao === 'nao-procede') continue;
     for (const k of nc.origem?.chavesLinha || []) m.set(k, { tipo: 'nc', ncId: nc.id, natureza: nc.natureza, situacao: nc.situacao, por: nc.criadaPor, em: nc.criadaEm });
@@ -3167,16 +3288,16 @@ function indiceDecisoes(ncs, considerar) {
 }
 const decisaoDaLinha = (idx, r, l) => chavesDaLinha(r, l).map(k => idx.get(k)).find(Boolean) || null;
 function aplicarDecisoes(res, idx) {
-  const n = { nc: 0, considerar: 0, dispensado: 0 };
+  const n = { nc: 0, considerar: 0, dispensado: 0, resolvido: 0 };
   for (const x of res.linhas) { x.decisao = decisaoDaLinha(idx, x.r, x.l); if (x.decisao) n[x.decisao.tipo]++; }
   res.porDecisao = n;
   return res;
 }
 function registrarConsiderar(reg, chave, chaves, justificativa, por, resumo = {}, tipo = 'considerar') {
-  if (!String(justificativa || '').trim()) throw new Error(tipo === 'dispensado' ? 'Informe a justificativa para dispensar o laudo.' : 'Informe a justificativa para considerar a linha no repasse.');
+  if (!String(justificativa || '').trim()) throw new Error(tipo === 'dispensado' ? 'Informe a justificativa para dispensar o laudo.' : tipo === 'resolvido' ? 'Informe o que foi corrigido no MV.' : 'Informe a justificativa para aceitar a linha para pagamento.');
   const c = itemCompetencia(reg, chave);
   c.decisoes = c.decisoes || [];
-  const d = { id: novoId('dec'), chaves, justificativa: justificativa.trim(), por, em: agoraISO(), resumo, ...(tipo === 'dispensado' ? { tipo } : {}) };
+  const d = { id: novoId('dec'), chaves, justificativa: justificativa.trim(), por, em: agoraISO(), resumo, ...(tipo !== 'considerar' ? { tipo } : {}) };
   c.decisoes.push(d);
   return d;
 }
@@ -3187,7 +3308,23 @@ function removerConsiderar(reg, chave, id) {
 }
 // Linhas de uma rodada que continuam pendentes depois das decisões (para o aceite e o fechamento).
 const linhaResolvida = l => ['conferido', 'identificado'].includes(l.estado);
-const pendenciasDaRodada = (rodada, idx) => rodada.linhas.filter(l => !linhaResolvida(l) && !idx.has(l.kd) && !(l.kl && idx.has(l.kl)));
+// SOL-F43: na conferência, pendência = classe «Pendente» (taxa/material/medicamento e HM sem regra são «Excluído», não pendência;
+// «Resolvido no MV» continua pendente até a reconferência). Correção de prestador segue a regra anterior.
+const pendenciasDaRodada = (rodada, idx) => rodada.tipo === 'conferencia' ? rodada.linhas.filter(l => classeDaLinhaRodada(l, idx) === 'pend')
+  : rodada.linhas.filter(l => !linhaResolvida(l) && !idx.has(l.kd) && !(l.kl && idx.has(l.kl)));
+/* SOL-F43 — Observação por linha: anotação livre na competência, pela mesma chave da linha (sem nome de paciente).
+ * Não muda a classe nem a situação; vale para toda nova rodada; editar acrescenta (o texto anterior fica no histórico). */
+function registrarObservacao(reg, chave, chaves, texto, por) {
+  const t = String(texto || '').trim(); if (!t) throw new Error('Escreva a observação.');
+  const c = itemCompetencia(reg, chave); c.observacoes = c.observacoes || [];
+  const o = { id: novoId('obs'), chaves, texto: t, por, em: agoraISO() }; c.observacoes.push(o); return o;
+}
+function indiceObservacoes(obs) {
+  const m = new Map();
+  for (const o of obs || []) for (const k of o.chaves || []) (m.get(k) || m.set(k, []).get(k)).push(o);
+  return m;
+}
+const observacoesDaLinha = (idx, r, l) => { const vistos = new Set(), out = []; for (const k of chavesDaLinha(r, l)) for (const o of idx.get(k) || []) if (!vistos.has(o.id)) { vistos.add(o.id); out.push(o); } return out.sort((a, b) => String(a.em).localeCompare(String(b.em))); };
 
 /* ---- src/engine/85-fluxo-sync.js ---- */
 /* ============================================================
@@ -4084,7 +4221,7 @@ const somaLinhas = (r, campo) => r2(r.linhas.reduce((s, l) => s + (+l[campo] || 
 
 /* Monta o fechamento da competência.
  * ctx: { rodadas, cfg, chave, decisoes (índice), fluxoComp, fech (ajustes/blocos), anterior (fechamento da competência anterior, opcional) } */
-function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior }) {
+function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior, fechada = false }) {
   fech = fech || fechamentoVazio();
   const tol = cfg.fechamento || FECHAMENTO_PADRAO, prestPorCod = new Map(cfg.prestadores.map(p => [String(p.cod), p]));
   const grupos = rodadasDoFechamento(rodadas, chave), linhasPrest = new Map();
@@ -4099,13 +4236,22 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   // Valores por unidade a partir das rodadas.
   for (const g of grupos) {
     const x = pegar(g.tipo, g.prestadorCod, g.prestadorNome), r = g.aceita || g.ultima;
+    // SOL-F43: rodada feita a partir da v3.0.0-alpha.6 → só Devido + Aceito (o que a conferência autorizou a pagar).
+    // Rodada anterior (competência já fechada, por exemplo) → total do MV, como era; na competência aberta, avisa.
+    const f43 = usaRegraF43(r), base = f43 ? { linhas: linhasParaPagamento(r, decisoes) } : r;
+    if (f43) {
+      const t = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, decisoes));
+      x.classes = x.classes || Object.fromEntries([...ORDEM_CLASSES, 'total'].map(k => [k, 0]));
+      for (const k of ORDEM_CLASSES) x.classes[k] = r2(x.classes[k] + t[k].valor); x.classes.total = r2(x.classes.total + t.total);
+      if (t.pend.n) x.avisos.push(`${t.pend.n} linha(s) pendente(s) na unidade ${g.unidadeCod} (R$ ${fmtBR(t.pend.valor)}) fora do valor até decidir`);
+    } else x.regraAntiga = true;
     // Na V3 o relatório de USG e o de IMG da mesma unidade somam.
-    x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(r, 'vlRepasse'));
-    if (g.tipo === 'usg' && x.tipo !== 'curitiba') x.producao[g.unidadeCod] = somaLinhas(r, 'vlTotal');
+    x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(base, 'vlRepasse'));
+    if (g.tipo === 'usg' && x.tipo !== 'curitiba') x.producao[g.unidadeCod] = somaLinhas(base, 'vlTotal');
     if ((!g.aceita || g.ultima.em > g.aceita.em) && !x.semAceite.includes(g.unidadeCod)) x.semAceite.push(g.unidadeCod);
     x.decisoes += r.linhas.filter(l => l.decisao).length;
     if (decisoes) x.pendencias += pendenciasDaRodada(r, decisoes).length;
-    x._rodadas = [...(x._rodadas || []), { r, unidade: g.unidadeCod }];
+    x._rodadas = [...(x._rodadas || []), { r, unidade: g.unidadeCod, linhas: base.linhas }];
   }
   // Roster: quem tem regra cadastrada aparece mesmo sem relatório (situação «Sem valores»).
   for (const p of cfg.prestadores) {
@@ -4124,7 +4270,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     if (x.tipo === 'curitiba') {
       const regra = x.p?.regras?.v3regra, unV3 = Object.keys(x.unidades).filter(u => ehUnidadeV3(cfg, u));
       if (regra && unV3.length) {
-        const linhas = (x._rodadas || []).filter(y => ehUnidadeV3(cfg, y.unidade)).flatMap(y => y.r.linhas);
+        const linhas = (x._rodadas || []).filter(y => ehUnidadeV3(cfg, y.unidade)).flatMap(y => y.linhas || y.r.linhas);
         x.v3 = calcularV3(regra, linhas);
         unV3.forEach((u, i) => { x.unidades[u] = i ? 0 : x.v3.total; });
         x.avisos.push(...avisosV3(x.v3));
@@ -4146,6 +4292,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     x.totalGeral = r2(x.total - x.descontos);
     if (parc.length) x.avisos.push(`desconto parcelado: ${parc.map(p => p.obs).join('; ')}${x.descontosManual ? ` (valor alterado à mão: R$ ${fmtBR(x.descontos)} no lugar de R$ ${fmtBR(x.descontosAuto)})` : ''}`);
     if (x.temValores && x.totalGeral < 0) { x.avisos.push(`desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)})`); alertasDescontos.push({ k: 'maior', cod: x.cod, tipo: x.tipo, texto: `${x.nome}: desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)}).` }); }
+    if (x.regraAntiga && !fechada) x.avisos.push('valor pela regra antiga (total do MV): confira de novo o relatório para valer só o Devido + Aceito');
     // Situação
     const d = [doc(x.tipo, x.cod)].filter(Boolean);
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
@@ -4530,7 +4677,7 @@ function xlsxExtracao(rel) {
 
 /* Excel da conferência cruzada (SOL-F23). Aba principal com o MV lado a lado com o Apolo e a
  * decisão da competência; o técnico (faixa, equivalência, chaves, candidatos) fica em abas à parte.
- * As decisões (NC, considerar no repasse) são tomadas na ferramenta; aqui só aparecem. */
+ * As decisões (NC, aceitar para pagamento) são tomadas na ferramenta; aqui só aparecem. */
 const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC', dispensado: 'EDEDED' };
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
@@ -4563,6 +4710,11 @@ function xlsxConferencia(res, ctx) {
   for (const k of ordem) { const s = res.porStatus[k]; R.push([{ v: STATUS_CONF[k].nome, st: { fill: STATUS_CONF[k].cor, b: true } }, s.n, { v: s.vlRepasse, st: { fmt: 'money' } }, { v: s.vlTotal, st: { fmt: 'money' } }]); }
   const tot = ordem.reduce((a, k) => [a[0] + res.porStatus[k].n, a[1] + res.porStatus[k].vlRepasse, a[2] + res.porStatus[k].vlTotal], [0, 0, 0]);
   R.push([{ v: 'TOTAL de registros únicos', st: { b: true, bt: true } }, { v: tot[0], st: { b: true, bt: true } }, { v: r2(tot[1]), st: { b: true, bt: true, fmt: 'money' } }, { v: r2(tot[2]), st: { b: true, bt: true, fmt: 'money' } }]);
+  // SOL-F43: o que a conferência autoriza a pagar.
+  const TC = totaisPorClasse(res.linhas, classeDaLinhaConf);
+  R.push([], cabecalho(['Fechamento (classe)', 'Linhas do MV', 'Vl Repasse', 'Entra no fechamento?']));
+  for (const k of ORDEM_CLASSES) R.push([{ v: CLASSES_FECH[k].nome, st: { fill: CLASSES_FECH[k].cor, b: true } }, TC[k].n, { v: TC[k].valor, st: { fmt: 'money' } }, CLASSES_FECH[k].entra ? 'sim' : 'não']);
+  R.push([{ v: 'VALOR PARA PAGAMENTO (Devido + Aceito)', st: { b: true, bt: true } }, '', { v: TC.pagar, st: { b: true, bt: true, fmt: 'money' } }, '']);
   R.push([], cabecalho(['Decisões na competência', 'Registros']));
   for (const [k, n] of Object.entries(res.porDecisao || {})) R.push([{ v: TIPOS_DECISAO[k], st: { fill: COR_DECISAO[k], b: true } }, n]);
   R.push([{ v: 'Pendentes (sem conferência e sem decisão)', st: { b: true } }, res.linhas.filter(pendente).length]);
@@ -4581,7 +4733,7 @@ function xlsxConferencia(res, ctx) {
     ['Linhas do MV', res.nMV], ['Procedimentos do MV', res.nProcedimentos], ['Laudos da unidade', res.nLaudosUnidade], ['Laudos no escopo «Só no laudo»', res.nLaudosEscopo], ['Pares formados', res.nPares],
     ['Equivalências validadas usadas (revisão da base)', `${res.eqValidadas} validadas · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
     ['Leitura', '«Conferido» = existe um laudo único e consistente; não prova que o valor está correto. Valores não são critério desta conferência.'],
-    ['Decisões', 'NC e «considerar no repasse» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
+    ['Decisões', 'NC e «aceitar para pagamento» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
   // Técnico: chaves, faixa do par e equivalência usada
   const cabTec = [...cabecalho(['Status', 'Origem', 'Linha MV', 'Chave da linha', 'Página', 'Remessa', 'Conta', 'Atendimento', 'Quant.', '% Repasse', 'Vl Total', 'Tipo de item']),
     ...cabecalho(['Laudo: ID', 'Laudo: linha da planilha', 'Laudo: ID paciente'], AP), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação'], OBS)];
@@ -4714,6 +4866,7 @@ function xlsxNC(itens, chave, meta = {}) {
  * ============================================================ */
 const TXT = { fmt: 'text' };
 const COLUNAS_EXPORT_CONF = [
+  { id: 'classe', rotulo: 'Classe (fechamento)', grupo: 'sit', larg: 18, valor: x => { const k = classeDaLinhaConf(x); return k ? { v: CLASSES_FECH[k].nome, st: { fill: CLASSES_FECH[k].cor, b: true } } : ''; } },
   { id: 'situacao', rotulo: 'Situação', grupo: 'sit', larg: 22, valor: (x, c, a) => ({ v: STATUS_CONF[x.status].nome, st: { ...a.f, b: true } }) },
   { id: 'decisao', rotulo: 'Decisão na competência', grupo: 'sit', larg: 28, valor: (x, c, a) => ({ v: a.textoDecisao(a.dec), st: a.dec ? { fill: COR_DECISAO[a.dec.tipo], b: true } : {} }) },
   { id: 'paciente', rotulo: 'Paciente', larg: 32, valor: x => x.r?.paciente || x.l?.paciente || '' },
@@ -4754,7 +4907,7 @@ const COLUNAS_EXPORT_CONF = [
 const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes'];
 const MODELOS_EXPORT_FIXOS = [
   { id: 'padrao', nome: 'Padrão — ordem de quem confere (layout operacional atual)', alvo: 'conferencia', colunas: IDS_PADRAO_CONF, fixo: true },
-  { id: 'completo', nome: 'Completo — padrão + colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: [...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
+  { id: 'completo', nome: 'Completo — padrão + classe do fechamento e colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: ['classe', ...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
 ];
 const colunaExport = id => COLUNAS_EXPORT_CONF.find(c => c.id === id);
 // Colunas válidas do modelo (ids desconhecidos são ignorados; sem colunas válidas, vale o padrão).
@@ -5872,84 +6025,145 @@ async function rodarDeNovoAfetadas(rodadas) {
   return { feitas, faltam };
 }
 
+/* SOL-F43 — A prévia de conferência é a conferência oficial: o que entra no fechamento é Devido + Aceito.
+ * Resultado em abas (Prévia · O que falta decidir · NCs e correções no MV · Aceite do relatório · Detalhes e equivalências),
+ * para não rolar uma página longa. A aba escolhida fica na sessão. */
+const ABAS_CONF = [['previa', 'Prévia de conferência'], ['decidir', 'O que falta decidir'], ['nc', 'NCs e correções no MV'], ['aceite', 'Aceite do relatório'], ['detalhes', 'Detalhes e equivalências']];
+const pillClasse = k => k ? `<span class="st cl-${k}" title="${esc(CLASSES_FECH[k].def)}">${esc(CLASSES_FECH[k].nome)}</span>` : '<span class="small muted">sem valor</span>';
+function irAbaConf(k) { if (!S.conf) return; S.conf.aba = k; desenharConferencia(); $('cfAbas')?.scrollIntoView({ block: 'start' }); }
 function desenharConferencia() {
   const { res, ctx, comparacao } = S.conf, c = $('cfRes'); if (!c) return;
   aplicarDecisoes(res, indiceDecisoesComp(ctx.chaveCompetencia));
-  const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
-  const CZ = causasDaConferencia(res, S.eq.compostas || []), pct = CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0;
+  const aba = S.conf.aba || 'previa', chave = ctx.chaveCompetencia || S.comp, idxObs = indiceObservacoes(estadoCompetencia(S.compReg, chave).observacoes);
+  const CZ = causasDaConferencia(res, S.eq.compostas || []), T = totaisPorClasse(res.linhas, classeDaLinhaConf);
+  const corr = situacaoCorrecoesMV(res, ctx, S.nc.itens.filter(x => x.competencia === chave), estadoCompetencia(S.compReg, chave).decisoes, S.rodadas);
+  const alertas = corr.ncs.filter(x => x.situacao === 'continua').length + corr.hm.filter(x => x.continua).length + corr.resolvidos.filter(x => x.situacao === 'continua').length;
   const ehSL = g => g.tipo === 'so-laudo' || g.tipo.startsWith('sl-'), nLote = CZ.grupos.filter(g => !ehSL(g)).reduce((t, g) => t + g.linhas.length, 0);
-  const seg = k => res.linhas.filter(x => x.r && (k === 'ok' ? (x.status === 'conferido' || x.status === 'nao-procedimental' || x.decisao) : !x.decisao && (k === 'ress' ? x.status === 'ressalva' : k === 'sf' ? x.status === 'so-faturamento' : !['conferido', 'nao-procedimental', 'ressalva', 'so-faturamento'].includes(x.status)))).length;
-  const barra = CZ.totalMV ? ['ok', 'ress', 'pend', 'sf'].map(k => `<span class="cf-b-${k}" style="width:${seg(k) / CZ.totalMV * 100}%" title="${seg(k)}"></span>`).join('') : '';
+  const barra = T.total ? ORDEM_CLASSES.map(k => `<span class="cl-${k}" style="width:${T[k].valor / T.total * 100}%" title="${esc(CLASSES_FECH[k].nome)}: R$ ${fmtBR(T[k].valor)}"></span>`).join('') : '';
+  const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
+  const comV = res.linhas.filter(x => x.r), opc = (f, rot) => [...new Map(comV.map(x => [f(x), rot(x)])).entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  const tile = k => `<button class="tot-cl${S.conf.filtroClasse === k ? ' sel' : ''}" data-cl="${k}" title="${esc(CLASSES_FECH[k].def)}"><span class="faixa cl-${k}"></span><b>R$ ${fmtBR(T[k].valor)}</b><small>${esc(CLASSES_FECH[k].nome)} · ${T[k].n} linha(s) · ${CLASSES_FECH[k].entra ? 'entra no fechamento' : 'fora do fechamento'}</small></button>`;
+  const secao = (k, html) => `<section class="cf-sec" data-cfsec="${k}"${aba === k ? '' : ' hidden'} role="tabpanel" aria-labelledby="cfAba-${k}">${html}</section>`;
   c.innerHTML = `<div class="card cf-frase"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
-    <div class="cf-barra">${barra}</div>
-    <p style="margin:6px 0"><b>${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${pct}%.</b> ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}${CZ.umaUma.length ? `${nLote ? ',' : ':'} ${CZ.umaUma.length} linha(s) precisam ser olhadas uma a uma` : ''}${CZ.grupos.some(ehSL) ? `${nLote || CZ.umaUma.length ? ', e' : ':'} ${CZ.grupos.filter(ehSL).reduce((t, g) => t + g.linhas.length, 0)} laudo(s) sem lançamento para apontar (correção de prestador ou NC)` : ''}.` : 'Nada falta decidir neste relatório: é só registrar o aceite.'}</p>
-    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<a class="small" href="#cfAceite">Ir para o aceite ↓</a>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button></div>
-    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}</details></div>
-    <details class="cf-det"${S.conf.detAberto ? ' open' : ''}><summary>Detalhes da rodada (relatório, período, volume, equivalências${comparacao ? ', comparação com a rodada anterior' : ''})</summary>
-    <dl class="kv"><dt>Relatório</dt><dd>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · repasse ${esc(ctx.relatorio.cab.repasse)} · ${esc(ctx.relatorio.cab.descricao)}</dd>
-    <dt>Unidade</dt><dd>${esc(ctx.unidadeNome)}</dd><dt>Médico(s) no escopo</dt><dd>${esc(ctx.medicosNomes || 'Todos os médicos')}</dd>
-    <dt>Período de produção</dt><dd>${res.periodo ? `${fmtData(res.periodo[0])} a ${fmtData(res.periodo[1])}` : '—'} · modalidades ${esc(res.modalidades.join(', ') || '—')}</dd>
-    <dt>Volume</dt><dd>${res.nMV} linhas do MV (${res.nProcedimentos} procedimentos) · ${res.nLaudosEscopo} laudos no escopo · ${res.nPares} pares</dd>
-    <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
-    ${comparacao ? resumoComparacao(comparacao) : ''}</details></div>
-    ${cartaoCausas(CZ, res)}
-    <div class="card cf-aceite-card">${quadroAceite()}</div>
-    <div class="card"><h2>Linhas</h2>
-    <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
-    <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
-    <p class="small muted">Cada registro tem uma categoria principal; os marcadores contam ocorrências (um registro pode ter vários).</p>
-    <div class="acoes"><input type="search" id="cfBusca" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}" style="max-width:420px"><button id="cfExcel2" data-cfexcel>Exportar Excel</button><button id="cfLimpar" class="sec">Limpar filtros</button><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label></div>
-    ${S.conf.filtroLinhas ? `<div class="cf-fl small"><b>Mostrando as ${S.conf.filtroLinhas.idx.length} linha(s) de:</b> ${esc(S.conf.filtroLinhas.titulo)} <button class="sec mini" id="cfFlLimpar">Mostrar todas</button></div>` : ''}
-    <div id="cfTab" style="margin-top:10px"></div></div>
-    ${ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''}
-    <div class="card"><h2>Equivalências desta rodada</h2><div id="cfEq"></div></div>`;
+    <div class="cf-barra cf-barra-cl">${barra}</div>
+    <p style="margin:6px 0"><b>${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0}%.</b> <b>R$ ${fmtBR(T.pagar)} para pagamento</b> (Devido + Aceito) de R$ ${fmtBR(T.total)} no relatório do MV. ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}; R$ ${fmtBR(T.pend.valor)} pendente(s) ficam fora do fechamento até decidir.` : 'Nada falta decidir neste relatório: é só registrar o aceite.'}${alertas ? ` <b style="color:var(--err)">${alertas} item(ns) que deviam ter saído do MV continuam no relatório.</b>` : ''}</p>
+    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button class="sec" id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button></div>
+    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}</div>
+    <nav class="cf-abas" id="cfAbas" role="tablist" aria-label="Áreas da conferência">${ABAS_CONF.map(([k, t]) => { const n = k === 'decidir' ? CZ.faltam : k === 'nc' ? alertas : 0; return `<button role="tab" id="cfAba-${k}" data-cfaba="${k}" aria-selected="${aba === k}" class="${aba === k ? 'on' : ''}">${t}${n ? `<span class="n${k === 'nc' ? ' alerta' : ''}">${n}</span>` : ''}</button>`; }).join('')}</nav>
+    ${secao('previa', `<div class="card"><div class="totais-cl">
+      <div class="tot-cl pagar"><small>VALOR PARA PAGAMENTO (Devido + Aceito)</small><b>R$ ${fmtBR(T.pagar)}</b><small>é o que vai para o Fechamento</small></div>${ORDEM_CLASSES.map(tile).join('')}</div>
+      <p class="small muted" style="margin:6px 0 0">Devido + Aceito + Pendente + NC + Excluído = R$ ${fmtBR(T.total)} = total do relatório do MV${Math.abs(T.total - r2(comV.reduce((s, x) => s + x.r.vlRepasse, 0))) < 0.011 ? ' ✓' : ''} · clique num valor para filtrar a tabela.</p></div>
+    <div class="card"><h2>Linhas do relatório</h2>
+      <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
+      <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
+      <div class="cf-filtros">
+        <label class="campo">Buscar<input type="search" id="cfBusca" placeholder="paciente, código, título ou médico…" value="${esc(S.conf.busca)}"></label>
+        <label class="campo">Procedimento<select id="cfFProc"><option value="*">Todos</option>${opc(x => x.r.codigo, x => `${x.r.codigo} · ${x.r.procDesc}`).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fProc === v ? ' selected' : ''}>${esc(t)} (${comV.filter(x => x.r.codigo === v).length})</option>`).join('')}</select></label>
+        <label class="campo">Data<select id="cfFData"><option value="*">Todas</option>${opc(x => isoDia(x.r.data), x => fmtData(x.r.data)).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fData === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <label class="campo">Convênio<select id="cfFConv"><option value="*">Todos</option>${opc(x => x.r.convenio, x => x.r.convenio).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fConv === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <div class="cf-fchk"><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label><label class="small"><input type="checkbox" id="cfFObs"${S.conf.fObs ? ' checked' : ''}> com observação</label></div></div>
+      <div class="cf-selinfo small" id="cfSelInfo"></div>
+      ${S.conf.filtroLinhas ? `<div class="cf-fl small"><b>Mostrando as ${S.conf.filtroLinhas.idx.length} linha(s) de:</b> ${esc(S.conf.filtroLinhas.titulo)} <button class="sec mini" id="cfFlLimpar">Mostrar todas</button></div>` : ''}
+      <div id="cfTab" style="margin-top:10px"></div></div>`)}
+    ${secao('decidir', CZ.faltam ? cartaoCausas(CZ, res) : '<div class="card"><h2>O que falta decidir</h2><p class="muted">Nada falta decidir neste relatório.</p></div>')}
+    ${secao('nc', cartaoCorrecoesMV(corr) + (ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''))}
+    ${secao('aceite', `<div class="card cf-aceite-card">${quadroAceite()}</div>`)}
+    ${secao('detalhes', `<div class="card"><h2>Detalhes da rodada</h2>
+      <dl class="kv"><dt>Relatório</dt><dd>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · repasse ${esc(textoRepasses(ctx.relatorio.cab))}</dd>
+      <dt>Unidade</dt><dd>${esc(ctx.unidadeNome)}</dd><dt>Médico(s) no escopo</dt><dd>${esc(ctx.medicosNomes || 'Todos os médicos')}</dd>
+      <dt>Período de produção</dt><dd>${res.periodo ? `${fmtData(res.periodo[0])} a ${fmtData(res.periodo[1])}` : '—'} · modalidades ${esc(res.modalidades.join(', ') || '—')}</dd>
+      <dt>Volume</dt><dd>${res.nMV} linhas do MV (${res.nProcedimentos} procedimentos) · ${res.nLaudosEscopo} laudos no escopo · ${res.nPares} pares</dd>
+      <dt>Equivalências</dt><dd>${res.eqValidadas} validadas (revisão ${res.eqRevisao})${res.eqValidadas ? '' : ' — <span style="color:var(--warn)">nenhuma validada: nada pode ser confirmado</span>'}</dd></dl>
+      ${comparacao ? resumoComparacao(comparacao) : ''}</div>
+      <div class="card"><h2>Equivalências desta rodada</h2><div id="cfEq"></div></div>`)}`;
   ligarCartaoCandidatosNC(c);
+  c.querySelectorAll('[data-cfaba]').forEach(b => b.onclick = () => irAbaConf(b.dataset.cfaba));
+  c.querySelectorAll('[data-cl]').forEach(b => b.onclick = () => { S.conf.filtroClasse = S.conf.filtroClasse === b.dataset.cl ? null : b.dataset.cl; if (S.conf.filtroClasse) S.conf.soFalta = false; desenharConferencia(); });
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
-  $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.busca = ''; S.conf.filtroLinhas = null; desenharConferencia(); };
-  // Os dois botões de Excel (no topo do resultado e ao lado da busca) fazem a mesma coisa. Antes os dois tinham o mesmo id
-  // e só o primeiro recebia a ação: o de baixo não fazia nada.
+  // Os dois botões de Excel (topo e tabela) fazem a mesma coisa.
   c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp));
-  if ($('cfIrCausas')) $('cfIrCausas').onclick = () => $('cfCausas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  $('cfVerTodas').onclick = () => { S.conf.soFalta = false; S.conf.filtroLinhas = null; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
-  $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
+  if ($('cfIrCausas')) $('cfIrCausas').onclick = () => irAbaConf('decidir');
+  if ($('cfIrAceite')) $('cfIrAceite').onclick = () => irAbaConf('aceite');
+  $('cfVerTodas').onclick = () => { Object.assign(S.conf, { soFalta: false, filtroLinhas: null, filtroClasse: null, aba: 'previa' }); desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
   if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
-  const det = c.querySelector('.cf-det'); if (det) det.ontoggle = () => { S.conf.detAberto = det.open; };
   ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
+  ligarCorrecoesMV(c, res, ctx);
   const filtrar = () => {
     const q = norm(S.conf.busca);
-    const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size;
-    return res.linhas.filter((x, i) => (!fl || fl.has(i)) && (!soFalta || (!x.decisao && x.status !== 'conferido' && x.status !== 'nao-procedimental'))
+    const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
+    return res.linhas.filter((x, i) => (!fl || fl.has(i)) && (!soFalta || (x.r ? classeDaLinhaConf(x) === 'pend' && x.decisao?.tipo !== 'resolvido' : !x.decisao && x.status !== 'conferido'))
+      && (!S.conf.filtroClasse || classeDaLinhaConf(x) === S.conf.filtroClasse)
       && (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
       && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => m.startsWith('dec-') ? x.decisao?.tipo === m.slice(4) : x.marcadores.has(m)))
+      && (!S.conf.fProc || S.conf.fProc === '*' || x.r?.codigo === S.conf.fProc)
+      && (!S.conf.fData || S.conf.fData === '*' || isoDia(x.r?.data || x.l?.data) === S.conf.fData)
+      && (!S.conf.fConv || S.conf.fConv === '*' || (x.r?.convenio || '') === S.conf.fConv)
+      && (!S.conf.fObs || observacoesDaLinha(idxObs, x.r, x.l).length)
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
+  };
+  // Contagem e soma do filtro + ações em lote sobre as linhas pendentes visíveis.
+  const infoSel = vis => {
+    const pend = vis.filter(x => x.r && classeDaLinhaConf(x) === 'pend' && !x.decisao), el = $('cfSelInfo'); if (!el) return;
+    el.innerHTML = `<b>${vis.length} linha(s) no filtro · R$ ${fmtBR(vis.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0))}</b>${S.conf.filtroClasse ? ` · ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)}` : ''}<span class="sy-esp"></span>
+      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>`;
+    $('cfExcel2').onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp);
+    $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fConv: '*', fObs: false }); desenharConferencia(); };
+    $('cfLoteAceitar').onclick = async () => { if (await considerarLinhas(res, pend.map(x => res.linhas.indexOf(x)), `${pend.length} linha(s) pendente(s) do filtro · R$ ${fmtBR(pend.reduce((s, x) => s + x.r.vlRepasse, 0))}`, '')) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
+    $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoDaLinhaConferencia(x, ctx, S.cfg)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
-      { t: 'Situação', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) },
+      { t: 'Classe', html: x => pillClasse(classeDaLinhaConf(x)) },
+      { t: 'Situação', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) + (observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : '') },
       { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
       { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
-      { t: 'O que falta / por quê', v: x => x.decisao ? '' : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
+      { t: 'O que falta / por quê', v: x => x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo] || ''}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : classeDaLinhaConf(x) === 'excluido' ? (x.tipo === 'hm' ? 'HM sem regra do prestador: não compõe repasse — excluir do MV' : `${TIPOS_ITEM[x.tipo] || x.tipo}: não compõe repasse`) : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
       { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
-    detalhe: x => `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, res.linhas.indexOf(x))}</div><p class="small muted" style="margin:0 0 6px">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
-      ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
-      ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}</div>
-      <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map(cd => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]})${cd.l === x.l ? '</strong>' : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`
+    detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
+      return `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div><p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+      ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
+      ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}
+      <h4 style="margin-top:8px">Observação</h4><textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
+      ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
+      <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]})${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
   });
-  $('cfBusca').oninput = e => { S.conf.busca = e.target.value; t.atualizar(filtrar()); };
+  infoSel(filtrar());
+  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); };
+  $('cfBusca').oninput = e => { S.conf.busca = e.target.value; refiltrar(); };
+  $('cfFProc').onchange = e => { S.conf.fProc = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFData').onchange = e => { S.conf.fData = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFConv').onchange = e => { S.conf.fConv = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
+  $('cfFObs').onchange = e => { S.conf.fObs = e.target.checked; desenharConferencia(); };
   $('cfTab').addEventListener('click', async e => {
-    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar]'); if (!b) return;
+    const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar],[data-resolvido],[data-escolher],[data-obs-salvar]'); if (!b) return;
     let ok = false;
     if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
     else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
     else if (b.dataset.dispensar !== undefined) ok = await dispensarLaudos(res, [+b.dataset.dispensar]);
+    else if (b.dataset.resolvido !== undefined) ok = await resolvidoNoMV(res.linhas[+b.dataset.resolvido], ctx);
+    else if (b.dataset.escolher !== undefined) { const [i, j] = b.dataset.escolher.split('|').map(Number), x = res.linhas[i], cd = x.cands[j]; ok = await considerarNoRepasse(x, `Laudo escolhido entre ${x.cands.length} candidatos: «${cd.l.titulo}» (${cd.l.medico || 'sem médico'}, ${fmtData(cd.l.data)})`); }
+    else if (b.dataset.obsSalvar !== undefined) ok = await salvarObservacaoLinha(res.linhas[+b.dataset.obsSalvar], $('cfTab').querySelector(`[data-obs="${b.dataset.obsSalvar}"]`)?.value || '');
     else ok = await removerDecisaoConsiderar(res.linhas[+b.dataset.desconsiderar]);
     if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
+// Aba «NCs e correções no MV»: o que devia ter saído do MV e o que já saiu (reconferência, SOL-F42).
+function cartaoCorrecoesMV(corr) {
+  const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
+  const cont = [...corr.ncs.filter(x => x.situacao === 'continua'), ...corr.resolvidos.filter(x => x.situacao === 'continua'), ...corr.hm.filter(x => x.continua)];
+  const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'] };
+  return `<div class="card"><h2>Correções no MV</h2>
+    ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
+    <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
+    <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
+    <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
+}
+function ligarCorrecoesMV() { }
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;
@@ -5960,20 +6174,45 @@ function resumoComparacao({ ant, grupos }) {
 
 /* ---------- Decisões por linha (memória da competência) ---------- */
 function botoesDecisao(x, i) {
-  if (x.decisao?.tipo === 'nc') return `<span class="small">NC registrada (${esc(SITUACAO_NC[x.decisao.situacao] || '')}) — <a href="#nc">ver na aba Não conformidades</a>. Para desfazer, mude a NC para «Não procede».</span>`;
-  if (x.decisao?.tipo === 'considerar' || x.decisao?.tipo === 'dispensado') return `<span class="small">${x.decisao.tipo === 'dispensado' ? 'Laudo dispensado' : 'Considerado no repasse'} por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
-  return `<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-considerar="${i}">Considerar no repasse…</button>` : ''}${!x.r && x.l ? ` <button class="sec mini" data-dispensar="${i}">Dispensar laudo…</button>` : ''}`;
+  const k = classeDaLinhaConf(x);
+  if (x.decisao?.tipo === 'nc') return `<span class="small">NC registrada (${esc(SITUACAO_NC[x.decisao.situacao] || '')}) — fora do fechamento. <a href="#nc">Ver na aba Não conformidades</a>; «Não procede» devolve a linha ao cálculo.</span>`;
+  if (x.decisao?.tipo === 'resolvido') return `<span class="small">Resolvido no MV por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}» — pendente até a reconferência confirmar.</span> <button class="mini" data-considerar="${i}">Aceitar para pagamento…</button> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
+  if (x.decisao?.tipo === 'considerar' || x.decisao?.tipo === 'dispensado') return `<span class="small">${x.decisao.tipo === 'dispensado' ? 'Laudo dispensado' : 'Aceito para pagamento'} por ${esc(x.decisao.por || '—')}: «${esc(x.decisao.justificativa)}»</span> <button class="sec mini" data-desconsiderar="${i}">Remover decisão</button>`;
+  if (k === 'excluido') return `<span class="small muted">${x.tipo === 'hm' ? 'HM sem regra do prestador: não compõe repasse — excluir do MV.' : 'Não compõe repasse: nenhuma decisão necessária.'}</span> <button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>`;
+  if (k === 'devido') return `<span class="small muted">Conferido: entra no fechamento sem decisão.</span> <button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>`;
+  return `${x.r ? `<button class="mini" data-considerar="${i}">Aceitar para pagamento…</button> ` : ''}<button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button>${x.r ? ` <button class="sec mini" data-resolvido="${i}">Resolvido no MV…</button>` : ''}${!x.r && x.l ? ` <button class="sec mini" data-dispensar="${i}">Dispensar laudo…</button>` : ''}`;
 }
-async function considerarNoRepasse(x) {
+async function considerarNoRepasse(x, sugestao = '') {
   if (!exigirAberta(S.comp, 'registrar decisões')) return false;
   const op = await exigirOperador(); if (!op) return false;
-  const r = await dialogo('Considerar no repasse', `<p class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · ${esc(fmtData(x.r.data))} · R$ ${fmtBR(x.r.vlRepasse)}</p>
-    <p class="small muted">A linha não bate, mas entra no repasse. A decisão vale para toda nova rodada da competência ${rotuloCompetencia(S.comp)} e não conta como pendência no aceite.</p>
-    <label class="campo">Justificativa (obrigatória)<input type="text" name="just"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Considerar no repasse']]);
+  const r = await dialogo('Aceitar para pagamento', `<p class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · ${esc(fmtData(x.r.data))} · R$ ${fmtBR(x.r.vlRepasse)}</p>
+    <p class="small muted">A linha passa a «Aceito» e <b>entra no fechamento</b>. A decisão é sua, fica registrada (quem e quando) e vale para toda nova rodada da competência ${rotuloCompetencia(S.comp)}.</p>
+    <label class="campo">Justificativa (obrigatória)<input type="text" name="just" value="${esc(sugestao)}"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Aceitar para pagamento']]);
   if (r.botao !== 'ok') return false;
   if (!r.campos.just.trim()) { avisar('Informe a justificativa.', 'warn'); return false; }
   registrarConsiderar(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.just, op, { codigo: x.r.codigo, desc: x.r.procDesc, titulo: x.l?.titulo || '' });
-  salvarCompReg(); avisar('Linha considerada no repasse nesta competência.', 'ok');
+  salvarCompReg(); avisar('Linha aceita para pagamento nesta competência: entra no fechamento.', 'ok');
+  return true;
+}
+// «Resolvido no MV»: a correção foi feita no MV; a linha fica pendente até o novo PDF confirmar (ou aceite manual).
+async function resolvidoNoMV(x, ctx) {
+  if (!exigirAberta(S.comp, 'registrar decisões')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const r = await dialogo('Resolvido no MV', `<p class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · ${esc(fmtData(x.r.data))} · R$ ${fmtBR(x.r.vlRepasse)}</p>
+    <p class="small muted">A linha continua <b>pendente</b> (fora do fechamento) até você reimportar o PDF do MV e a ferramenta confirmar a correção, ou até você aceitar para pagamento. Se a linha continuar no novo PDF, a ferramenta avisa.</p>
+    <label class="campo">O que foi corrigido no MV (obrigatório)<input type="text" name="just" placeholder="ex.: lançamento duplicado retirado da conta"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+  if (r.botao !== 'ok') return false;
+  if (!r.campos.just.trim()) { avisar('Informe o que foi corrigido no MV.', 'warn'); return false; }
+  registrarConsiderar(S.compReg, S.comp, chavesDaLinha(x.r, null), r.campos.just, op, { codigo: x.r.codigo, desc: x.r.procDesc, hashMV: (ctx.arquivos || []).find(a => a.papel === 'MV')?.hash || '', relatorio: `${ctx.relatorio.cab.prestadorCod}|${ctx.unidadeCod}` }, 'resolvido');
+  salvarCompReg(); avisar('Registrado como resolvido no MV: reimporte o PDF para a ferramenta confirmar.', 'ok');
+  return true;
+}
+async function salvarObservacaoLinha(x, texto) {
+  if (!String(texto).trim()) { avisar('Escreva a observação antes de salvar.', 'warn'); return false; }
+  if (!exigirAberta(S.comp, 'registrar observações')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  registrarObservacao(S.compReg, S.comp, chavesDaLinha(x.r, x.l), texto, op);
+  salvarCompReg(); avisar('Observação salva na competência.', 'ok');
   return true;
 }
 // «Só no laudo» que não precisa de lançamento: dispensa com justificativa (como o aceite de uma ressalva). Vale para toda nova
@@ -6013,12 +6252,13 @@ function quadroAceite() {
   const r = rodadaDaConf(); if (!r) return '';
   const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
   const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => idx.has(l.kd) || (l.kl && idx.has(l.kl)));
+  const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}</p>`;
   const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => idx.get(l.kd)?.tipo === 'nc' || (l.kl && idx.get(l.kl)?.tipo === 'nc')).length;
-  if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge ok">aceito</span>
+  if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite do relatório</b> <span class="badge ok">aceito</span>${resumoCl}
     <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
     <div class="acoes" style="margin:0">${fechada ? '<span class="small muted">Competência fechada: reabra no Início para desfazer.</span>' : '<button class="sec mini" id="cfDesfazer">Desfazer aceite</button>'}<a href="#rodadas" class="small">Ver em Rodadas</a>
     ${prox ? `<button class="sec mini" id="cfProximo">Ir para o próximo relatório (${esc(prox.rel.cab.prestadorCod)} - ${esc(prox.rel.cab.prestadorNome)})</button>` : ''}</div></div>`;
-  return `<div class="aceite-box" id="cfAceite"><b>Aceite desta rodada</b> <span class="badge warn">sem aceite</span>
+  return `<div class="aceite-box" id="cfAceite"><b>Aceite do relatório</b> <span class="badge warn">sem aceite</span>${resumoCl}
     <p class="small" style="margin:6px 0">${abertas.length} linha(s) com pendência ou ressalva · <b>${comDecisao.length} já com decisão</b>${comDecisao.length ? ` (${nNC} NC, ${comDecisao.length - nNC} considerada(s) no repasse)` : ''} · <b>${pend} pendente(s)</b></p>
     ${fechada ? `<div class="acoes" style="margin:0"><button disabled>Registrar aceite</button><span class="small muted">Competência ${rotuloCompetencia(chave)} fechada: reabra no Início para registrar aceite.</span></div>` : `
     <label class="campo">Observação do aceite${pend ? ' (obrigatória: há pendências)' : ' (opcional)'}<textarea id="cfAceiteObs" rows="2" style="min-height:0;height:58px"></textarea></label>
@@ -6108,7 +6348,7 @@ function botoesCausa(c, n) {
     case 'convenio': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(mesmo convênio)`, false) + b('nc', 'Registrar NC') + ver;
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
     case 'composta-falta': { const r0 = (S.eq.compostas || []).find(x => x.id === c.regraId), alt = r0 && modoComposta(r0) === 'juntos' && regraComposta(r0).itens.flatMap(it => it.codigos).length > 1;
-      return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Considerar no repasse') + ver; }
+      return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Aceitar para pagamento') + ver; }
     case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + b('dispensar', 'Dispensar…') + ver;
     case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + ver;
     case 'sl-outro-relatorio': return ver + b('dispensar', 'Dispensar (está no relatório do outro médico)…') + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
@@ -6117,7 +6357,7 @@ function botoesCausa(c, n) {
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
     case 'nome-semelhante': return b('aceitar', 'É o mesmo paciente', false) + b('nc', 'Não é → NC') + ver;
-    default: return b('nc', 'Registrar NC', false) + b('aceitar', 'Considerar no repasse…') + ver;
+    default: return b('nc', 'Registrar NC', false) + b('aceitar', 'Aceitar para pagamento…') + ver;
   }
 }
 function cartaoCausas(CZ, res) {
@@ -6129,9 +6369,9 @@ function cartaoCausas(CZ, res) {
     ${CZ.grupos.map((c, n) => item(c, n)).join('')}
     ${CZ.umaUma.length ? `<div class="cz-sep">Uma a uma (${CZ.umaUma.length} linha${CZ.umaUma.length > 1 ? 's' : ''})</div>${CZ.umaUma.slice(0, MAX).map((c, n) => item(c, CZ.grupos.length + n)).join('')}
       ${CZ.umaUma.length > MAX ? `<button class="sec mini" id="czMais">Mostrar as outras ${CZ.umaUma.length - MAX}</button>` : ''}` : ''}
-    <p class="small muted">Decisões de equivalência valem para todos os relatórios (e para a outra pessoa, com a pasta conectada) e a conferência roda de novo sozinha. As de linha (NC, considerar no repasse) ficam na competência, como antes.</p></div>`;
+    <p class="small muted">Decisões de equivalência valem para todos os relatórios (e para a outra pessoa, com a pasta conectada) e a conferência roda de novo sozinha. As de linha (NC, aceitar para pagamento) ficam na competência, como antes.</p></div>`;
 }
-// Considerar no repasse várias linhas de uma vez, com uma justificativa (já sugerida).
+// Aceitar para pagamento várias linhas de uma vez, com uma justificativa (já sugerida).
 async function considerarLinhas(res, idxs, titulo, sugestao) {
   if (!exigirAberta(S.comp, 'registrar decisões')) return false;
   const op = await exigirOperador(); if (!op) return false;
@@ -6176,7 +6416,7 @@ function ligarCausas(raiz, CZ, res, ctx) {
   if ($('czMais')) $('czMais').onclick = () => { S.conf.umaMais = true; desenharConferencia(); };
   raiz.querySelectorAll('[data-cz]').forEach(b => b.onclick = async () => {
     const c = todas[+b.dataset.cz], ac = b.dataset.cza; let ok = false;
-    if (ac === 'ver') { S.conf.filtroLinhas = { idx: c.linhas, titulo: c.rotulo }; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); return; }
+    if (ac === 'ver') { S.conf.filtroLinhas = { idx: c.linhas, titulo: c.rotulo }; S.conf.aba = 'previa'; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); return; }
     if (ac === 'equivalencias') { location.hash = 'equivalencias'; return; }
     if (ac === 'bases') { location.hash = 'bases'; return; }
     if (ac === 'ncs') { const h = [...$('cfRes').querySelectorAll('.card h2')].find(x => /NC/.test(x.textContent)); h ? h.scrollIntoView({ behavior: 'smooth', block: 'start' }) : (location.hash = 'nc'); return; }
@@ -6792,7 +7032,7 @@ function sincronizarDocumentalComBases(comp) {
 
 /* ---------- F13: classificação ---------- */
 function fechamentoDoFluxo(comp) {
-  try { return comp.chave === S.comp ? fechamentoAtual() : montarFechamento({ rodadas: S.rodadas, cfg: S.cfg, chave: comp.chave, fech: fechDaCompetencia(comp.chave), fluxoComp: comp }); } catch (e) { return null; }
+  try { return comp.chave === S.comp ? fechamentoAtual() : montarFechamento({ rodadas: S.rodadas, cfg: S.cfg, chave: comp.chave, decisoes: indiceDecisoesComp(comp.chave), fechada: compFechada(comp.chave), fech: fechDaCompetencia(comp.chave), fluxoComp: comp }); } catch (e) { return null; }
 }
 function linhasClassificacao(comp) {
   const f = fechamentoDoFluxo(comp), cl = comp.grupos.classif?.classificacao || {};
@@ -8021,8 +8261,8 @@ function marcosFech(chave) {
 function fechamentoAtual() {
   const base = { rodadas: S.rodadas, cfg: S.cfg };
   const ant = competenciaVizinha(S.comp, -1);
-  const anterior = montarFechamento({ ...base, chave: ant, fech: fechDaCompetencia(ant), fluxoComp: S.fluxo.competencias[ant] });
-  return montarFechamento({ ...base, chave: S.comp, decisoes: indiceDecisoesComp(), fluxoComp: S.fluxo.competencias[S.comp], fech: fechDaCompetencia(), anterior });
+  const anterior = montarFechamento({ ...base, chave: ant, decisoes: indiceDecisoesComp(ant), fechada: compFechada(ant), fech: fechDaCompetencia(ant), fluxoComp: S.fluxo.competencias[ant] });
+  return montarFechamento({ ...base, chave: S.comp, decisoes: indiceDecisoesComp(), fechada: compFechada(S.comp), fluxoComp: S.fluxo.competencias[S.comp], fech: fechDaCompetencia(), anterior });
 }
 
 RENDER.fechamento = async () => {
@@ -8052,7 +8292,9 @@ const inputAjuste = (tipo, x, campo, largura = 80) => `<input type="${campo === 
 // Avisos recolhidos (como na Conferência): o botão mostra quantos; clicar abre a linha de detalhe e clicar de novo fecha.
 FH.abertos = FH.abertos || new Set();
 const chaveAviso = x => `${x.tipo}|${x.cod}`;
-const avisosHtml = x => x.avisos.length ? `<button type="button" class="fh-avisos-bt${FH.abertos.has(chaveAviso(x)) ? ' aberto' : ''}" data-avisos="${esc(chaveAviso(x))}" aria-expanded="${FH.abertos.has(chaveAviso(x))}" title="Mostrar ou esconder os avisos">⚠ ${x.avisos.length} aviso${x.avisos.length > 1 ? 's' : ''} <span class="seta">▸</span></button>` : '';
+// SOL-F43: valor aberto por classe (o que vai para pagamento e o que ficou fora), quando a rodada usa a regra nova.
+const classesHtml = x => x.classes ? `<div class="small muted fh-classes" title="Devido + Aceito = para pagamento. Pendente, NC e Excluído ficam fora do fechamento.">para pagamento R$ ${fmtBR(x.classes.devido + x.classes.aceito)}${x.classes.pend ? ` · <b style="color:var(--warn)">pendente R$ ${fmtBR(x.classes.pend)}</b>` : ''}${x.classes.nc ? ` · NC R$ ${fmtBR(x.classes.nc)}` : ''}${x.classes.excluido ? ` · excluído R$ ${fmtBR(x.classes.excluido)}` : ''} <span>(MV R$ ${fmtBR(x.classes.total)})</span></div>` : '';
+const avisosHtml = x => classesHtml(x) + (x.avisos.length ? `<button type="button" class="fh-avisos-bt${FH.abertos.has(chaveAviso(x)) ? ' aberto' : ''}" data-avisos="${esc(chaveAviso(x))}" aria-expanded="${FH.abertos.has(chaveAviso(x))}" title="Mostrar ou esconder os avisos">⚠ ${x.avisos.length} aviso${x.avisos.length > 1 ? 's' : ''} <span class="seta">▸</span></button>` : '');
 const detAvisos = x => x.avisos.length ? `<tr class="detalhe fh-det" data-det="${esc(chaveAviso(x))}"${FH.abertos.has(chaveAviso(x)) ? '' : ' hidden'}><td colspan="40"><div class="fh-det-corpo"><b>Avisos de ${esc(x.nome)}</b><ul>${x.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div></td></tr>` : '';
 
 function desenharUSG(corpo, f, mk) {
@@ -10113,7 +10355,7 @@ function iniciarVerificacaoAtualizacao() {
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
   window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
-    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
+    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 
 </script>

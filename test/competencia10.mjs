@@ -96,6 +96,7 @@ for (const rel of rels) {
       pbi: ctx.pbiResumo ? Object.fromEntries(Object.entries(ctx.pbiResumo).filter(([, n]) => n)) : null };
   });
   // Aceite com observação (as pendências ficam registradas).
+  await p.click('[data-cfaba="aceite"]').catch(() => {});   // v3.0.0-alpha.6: aceite na aba própria
   await p.fill('#cfAceiteObs', 'teste automatizado da competência 10/2026').catch(() => {});
   if (await p.$('#cfAceitar')) { await p.click('#cfAceitar'); await p.waitForSelector('.aceite-box.feito'); }
   R.conferencias.push({ arquivo: rel.nome, cod: rel.cod, unidade: un, escopoMedico: temPrest ? 'cadastro' : 'todos', ...r });

@@ -38,7 +38,7 @@ function xlsxExtracao(rel) {
 
 /* Excel da conferência cruzada (SOL-F23). Aba principal com o MV lado a lado com o Apolo e a
  * decisão da competência; o técnico (faixa, equivalência, chaves, candidatos) fica em abas à parte.
- * As decisões (NC, considerar no repasse) são tomadas na ferramenta; aqui só aparecem. */
+ * As decisões (NC, aceitar para pagamento) são tomadas na ferramenta; aqui só aparecem. */
 const COR_DECISAO = { nc: 'C6EFCE', considerar: 'E4DFEC', dispensado: 'EDEDED' };
 function xlsxConferencia(res, ctx) {
   const st = s => ({ fill: STATUS_CONF[s].cor });
@@ -71,6 +71,11 @@ function xlsxConferencia(res, ctx) {
   for (const k of ordem) { const s = res.porStatus[k]; R.push([{ v: STATUS_CONF[k].nome, st: { fill: STATUS_CONF[k].cor, b: true } }, s.n, { v: s.vlRepasse, st: { fmt: 'money' } }, { v: s.vlTotal, st: { fmt: 'money' } }]); }
   const tot = ordem.reduce((a, k) => [a[0] + res.porStatus[k].n, a[1] + res.porStatus[k].vlRepasse, a[2] + res.porStatus[k].vlTotal], [0, 0, 0]);
   R.push([{ v: 'TOTAL de registros únicos', st: { b: true, bt: true } }, { v: tot[0], st: { b: true, bt: true } }, { v: r2(tot[1]), st: { b: true, bt: true, fmt: 'money' } }, { v: r2(tot[2]), st: { b: true, bt: true, fmt: 'money' } }]);
+  // SOL-F43: o que a conferência autoriza a pagar.
+  const TC = totaisPorClasse(res.linhas, classeDaLinhaConf);
+  R.push([], cabecalho(['Fechamento (classe)', 'Linhas do MV', 'Vl Repasse', 'Entra no fechamento?']));
+  for (const k of ORDEM_CLASSES) R.push([{ v: CLASSES_FECH[k].nome, st: { fill: CLASSES_FECH[k].cor, b: true } }, TC[k].n, { v: TC[k].valor, st: { fmt: 'money' } }, CLASSES_FECH[k].entra ? 'sim' : 'não']);
+  R.push([{ v: 'VALOR PARA PAGAMENTO (Devido + Aceito)', st: { b: true, bt: true } }, '', { v: TC.pagar, st: { b: true, bt: true, fmt: 'money' } }, '']);
   R.push([], cabecalho(['Decisões na competência', 'Registros']));
   for (const [k, n] of Object.entries(res.porDecisao || {})) R.push([{ v: TIPOS_DECISAO[k], st: { fill: COR_DECISAO[k], b: true } }, n]);
   R.push([{ v: 'Pendentes (sem conferência e sem decisão)', st: { b: true } }, res.linhas.filter(pendente).length]);
@@ -89,7 +94,7 @@ function xlsxConferencia(res, ctx) {
     ['Linhas do MV', res.nMV], ['Procedimentos do MV', res.nProcedimentos], ['Laudos da unidade', res.nLaudosUnidade], ['Laudos no escopo «Só no laudo»', res.nLaudosEscopo], ['Pares formados', res.nPares],
     ['Equivalências validadas usadas (revisão da base)', `${res.eqValidadas} validadas · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
     ['Leitura', '«Conferido» = existe um laudo único e consistente; não prova que o valor está correto. Valores não são critério desta conferência.'],
-    ['Decisões', 'NC e «considerar no repasse» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
+    ['Decisões', 'NC e «aceitar para pagamento» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
   // Técnico: chaves, faixa do par e equivalência usada
   const cabTec = [...cabecalho(['Status', 'Origem', 'Linha MV', 'Chave da linha', 'Página', 'Remessa', 'Conta', 'Atendimento', 'Quant.', '% Repasse', 'Vl Total', 'Tipo de item']),
     ...cabecalho(['Laudo: ID', 'Laudo: linha da planilha', 'Laudo: ID paciente'], AP), ...cabecalho(['Faixa do par', 'Equivalência usada', 'Responsável pela validação'], OBS)];

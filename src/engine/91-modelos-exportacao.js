@@ -7,6 +7,7 @@
  * ============================================================ */
 const TXT = { fmt: 'text' };
 const COLUNAS_EXPORT_CONF = [
+  { id: 'classe', rotulo: 'Classe (fechamento)', grupo: 'sit', larg: 18, valor: x => { const k = classeDaLinhaConf(x); return k ? { v: CLASSES_FECH[k].nome, st: { fill: CLASSES_FECH[k].cor, b: true } } : ''; } },
   { id: 'situacao', rotulo: 'Situação', grupo: 'sit', larg: 22, valor: (x, c, a) => ({ v: STATUS_CONF[x.status].nome, st: { ...a.f, b: true } }) },
   { id: 'decisao', rotulo: 'Decisão na competência', grupo: 'sit', larg: 28, valor: (x, c, a) => ({ v: a.textoDecisao(a.dec), st: a.dec ? { fill: COR_DECISAO[a.dec.tipo], b: true } : {} }) },
   { id: 'paciente', rotulo: 'Paciente', larg: 32, valor: x => x.r?.paciente || x.l?.paciente || '' },
@@ -47,7 +48,7 @@ const COLUNAS_EXPORT_CONF = [
 const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes'];
 const MODELOS_EXPORT_FIXOS = [
   { id: 'padrao', nome: 'Padrão — ordem de quem confere (layout operacional atual)', alvo: 'conferencia', colunas: IDS_PADRAO_CONF, fixo: true },
-  { id: 'completo', nome: 'Completo — padrão + colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: [...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
+  { id: 'completo', nome: 'Completo — padrão + classe do fechamento e colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: ['classe', ...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
 ];
 const colunaExport = id => COLUNAS_EXPORT_CONF.find(c => c.id === id);
 // Colunas válidas do modelo (ids desconhecidos são ignorados; sem colunas válidas, vale o padrão).

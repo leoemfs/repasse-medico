@@ -14,6 +14,7 @@ function registroRodada(res, ctx) {
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
       vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
       kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
+    regraValor: res.tipo === 'conferencia' ? REGRA_VALOR_F43 : undefined,   // SOL-F43: só Devido + Aceito compõem o fechamento
     aceite: null
   };
 }

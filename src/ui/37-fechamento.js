@@ -24,8 +24,8 @@ function marcosFech(chave) {
 function fechamentoAtual() {
   const base = { rodadas: S.rodadas, cfg: S.cfg };
   const ant = competenciaVizinha(S.comp, -1);
-  const anterior = montarFechamento({ ...base, chave: ant, fech: fechDaCompetencia(ant), fluxoComp: S.fluxo.competencias[ant] });
-  return montarFechamento({ ...base, chave: S.comp, decisoes: indiceDecisoesComp(), fluxoComp: S.fluxo.competencias[S.comp], fech: fechDaCompetencia(), anterior });
+  const anterior = montarFechamento({ ...base, chave: ant, decisoes: indiceDecisoesComp(ant), fechada: compFechada(ant), fech: fechDaCompetencia(ant), fluxoComp: S.fluxo.competencias[ant] });
+  return montarFechamento({ ...base, chave: S.comp, decisoes: indiceDecisoesComp(), fechada: compFechada(S.comp), fluxoComp: S.fluxo.competencias[S.comp], fech: fechDaCompetencia(), anterior });
 }
 
 RENDER.fechamento = async () => {
@@ -55,7 +55,9 @@ const inputAjuste = (tipo, x, campo, largura = 80) => `<input type="${campo === 
 // Avisos recolhidos (como na Conferência): o botão mostra quantos; clicar abre a linha de detalhe e clicar de novo fecha.
 FH.abertos = FH.abertos || new Set();
 const chaveAviso = x => `${x.tipo}|${x.cod}`;
-const avisosHtml = x => x.avisos.length ? `<button type="button" class="fh-avisos-bt${FH.abertos.has(chaveAviso(x)) ? ' aberto' : ''}" data-avisos="${esc(chaveAviso(x))}" aria-expanded="${FH.abertos.has(chaveAviso(x))}" title="Mostrar ou esconder os avisos">⚠ ${x.avisos.length} aviso${x.avisos.length > 1 ? 's' : ''} <span class="seta">▸</span></button>` : '';
+// SOL-F43: valor aberto por classe (o que vai para pagamento e o que ficou fora), quando a rodada usa a regra nova.
+const classesHtml = x => x.classes ? `<div class="small muted fh-classes" title="Devido + Aceito = para pagamento. Pendente, NC e Excluído ficam fora do fechamento.">para pagamento R$ ${fmtBR(x.classes.devido + x.classes.aceito)}${x.classes.pend ? ` · <b style="color:var(--warn)">pendente R$ ${fmtBR(x.classes.pend)}</b>` : ''}${x.classes.nc ? ` · NC R$ ${fmtBR(x.classes.nc)}` : ''}${x.classes.excluido ? ` · excluído R$ ${fmtBR(x.classes.excluido)}` : ''} <span>(MV R$ ${fmtBR(x.classes.total)})</span></div>` : '';
+const avisosHtml = x => classesHtml(x) + (x.avisos.length ? `<button type="button" class="fh-avisos-bt${FH.abertos.has(chaveAviso(x)) ? ' aberto' : ''}" data-avisos="${esc(chaveAviso(x))}" aria-expanded="${FH.abertos.has(chaveAviso(x))}" title="Mostrar ou esconder os avisos">⚠ ${x.avisos.length} aviso${x.avisos.length > 1 ? 's' : ''} <span class="seta">▸</span></button>` : '');
 const detAvisos = x => x.avisos.length ? `<tr class="detalhe fh-det" data-det="${esc(chaveAviso(x))}"${FH.abertos.has(chaveAviso(x)) ? '' : ' hidden'}><td colspan="40"><div class="fh-det-corpo"><b>Avisos de ${esc(x.nome)}</b><ul>${x.avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div></td></tr>` : '';
 
 function desenharUSG(corpo, f, mk) {

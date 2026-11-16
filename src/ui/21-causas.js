@@ -14,7 +14,7 @@ function botoesCausa(c, n) {
     case 'convenio': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(mesmo convênio)`, false) + b('nc', 'Registrar NC') + ver;
     case 'data': return b('aceitar', `Aceitar ${c.linhas.length > 1 ? `as ${c.linhas.length} ` : ''}(data dentro do esperado)`, false) + ver;
     case 'composta-falta': { const r0 = (S.eq.compostas || []).find(x => x.id === c.regraId), alt = r0 && modoComposta(r0) === 'juntos' && regraComposta(r0).itens.flatMap(it => it.codigos).length > 1;
-      return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Considerar no repasse') + ver; }
+      return (alt ? b('alternante', 'Tornar a regra alternante (um ou outro) e conferir de novo', false) : '') + b('nc', 'Registrar NC do que falta', !alt) + b('aceitar', 'Aceitar para pagamento') + ver; }
     case 'sl-outro-prestador': return b('corrprest', 'Apontar correção de prestador', false) + b('nc', 'Registrar outra NC') + b('dispensar', 'Dispensar…') + ver;
     case 'sl-nc': return b('nc', 'Registrar NC', false) + b('corrprest', 'É correção de prestador…') + b('dispensar', 'Dispensar (não precisa de lançamento)…') + ver;
     case 'sl-outro-relatorio': return ver + b('dispensar', 'Dispensar (está no relatório do outro médico)…') + b('nc', 'Registrar NC') + b('corrprest', 'Apontar correção de prestador…');
@@ -23,7 +23,7 @@ function botoesCausa(c, n) {
     case 'hm': case 'classificacao': return b('bases', 'Abrir Bases', false) + ver;
     case 'repetida': return b('nc', 'Esta é a repetida → NC', false) + b('aceitar', 'As duas estão certas') + ver;
     case 'nome-semelhante': return b('aceitar', 'É o mesmo paciente', false) + b('nc', 'Não é → NC') + ver;
-    default: return b('nc', 'Registrar NC', false) + b('aceitar', 'Considerar no repasse…') + ver;
+    default: return b('nc', 'Registrar NC', false) + b('aceitar', 'Aceitar para pagamento…') + ver;
   }
 }
 function cartaoCausas(CZ, res) {
@@ -35,9 +35,9 @@ function cartaoCausas(CZ, res) {
     ${CZ.grupos.map((c, n) => item(c, n)).join('')}
     ${CZ.umaUma.length ? `<div class="cz-sep">Uma a uma (${CZ.umaUma.length} linha${CZ.umaUma.length > 1 ? 's' : ''})</div>${CZ.umaUma.slice(0, MAX).map((c, n) => item(c, CZ.grupos.length + n)).join('')}
       ${CZ.umaUma.length > MAX ? `<button class="sec mini" id="czMais">Mostrar as outras ${CZ.umaUma.length - MAX}</button>` : ''}` : ''}
-    <p class="small muted">Decisões de equivalência valem para todos os relatórios (e para a outra pessoa, com a pasta conectada) e a conferência roda de novo sozinha. As de linha (NC, considerar no repasse) ficam na competência, como antes.</p></div>`;
+    <p class="small muted">Decisões de equivalência valem para todos os relatórios (e para a outra pessoa, com a pasta conectada) e a conferência roda de novo sozinha. As de linha (NC, aceitar para pagamento) ficam na competência, como antes.</p></div>`;
 }
-// Considerar no repasse várias linhas de uma vez, com uma justificativa (já sugerida).
+// Aceitar para pagamento várias linhas de uma vez, com uma justificativa (já sugerida).
 async function considerarLinhas(res, idxs, titulo, sugestao) {
   if (!exigirAberta(S.comp, 'registrar decisões')) return false;
   const op = await exigirOperador(); if (!op) return false;
@@ -82,7 +82,7 @@ function ligarCausas(raiz, CZ, res, ctx) {
   if ($('czMais')) $('czMais').onclick = () => { S.conf.umaMais = true; desenharConferencia(); };
   raiz.querySelectorAll('[data-cz]').forEach(b => b.onclick = async () => {
     const c = todas[+b.dataset.cz], ac = b.dataset.cza; let ok = false;
-    if (ac === 'ver') { S.conf.filtroLinhas = { idx: c.linhas, titulo: c.rotulo }; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); return; }
+    if (ac === 'ver') { S.conf.filtroLinhas = { idx: c.linhas, titulo: c.rotulo }; S.conf.aba = 'previa'; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); return; }
     if (ac === 'equivalencias') { location.hash = 'equivalencias'; return; }
     if (ac === 'bases') { location.hash = 'bases'; return; }
     if (ac === 'ncs') { const h = [...$('cfRes').querySelectorAll('.card h2')].find(x => /NC/.test(x.textContent)); h ? h.scrollIntoView({ behavior: 'smooth', block: 'start' }) : (location.hash = 'nc'); return; }

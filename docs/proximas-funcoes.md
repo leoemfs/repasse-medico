@@ -1,10 +1,10 @@
 # Próximas funções — requisitos registrados
 
-**Próxima melhoria urgente: SOL-F43, logo abaixo.** Ela transforma a prévia de conferência na conferência oficial (só Devido + Aceito compõem o fechamento) e consolida a SOL-F42 (NC fora do cálculo e reconferência) e a SOL-F41 (filtros, observação, «Resolvido no MV»).
+**SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
-## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — A FAZER · **URGENTE** (pedido de 13/11/2026)
+## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — **IMPLEMENTADA na v3.0.0-alpha.6** (pedido de 13/11/2026; guia em `como-usar-conferencia-oficial.md`)
 
 **Consolida a SOL-F41 e a SOL-F42** num plano só, e responde à pergunta que estava em aberto: **pendente de análise NÃO compõe o fechamento.**
 

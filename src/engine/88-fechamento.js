@@ -76,7 +76,7 @@ const somaLinhas = (r, campo) => r2(r.linhas.reduce((s, l) => s + (+l[campo] || 
 
 /* Monta o fechamento da competência.
  * ctx: { rodadas, cfg, chave, decisoes (índice), fluxoComp, fech (ajustes/blocos), anterior (fechamento da competência anterior, opcional) } */
-function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior }) {
+function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior, fechada = false }) {
   fech = fech || fechamentoVazio();
   const tol = cfg.fechamento || FECHAMENTO_PADRAO, prestPorCod = new Map(cfg.prestadores.map(p => [String(p.cod), p]));
   const grupos = rodadasDoFechamento(rodadas, chave), linhasPrest = new Map();
@@ -91,13 +91,22 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
   // Valores por unidade a partir das rodadas.
   for (const g of grupos) {
     const x = pegar(g.tipo, g.prestadorCod, g.prestadorNome), r = g.aceita || g.ultima;
+    // SOL-F43: rodada feita a partir da v3.0.0-alpha.6 → só Devido + Aceito (o que a conferência autorizou a pagar).
+    // Rodada anterior (competência já fechada, por exemplo) → total do MV, como era; na competência aberta, avisa.
+    const f43 = usaRegraF43(r), base = f43 ? { linhas: linhasParaPagamento(r, decisoes) } : r;
+    if (f43) {
+      const t = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, decisoes));
+      x.classes = x.classes || Object.fromEntries([...ORDEM_CLASSES, 'total'].map(k => [k, 0]));
+      for (const k of ORDEM_CLASSES) x.classes[k] = r2(x.classes[k] + t[k].valor); x.classes.total = r2(x.classes.total + t.total);
+      if (t.pend.n) x.avisos.push(`${t.pend.n} linha(s) pendente(s) na unidade ${g.unidadeCod} (R$ ${fmtBR(t.pend.valor)}) fora do valor até decidir`);
+    } else x.regraAntiga = true;
     // Na V3 o relatório de USG e o de IMG da mesma unidade somam.
-    x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(r, 'vlRepasse'));
-    if (g.tipo === 'usg' && x.tipo !== 'curitiba') x.producao[g.unidadeCod] = somaLinhas(r, 'vlTotal');
+    x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(base, 'vlRepasse'));
+    if (g.tipo === 'usg' && x.tipo !== 'curitiba') x.producao[g.unidadeCod] = somaLinhas(base, 'vlTotal');
     if ((!g.aceita || g.ultima.em > g.aceita.em) && !x.semAceite.includes(g.unidadeCod)) x.semAceite.push(g.unidadeCod);
     x.decisoes += r.linhas.filter(l => l.decisao).length;
     if (decisoes) x.pendencias += pendenciasDaRodada(r, decisoes).length;
-    x._rodadas = [...(x._rodadas || []), { r, unidade: g.unidadeCod }];
+    x._rodadas = [...(x._rodadas || []), { r, unidade: g.unidadeCod, linhas: base.linhas }];
   }
   // Roster: quem tem regra cadastrada aparece mesmo sem relatório (situação «Sem valores»).
   for (const p of cfg.prestadores) {
@@ -116,7 +125,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     if (x.tipo === 'curitiba') {
       const regra = x.p?.regras?.v3regra, unV3 = Object.keys(x.unidades).filter(u => ehUnidadeV3(cfg, u));
       if (regra && unV3.length) {
-        const linhas = (x._rodadas || []).filter(y => ehUnidadeV3(cfg, y.unidade)).flatMap(y => y.r.linhas);
+        const linhas = (x._rodadas || []).filter(y => ehUnidadeV3(cfg, y.unidade)).flatMap(y => y.linhas || y.r.linhas);
         x.v3 = calcularV3(regra, linhas);
         unV3.forEach((u, i) => { x.unidades[u] = i ? 0 : x.v3.total; });
         x.avisos.push(...avisosV3(x.v3));
@@ -138,6 +147,7 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     x.totalGeral = r2(x.total - x.descontos);
     if (parc.length) x.avisos.push(`desconto parcelado: ${parc.map(p => p.obs).join('; ')}${x.descontosManual ? ` (valor alterado à mão: R$ ${fmtBR(x.descontos)} no lugar de R$ ${fmtBR(x.descontosAuto)})` : ''}`);
     if (x.temValores && x.totalGeral < 0) { x.avisos.push(`desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)})`); alertasDescontos.push({ k: 'maior', cod: x.cod, tipo: x.tipo, texto: `${x.nome}: desconto (R$ ${fmtBR(x.descontos)}) maior que o repasse do mês (R$ ${fmtBR(x.total)}).` }); }
+    if (x.regraAntiga && !fechada) x.avisos.push('valor pela regra antiga (total do MV): confira de novo o relatório para valer só o Devido + Aceito');
     // Situação
     const d = [doc(x.tipo, x.cod)].filter(Boolean);
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
