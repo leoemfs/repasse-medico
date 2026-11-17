@@ -66,8 +66,9 @@ function estruturaCompetencia(chave) {
   const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
   for (const g of ['USG', 'IMG']) for (const u of normais) cam.push([...base, PASTA_REL, G[g], un(u)]);
   if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_REL, { nome: 'Curitiba', re: /^(CURITIBA|V3)/ }]);
-  // Correção de prestador vale para todas as unidades, inclusive Curitiba (V3): o fluxo de Curitiba também tem correção.
-  for (const u of uns) cam.push([...base, PASTA_CORR, un(u)]);
+  // Correção de prestador: uma pasta só, sem subpastas por unidade (pedido de 17/11/2026). Os arquivos ficam organizados pelo
+  // nome, «nome_unidade» (ex.: «prestador generico_17.pdf» ou «…_Cambe.pdf»); subpastas que já existam continuam sendo lidas.
+  cam.push([...base, PASTA_CORR]);
   cam.push([...base, PASTA_CONF], [...base, PASTA_NC]);
   return cam;
 }
@@ -103,7 +104,21 @@ async function* arquivosEm(dir, rel = '') {
   }
 }
 const unidadeDoNomePasta = n => (norm(n).match(/^(?:UNIDADE |UN )?(\d+)\b/) || [])[1] || '';
-async function atualizarDaPasta({ silencioso = false } = {}) {
+/* Unidade de um PDF da Correção de prestador pelo nome do arquivo «nome_unidade»: o que vem depois do último «_» é o código
+ * da unidade (17, «Unidade 17», «un17») ou parte do nome dela (Cambé, Arapongas…). Sem isso, vale «unidade N» em qualquer
+ * parte do nome e, por fim, a subpasta (organização antiga). */
+function unidadeDoArquivoCorrecao(nomeArq, pastaPai = '') {
+  const base = String(nomeArq).replace(/\.pdf$/i, ''), fim = norm(base.includes('_') ? base.slice(base.lastIndexOf('_') + 1) : '');
+  if (fim) {
+    const cod = (fim.match(/^(?:UNIDADE ?|UN ?)?(\d+)$/) || [])[1];
+    if (cod && unidadePorCod(S.cfg, cod)) return cod;
+    const porNome = S.cfg.unidades.filter(u => [u.nome, ...(u.apolo || [])].some(n => { const k = norm(n); return k && (k.includes(fim) || fim.includes(k)); }));
+    if (porNome.length === 1) return String(porNome[0].cod);
+  }
+  return unidadeSugeridaPeloArquivo(nomeArq) || unidadeDoNomePasta(pastaPai);
+}
+// so: 'conferencia' ou 'correcao' lê só aquela pasta (botão «Sincronizar pasta» de cada aba), sem as planilhas e a outra pasta.
+async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
   if (!SY.handle || SY.legado) { if (!silencioso) avisar('Conecte a pasta raiz do aplicativo no Início.', 'warn'); return null; }
   if (PR.lendo) return null;
   if (!(await temPermissaoPasta(!silencioso))) { if (!silencioso) avisar('O acesso à pasta não foi liberado.', 'warn'); return null; }
@@ -111,8 +126,8 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
   try {
     const comp = nomeCompPasta(S.comp), dC = await dirCompetencia(S.comp);
     // Planilhas do mês: Bases de dados › Comp_MM-AAAA ou PLANILHAS-… dentro da pasta do mês (vale a mais recente de cada tipo).
-    const dirsPl = [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
-    if (dirsPl.length) {
+    const dirsPl = so ? [] : [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
+    if (so) { /* só a pasta da aba */ } else if (dirsPl.length) {
       const pl = { apolo: null, pbi: null };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
         if (!/\.xlsx$/i.test(h.name)) continue;
@@ -128,13 +143,14 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
     } else r.avisos.push(`sem planilhas em Bases de dados › ${comp}`);
     // Relatórios: pasta do mês › Relatórios para conferência (RELATORIOS-MV-CONFERENCIA) | Correção de prestador.
     if (!dC) r.avisos.push(`sem a pasta Competências › ${comp}`);
-    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']]) {
+    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
       const d = await subpasta(dC, pasta); if (!d) continue;
       for await (const { h, caminho: c } of arquivosEm(d)) {
         if (!/\.pdf$/i.test(h.name)) continue;
         const partes = c.split('/'); r.pdfs++;
         const grupo = finalidade === 'correcao' ? '' : grupoDaPasta(partes[0]);
-        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : unidadeDoNomePasta(partes.length > 1 ? partes[partes.length - 2] : '');
+        const pai = partes.length > 1 ? partes[partes.length - 2] : '';
+        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDoNomePasta(pai);
         const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${pasta.nome}/${c}`;
         // PDF que a pessoa mandou ignorar (ex.: de outra produção): não pergunta de novo enquanto o arquivo não mudar.
         if (pdfIgnorado(k, sig)) { r.ignorados = (r.ignorados || 0) + 1; continue; }
@@ -155,7 +171,8 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
     PR.ultima = { em: Date.now(), ...r };
   } catch (e) { r.avisos.push(e.message); if (!silencioso) avisar(`Erro ao ler a pasta (${e.message}).`, 'err'); }
   finally { PR.lendo = false; }
-  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
+  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';
+  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}${ondeSo}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
   if (r.mudaram) avisar(`${r.mudaram} relatório(s) mudaram desde a última leitura: rode a conferência deles de novo.`, 'warn');
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
   return r;
@@ -221,11 +238,8 @@ async function checarEqPasta() {
   if (!SY.handle || SY.legado || SYQ.ocupado || SYQ.status === 'permissao') return;
   try { const f = await (await (await dirEq()).getFileHandle(ARQ_EQ)).getFile(); if (f.lastModified !== SYQ.lm) sincronizarEq(); } catch (e) { if (e.name === 'NotFoundError') sincronizarEq(); }
 }
-// Toda gravação da base de equivalências agenda a sincronização.
+// Gravação usada pela própria sincronização (não agenda outra). As da tela usam salvarEq (00-base.js).
 const gravarEqLocal = () => { if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador.', 'err'); };
-const _salvarEq = salvarEq;
-let syncEqAgendada = 0;
-salvarEq = function (msg = '') { _salvarEq(msg); if (SY.handle && !SY.legado && SYQ.status !== 'permissao') { clearTimeout(syncEqAgendada); syncEqAgendada = setTimeout(() => sincronizarEq(), 800); } };
 function barraEq() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="eqSync"><span class="sy-dot"></span><b>Equivalências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo no Início para dividir as validações com a outra pessoa.</span></div>`;
   const ult = SYQ.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYQ.meta.atualizadoPor || '—')}</b> em ${new Date(SYQ.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
@@ -255,7 +269,7 @@ function cartaoPastaRaiz() {
 }
 function ligarPastaRaiz() {
   if ($('prConectar')) $('prConectar').onclick = () => escolherPastaSync();
-  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await atualizarDaPasta(); } else avisar('O acesso à pasta não foi liberado.', 'warn'); };
+  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await liberarPastaSync()) await atualizarDaPasta(); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
   if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
@@ -269,10 +283,9 @@ function ligarPastaRaiz() {
     PRI.verifComp = S.comp; verificarEstrutura(S.comp).then(v => { PRI.verif = v; if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }).catch(() => {});
   }
 }
-const _renderInicio = RENDER.inicio;
-RENDER.inicio = (...a) => {
-  const r = _renderInicio(...a), pg = $('pag-inicio');
-  const alvo = pg?.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
+// Chamado por RENDER.inicio (10-inicio.js), depois do resto do Início.
+function complementoInicioPastaRaiz() {
+  const pg = $('pag-inicio'); if (!pg) return;
+  const alvo = pg.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
   if (html) { alvo ? alvo.insertAdjacentHTML('afterend', html) : pg.insertAdjacentHTML('afterbegin', html); ligarPastaRaiz(); }
-  return r;
-};
+}

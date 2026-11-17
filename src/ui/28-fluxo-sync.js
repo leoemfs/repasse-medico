@@ -29,12 +29,6 @@ async function temPermissaoPasta(pedir = false) {
   if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') return true;
   return pedir && h.requestPermission ? await h.requestPermission({ mode: 'readwrite' }) === 'granted' : false;
 }
-async function definirPastaSync(handle) {
-  SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); if (typeof SYQ !== 'undefined') { SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off'; }
-  if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
-  iniciarTimerSync();
-  if (handle) { await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } else { SY.status = 'off'; atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }
-}
 async function escolherPastaSync() {
   if (!suportaPasta()) return avisar('Este navegador não grava em pastas. Use o Edge ou o Chrome no computador.', 'warn');
   const op = await exigirOperador(); if (!op) return;
@@ -44,9 +38,6 @@ async function escolherPastaSync() {
     await definirPastaSync(h); avisar(`Pasta raiz «${h.name}» conectada: Fluxo, equivalências e relatórios passam a usar as subpastas dela.`, 'ok');
   }
   catch (e) { if (e.name !== 'AbortError') avisar(`Não foi possível usar a pasta (${e.message}).`, 'err'); }
-}
-async function restaurarPastaSync() {
-  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.legado = ehPastaLegadaFluxo(h); SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') { await sincronizarFluxo(); await sincronizarEq(); if (S.cfg.parametros.lerPastaAoAbrir !== false) atualizarDaPasta({ silencioso: true }); } else atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } } catch (e) { /* sem pasta guardada */ }
 }
 
 // Lê a pasta, mescla com a versão local e grava o resultado. interativo: pode abrir o diálogo de conflitos.
@@ -97,20 +88,7 @@ async function resolverConflitosFluxo(conflitos, remoto) {
       <label class="small"><input type="radio" name="c${i}" value="remoto"> A de ${esc(quem)}: ${esc(resumoValorFluxo(c.remoto))}</label></div>`).join('')}`, [['', 'Decidir depois', 'sec'], ['ok', 'Aplicar escolhas']]);
   return r.botao === 'ok' ? conflitos.map((c, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local') : null;
 }
-function iniciarTimerSync() {
-  clearInterval(SY.timer); if (!SY.handle) return;
-  SY.timer = setInterval(async () => {
-    if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
-    try { if (typeof checarEqPasta === 'function') checarEqPasta(); const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
-    catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
-    atualizarBarraSync();
-  }, 30000);
-}
 
-// Toda gravação do Fluxo agenda a sincronização (sem esperar).
-const gravarFluxoLocal = salvarFluxo;
-let syncAgendada = 0;
-salvarFluxo = function (msg = '') { gravarFluxoLocal(msg); if (SY.handle && SY.status !== 'permissao') { clearTimeout(syncAgendada); syncAgendada = setTimeout(() => sincronizarFluxo(), 800); } };
 
 /* ---------- Barra de sincronização ---------- */
 function barraSync() {
@@ -129,7 +107,7 @@ function ligarBarraSync(raiz) {
     const a = b.dataset.sy;
     if (a === 'escolher') return escolherPastaSync();
     if (a === 'desconectar') { if (await confirmar('Desconectar da pasta?', 'O Fluxo continua neste navegador; a pasta e o arquivo não são apagados.', 'Desconectar')) definirPastaSync(null); return; }
-    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); return; } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
+    if (a === 'liberar') { if (await liberarPastaSync() && (location.hash === '#inicio' || !location.hash)) RENDER.inicio(); return; }
     sincronizarFluxo({ interativo: true });
   });
 }
@@ -204,12 +182,11 @@ document.addEventListener('click', e => {
 });
 
 // Fluxo: barra de sincronização e divisão no topo do acompanhamento.
-const _desenharAcompanhamento = desenharAcompanhamento;
-desenharAcompanhamento = function () {
-  _desenharAcompanhamento();
+// Chamado por desenharAcompanhamento (25-fluxo.js).
+function barraSyncAcompanhamento() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
   c.insertAdjacentHTML('afterbegin', barraSync()); ligarBarraSync(c);
-};
+}
 // Subaba «Divisão do trabalho»: barra de sincronização + quadro unidade × grupo + últimas mudanças.
 function desenharDivisaoFluxo() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
@@ -217,12 +194,11 @@ function desenharDivisaoFluxo() {
   ligarBarraSync(c); if (comp) ligarDivisao(c, comp);
 }
 // Prestadores por unidade e Conferência: aviso da divisão.
-const _desenharControleUnidade = desenharControleUnidade;
-desenharControleUnidade = async function () {
-  await _desenharControleUnidade();
+// Chamado por desenharControleUnidade (22-prestadores-unidade.js).
+function avisoDivisaoControle() {
   const alvo = document.querySelector('#pag-conferencia .cu-res'); if (!alvo || !CU.unidade || !CU.grupo) return;
   alvo.insertAdjacentHTML('beforebegin', avisoDivisao(CU.unidade, CU.grupo));
-};
+}
 document.addEventListener('change', e => {
   if (e.target.id !== 'cfUn' && e.target.id !== 'cfRel') return;
   document.querySelectorAll('#pag-conferencia .dv-aviso').forEach(x => x.remove());

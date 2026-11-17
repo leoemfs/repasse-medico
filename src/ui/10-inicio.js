@@ -1,7 +1,9 @@
 /* ============================================================
  * Início: arquivos da sessão (carregados uma vez, usados por todas as análises)
  * ============================================================ */
-RENDER.inicio = () => {
+// Complementos explícitos (P2, v3.0.0-alpha.11): o cartão da pasta raiz entra aqui, não por redefinição em outro arquivo.
+RENDER.inicio = () => { desenharInicio(); complementoInicioPastaRaiz(); };
+function desenharInicio() {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
   $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}${painelControleUnidade()}
   <div class="card">

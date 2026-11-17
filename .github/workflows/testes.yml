@@ -1,0 +1,41 @@
+# Testes a cada envio (P2 da auditoria de 16/11/2026): os que não dependem da pasta dados/ (arquivos reais de pacientes,
+# que nunca vão para o GitHub). Os arquivos de teste são fictícios e gerados nos próprios testes.
+name: Testes
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # o teste do site (pwa) monta as versões anteriores a partir do histórico
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Dependências dos testes (Playwright com Chromium e openpyxl)
+        run: |
+          npm install --no-save --no-package-lock playwright@1.63.0
+          npx playwright install --with-deps chromium
+          pip install openpyxl
+      - name: Testes
+        run: node tools/testes.mjs
+      - name: Telas e planilhas dos testes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: saida-dos-testes
+          path: test/saida/
+          retention-days: 7
+          if-no-files-found: ignore

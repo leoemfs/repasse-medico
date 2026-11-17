@@ -19,7 +19,7 @@ async function sincronizarCfg({ interativo = false } = {}) {
   if (cfgSemSalvar()) {
     if (!interativo) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
     if (!await confirmar('Alterações não salvas', 'A configuração tem alterações que ainda não foram salvas. Salvar agora e sincronizar com a pasta?', 'Salvar e sincronizar')) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
-    salvarCfgSemSync('Configuração salva.');
+    gravarCfgLocal('Configuração salva.');
   }
   SYC.ocupado = true;
   try {
@@ -71,16 +71,6 @@ async function checarCfgPasta() {
   if (SYC.status === 'edicao' && !cfgSemSalvar()) SYC.status = 'ok';
   try { const f = await (await (await dirCfg()).getFileHandle(ARQ_CFG)).getFile(); if (f.lastModified !== SYC.lm) sincronizarCfg(); } catch (e) { if (e.name === 'NotFoundError') sincronizarCfg(); }
 }
-// Toda gravação da configuração agenda a sincronização.
-const salvarCfgSemSync = salvarCfg;
-let syncCfgAgendada = 0;
-salvarCfg = function (...a) { salvarCfgSemSync(...a); if (SY.handle && !SY.legado && SYC.status !== 'permissao') { clearTimeout(syncCfgAgendada); syncCfgAgendada = setTimeout(() => sincronizarCfg(), 800); } };
-const _checarEqPastaCfg = checarEqPasta;
-checarEqPasta = async function () { _checarEqPastaCfg(); checarCfgPasta(); };
-const _definirPastaSyncCfg = definirPastaSync;
-definirPastaSync = async function (h) { await _definirPastaSyncCfg(h); if (h) await sincronizarCfg({ interativo: true }); else { SYC.status = 'off'; } };
-const _restaurarPastaSyncCfg = restaurarPastaSync;
-restaurarPastaSync = async function () { await _restaurarPastaSyncCfg(); if (SY.handle && SY.status === 'ok') await sincronizarCfg(); };
 
 const TXT_SYNC = { ok: 'sincronizada', permissao: 'acesso precisa ser liberado', erro: 'sem acesso', conflito: 'mudanças dos dois para escolher', edicao: 'alterações não salvas (sincroniza ao salvar)', off: 'só neste navegador' };
 function barraCfg() {

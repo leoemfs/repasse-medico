@@ -44,7 +44,28 @@ Os dois foram reproduzidos por teste. Escrever um teste para cada um junto com a
 - **Excel lento sem retorno.** O botão chama `entregarArquivo` direto: 30 mil linhas levam 2,2 s para montar e 4,4 s para gerar, com a tela congelada. Mostrar «Processando…» e oferecer «exportar só o filtrado».
 - **Escopo do «Só no laudo».** Usar o médico do prestador como padrão quando houver cadastro, para reduzir o ruído e o volume de candidatos.
 
-## P2
+## P2 — **FEITOS na v3.0.0-alpha.11**
+
+**Como ficou:**
+- **Pior caso da conferência.** Nesta máquina, 3.000 linhas × 30 mil laudos com homônimos caiu de 14,9 s para ~2 s, com resultado idêntico (assinatura em `test/bench_pior_caso.mjs`; as do `bench_motor` também não mudaram).
+  - Cache em `norm`, `chaveTitulo` e `nivelNome`.
+  - `avaliarProcedimento` memorizado no índice da conferência, por código, título, unidade, modalidade e convênio.
+  - Convênio comparado uma vez por candidato.
+  - Na prática, o cache cobre o «guardar a chave do título e o convênio normalizado no laudo».
+- **Expressões regulares.** `classificarItem` compila cada padrão uma vez (cache por padrão).
+- **Funções redefinidas.**
+  - Nenhum arquivo redefine mais função de outro.
+  - Cada tela chama os complementos explicitamente: Início + pasta raiz, Conferência + Prestadores por unidade, Equivalências + barra, Bases + abas, Fluxo + barra, Controle + aviso da divisão. O `97-decoracoes.js` saiu.
+  - `salvarCfg`, `salvarEq` e `salvarFluxo` gravam e chamam `agendarSincronizacao`. A sincronização e a restauração usam `gravarCfgLocal`, `gravarEqLocal` e `gravarFluxoLocal`.
+  - A orquestração das três sincronizações está num módulo só (`src/ui/29c-sincronizacao.js`): agendar, sincronizar tudo, liberar acesso (os três botões fazem o mesmo; antes, o do Início e o do Fluxo não sincronizavam a configuração), conectar, restaurar ao abrir e o relógio de checagem.
+- **Equivalências.** A tela não grava mais ao abrir. A cobertura por regra composta é aplicada em `salvarEq`, e uma vez ao carregar a base gravada por versões anteriores.
+- **Testes.**
+  - `test/ponta_a_ponta_ficticio.mjs`: Início, conferência, decisões, NCs, aceite, correção, fechamento e Excel, com PDF e planilha fictícios gerados no teste.
+  - `tools/testes.mjs` roda tudo o que não precisa de `dados/`.
+  - `.github/workflows/testes.yml` roda o mesmo no GitHub a cada envio e guarda as telas e planilhas dos testes.
+  - Continuam dependendo de `dados/` (rodar localmente) os testes que conferem números dos arquivos reais.
+
+### Lista original
 
 - **Pior caso da conferência: 6,8 s** (30 mil laudos, muitos homônimos). O perfil mostrou `simToken` e `norm` repetidos. Guardar a chave do título e o convênio normalizado no laudo ao ler o Apolo, e memorizar `avaliarProcedimento` por (código, título, modalidade, convênio). As regras não mudam.
 - **Funções redefinidas por arquivos posteriores.** `salvarCfg`, `salvarEq`, `salvarFluxo`, `restaurarPastaSync` (envolvida 3 vezes) e `RENDER.*` são substituídas em outros arquivos. Trocar por ganchos explícitos e juntar as três sincronizações (Fluxo, Equivalências, Configuração) num módulo só.

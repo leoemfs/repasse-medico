@@ -7,7 +7,14 @@ const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Des
 const TIPOS_EQ = { titulo: 'Validada por título', descricao: 'Validada por descrição/contexto', exata: 'Exata (mesmo código)' };
 
 // Chave de título: normalizado, com sufixo administrativo final -OP/-HM opcional.
-const chaveTitulo = t => norm(t).replace(/\s+(OP|HM)$/, '').trim();
+// P2: com cache (títulos se repetem em todas as linhas e candidatos).
+const _cacheChaveTitulo = new Map();
+const chaveTitulo = t => {
+  if (typeof t !== 'string') return norm(t).replace(/\s+(OP|HM)$/, '').trim();
+  let v = _cacheChaveTitulo.get(t); if (v !== undefined) return v;
+  if (_cacheChaveTitulo.size > 100000) _cacheChaveTitulo.clear();
+  v = norm(t).replace(/\s+(OP|HM)$/, '').trim(); _cacheChaveTitulo.set(t, v); return v;
+};
 
 function eqVazia() {
   return { schema: SCHEMA_EQ, versaoSchema: 1, revisao: 0, atualizadoEm: agoraISO(), itens: [], compostas: [], catalogoTitulos: [], catalogoTUSS: [] };
@@ -205,7 +212,16 @@ function parteDoExame(idx, c, l, unidade = '') {
 }
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
  * Resultado: validada · conflito · pendente · divergente (código tem validação, título não) · sem-cadastro */
-function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
+// P2: memorizado no índice (que vive uma conferência): mesmo código, título, unidade, modalidade e convênio dão o mesmo
+// resultado. O objeto devolvido é compartilhado entre as linhas e só é lido.
+function avaliarProcedimento(idx, codigo, titulo, opc = {}) {
+  const { unidade = '', modalidade = '', convenio = '' } = opc;
+  const c = idx.cacheAval || (idx.cacheAval = new Map()), k1 = `${codigo}\u0001${unidade}\u0001${modalidade}\u0001${convenio}`;
+  let m = c.get(k1); if (!m) c.set(k1, m = new Map());
+  let v = m.get(titulo); if (v === undefined) { v = _avaliarProcedimento(idx, codigo, titulo, unidade, modalidade, convenio); m.set(titulo, v); }
+  return v;
+}
+function _avaliarProcedimento(idx, codigo, titulo, unidade, modalidade, convenio) {
   const kt = chaveTitulo(titulo);
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
   // Regra composta validada para o título: vale por cima das relações simples (SOL-F5). Título da lista

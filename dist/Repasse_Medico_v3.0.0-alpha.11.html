@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.10</title>
+<title>Repasse Médico v3.0.0-alpha.11</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -294,7 +294,13 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cu-outros{border:1px dashed var(--line);border-radius:10px;padding:6px 10px;margin-top:10px}
 .cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
 .cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
-.fh-ctl{margin-bottom:8px}
+.fh-ctl{margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 12px}
+.fh-ctl>summary{cursor:pointer;padding:10px 0;list-style:revert}
+.fh-ctl[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+.fh-ctl .aviso-fixo{margin:6px 0}
+.bolinha{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--err);font-size:12px;font-weight:700;vertical-align:middle;color:var(--card)}
+.bolinha.warn{background:var(--warn)}
+.fh-ctl[open] .bolinha{opacity:.55}
 /* SOL-F36 — Fluxo sincronizado e divisão do trabalho */
 .sy-barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;border:1px solid var(--line)}
 .sy-barra.ok{background:var(--okbg);border-color:var(--ok)}.sy-barra.warn{background:var(--warnbg);border-color:var(--warn)}.sy-barra.off{background:var(--card)}
@@ -412,7 +418,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.10 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.11 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
@@ -463,7 +469,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.10';
+const MOTOR_VERSAO = '3.0.0-alpha.11';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -485,8 +491,16 @@ function fixMojibake(s) {
 }
 
 // Forma de comparação: sem acento, maiúsculas, só letras/dígitos e espaços simples.
-const norm = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase()
+// v3.0.0-alpha.11 (P2): com cache — os mesmos nomes, títulos e convênios são normalizados milhares de vezes por conferência.
+const _normBruto = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase()
   .replace(/[^A-Z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const _cacheNorm = new Map();
+const norm = s => {
+  if (typeof s !== 'string' || s.length > 300) return _normBruto(s);
+  let v = _cacheNorm.get(s); if (v !== undefined) return v;
+  if (_cacheNorm.size > 200000) _cacheNorm.clear();
+  v = _normBruto(s); _cacheNorm.set(s, v); return v;
+};
 
 const PARTICULAS = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'E']);
 // Tokens e semelhança entre tokens ficam em cache (os mesmos nomes e sobrenomes se repetem milhares de vezes
@@ -534,9 +548,17 @@ function nomeSemelhanca(a, b) {
  *  3 = idêntico · 2 = um é prefixo do outro (truncamento) · 1 = apenas semelhante · 0 = diferente.
  * Prefixo no meio de palavra só vale quando o nome mais curto tem pelo menos `minTrunc` caracteres,
  * que é o caso de truncamento por largura de coluna. */
+// P2: resultado em cache por par (com homônimos, o mesmo par de nomes se repete centenas de vezes).
+const _cacheNivel = new Map(); let _nCacheNivel = 0;
 function nivelNome(a, b, minTrunc = 20) {
   if (!a || !b) return 0;
   if (a === b) return 3;
+  const ka = minTrunc === 20 ? a : `${minTrunc}\u0001${a}`;
+  let m = _cacheNivel.get(ka); if (!m) { if (_nCacheNivel > 300000) { _cacheNivel.clear(); _nCacheNivel = 0; } _cacheNivel.set(ka, m = new Map()); }
+  let v = m.get(b); if (v === undefined) { v = _nivelNome(a, b, minTrunc); m.set(b, v); _nCacheNivel++; }
+  return v;
+}
+function _nivelNome(a, b, minTrunc) {
   const [c, l] = a.length <= b.length ? [a, b] : [b, a];
   if (l.startsWith(c) && (l[c.length] === ' ' || c.length >= minTrunc) && tokensNome(c).length >= 2) return 2;
   // Mesmo nome sem as partículas (ex.: MV «DAMARIS VIEIRA DE MATTOS» × Apolo «DAMARIS VIEIRA MATTOS»): mesma pessoa,
@@ -583,7 +605,7 @@ function indiceNomes(itens, diaDe, pnDe) {
 
 // Convênio: o MV costuma truncar; compatível se um for prefixo do outro.
 function convenioCompativel(a, b) {
-  const x = norm(a).replace(/\s*$/, ''), y = norm(b);
+  const x = norm(a), y = norm(b);   // norm já tira o espaço do fim
   if (!x || !y) return null;
   return x === y || y.startsWith(x) || x.startsWith(y);
 }
@@ -1194,12 +1216,20 @@ function registrarFaturistas(cfg, nomes, origem) {
 }
 
 /* ---------- Classificação do tipo de item (RN-199) ---------- */
+// P2: cada padrão é compilado uma vez (antes, a cada linha do relatório). Padrão inválido fica em cache como null.
+const _cacheRegex = new Map();
+function regexClassificacao(padrao) {
+  if (_cacheRegex.has(padrao)) return _cacheRegex.get(padrao);
+  let re = null; try { re = new RegExp(padrao); } catch (e) { re = null; }
+  if (_cacheRegex.size > 1000) _cacheRegex.clear();
+  _cacheRegex.set(padrao, re); return re;
+}
 function classificarItem(reg, regras) {
   const campos = { grupo: norm(reg.grupoNome), descricao: norm(reg.procDesc), codigo: String(reg.codigo) };
   for (const r of regras) {
     if (!r.ativa) continue;
     const alvo = campos[r.campo]; if (alvo === undefined) continue;
-    let re; try { re = new RegExp(r.padrao); } catch (e) { continue; }
+    const re = regexClassificacao(r.padrao); if (!re) continue;
     if (re.test(alvo)) return { tipo: r.tipo, regra: r.id };
   }
   return { tipo: 'desconhecido', regra: '' };
@@ -1754,7 +1784,14 @@ const STATUS_EQ = { validada: 'Validada', pendente: 'Pendente', desativada: 'Des
 const TIPOS_EQ = { titulo: 'Validada por título', descricao: 'Validada por descrição/contexto', exata: 'Exata (mesmo código)' };
 
 // Chave de título: normalizado, com sufixo administrativo final -OP/-HM opcional.
-const chaveTitulo = t => norm(t).replace(/\s+(OP|HM)$/, '').trim();
+// P2: com cache (títulos se repetem em todas as linhas e candidatos).
+const _cacheChaveTitulo = new Map();
+const chaveTitulo = t => {
+  if (typeof t !== 'string') return norm(t).replace(/\s+(OP|HM)$/, '').trim();
+  let v = _cacheChaveTitulo.get(t); if (v !== undefined) return v;
+  if (_cacheChaveTitulo.size > 100000) _cacheChaveTitulo.clear();
+  v = norm(t).replace(/\s+(OP|HM)$/, '').trim(); _cacheChaveTitulo.set(t, v); return v;
+};
 
 function eqVazia() {
   return { schema: SCHEMA_EQ, versaoSchema: 1, revisao: 0, atualizadoEm: agoraISO(), itens: [], compostas: [], catalogoTitulos: [], catalogoTUSS: [] };
@@ -1952,7 +1989,16 @@ function parteDoExame(idx, c, l, unidade = '') {
 }
 /* Avalia se o título do laudo sustenta o código TUSS do MV (RN-192, RN-198).
  * Resultado: validada · conflito · pendente · divergente (código tem validação, título não) · sem-cadastro */
-function avaliarProcedimento(idx, codigo, titulo, { unidade = '', modalidade = '', convenio = '' } = {}) {
+// P2: memorizado no índice (que vive uma conferência): mesmo código, título, unidade, modalidade e convênio dão o mesmo
+// resultado. O objeto devolvido é compartilhado entre as linhas e só é lido.
+function avaliarProcedimento(idx, codigo, titulo, opc = {}) {
+  const { unidade = '', modalidade = '', convenio = '' } = opc;
+  const c = idx.cacheAval || (idx.cacheAval = new Map()), k1 = `${codigo}\u0001${unidade}\u0001${modalidade}\u0001${convenio}`;
+  let m = c.get(k1); if (!m) c.set(k1, m = new Map());
+  let v = m.get(titulo); if (v === undefined) { v = _avaliarProcedimento(idx, codigo, titulo, unidade, modalidade, convenio); m.set(titulo, v); }
+  return v;
+}
+function _avaliarProcedimento(idx, codigo, titulo, unidade, modalidade, convenio) {
   const kt = chaveTitulo(titulo);
   if (!kt) return { estado: 'sem-titulo', motivo: 'Laudo sem TITLE' };
   // Regra composta validada para o título: vale por cima das relações simples (SOL-F5). Título da lista
@@ -5231,17 +5277,24 @@ function registrarAlteracaoBase(motivo, tipo) {
   if (!motivo || !S.compReg) return;
   registrarAlteracao(S.compReg, S.comp, S.operador, tipo || tipoDaAlteracao(motivo), motivo); salvarCompReg();
 }
-function salvarCfg(motivo = '', tipo = '') {
+// P2 (v3.0.0-alpha.11): salvar = gravar neste navegador + agendar a sincronização com a pasta (29c-sincronizacao.js).
+// A própria sincronização e a restauração usam só o gravar*Local, para não agendar de novo.
+function salvarCfg(motivo = '', tipo = '') { gravarCfgLocal(motivo, tipo); agendarSincronizacao('cfg'); }
+function gravarCfgLocal(motivo = '', tipo = '') {
   registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
 }
 function salvarEq(motivo = '') {
+  // P2 (v3.0.0-alpha.11): relações resolvidas por regra composta validada ficam «cobertas» ao GRAVAR (antes, a tela de
+  // Equivalências fazia isso — e gravava — só por abrir).
+  aplicarCobertas(S.eq, S.operador, S.comp);
   registrarAlteracaoBase(motivo, 'equivalencias');
   if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador. Exporte o JSON para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
   atualizarNavPendencias();
+  agendarSincronizacao('eq');
 }
 // Cópia de segurança antes de substituir uma base inteira (RN-215).
 // v3.0: a base inteira vai ser trocada (backup, desfazer, substituir): a próxima sincronização com a pasta compara
@@ -5682,7 +5735,9 @@ function ligarPlanilhasGuardadas(raiz) {
 /* ============================================================
  * Início: arquivos da sessão (carregados uma vez, usados por todas as análises)
  * ============================================================ */
-RENDER.inicio = () => {
+// Complementos explícitos (P2, v3.0.0-alpha.11): o cartão da pasta raiz entra aqui, não por redefinição em outro arquivo.
+RENDER.inicio = () => { desenharInicio(); complementoInicioPastaRaiz(); };
+function desenharInicio() {
   const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
   $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}${painelControleUnidade()}
   <div class="card">
@@ -6055,9 +6110,21 @@ const FAIXA = { 1: 'validada · mesma data', 2: 'validada · data na tolerância
 // Finalidade do PDF: o do prestador genérico vai para a Correção; os demais, para a Conferência.
 const finalidadePadrao = rel => String(rel.cab.prestadorCod) === String(S.cfg.parametros.prestadorGenerico || '2') ? 'correcao' : 'conferencia';
 const relatoriosPara = prefixo => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) === (prefixo === 'co' ? 'correcao' : 'conferencia'));
+/* Pedido de 17/11/2026: cada aba sincroniza só a pasta dela, sem reler tudo — Conferência lê «Relatórios para conferência»;
+ * Correção de prestador lê «Correção de prestador». Só aparece com a pasta raiz conectada. */
+function botaoSyncPasta(prefixo) {
+  if (!pastaConectadaConf()) return '';
+  const so = prefixo === 'co' ? 'correcao' : 'conferencia', nome = so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome;
+  return `<button class="sec" data-syncpasta="${so}" title="Lê só «${esc(nome)}» da competência ${esc(rotuloCompetencia(S.comp))}: PDFs novos ou que mudaram">Sincronizar pasta</button>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-syncpasta]'); if (!b) return;
+  const so = b.dataset.syncpasta;
+  comProcessando(b, async () => { await atualizarDaPasta({ so }); (so === 'correcao' ? RENDER.correcao : RENDER.conferencia)(); }, 'a leitura da pasta');
+});
 function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
-  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
 }
 // Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
 const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };
@@ -6116,12 +6183,14 @@ function cartaoOutraCompetencia(x, nome) {
   return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
 }
 
-RENDER.conferencia = () => {
+// Subaba «Prestadores por unidade» e as abas do topo (22-prestadores-unidade.js) entram aqui, explicitamente (P2).
+RENDER.conferencia = () => { if (CU.sub === 'unidades') return desenharControleUnidade(); desenharPaginaConferencia(); complementoConferenciaUnidades(); };
+function desenharPaginaConferencia() {
   const p = $('pag-conferencia');
-  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
+  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos('cf'); return; }
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
-    <div class="acoes"><button id="cfRodar">Executar conferência</button><span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
+    <div class="acoes"><button id="cfRodar">Executar conferência</button>${botaoSyncPasta('cf')}<span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
     <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
@@ -6154,8 +6223,8 @@ RENDER.conferencia = () => {
   $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
-function faltamArquivos() {
-  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+function faltamArquivos(prefixo = 'cf') {
+  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button>${botaoSyncPasta(prefixo)}</div></div>`;
 }
 
 async function executarConferencia() {
@@ -6728,13 +6797,11 @@ const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apo
 const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;
 const ligarAbasConferencia = raiz => raiz.querySelectorAll('[data-cusub]').forEach(b => b.onclick = () => { CU.sub = b.dataset.cusub; RENDER.conferencia(); });
 
-const _renderConferencia = RENDER.conferencia;
-RENDER.conferencia = () => {
-  if (CU.sub === 'unidades') return desenharControleUnidade();
-  _renderConferencia();
+// Chamado por RENDER.conferencia (20-conferencia.js): abas do topo e o «Abrir conferência» vindo daqui.
+function complementoConferenciaUnidades() {
   const p = $('pag-conferencia'); p.insertAdjacentHTML('afterbegin', abasConferencia()); ligarAbasConferencia(p);
   if (CU.abrir) { const a = CU.abrir; CU.abrir = null; preSelecionarConferencia(a); }
-};
+}
 // «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
 function preSelecionarConferencia(a) {
   const doPrest = S.relatorios.filter(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
@@ -6747,7 +6814,9 @@ function preSelecionarConferencia(a) {
   $('cfRel').scrollIntoView({ block: 'center' });
 }
 
-async function desenharControleUnidade() {
+// O aviso da divisão do trabalho (28-fluxo-sync.js) entra aqui, explicitamente (P2).
+async function desenharControleUnidade() { await desenharControleUnidadeBase(); avisoDivisaoControle(); }
+async function desenharControleUnidadeBase() {
   const pg = $('pag-conferencia');
   S.rodadas = await dbRodadasJanela();
   if (!S.apolo) { pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade</h2><p class="lead">Carregue a planilha de laudos do Apolo no Início. A lista de quem precisa de repasse sai dela, por unidade.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`; return ligarAbasConferencia(pg); }
@@ -6860,7 +6929,8 @@ function carregarFluxo() {
   const f = lerLocal(CHAVES.fluxo);
   S.fluxo = f && !validarFluxo(f).length ? f : { schema: SCHEMA_FLUXO, versaoSchema: 1, modelo: modeloFluxoPadrao(), competencias: {} };
 }
-function salvarFluxo(msg = '') {
+function salvarFluxo(msg = '') { gravarFluxoLocal(msg); agendarSincronizacao('fluxo'); }
+function gravarFluxoLocal(msg = '') {
   if (!gravarLocal(CHAVES.fluxo, S.fluxo)) avisar('Não foi possível gravar o fluxo neste navegador. Exporte um backup em Configurações.', 'err');
   else if (msg) avisar(msg, 'ok');
   atualizarNavFluxo();
@@ -6895,7 +6965,9 @@ RENDER.fluxo = async () => {
 };
 
 /* ---------------- Acompanhamento ---------------- */
-function desenharAcompanhamento() {
+// A barra de sincronização (28-fluxo-sync.js) entra aqui, explicitamente (P2).
+function desenharAcompanhamento() { desenharAcompanhamentoBase(); barraSyncAcompanhamento(); }
+function desenharAcompanhamentoBase() {
   const c = $('fxCorpo'), comp = compAtual();
   const cab = `<div class="fx-topo"><h2 class="fx-titulo">Checklist da competência ${rotuloCompetencia(FX.chave)}</h2>
     <div class="acoes" style="margin:0">${comp ? '<button class="sec" id="fxExp">Exportar situação (.xlsx)</button>' : ''}</div></div>`;
@@ -7400,12 +7472,6 @@ async function temPermissaoPasta(pedir = false) {
   if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') return true;
   return pedir && h.requestPermission ? await h.requestPermission({ mode: 'readwrite' }) === 'granted' : false;
 }
-async function definirPastaSync(handle) {
-  SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); if (typeof SYQ !== 'undefined') { SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off'; }
-  if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
-  iniciarTimerSync();
-  if (handle) { await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } else { SY.status = 'off'; atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }
-}
 async function escolherPastaSync() {
   if (!suportaPasta()) return avisar('Este navegador não grava em pastas. Use o Edge ou o Chrome no computador.', 'warn');
   const op = await exigirOperador(); if (!op) return;
@@ -7415,9 +7481,6 @@ async function escolherPastaSync() {
     await definirPastaSync(h); avisar(`Pasta raiz «${h.name}» conectada: Fluxo, equivalências e relatórios passam a usar as subpastas dela.`, 'ok');
   }
   catch (e) { if (e.name !== 'AbortError') avisar(`Não foi possível usar a pasta (${e.message}).`, 'err'); }
-}
-async function restaurarPastaSync() {
-  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.legado = ehPastaLegadaFluxo(h); SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') { await sincronizarFluxo(); await sincronizarEq(); if (S.cfg.parametros.lerPastaAoAbrir !== false) atualizarDaPasta({ silencioso: true }); } else atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } } catch (e) { /* sem pasta guardada */ }
 }
 
 // Lê a pasta, mescla com a versão local e grava o resultado. interativo: pode abrir o diálogo de conflitos.
@@ -7468,20 +7531,7 @@ async function resolverConflitosFluxo(conflitos, remoto) {
       <label class="small"><input type="radio" name="c${i}" value="remoto"> A de ${esc(quem)}: ${esc(resumoValorFluxo(c.remoto))}</label></div>`).join('')}`, [['', 'Decidir depois', 'sec'], ['ok', 'Aplicar escolhas']]);
   return r.botao === 'ok' ? conflitos.map((c, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local') : null;
 }
-function iniciarTimerSync() {
-  clearInterval(SY.timer); if (!SY.handle) return;
-  SY.timer = setInterval(async () => {
-    if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
-    try { if (typeof checarEqPasta === 'function') checarEqPasta(); const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
-    catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
-    atualizarBarraSync();
-  }, 30000);
-}
 
-// Toda gravação do Fluxo agenda a sincronização (sem esperar).
-const gravarFluxoLocal = salvarFluxo;
-let syncAgendada = 0;
-salvarFluxo = function (msg = '') { gravarFluxoLocal(msg); if (SY.handle && SY.status !== 'permissao') { clearTimeout(syncAgendada); syncAgendada = setTimeout(() => sincronizarFluxo(), 800); } };
 
 /* ---------- Barra de sincronização ---------- */
 function barraSync() {
@@ -7500,7 +7550,7 @@ function ligarBarraSync(raiz) {
     const a = b.dataset.sy;
     if (a === 'escolher') return escolherPastaSync();
     if (a === 'desconectar') { if (await confirmar('Desconectar da pasta?', 'O Fluxo continua neste navegador; a pasta e o arquivo não são apagados.', 'Desconectar')) definirPastaSync(null); return; }
-    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); return; } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
+    if (a === 'liberar') { if (await liberarPastaSync() && (location.hash === '#inicio' || !location.hash)) RENDER.inicio(); return; }
     sincronizarFluxo({ interativo: true });
   });
 }
@@ -7575,12 +7625,11 @@ document.addEventListener('click', e => {
 });
 
 // Fluxo: barra de sincronização e divisão no topo do acompanhamento.
-const _desenharAcompanhamento = desenharAcompanhamento;
-desenharAcompanhamento = function () {
-  _desenharAcompanhamento();
+// Chamado por desenharAcompanhamento (25-fluxo.js).
+function barraSyncAcompanhamento() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
   c.insertAdjacentHTML('afterbegin', barraSync()); ligarBarraSync(c);
-};
+}
 // Subaba «Divisão do trabalho»: barra de sincronização + quadro unidade × grupo + últimas mudanças.
 function desenharDivisaoFluxo() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
@@ -7588,12 +7637,11 @@ function desenharDivisaoFluxo() {
   ligarBarraSync(c); if (comp) ligarDivisao(c, comp);
 }
 // Prestadores por unidade e Conferência: aviso da divisão.
-const _desenharControleUnidade = desenharControleUnidade;
-desenharControleUnidade = async function () {
-  await _desenharControleUnidade();
+// Chamado por desenharControleUnidade (22-prestadores-unidade.js).
+function avisoDivisaoControle() {
   const alvo = document.querySelector('#pag-conferencia .cu-res'); if (!alvo || !CU.unidade || !CU.grupo) return;
   alvo.insertAdjacentHTML('beforebegin', avisoDivisao(CU.unidade, CU.grupo));
-};
+}
 document.addEventListener('change', e => {
   if (e.target.id !== 'cfUn' && e.target.id !== 'cfRel') return;
   document.querySelectorAll('#pag-conferencia .dv-aviso').forEach(x => x.remove());
@@ -7673,8 +7721,9 @@ function estruturaCompetencia(chave) {
   const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
   for (const g of ['USG', 'IMG']) for (const u of normais) cam.push([...base, PASTA_REL, G[g], un(u)]);
   if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_REL, { nome: 'Curitiba', re: /^(CURITIBA|V3)/ }]);
-  // Correção de prestador vale para todas as unidades, inclusive Curitiba (V3): o fluxo de Curitiba também tem correção.
-  for (const u of uns) cam.push([...base, PASTA_CORR, un(u)]);
+  // Correção de prestador: uma pasta só, sem subpastas por unidade (pedido de 17/11/2026). Os arquivos ficam organizados pelo
+  // nome, «nome_unidade» (ex.: «prestador generico_17.pdf» ou «…_Cambe.pdf»); subpastas que já existam continuam sendo lidas.
+  cam.push([...base, PASTA_CORR]);
   cam.push([...base, PASTA_CONF], [...base, PASTA_NC]);
   return cam;
 }
@@ -7710,7 +7759,21 @@ async function* arquivosEm(dir, rel = '') {
   }
 }
 const unidadeDoNomePasta = n => (norm(n).match(/^(?:UNIDADE |UN )?(\d+)\b/) || [])[1] || '';
-async function atualizarDaPasta({ silencioso = false } = {}) {
+/* Unidade de um PDF da Correção de prestador pelo nome do arquivo «nome_unidade»: o que vem depois do último «_» é o código
+ * da unidade (17, «Unidade 17», «un17») ou parte do nome dela (Cambé, Arapongas…). Sem isso, vale «unidade N» em qualquer
+ * parte do nome e, por fim, a subpasta (organização antiga). */
+function unidadeDoArquivoCorrecao(nomeArq, pastaPai = '') {
+  const base = String(nomeArq).replace(/\.pdf$/i, ''), fim = norm(base.includes('_') ? base.slice(base.lastIndexOf('_') + 1) : '');
+  if (fim) {
+    const cod = (fim.match(/^(?:UNIDADE ?|UN ?)?(\d+)$/) || [])[1];
+    if (cod && unidadePorCod(S.cfg, cod)) return cod;
+    const porNome = S.cfg.unidades.filter(u => [u.nome, ...(u.apolo || [])].some(n => { const k = norm(n); return k && (k.includes(fim) || fim.includes(k)); }));
+    if (porNome.length === 1) return String(porNome[0].cod);
+  }
+  return unidadeSugeridaPeloArquivo(nomeArq) || unidadeDoNomePasta(pastaPai);
+}
+// so: 'conferencia' ou 'correcao' lê só aquela pasta (botão «Sincronizar pasta» de cada aba), sem as planilhas e a outra pasta.
+async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
   if (!SY.handle || SY.legado) { if (!silencioso) avisar('Conecte a pasta raiz do aplicativo no Início.', 'warn'); return null; }
   if (PR.lendo) return null;
   if (!(await temPermissaoPasta(!silencioso))) { if (!silencioso) avisar('O acesso à pasta não foi liberado.', 'warn'); return null; }
@@ -7718,8 +7781,8 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
   try {
     const comp = nomeCompPasta(S.comp), dC = await dirCompetencia(S.comp);
     // Planilhas do mês: Bases de dados › Comp_MM-AAAA ou PLANILHAS-… dentro da pasta do mês (vale a mais recente de cada tipo).
-    const dirsPl = [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
-    if (dirsPl.length) {
+    const dirsPl = so ? [] : [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
+    if (so) { /* só a pasta da aba */ } else if (dirsPl.length) {
       const pl = { apolo: null, pbi: null };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
         if (!/\.xlsx$/i.test(h.name)) continue;
@@ -7735,13 +7798,14 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
     } else r.avisos.push(`sem planilhas em Bases de dados › ${comp}`);
     // Relatórios: pasta do mês › Relatórios para conferência (RELATORIOS-MV-CONFERENCIA) | Correção de prestador.
     if (!dC) r.avisos.push(`sem a pasta Competências › ${comp}`);
-    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']]) {
+    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
       const d = await subpasta(dC, pasta); if (!d) continue;
       for await (const { h, caminho: c } of arquivosEm(d)) {
         if (!/\.pdf$/i.test(h.name)) continue;
         const partes = c.split('/'); r.pdfs++;
         const grupo = finalidade === 'correcao' ? '' : grupoDaPasta(partes[0]);
-        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : unidadeDoNomePasta(partes.length > 1 ? partes[partes.length - 2] : '');
+        const pai = partes.length > 1 ? partes[partes.length - 2] : '';
+        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDoNomePasta(pai);
         const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${pasta.nome}/${c}`;
         // PDF que a pessoa mandou ignorar (ex.: de outra produção): não pergunta de novo enquanto o arquivo não mudar.
         if (pdfIgnorado(k, sig)) { r.ignorados = (r.ignorados || 0) + 1; continue; }
@@ -7762,7 +7826,8 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
     PR.ultima = { em: Date.now(), ...r };
   } catch (e) { r.avisos.push(e.message); if (!silencioso) avisar(`Erro ao ler a pasta (${e.message}).`, 'err'); }
   finally { PR.lendo = false; }
-  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
+  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';
+  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}${ondeSo}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
   if (r.mudaram) avisar(`${r.mudaram} relatório(s) mudaram desde a última leitura: rode a conferência deles de novo.`, 'warn');
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
   return r;
@@ -7828,11 +7893,8 @@ async function checarEqPasta() {
   if (!SY.handle || SY.legado || SYQ.ocupado || SYQ.status === 'permissao') return;
   try { const f = await (await (await dirEq()).getFileHandle(ARQ_EQ)).getFile(); if (f.lastModified !== SYQ.lm) sincronizarEq(); } catch (e) { if (e.name === 'NotFoundError') sincronizarEq(); }
 }
-// Toda gravação da base de equivalências agenda a sincronização.
+// Gravação usada pela própria sincronização (não agenda outra). As da tela usam salvarEq (00-base.js).
 const gravarEqLocal = () => { if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador.', 'err'); };
-const _salvarEq = salvarEq;
-let syncEqAgendada = 0;
-salvarEq = function (msg = '') { _salvarEq(msg); if (SY.handle && !SY.legado && SYQ.status !== 'permissao') { clearTimeout(syncEqAgendada); syncEqAgendada = setTimeout(() => sincronizarEq(), 800); } };
 function barraEq() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="eqSync"><span class="sy-dot"></span><b>Equivalências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo no Início para dividir as validações com a outra pessoa.</span></div>`;
   const ult = SYQ.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYQ.meta.atualizadoPor || '—')}</b> em ${new Date(SYQ.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
@@ -7862,7 +7924,7 @@ function cartaoPastaRaiz() {
 }
 function ligarPastaRaiz() {
   if ($('prConectar')) $('prConectar').onclick = () => escolherPastaSync();
-  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await atualizarDaPasta(); } else avisar('O acesso à pasta não foi liberado.', 'warn'); };
+  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await liberarPastaSync()) await atualizarDaPasta(); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
   if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
@@ -7876,13 +7938,12 @@ function ligarPastaRaiz() {
     PRI.verifComp = S.comp; verificarEstrutura(S.comp).then(v => { PRI.verif = v; if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }).catch(() => {});
   }
 }
-const _renderInicio = RENDER.inicio;
-RENDER.inicio = (...a) => {
-  const r = _renderInicio(...a), pg = $('pag-inicio');
-  const alvo = pg?.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
+// Chamado por RENDER.inicio (10-inicio.js), depois do resto do Início.
+function complementoInicioPastaRaiz() {
+  const pg = $('pag-inicio'); if (!pg) return;
+  const alvo = pg.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
   if (html) { alvo ? alvo.insertAdjacentHTML('afterend', html) : pg.insertAdjacentHTML('afterbegin', html); ligarPastaRaiz(); }
-  return r;
-};
+}
 
 /* ---- src/ui/29b-cfg-sync.js ---- */
 /* ============================================================
@@ -7906,7 +7967,7 @@ async function sincronizarCfg({ interativo = false } = {}) {
   if (cfgSemSalvar()) {
     if (!interativo) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
     if (!await confirmar('Alterações não salvas', 'A configuração tem alterações que ainda não foram salvas. Salvar agora e sincronizar com a pasta?', 'Salvar e sincronizar')) { SYC.status = 'edicao'; atualizarBarraCfg(); return; }
-    salvarCfgSemSync('Configuração salva.');
+    gravarCfgLocal('Configuração salva.');
   }
   SYC.ocupado = true;
   try {
@@ -7958,16 +8019,6 @@ async function checarCfgPasta() {
   if (SYC.status === 'edicao' && !cfgSemSalvar()) SYC.status = 'ok';
   try { const f = await (await (await dirCfg()).getFileHandle(ARQ_CFG)).getFile(); if (f.lastModified !== SYC.lm) sincronizarCfg(); } catch (e) { if (e.name === 'NotFoundError') sincronizarCfg(); }
 }
-// Toda gravação da configuração agenda a sincronização.
-const salvarCfgSemSync = salvarCfg;
-let syncCfgAgendada = 0;
-salvarCfg = function (...a) { salvarCfgSemSync(...a); if (SY.handle && !SY.legado && SYC.status !== 'permissao') { clearTimeout(syncCfgAgendada); syncCfgAgendada = setTimeout(() => sincronizarCfg(), 800); } };
-const _checarEqPastaCfg = checarEqPasta;
-checarEqPasta = async function () { _checarEqPastaCfg(); checarCfgPasta(); };
-const _definirPastaSyncCfg = definirPastaSync;
-definirPastaSync = async function (h) { await _definirPastaSyncCfg(h); if (h) await sincronizarCfg({ interativo: true }); else { SYC.status = 'off'; } };
-const _restaurarPastaSyncCfg = restaurarPastaSync;
-restaurarPastaSync = async function () { await _restaurarPastaSyncCfg(); if (SY.handle && SY.status === 'ok') await sincronizarCfg(); };
 
 const TXT_SYNC = { ok: 'sincronizada', permissao: 'acesso precisa ser liberado', erro: 'sem acesso', conflito: 'mudanças dos dois para escolher', edicao: 'alterações não salvas (sincroniza ao salvar)', off: 'só neste navegador' };
 function barraCfg() {
@@ -8030,17 +8081,80 @@ async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp
   } catch (e) { avisar(`Excel baixado, mas não foi gravado na pasta (${e.message}).`, 'warn'); return 'download'; }
 }
 
+/* ---- src/ui/29c-sincronizacao.js ---- */
+/* ============================================================
+ * Sincronização pela pasta raiz — orquestração única (v3.0.0-alpha.11, P2 da auditoria de 16/11/2026).
+ * As três bases compartilhadas têm a sua leitura/mescla/gravação no próprio arquivo:
+ *   Fluxo mensal → 28-fluxo-sync.js (SY) · Equivalências → 29-pasta-raiz.js (SYQ) · Configuração → 29b-cfg-sync.js (SYC).
+ * Aqui fica o que é comum às três, chamado explicitamente (antes, cada arquivo redefinia salvarCfg, salvarEq,
+ * salvarFluxo e restaurarPastaSync por cima do anterior, e o resultado dependia da ordem dos arquivos):
+ *   - agendarSincronizacao(tipo): toda gravação (salvarCfg, salvarEq, salvarFluxo) agenda a da sua base;
+ *   - sincronizarTudo, liberarPastaSync, definirPastaSync, restaurarPastaSync e o relógio de checagem.
+ * ============================================================ */
+const AGENDA_SYNC = { fluxo: 0, eq: 0, cfg: 0 };
+const SYNC_DE = { fluxo: () => sincronizarFluxo(), eq: () => sincronizarEq(), cfg: () => sincronizarCfg() };
+// Pode agendar: há pasta e acesso; Equivalências e Configuração não vão para a pasta antiga do Fluxo («legado»).
+function podeSincronizar(tipo) {
+  if (!SY.handle) return false;
+  if (tipo === 'fluxo') return SY.status !== 'permissao';
+  if (SY.legado) return false;
+  return (tipo === 'eq' ? SYQ : SYC).status !== 'permissao';
+}
+function agendarSincronizacao(tipo) {
+  if (!podeSincronizar(tipo)) return;
+  clearTimeout(AGENDA_SYNC[tipo]); AGENDA_SYNC[tipo] = setTimeout(() => SYNC_DE[tipo](), 800);
+}
+async function sincronizarTudo(opc = {}) { await sincronizarFluxo(opc); await sincronizarEq(opc); await sincronizarCfg(opc); }
+// Botões «Liberar acesso» (Início, Fluxo, Configurações): mesma ação nos três lugares.
+async function liberarPastaSync() {
+  if (!(await temPermissaoPasta(true))) { avisar('O acesso à pasta não foi liberado.', 'warn'); return false; }
+  SY.status = 'ok'; iniciarTimerSync(); await sincronizarTudo({ interativo: true });
+  return true;
+}
+async function definirPastaSync(handle) {
+  SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off';
+  if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
+  iniciarTimerSync();
+  if (handle) await sincronizarTudo({ interativo: true });
+  else { SY.status = 'off'; SYC.status = 'off'; atualizarBarraSync(); }
+  if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
+}
+// Ao abrir: volta a pasta guardada, sincroniza as três bases, lê a pasta da competência e faz o backup do dia.
+async function restaurarPastaSync() {
+  try {
+    const h = await dbSync('ler'); if (!h) return;
+    SY.handle = h; SY.legado = ehPastaLegadaFluxo(h); SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync();
+    if (SY.status === 'ok') {
+      await sincronizarTudo();
+      if (S.cfg.parametros.lerPastaAoAbrir !== false) atualizarDaPasta({ silencioso: true });
+      setTimeout(() => backupAutomaticoDiario().catch(() => {}), 3000);
+    } else atualizarBarraSync();
+    if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
+  } catch (e) { /* sem pasta guardada */ }
+}
+// A cada 30 s, com a janela visível: as três bases conferem se o arquivo da pasta mudou.
+function iniciarTimerSync() {
+  clearInterval(SY.timer); if (!SY.handle) return;
+  SY.timer = setInterval(async () => {
+    if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
+    checarEqPasta(); checarCfgPasta();
+    try { const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
+    catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
+    atualizarBarraSync();
+  }, 30000);
+}
+
 /* ---- src/ui/30-correcao.js ---- */
 /* ============================================================
  * Correção / identificação de prestador
  * ============================================================ */
 RENDER.correcao = () => {
   const p = $('pag-correcao');
-  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
+  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos('co'); return; }
   if (!relatoriosPara('co').length) { p.innerHTML = semRelatorioPara('co'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
     ${seletoresAnalise('co', S.cfg.parametros.tolCorrecao)}
-    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
+    <div class="acoes"><button id="coRodar">Executar identificação</button>${botaoSyncPasta('co')}</div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
   if (!$('coRel')) { $('coRodar').disabled = true; return; }
   $('coExtra').innerHTML = '';
   $('coRodar').onclick = () => comProcessando($('coRodar'), executarCorrecao, 'a identificação');
@@ -8532,10 +8646,10 @@ RENDER.fechamento = async () => {
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
-    ${avisosFechamentoControle()}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
-    <div id="fhCorpo"></div>`;
+    <div id="fhCorpo"></div>
+    ${avisosFechamentoControle()}`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
@@ -8831,8 +8945,13 @@ async function acaoSituacao(ac, modo, x) {
 function avisosFechamentoControle() {
   if (!S.apolo || !['usg', 'img', 'curitiba'].includes(FH.sub)) return '';
   const av = avisosControleUnidade(controleAtual()).filter(a => a.grupo === FH.sub && a.tipo !== 'sem-cadastro');
-  return av.length ? `<div class="fh-ctl">${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></div>` : '';
+  // Alternante no fim da tela (pedido de 17/11/2026): fechado, mostra só a bolinha com a quantidade de avisos.
+  let aberto = false; try { aberto = localStorage.getItem('rm2.fhAvisosAbertos') === '1'; } catch (e) { }
+  const nErr = av.filter(a => a.tipo === 'gerar').length;
+  return av.length ? `<details class="fh-ctl" id="fhAvisos"${aberto ? ' open' : ''}><summary><b>Avisos de prestadores por unidade</b> <span class="bolinha${nErr ? '' : ' warn'}" title="${av.length} aviso(s)">${av.length}</span><span class="small muted"> · não bloqueiam o fechamento</span></summary>
+    ${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></details>` : '';
 }
+document.addEventListener('toggle', e => { if (e.target.id === 'fhAvisos') try { localStorage.setItem('rm2.fhAvisosAbertos', e.target.open ? '1' : '0'); } catch (x) { } }, true);
 document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) CU.sub = 'unidades'; });
 
 /* ---- src/ui/40-equivalencias.js ---- */
@@ -8842,10 +8961,11 @@ document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) 
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
 const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base', vis: 'lista', gmarcas: new Map() };
 
-RENDER.equivalencias = () => {
+// Barra da base compartilhada no topo, explicitamente (P2; antes em 97-decoracoes.js).
+RENDER.equivalencias = () => { const r = desenharEquivalencias(); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
+function desenharEquivalencias() {
   if (FE.sub === 'destrava') return desenharDestrava();
   if (FE.sub === 'titulos') return desenharTitulos();   // v3.0: manutenção por título do Apolo
-  if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
   const cpVal = indiceEquivalencias(S.eq).compostas || [], regraDoConf = c => cpVal.find(r => compostaCasaTitulo(r, c.titulo) > 0);
@@ -9499,7 +9619,14 @@ function ligarPainelTitulo(t, lista) {
  * ============================================================ */
 const BS = { sub: 'unidades', soSemTipo: false };
 const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['pbi', 'Power BI']];
+// Bases e regras = categoria das Configurações: abas no topo e a barra da configuração compartilhada (P2; antes em 97-decoracoes.js).
 RENDER.bases = () => {
+  const r = desenharBases(), pg = $('pag-bases');
+  if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
+  if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); }
+  return r;
+};
+function desenharBases() {
   const medApolo = S.apolo ? [...contar(S.apolo.laudos.filter(l => l.medico), l => l.medico)].sort((a, b) => a[0].localeCompare(b[0])) : [];
   const idxP = indicePrestadores(S.cfg);
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
@@ -10346,7 +10473,7 @@ function cfgPastas() {
 }
 function ligarPastas() {
   if ($('psConectar')) $('psConectar').onclick = async () => { await escolherPastaSync(); RENDER.configuracoes(); };
-  if ($('psLiberar')) $('psLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await sincronizarCfg({ interativo: true }); } else avisar('O acesso à pasta não foi liberado.', 'warn'); RENDER.configuracoes(); };
+  if ($('psLiberar')) $('psLiberar').onclick = async () => { await liberarPastaSync(); RENDER.configuracoes(); };
   if ($('psDesc')) $('psDesc').onclick = async () => { if (await confirmar('Desconectar da pasta?', 'Os dados continuam neste navegador; a pasta e os arquivos não são apagados.', 'Desconectar')) { await definirPastaSync(null); RENDER.configuracoes(); } };
   if ($('psCriar')) $('psCriar').onclick = () => criarEstrutura(S.comp);
   $('psSalvarComp').onclick = () => { S.cfg.parametros = { ...S.cfg.parametros, lerPastaAoAbrir: $('psLerAbrir').checked, exportarNaPasta: $('psExport').checked }; salvarCfg('Preferências de pasta salvas.', 'parametros'); };
@@ -10441,7 +10568,7 @@ async function restaurarBackup(b, origem) {
   const atual = montarBackup(partesAtuaisBackup({ nc: true, rodadas: await dbTodas() }), { operador: S.operador, motivo: `antes de restaurar ${origem}` });
   if (!(await gravarBackupPasta(atual, { auto: false, silencioso: true }))) gravarLocal(CHAVES.bkAntes, atual);
   const feito = [];
-  if (quer('configuracao')) { backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); S.cfg = clone(b.configuracao); migrarConfig(S.cfg); aplicarPastasConfig(); salvarCfgSemSync(); feito.push('configuração'); }
+  if (quer('configuracao')) { backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); S.cfg = clone(b.configuracao); migrarConfig(S.cfg); aplicarPastasConfig(); gravarCfgLocal(); feito.push('configuração'); }
   if (quer('equivalencias')) { backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq); S.eq = clone(b.equivalencias); salvarEq(); feito.push('equivalências'); }
   if (quer('fluxo')) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = clone(b.fluxo); salvarFluxo(); feito.push('fluxo'); }
   if (quer('competencias')) { S.compReg = clone(b.competencias); salvarCompReg(); feito.push('competências'); }
@@ -10476,8 +10603,6 @@ async function backupAutomaticoDiario() {
   const b = montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbRodadasJanela(S.comp, true) }), { operador: S.operador, motivo: 'automático diário' });
   if (await gravarBackupPasta(b, { auto: true, silencioso: true })) gravarLocal(CHAVES.bkPasta, { ...pb, ultimoAuto: hoje });
 }
-const _restaurarPastaSyncBk = restaurarPastaSync;
-restaurarPastaSync = async function () { await _restaurarPastaSyncBk(); setTimeout(() => backupAutomaticoDiario().catch(() => {}), 3000); };
 async function listarBackupsPasta() {
   const d = await caminho([PASTAS_RAIZ.backups]); if (!d) return [];
   const l = []; for await (const h of d.values()) if (h.kind === 'file' && /\.json$/i.test(h.name)) { const f = await h.getFile(); l.push({ h, nome: h.name, em: f.lastModified, tam: f.size }); }
@@ -10514,24 +10639,6 @@ function cfgSobre() {
     <div class="acoes"><button class="sec" id="sbVerificar">Verificar atualização agora</button></div></div>`;
 }
 function ligarSobre() { $('sbVerificar').onclick = async () => { await verificarAtualizacao(true); const e = $('sbAtual'); if (e) e.textContent = textoAtualizacao(); }; }
-
-/* ---- src/ui/97-decoracoes.js ---- */
-/* ============================================================
- * Complementos de tela aplicados depois que TODAS as telas foram definidas (v3.0).
- * Antes, 29-pasta-raiz.js envolvia RENDER.equivalencias antes de 40-equivalencias.js defini-la, e a definição
- * posterior apagava o complemento: a barra de sincronização das equivalências nunca aparecia. Aqui a ordem é garantida.
- * ============================================================ */
-// Equivalências: barra de sincronização da base compartilhada (SOL-F37).
-const _renderEqSync = RENDER.equivalencias;
-RENDER.equivalencias = (...a) => { const r = _renderEqSync(...a); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
-// Bases e regras = categoria das Configurações: mesmas abas no topo e a barra da configuração compartilhada.
-const _renderBasesV3 = RENDER.bases;
-RENDER.bases = (...a) => {
-  const r = _renderBasesV3(...a), pg = $('pag-bases');
-  if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
-  if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); }
-  return r;
-};
 
 /* ---- src/ui/98-atualizacao.js ---- */
 /* ============================================================
@@ -10591,6 +10698,7 @@ function iniciarVerificacaoAtualizacao() {
   aplicarPastasConfig();   // nomes das pastas configurados (v3.0)
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
+  else if (aplicarCobertas(S.eq, '', S.comp)) gravarLocal(CHAVES.eq, S.eq);   // base gravada antes de a cobertura ir para o salvarEq (P2)
   S.operador = lerLocal(CHAVES.operador) || '';
   carregarCompetencia(); carregarFluxo(); carregarNC();
   iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo(); atualizarNavNC();
@@ -10614,7 +10722,7 @@ function iniciarVerificacaoAtualizacao() {
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
   window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
-    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
+    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 
 </script>

@@ -23,6 +23,7 @@ Os dois usuários dividem a mesma **pasta raiz na rede** (Fluxo mensal, equival�
 ```bash
 node tools/build.mjs            # gera o HTML final em dist/
 node tools/build.mjs --harness  # gera dist/harness.html para test/motor.mjs
+node tools/testes.mjs           # monta e roda todos os testes que não precisam de dados/ (o mesmo do GitHub a cada envio)
 node test/motor.mjs             # motor com os arquivos de dados/
 node test/e2e.mjs               # interface completa com os arquivos de dados/
 node test/menu.mjs              # menu recolhível, Ctrl+B e barra do celular
@@ -60,6 +61,9 @@ node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, 
 node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
 node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
+node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios
+node test/pasta_por_aba.mjs    # v3.0: «Sincronizar pasta» por aba, Correção de prestador sem subpastas (unidade pelo nome) e avisos do Fechamento recolhíveis
+node test/bench_pior_caso.mjs  # desempenho: 3.000 linhas × 30 mil laudos com homônimos; resultado idêntico (assinatura) e limite de tempo (precisa do --harness)
 ```
 
 ## Publicação (GitHub Pages)
@@ -77,4 +81,5 @@ A ferramenta fica em **https://leoemfs.github.io/repasse-medico/**, sempre na ú
 1. Regra de negócio só em `src/engine/`; as telas apenas chamam o motor.
 2. Toda mudança começa como solicitação com critério de aceite; o teste entra junto.
 3. Uma versão por vez; `MOTOR_VERSAO` em `src/engine/00-util.js` sobe a cada entrega.
-4. Antes de entregar: `motor.mjs` e `e2e.mjs` sem erros, Excels reabertos e totais reconciliados.
+4. Antes de entregar: `node tools/testes.mjs` sem falhas (o GitHub roda o mesmo a cada envio, em «Testes»), `motor.mjs` e `e2e.mjs` sem erros com os arquivos de `dados/`, Excels reabertos e totais reconciliados.
+5. Uma tela chama os complementos dela explicitamente (ex.: `RENDER.inicio` chama `complementoInicioPastaRaiz`). Nenhum arquivo redefine função de outro. A sincronização com a pasta (Fluxo, Equivalências e Configuração) é orquestrada em `src/ui/29c-sincronizacao.js`: toda gravação (`salvarCfg`, `salvarEq`, `salvarFluxo`) chama `agendarSincronizacao`.

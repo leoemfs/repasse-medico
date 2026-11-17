@@ -7,9 +7,21 @@ const FAIXA = { 1: 'validada · mesma data', 2: 'validada · data na tolerância
 // Finalidade do PDF: o do prestador genérico vai para a Correção; os demais, para a Conferência.
 const finalidadePadrao = rel => String(rel.cab.prestadorCod) === String(S.cfg.parametros.prestadorGenerico || '2') ? 'correcao' : 'conferencia';
 const relatoriosPara = prefixo => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) === (prefixo === 'co' ? 'correcao' : 'conferencia'));
+/* Pedido de 17/11/2026: cada aba sincroniza só a pasta dela, sem reler tudo — Conferência lê «Relatórios para conferência»;
+ * Correção de prestador lê «Correção de prestador». Só aparece com a pasta raiz conectada. */
+function botaoSyncPasta(prefixo) {
+  if (!pastaConectadaConf()) return '';
+  const so = prefixo === 'co' ? 'correcao' : 'conferencia', nome = so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome;
+  return `<button class="sec" data-syncpasta="${so}" title="Lê só «${esc(nome)}» da competência ${esc(rotuloCompetencia(S.comp))}: PDFs novos ou que mudaram">Sincronizar pasta</button>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-syncpasta]'); if (!b) return;
+  const so = b.dataset.syncpasta;
+  comProcessando(b, async () => { await atualizarDaPasta({ so }); (so === 'correcao' ? RENDER.correcao : RENDER.conferencia)(); }, 'a leitura da pasta');
+});
 function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
-  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
 }
 // Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
 const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };
@@ -68,12 +80,14 @@ function cartaoOutraCompetencia(x, nome) {
   return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
 }
 
-RENDER.conferencia = () => {
+// Subaba «Prestadores por unidade» e as abas do topo (22-prestadores-unidade.js) entram aqui, explicitamente (P2).
+RENDER.conferencia = () => { if (CU.sub === 'unidades') return desenharControleUnidade(); desenharPaginaConferencia(); complementoConferenciaUnidades(); };
+function desenharPaginaConferencia() {
   const p = $('pag-conferencia');
-  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
+  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos('cf'); return; }
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
-    <div class="acoes"><button id="cfRodar">Executar conferência</button><span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
+    <div class="acoes"><button id="cfRodar">Executar conferência</button>${botaoSyncPasta('cf')}<span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
     <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
@@ -106,8 +120,8 @@ RENDER.conferencia = () => {
   $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
-function faltamArquivos() {
-  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+function faltamArquivos(prefixo = 'cf') {
+  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button>${botaoSyncPasta(prefixo)}</div></div>`;
 }
 
 async function executarConferencia() {

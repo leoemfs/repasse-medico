@@ -1,7 +1,7 @@
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.10';
+const MOTOR_VERSAO = '3.0.0-alpha.11';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -23,8 +23,16 @@ function fixMojibake(s) {
 }
 
 // Forma de comparação: sem acento, maiúsculas, só letras/dígitos e espaços simples.
-const norm = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase()
+// v3.0.0-alpha.11 (P2): com cache — os mesmos nomes, títulos e convênios são normalizados milhares de vezes por conferência.
+const _normBruto = s => fixMojibake(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase()
   .replace(/[^A-Z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+const _cacheNorm = new Map();
+const norm = s => {
+  if (typeof s !== 'string' || s.length > 300) return _normBruto(s);
+  let v = _cacheNorm.get(s); if (v !== undefined) return v;
+  if (_cacheNorm.size > 200000) _cacheNorm.clear();
+  v = _normBruto(s); _cacheNorm.set(s, v); return v;
+};
 
 const PARTICULAS = new Set(['DE', 'DA', 'DO', 'DAS', 'DOS', 'E']);
 // Tokens e semelhança entre tokens ficam em cache (os mesmos nomes e sobrenomes se repetem milhares de vezes
@@ -72,9 +80,17 @@ function nomeSemelhanca(a, b) {
  *  3 = idêntico · 2 = um é prefixo do outro (truncamento) · 1 = apenas semelhante · 0 = diferente.
  * Prefixo no meio de palavra só vale quando o nome mais curto tem pelo menos `minTrunc` caracteres,
  * que é o caso de truncamento por largura de coluna. */
+// P2: resultado em cache por par (com homônimos, o mesmo par de nomes se repete centenas de vezes).
+const _cacheNivel = new Map(); let _nCacheNivel = 0;
 function nivelNome(a, b, minTrunc = 20) {
   if (!a || !b) return 0;
   if (a === b) return 3;
+  const ka = minTrunc === 20 ? a : `${minTrunc}\u0001${a}`;
+  let m = _cacheNivel.get(ka); if (!m) { if (_nCacheNivel > 300000) { _cacheNivel.clear(); _nCacheNivel = 0; } _cacheNivel.set(ka, m = new Map()); }
+  let v = m.get(b); if (v === undefined) { v = _nivelNome(a, b, minTrunc); m.set(b, v); _nCacheNivel++; }
+  return v;
+}
+function _nivelNome(a, b, minTrunc) {
   const [c, l] = a.length <= b.length ? [a, b] : [b, a];
   if (l.startsWith(c) && (l[c.length] === ' ' || c.length >= minTrunc) && tokensNome(c).length >= 2) return 2;
   // Mesmo nome sem as partículas (ex.: MV «DAMARIS VIEIRA DE MATTOS» × Apolo «DAMARIS VIEIRA MATTOS»): mesma pessoa,
@@ -121,7 +137,7 @@ function indiceNomes(itens, diaDe, pnDe) {
 
 // Convênio: o MV costuma truncar; compatível se um for prefixo do outro.
 function convenioCompativel(a, b) {
-  const x = norm(a).replace(/\s*$/, ''), y = norm(b);
+  const x = norm(a), y = norm(b);   // norm já tira o espaço do fim
   if (!x || !y) return null;
   return x === y || y.startsWith(x) || x.startsWith(y);
 }

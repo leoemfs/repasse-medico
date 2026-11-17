@@ -36,10 +36,10 @@ RENDER.fechamento = async () => {
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
-    ${avisosFechamentoControle()}
     <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
-    <div id="fhCorpo"></div>`;
+    <div id="fhCorpo"></div>
+    ${avisosFechamentoControle()}`;
   $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
@@ -335,6 +335,11 @@ async function acaoSituacao(ac, modo, x) {
 function avisosFechamentoControle() {
   if (!S.apolo || !['usg', 'img', 'curitiba'].includes(FH.sub)) return '';
   const av = avisosControleUnidade(controleAtual()).filter(a => a.grupo === FH.sub && a.tipo !== 'sem-cadastro');
-  return av.length ? `<div class="fh-ctl">${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></div>` : '';
+  // Alternante no fim da tela (pedido de 17/11/2026): fechado, mostra só a bolinha com a quantidade de avisos.
+  let aberto = false; try { aberto = localStorage.getItem('rm2.fhAvisosAbertos') === '1'; } catch (e) { }
+  const nErr = av.filter(a => a.tipo === 'gerar').length;
+  return av.length ? `<details class="fh-ctl" id="fhAvisos"${aberto ? ' open' : ''}><summary><b>Avisos de prestadores por unidade</b> <span class="bolinha${nErr ? '' : ' warn'}" title="${av.length} aviso(s)">${av.length}</span><span class="small muted"> · não bloqueiam o fechamento</span></summary>
+    ${av.map(a => `<div class="aviso-fixo ${a.tipo === 'gerar' ? 'err' : 'warn'}">${esc(a.texto)}.</div>`).join('')}<p class="small muted">Prestadores por unidade (Conferência): os avisos não bloqueiam o fechamento e vão para a exportação de indicadores. <a href="#conferencia" data-ctlun>Ver prestadores por unidade</a></p></details>` : '';
 }
+document.addEventListener('toggle', e => { if (e.target.id === 'fhAvisos') try { localStorage.setItem('rm2.fhAvisosAbertos', e.target.open ? '1' : '0'); } catch (x) { } }, true);
 document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) CU.sub = 'unidades'; });
