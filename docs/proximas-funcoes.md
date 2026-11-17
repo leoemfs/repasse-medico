@@ -1,5 +1,32 @@
 # Próximas funções — requisitos registrados
 
+**Atualização de 17/11/2026 — v3.0.0-alpha.9 a alpha.12.** A auditoria técnica de 16/11/2026 (`auditoria-tecnica-2026-11-16.md`) foi feita inteira, do P0 ao P3, e entraram os pedidos de 17/11 (SOL-F44, abaixo). Resumo:
+
+| Versão | O que entrou |
+|---|---|
+| **3.0.0-alpha.9** | **P0, valor pago.** (1) A NC «não lançado» de um laudo «Só no laudo» não passa mais para o lançamento que o MV fez depois: a linha nova segue a própria classe, e a NC aparece como «Corrigida: lançada no MV». (2) Linha repetida no MV: «Esta é a repetida → NC» tira do fechamento só a duplicata, e a cobrança legítima continua Devido. |
+| **3.0.0-alpha.10** | **P1.** Reconferir em um clique, mantendo unidade, médico e aba. Excel com «Processando…» e «Exportar só o filtrado». Candidatos a NC só do prestador, guardados compactos. Rodadas lidas por competência, com retenção (ficam inteiras as com aceite e as mais recentes de cada PDF) e backup só da competência aberta. |
+| **3.0.0-alpha.11** | **P2.** Pior caso da conferência de 14,9 s para cerca de 2 s, com o mesmo resultado. Nenhum arquivo redefine função de outro, e a sincronização das três bases ficou num módulo só. A tela de Equivalências não grava ao abrir. Teste de ponta a ponta com arquivos fictícios e testes no GitHub a cada envio. Também a **SOL-F44**. |
+| **3.0.0-alpha.12** | **P3.** Código sem uso removido. **Modo celular removido** (decisão do usuário em 17/11). Texto de privacidade atualizado. Modalidade do Apolo por grupo do MV e HM da V3 configuráveis em Bases e regras → «Modalidades e HM V3». |
+
+Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
+
+## SOL-F44 — Ajustes de uso pedidos em 17/11/2026 — **IMPLEMENTADA na v3.0.0-alpha.11** (teste: `test/pasta_por_aba.mjs`)
+
+**Pedido do usuário:** «esses log de erro ocupa muito espaço, colocar em um alternante na parte inferior e deixar com bolinha de notificação quando o alternante estiver fechado. Nas pastas de correção, dentro da pasta de correção não precisa de subpastas; os arquivos ficam aqui organizados por nome_unidade. Outra coisa, um botão em cada aba para sincronizar com a pasta em questão […] assim sincroniza só a pasta em questão para não precisar reler todos os PDFs.»
+
+1. **Avisos do Fechamento** («N prestador(es) laudaram na unidade X e não têm relatório»):
+   - ficam num alternante no fim da tela, depois do conteúdo do fechamento;
+   - fechado, mostra uma bolinha com a quantidade de avisos: vermelha se há prestador sem relatório, amarela nos demais casos;
+   - aberto ou fechado, a escolha fica lembrada no navegador.
+2. **Correção de prestador sem subpastas por unidade:**
+   - «Criar pastas da competência» cria só `Competências › Comp_MM-AAAA › Correção de prestador`;
+   - a unidade de cada PDF vem do nome do arquivo, no formato `nome_unidade`. O trecho depois do último «_» pode ser o código (`_17`, `_Unidade 4`, `_un10`) ou parte do nome da unidade (`_Cambe`);
+   - as subpastas que já existem continuam sendo lidas, como organização antiga.
+3. **«Sincronizar pasta» em cada aba.** Lê só a pasta daquela aba, sem as planilhas e sem a outra pasta. Aparece com a pasta raiz conectada, inclusive quando ainda não há PDF carregado.
+   - **Conferência cruzada:** lê `Relatórios para conferência`.
+   - **Correção de prestador:** lê `Correção de prestador`.
+
 **SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
@@ -114,7 +141,7 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
 4. Fechamento pela regra nova, com a proteção das competências antigas.
 5. Reconferência e alertas de NC (F42).
 
-## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — A FAZER · **URGENTE** (pedido de 13/11/2026)
+## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — **IMPLEMENTADA na v3.0.0-alpha.6** com a SOL-F43 (pedido de 13/11/2026); na v3.0.0-alpha.9, a reconferência passa a mostrar também a NC «não lançado» que o MV lançou depois
 
 **Princípio (do usuário):** «a ferramenta precisa ser o reflexo fiel do que realmente está sendo pago ao prestador. Não basta identificar uma divergência: é necessário garantir que ela tenha sido tratada e que o cálculo do fechamento considere somente os procedimentos efetivamente devidos.»
 
@@ -160,7 +187,7 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
 - **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
 - **Pergunta da F41 (pendente sai ou não do valor): respondida na SOL-F43.** Pendente de análise **não** compõe o fechamento.
 
-## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
+## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — **maior parte IMPLEMENTADA na v3.0.0-alpha.6** com a SOL-F43 (pedido de 13/11/2026); «Exportar só o filtrado» e reconferir em um clique na v3.0.0-alpha.10
 
 **Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
 
