@@ -14,6 +14,21 @@ const SITUACAO_FECH = {
   enviado: { nome: 'E-mail enviado / aguardando nota', cor: '00B0F0', fc: '000000' },
   concluido: { nome: 'Concluído', cor: '00B050', fc: 'FFFFFF' }
 };
+/* SOL-F19 (v3.0.0-alpha.15) — Quadro por prestador. A coluna sai dos dados que já existem (rodada, aceite, controle
+ * documental do Fluxo); «Aguardando terceiros» é a única marca à mão (com motivo e de quem), em fech.aguardando[tipo][cod]. */
+const COLUNAS_QUADRO = [
+  ['conferir', 'A conferir', 'sem rodada de conferência'], ['correcao', 'Em correção', 'rodada sem aceite em alguma unidade'],
+  ['terceiros', 'Aguardando terceiros', 'marcado à mão, com motivo'], ['aceite', 'Com aceite', 'aceite em todas as unidades; e-mail não enviado'],
+  ['enviado', 'Enviado', 'e-mail enviado (relatório e prévia)'], ['nf', 'NF recebida', 'NF recebida, ainda não encaminhada'], ['concluido', 'Concluído', 'NF encaminhada ao Financeiro']];
+const QUEM_AGUARDA = [['medico', 'Médico'], ['unidade', 'Unidade'], ['faturamento', 'Faturamento'], ['outro', 'Outro']];
+function colunaQuadro(x) {
+  const d = x.doc || {};
+  if (d.nfFinanceiro) return 'concluido';
+  if (x.aguardando) return 'terceiros';
+  if (!x.temValores) return 'conferir';
+  if (x.semAceite.length) return 'correcao';
+  return d.nfRecebida ? 'nf' : d.relatorio ? 'enviado' : 'aceite';
+}
 const fechamentoVazio = () => ({ ajustes: { usg: {}, img: {}, curitiba: {} }, nfs: [], blocos: { complementar: [], cetrus: [] }, valorPeriodoCetrus: 1000, obs: { usg: '', img: '', curitiba: '' }, manual: {} });
 
 /* ---------- NF complementar (SOL-F28): lançamentos da competência em USG, IMG e Curitiba ----------
@@ -151,10 +166,15 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     if (x.regraAntiga && !fechada) x.avisos.push('valor pela regra antiga (total do MV): confira de novo o relatório para valer só o Devido + Aceito');
     // Situação
     const d = [doc(x.tipo, x.cod)].filter(Boolean);
+    x.doc = d[0] || {};
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
     // Marca manual «Verificar» (SOL-F32) fica por cima do cálculo até ser retirada.
     const manual = legado(fech.manual, x.tipo);
     if (manual) { x.situacaoCalculada = x.situacao; x.situacao = 'verificar'; x.manual = manual; x.avisos.push(`marcado para verificar: ${manual.motivo}`); }
+    // SOL-F19: «Aguardando terceiros» (marca à mão) e a coluna do quadro.
+    const ag = legado(fech.aguardando, x.tipo);
+    if (ag) { x.aguardando = ag; x.avisos.push(`aguardando ${(QUEM_AGUARDA.find(q => q[0] === ag.quem)?.[1] || 'terceiros').toLowerCase()}: ${ag.motivo}`); }
+    x.coluna = colunaQuadro(x);
     if (x.semAceite.length) x.avisos.push(`sem aceite na(s) unidade(s) ${x.semAceite.join(', ')}`);
     if (x.pendencias) x.avisos.push(`${x.pendencias} pendência(s) na conferência`);
     // Classe (IMG) e produção
@@ -415,5 +435,10 @@ function xlsxIndicadoresFechamento(f, ind, meta = {}) {
     ...(ind.cobertura ? bloco(`Cobertura automática por prestador (%) — competência ${fmtBR(ind.cobertura.pct)}%`, ind.cobertura.porPrestador.map(e => [`${e.cod} - ${e.nome} (${e.conferidas} de ${e.total})${e.maiorBloqueio ? ` · maior bloqueio: ${e.maiorBloqueio[0]}` : ''}`, e.pct]), '') : []),
     ...bloco('Prestadores por situação', ind.porSituacao, 'int'), ...bloco('NF complementar por fechamento', ind.nfComplementar), ...bloco('Variação acima do limite (%)', ind.variacoes, ''),
     ...(ind.controleUnidade?.length ? bloco('Prestadores por unidade (laudos × repasse) — avisos', ind.controleUnidade.map(a => [a.texto, '']), '') : [])];
-  return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }]);
+  // SOL-F19: o quadro por prestador também vai para o Excel de indicadores.
+  const nomeCol = Object.fromEntries(COLUNAS_QUADRO.map(([k, n]) => [k, n])), tipoNome = { usg: 'USG', img: 'IMG', curitiba: 'Curitiba' };
+  const Q = [cabecalho(['Repasse', 'Cód.', 'Prestador', 'Coluna do quadro', 'Valor', 'Aguardando (de quem: motivo)', 'Marcado por', 'Em'])];
+  for (const t of ['usg', 'img', 'curitiba']) for (const x of f[t] || []) Q.push([tipoNome[t], x.cod, x.nome, nomeCol[x.coluna] || '', { v: x.totalGeral || 0, st: { fmt: 'money' } },
+    x.aguardando ? `${QUEM_AGUARDA.find(q => q[0] === x.aguardando.quem)?.[1] || 'Outro'}: ${x.aguardando.motivo}` : '', x.aguardando?.por || '', x.aguardando?.em ? new Date(x.aguardando.em) : '']);
+  return criarXlsx([{ nome: 'Indicadores', larguras: [56, 20], linhas, filtro: false, congelar: false }, { nome: 'Quadro', larguras: [10, 8, 36, 22, 14, 50, 16, 18], linhas: Q }]);
 }

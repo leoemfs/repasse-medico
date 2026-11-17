@@ -576,7 +576,26 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - Ao salvar, avisa se a outra pessoa alterou o mesmo item desde a última leitura (conflito) e mostra as duas versões.
 - **Aceite:** a validação feita por uma pessoa aparece para a outra; nenhuma gravação apaga a alteração da outra sem aviso.
 
-## SOL-F19 — Quadro Kanban por prestador — PLANEJADO
+## SOL-F19 — Quadro Kanban por prestador — **IMPLEMENTADA na v3.0.0-alpha.15** (teste: `test/quadro_fechamento.mjs`; guia em `como-usar-fechamento.md`)
+
+**Decisões do usuário (17/11/2026):**
+- é uma subaba do Fechamento;
+- os cartões mudam de coluna sozinhos, pelos dados;
+- «Aguardando terceiros» é uma marca à mão, com motivo;
+- não tem limite de WIP.
+
+**Como ficou:**
+- **Subaba «Quadro»** com seletor de repasse: Todos, USG, IMG ou Curitiba.
+- **As 7 colunas e de onde vêm:**
+  - A conferir: sem rodada;
+  - Em correção: rodada sem aceite em alguma unidade;
+  - Aguardando terceiros: marca à mão;
+  - Com aceite;
+  - Enviado, NF recebida e Concluído: marcas do controle documental do Fluxo.
+- **Clique no cartão:** abre o menu da situação, com «E-mail enviado», «NF recebida», «NF encaminhada», «Aguardando terceiros…» (de quem e motivo) e «Abrir conferência».
+- **Excel de indicadores:** ganha a aba «Quadro», com a coluna de cada prestador e quem ele aguarda.
+
+**Proposta original:**
 - **Proposta:** visão em quadro no Fechamento (ou no Fluxo), com as colunas:
   1. a conferir;
   2. em correção;

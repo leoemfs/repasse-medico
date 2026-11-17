@@ -86,3 +86,22 @@ O Doppler sempre conta como USG: entra no volume de exames e no faturamento de U
   - USG em blocos por faixa;
   - abas IMG, Curitiba e Produção;
   - mesclagens, bordas, formato R$ e zoom de 85%.
+
+## Quadro por prestador (desde a v3.0.0-alpha.15)
+
+Na subaba **Quadro** do Fechamento, cada prestador é um cartão numa destas colunas. Escolha Todos, USG, IMG ou Curitiba no seletor «Repasse».
+
+| Coluna | Quando o cartão está nela |
+|---|---|
+| A conferir | o prestador ainda não tem rodada de conferência na competência |
+| Em correção | tem rodada, mas falta o aceite em alguma unidade |
+| Aguardando terceiros | você marcou à mão, com de quem (médico, unidade, faturamento, outro) e o motivo |
+| Com aceite | aceite em todas as unidades; o e-mail ainda não foi enviado |
+| Enviado | «E-mail enviado» marcado (controle documental do Fluxo) |
+| NF recebida | «NF recebida» marcada |
+| Concluído | «NF encaminhada ao Financeiro» marcada |
+
+- **O cartão muda de coluna sozinho,** conforme os dados mudam. Não há arrastar.
+- **Clique no cartão** para marcar e-mail, NF ou «Aguardando terceiros…», ou para abrir a conferência do prestador.
+- **«Aguardando terceiros»:** fica até você tirar a marca ou a NF ser encaminhada ao Financeiro.
+- **Excel de indicadores:** tem a aba «Quadro», com a coluna de cada prestador.

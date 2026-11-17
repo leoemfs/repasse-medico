@@ -36,7 +36,7 @@ RENDER.fechamento = async () => {
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
-    <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
+    <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['quadro', 'Quadro'], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
     ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
     <div id="fhCorpo"></div>
     ${avisosFechamentoControle()}`;
@@ -45,7 +45,7 @@ RENDER.fechamento = async () => {
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
   $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp), controleUnidade: S.apolo ? avisosControleUnidade(controleAtual()).filter(a => a.tipo !== 'sem-cadastro') : [] }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
-  if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else desenharIndicadoresFech(corpo, f);
+  if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else if (FH.sub === 'quadro') desenharQuadro(corpo, f); else desenharIndicadoresFech(corpo, f);
   if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
 };
 
@@ -300,6 +300,8 @@ function abrirMenuSituacao(btn, f) {
   m.innerHTML = `<div class="cab">Situação de «${esc(x.nome)}»</div>
     ${x.manual ? '<button type="button" data-ac="tirar">Tirar a marca «Verificar» (volta ao calculado)</button>' : '<button type="button" data-ac="verificar">Marcar para verificar… <small>pede o motivo</small></button>'}
     <hr>${ACOES_DOC.map(([k, t]) => `<button type="button" data-ac="${k}">${doc[k] ? `✓ ${t} · ${fmtData(paraData(doc[k]))} <small>desfazer</small>` : `${t} <small>grava no Fluxo</small>`}</button>`).join('')}
+    <hr>${x.aguardando ? `<button type="button" data-ac="tirarAguardando">Tirar «Aguardando terceiros» <small>${esc(x.aguardando.motivo)}</small></button>` : '<button type="button" data-ac="aguardando">Aguardando terceiros… <small>pede o motivo</small></button>'}
+    <button type="button" data-ac="abrir">Abrir conferência <small>${esc(x.semAceite[0] ? `unidade ${x.semAceite[0]}` : Object.keys(x.unidades)[0] ? `unidade ${Object.keys(x.unidades)[0]}` : 'escolher o relatório')}</small></button>
     <hr><div class="rodape">Situação calculada: ${esc(SITUACAO_FECH[x.situacaoCalculada || x.situacao].nome)}</div>`;
   document.body.appendChild(m); menuSitEm = Date.now();
   const r = btn.getBoundingClientRect(), w = 320;
@@ -311,7 +313,21 @@ async function acaoSituacao(ac, modo, x) {
   if (!exigirAberta(S.comp, 'mudar a situação')) return;
   const op = await exigirOperador(); if (!op) return;
   const tipo = x.tipo;   // as marcas manuais usam a tabela do prestador (usg, img ou curitiba)
-  if (ac === 'verificar') {
+  if (ac === 'abrir') {   // SOL-F19: do quadro (ou da tabela) para a conferência do prestador
+    CU.sub = 'conferir'; CU.abrir = { cod: x.cod, unidade: x.semAceite[0] || Object.keys(x.unidades)[0] || '', grupo: modo };
+    location.hash = 'conferencia'; return;
+  }
+  if (ac === 'aguardando') {
+    const r = await dialogo(`«${x.nome}» aguardando terceiros`, `<p class="small muted">O prestador vai para a coluna «Aguardando terceiros» do quadro até você tirar a marca (ou a NF ser encaminhada). Aparece no cartão e no Excel de indicadores.</p>
+      <label class="campo">De quem<select name="quem">${opcoes(QUEM_AGUARDA, 'medico')}</select></label><label class="campo">Motivo (obrigatório)<input type="text" name="motivo" placeholder="ex.: médico vai reenviar a NF"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Marcar']]);
+    if (r.botao !== 'ok') return;
+    if (!r.campos.motivo.trim()) return avisar('Informe o motivo.', 'warn');
+    salvarFech(fe => { fe.aguardando = fe.aguardando || {}; fe.aguardando[tipo] = { ...(fe.aguardando[tipo] || {}), [x.cod]: { quem: r.campos.quem, motivo: r.campos.motivo.trim(), por: op, em: agoraISO() } }; });
+    avisar(`${x.nome}: aguardando terceiros.`, 'ok');
+  } else if (ac === 'tirarAguardando') {
+    salvarFech(fe => { if (fe.aguardando?.[tipo]) delete fe.aguardando[tipo][x.cod]; if (tipo === 'curitiba' && fe.aguardando?.img) delete fe.aguardando.img[x.cod]; });
+    avisar(`Marca «Aguardando terceiros» retirada de ${x.nome}.`, 'ok');
+  } else if (ac === 'verificar') {
     const r = await dialogo(`Marcar «${x.nome}» para verificar`, `<p class="small muted">A marca fica por cima da situação calculada até você tirar. Aparece na tela e na planilha (cor «Verificar»).</p><label class="campo">Motivo (obrigatório)<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Marcar']]);
     if (r.botao !== 'ok') return;
     if (!r.campos.motivo.trim()) return avisar('Informe o motivo.', 'warn');
@@ -343,3 +359,22 @@ function avisosFechamentoControle() {
 }
 document.addEventListener('toggle', e => { if (e.target.id === 'fhAvisos') try { localStorage.setItem('rm2.fhAvisosAbertos', e.target.open ? '1' : '0'); } catch (x) { } }, true);
 document.addEventListener('click', e => { if (e.target.closest('[data-ctlun]')) CU.sub = 'unidades'; });
+
+/* SOL-F19 (v3.0.0-alpha.15) — Quadro por prestador: as colunas saem dos dados (rodada, aceite, envio e NF no Fluxo);
+ * clicar no cartão abre o mesmo menu da situação (e-mail, NF, «Aguardando terceiros», abrir a conferência). */
+FH.qTipo = FH.qTipo || 'todos';
+function desenharQuadro(corpo, f) {
+  const tipos = FH.qTipo === 'todos' ? ['usg', 'img', 'curitiba'] : [FH.qTipo], rot = { usg: 'USG', img: 'IMG', curitiba: 'Curitiba' };
+  const todos = tipos.flatMap(t => (f[t] || []).map(x => ({ x, t })));
+  const card = ({ x, t }) => `<button type="button" class="qd-card${x.situacao === 'verificar' ? ' qd-verif' : ''}" data-sit="${esc(t)}|${esc(x.cod)}" title="Clique para mudar a situação ou abrir a conferência">
+    <span class="qd-nome">${esc(x.nome)}</span><span class="qd-meta">${esc(x.cod)}${FH.qTipo === 'todos' ? ` · ${rot[t]}` : ''}${x.temValores ? ` · R$ ${fmtBR(x.totalGeral)}` : ''}</span>
+    ${x.semAceite.length ? `<span class="qd-tag warn">sem aceite: un. ${esc(x.semAceite.join(', '))}</span>` : ''}${x.pendencias ? `<span class="qd-tag warn">${x.pendencias} pendência(s)</span>` : ''}
+    ${x.manual ? `<span class="qd-tag err">verificar: ${esc(x.manual.motivo)}</span>` : ''}${x.aguardando ? `<span class="qd-tag info">${esc(QUEM_AGUARDA.find(q => q[0] === x.aguardando.quem)?.[1] || 'Outro')}: ${esc(x.aguardando.motivo)}</span>` : ''}
+    ${x.doc?.relatorio ? `<span class="qd-data">e-mail ${fmtCurta(paraData(x.doc.relatorio))}</span>` : ''}${x.doc?.nfRecebida ? `<span class="qd-data">NF ${fmtCurta(paraData(x.doc.nfRecebida))}</span>` : ''}</button>`;
+  corpo.innerHTML = `<div class="card"><div class="fx-topo"><h2 style="margin:0">Quadro por prestador</h2>
+    <label class="campo" style="margin:0">Repasse<select id="qdTipo">${opcoes([['todos', 'Todos'], ['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba (V3)']], FH.qTipo)}</select></label></div>
+    <p class="small muted">Os cartões mudam de coluna sozinhos, pelos dados: rodada, aceite, e-mail e NF (controle documental do Fluxo). Clique no cartão para registrar envio, NF, «Aguardando terceiros» ou abrir a conferência.</p>
+    <div class="quadro">${COLUNAS_QUADRO.map(([k, nome, dica]) => { const c = todos.filter(y => y.x.coluna === k); return `<section class="qd-col qd-${k}" data-col="${k}"><h3 title="${esc(dica)}">${esc(nome)} <span class="qd-n">${c.length}</span></h3>${c.map(card).join('') || '<p class="small muted">—</p>'}</section>`; }).join('')}</div></div>`;
+  $('qdTipo').onchange = e => { FH.qTipo = e.target.value; desenharQuadro(corpo, f); };
+  corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
+}
