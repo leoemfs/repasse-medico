@@ -154,7 +154,7 @@ function desenharListaMV() {
   c.querySelectorAll('[data-fin]').forEach(s => s.onchange = () => { S.relatorios.find(y => y.id === s.dataset.fin).finalidade = s.value; avisar(`Relatório marcado para ${s.value === 'correcao' ? 'a Correção de prestador' : 'a Conferência'}.`, 'ok'); });
 }
 
-async function carregarPDFs(files) {
+async function carregarPDFs(files, origem = null) {
   for (const f of files) {
     if (!/\.pdf$/i.test(f.name)) { avisar(`${f.name}: envie o relatório em PDF.`, 'err'); continue; }
     $('stMV').innerHTML = `Lendo ${esc(f.name)}…`;
@@ -166,7 +166,7 @@ async function carregarPDFs(files) {
       if (!rel.regs.length) { avisar(`${f.name}: nenhuma linha de atendimento reconhecida. ${rel.avisos[0] || ''}`, 'err'); continue; }
       const item = { id: novoId('mv'), nome: f.name, tamanho: f.size, hash, rel };
       Object.defineProperty(item, 'bytes', { value: bytes, enumerable: false });   // só na memória: vai para a pasta da competência
-      if (!await aceitarProducao(f.name, producaoDoArquivo(item, () => rel.regs.map(l => l.data)))) continue;
+      if (!await aceitarProducao(f.name, producaoDoArquivo(item, () => rel.regs.map(l => l.data)), origem)) continue;
       item.finalidade = finalidadePadrao(rel);
       S.relatorios.push(item);
       if (registrarPrestadorDoMV(S.cfg, rel.cab.prestadorCod, rel.cab.prestadorNome)) salvarCfg();
@@ -234,11 +234,21 @@ async function importarEquivalenciasArquivo(f, modo) {
 
 /* ---------- Arquivos da sessão: produção esperada e limpeza ---------- */
 // Arquivo de produção diferente da esperada pela competência do topo: pergunta antes de incluir.
-async function aceitarProducao(nome, dom) {
+// origem (PDF lido da pasta): mostra onde o arquivo está e permite «Ignorar este arquivo», lembrado neste navegador
+// enquanto o arquivo não mudar. Antes, «Cancelar» valia só até recarregar e o aviso voltava a cada abertura.
+async function aceitarProducao(nome, dom, origem = null) {
   const esp = producaoEsperada(S.comp);
   if (!dom || dom.mes === esp) return true;
-  return confirmar('Arquivo de outra produção', `«${esc(nome)}» é de produção <b>${rotuloMes(dom.mes)}</b>, mas a competência ${rotuloCompetencia(S.comp)} espera produção ${rotuloMes(esp)}. As análises seriam gravadas em ${rotuloCompetencia(S.comp)}. Incluir mesmo assim? (Se o arquivo é de outra competência, troque a competência no topo antes.)`, 'Incluir mesmo assim');
+  const texto = `<p>«${esc(nome)}» é de produção <b>${rotuloMes(dom.mes)}</b>, mas a competência ${rotuloCompetencia(S.comp)} espera produção ${rotuloMes(esp)}. As análises seriam gravadas em ${rotuloCompetencia(S.comp)}. Incluir mesmo assim? (Se o arquivo é de outra competência, troque a competência no topo antes.)</p>`;
+  if (!origem) return confirmar('Arquivo de outra produção', texto.replace(/^<p>|<\/p>$/g, ''), 'Incluir mesmo assim');
+  const r = await dialogo('Arquivo de outra produção', `${texto}<p class="small"><b>Onde está:</b> <code>${esc(origem.caminho)}</code><br><span class="muted">A ferramenta lê todas as subpastas de «Relatórios para conferência» e «Correção de prestador» (menos as que começam com «_»). Para tirar de vez, apague ou mova o arquivo dessa pasta, ou ignore-o aqui.</span></p>`,
+    [['', 'Agora não', 'sec'], ['ignorar', 'Ignorar este arquivo', 'sec'], ['ok', 'Incluir mesmo assim']]);
+  if (r.botao === 'ignorar') { ignorarPDF(origem, nome); avisar(`«${nome}» ignorado: não será lido de novo enquanto o arquivo não mudar. Para voltar a ler, use «PDFs ignorados» no cartão da pasta raiz.`, 'ok'); }
+  return r.botao === 'ok';
 }
+const pdfsIgnorados = () => lerLocal(CHAVES.pdfsIgnorados) || {};
+const pdfIgnorado = (chave, sig) => pdfsIgnorados()[chave]?.sig === sig;
+function ignorarPDF(origem, nome) { const m = pdfsIgnorados(); m[origem.chave] = { sig: origem.sig, nome, caminho: origem.caminho, comp: S.comp, por: S.operador || '', em: agoraISO() }; gravarLocal(CHAVES.pdfsIgnorados, m); }
 function limparSessao(oque) {
   if (oque === 'tudo' || oque === 'pdfs') S.relatorios = [];
   if (oque === 'tudo' || oque === 'bases') { S.apolo = null; S.pbi = null; }

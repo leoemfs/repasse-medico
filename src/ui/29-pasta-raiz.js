@@ -136,10 +136,12 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
         const grupo = finalidade === 'correcao' ? '' : grupoDaPasta(partes[0]);
         const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : unidadeDoNomePasta(partes.length > 1 ? partes[partes.length - 2] : '');
         const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${pasta.nome}/${c}`;
+        // PDF que a pessoa mandou ignorar (ex.: de outra produção): não pergunta de novo enquanto o arquivo não mudar.
+        if (pdfIgnorado(k, sig)) { r.ignorados = (r.ignorados || 0) + 1; continue; }
         const atual = S.relatorios.find(x => x.caminhoPasta === k);
         if (atual && PR.lidos.get(k) === sig) continue;
         if (atual) S.relatorios = S.relatorios.filter(x => x !== atual);
-        const n0 = S.relatorios.length; await carregarPDFs([f]);
+        const n0 = S.relatorios.length; await carregarPDFs([f], { caminho: `${nomeCompPasta(S.comp)} › ${pasta.nome} › ${c.split('/').join(' › ')}`, chave: k, sig });
         if (S.relatorios.length > n0) {
           const it = S.relatorios.at(-1); it.caminhoPasta = k; it.unidadePasta = un; it.grupoPasta = grupo; if (finalidade === 'correcao') it.finalidade = 'correcao';
           // Mesmo prestador × unidade lido de outro arquivo: fica o mais recente.
@@ -153,7 +155,7 @@ async function atualizarDaPasta({ silencioso = false } = {}) {
     PR.ultima = { em: Date.now(), ...r };
   } catch (e) { r.avisos.push(e.message); if (!silencioso) avisar(`Erro ao ler a pasta (${e.message}).`, 'err'); }
   finally { PR.lendo = false; }
-  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
+  if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
   if (r.mudaram) avisar(`${r.mudaram} relatório(s) mudaram desde a última leitura: rode a conferência deles de novo.`, 'warn');
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
   return r;
@@ -248,7 +250,7 @@ function cartaoPastaRaiz() {
     ${perm ? '<p class="small"><b>O Edge pede para liberar o acesso à pasta</b> a cada sessão (ou marque «permitir sempre»). Clique em «Liberar acesso».</p>' : `
     <p class="small muted">Lê de <code>Competências › ${nomeCompPasta(S.comp)} › ${PASTA_REL.nome}</code> (USG, IMG, Curitiba, por unidade), <code>${PASTA_CORR.nome}</code> e <code>Bases de dados › ${nomeCompPasta(S.comp)}</code> (laudos e Power BI). Só lê o que é novo ou mudou; pastas que começam com «_» (ex.: _antigos) ficam de fora.</p>
     <div class="pr-st"><span>${v ? (v.faltam.length ? `<span class="badge warn">${v.faltam.length} pasta(s) faltando</span> <span class="small muted">${esc(v.faltam.slice(0, 3).join(' · '))}${v.faltam.length > 3 ? ' …' : ''}</span>` : '<span class="badge ok">pastas da competência em ordem</span>') : '<span class="small muted">conferindo as pastas…</span>'}</span>
-      <span class="small muted">${u ? `última leitura ${new Date(u.em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}: ${u.pdfs} PDF(s) na pasta · ${u.novos} novo(s) · ${u.mudaram} atualizado(s)` : 'ainda não lida nesta sessão'}</span>
+      <span class="small muted">${u ? `última leitura ${new Date(u.em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}: ${u.pdfs} PDF(s) na pasta · ${u.novos} novo(s) · ${u.mudaram} atualizado(s)` : 'ainda não lida nesta sessão'}</span>${(() => { const ig = Object.values(pdfsIgnorados()).filter(x => x.comp === S.comp); return ig.length ? ` <button class="sec mini" id="prIgnorados">PDFs ignorados (${ig.length})</button>` : ''; })()}
       <span class="small muted">Fluxo: ${esc({ ok: 'sincronizado', erro: 'sem acesso', conflito: 'conflito', permissao: 'liberar acesso' }[SY.status] || SY.status)} · Equivalências: ${esc({ ok: 'sincronizadas', erro: 'sem acesso', conflito: 'conflito', juntar: 'falta juntar', permissao: 'liberar acesso', off: '—' }[SYQ.status] || SYQ.status)}</span></div>`}</div>`;
 }
 function ligarPastaRaiz() {
@@ -256,6 +258,13 @@ function ligarPastaRaiz() {
   if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await atualizarDaPasta(); } else avisar('O acesso à pasta não foi liberado.', 'warn'); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
+  if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
+    const m = pdfsIgnorados(), ks = Object.keys(m).filter(k => m[k].comp === S.comp);
+    const r = await dialogo('PDFs ignorados nesta competência', `<p class="small muted">Estes arquivos da pasta não são lidos enquanto não mudarem. Marque os que devem voltar a ser lidos.</p>${ks.map((k, i) => `<label class="small" style="display:block;margin:4px 0"><input type="checkbox" name="v${i}"> <b>${esc(m[k].nome)}</b> — <code>${esc(m[k].caminho)}</code> <span class="muted">(${esc(m[k].por || '—')}, ${new Date(m[k].em).toLocaleDateString('pt-BR')})</span></label>`).join('')}`, [['', 'Fechar', 'sec'], ['ok', 'Voltar a ler os marcados']]);
+    if (r.botao !== 'ok') return;
+    let n = 0; ks.forEach((k, i) => { if (r.campos[`v${i}`]) { delete m[k]; PR.lidos.delete(k); n++; } });
+    gravarLocal(CHAVES.pdfsIgnorados, m); if (n) { avisar(`${n} PDF(s) voltam a ser lidos.`, 'ok'); await atualizarDaPasta(); } else RENDER.inicio();
+  };
   if (SY.handle && !SY.legado && SY.status !== 'permissao' && PRI.verifComp !== S.comp) {
     PRI.verifComp = S.comp; verificarEstrutura(S.comp).then(v => { PRI.verif = v; if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }).catch(() => {});
   }

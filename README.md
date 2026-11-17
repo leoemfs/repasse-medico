@@ -57,6 +57,7 @@ node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com
 node test/exames.mjs             # v3.0: exame (USG com Doppler em uma ou duas páginas) e «Dispensar laudo»
 node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (complementar e manual)
 node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, lote, observação, resolvido no MV, reconferência e fechamento
+node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
 ```
 
 ## Publicação (GitHub Pages)
