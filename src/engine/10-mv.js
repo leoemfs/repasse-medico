@@ -145,6 +145,7 @@ function interpretarMV(linhas, arquivo) {
     // Identificador estável da linha para comparar rodadas (sem nome de paciente).
     r.chave = `${r.codigo}|${r.conta}|${r.atendimento}|${isoDia(r.data)}|${ord.get(k)}`;
   }
+  marcarOrdemDecisao(regs);   // chave das decisões: ordem entre as linhas com mesma conta, atendimento, código e data
   const nRep = regs.filter(r => r.repeticao).length;
   if (nRep) notas.push(`${nRep} linha(s) idênticas repetidas (mesmo procedimento, conta, atendimento, data e valores). Foram mantidas e marcadas para revisão.`);
   const nPct = regs.filter(r => r.pctCalculado).length;

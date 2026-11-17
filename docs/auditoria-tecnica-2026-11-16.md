@@ -2,7 +2,7 @@
 
 Feita sem alterar código. As medições usaram dados fictícios no volume real (30 mil laudos; relatórios de 2 a 3 mil linhas). Esta é a lista de trabalho das próximas sessões.
 
-## P0 — erros confirmados que afetam o valor pago (fazer primeiro)
+## P0 — erros confirmados que afetam o valor pago (fazer primeiro) — **CORRIGIDOS na v3.0.0-alpha.9** (teste: `test/p0_decisoes.mjs`)
 
 1. **A NC de um laudo «Só no laudo» é herdada pelo lançamento que o MV fez depois para corrigir.**
    - A NC «não lançado» é gravada pela chave do laudo (`L|idLaudo`). Na rodada seguinte, depois de o MV lançar o procedimento, a linha forma par com o laudo e herda a decisão NC. Resultado: classe NC, fora do fechamento, mesmo estando conferida.
@@ -14,6 +14,12 @@ Feita sem alterar código. As medições usaram dados fictícios no volume real 
    - Correção esperada: incluir a ordem da repetição (`r.repeticao.i`) na chave apenas quando houver repetição, para manter as chaves já gravadas das linhas únicas.
 
 Os dois foram reproduzidos por teste. Escrever um teste para cada um junto com a correção.
+
+**Como ficou (v3.0.0-alpha.9):**
+- A decisão de uma linha do MV é procurada **só pela chave do MV**. A chave do laudo reconhece o laudo quando ele aparece «Só no laudo» (o caso da SOL-F6 continua: NC de linha com par cujo procedimento sai do MV). A NC «não lançado» aparece como «Corrigida: lançada no MV» na aba «NCs e correções no MV» quando o laudo passa a ter par.
+- Linhas do MV que dividem conta + atendimento + código + data (cobrança repetida e mesmo código no mesmo dia com valores diferentes) ganham a ordem na chave (`…|1`, `…|2`). Linhas únicas mantêm a chave de sempre.
+- Decisões gravadas antes na chave sem a ordem valem para **uma** linha só: a do mesmo laudo; sem laudo, a 1ª; a NC de duplicidade, as repetidas (2ª em diante). Nenhuma decisão antiga passa a pagar uma cobrança a mais.
+- Rodadas gravadas antes são lidas com a ordem nas linhas repetidas (`normalizarChavesRodada`), sem regravar.
 
 ## P1
 

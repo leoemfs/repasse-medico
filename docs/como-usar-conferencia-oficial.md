@@ -64,6 +64,9 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
    - **Aguardando correção no MV:** ainda é o mesmo PDF; falta reimportar.
    - **Não corrigida: continua no MV** (alerta vermelho): o PDF é novo e a linha continua lá. A ferramenta já tira o valor do fechamento, mas o MV ainda vai pagar.
    - **HM que continua no MV** depois da reconferência: notificado para excluir.
+   - **Corrigida: lançada no MV** (desde a v3.0.0-alpha.9): a NC «não lançado» de um laudo «Só no laudo» cujo procedimento o MV lançou depois. A linha nova segue a própria classe (normalmente Devido); a NC não passa para ela.
+
+**Linha repetida no MV** (mesma conta, atendimento, código e data): cada repetição tem decisão própria. «Esta é a repetida → NC» tira do fechamento só a duplicata; a cobrança legítima continua Devido.
 
 ## 6. Fechamento
 - Cada prestador × unidade usa o **valor para pagamento** da rodada. Isso vale também para a produção de USG (classe A/B/C/D), a V3, a planilha de controle e o e-mail.

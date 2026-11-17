@@ -128,7 +128,7 @@ function abrirDB() {
 }
 function dbTodas() {
   if (!DB.ok) return Promise.resolve(S.rodadas);
-  return new Promise(res => { const rq = DB.db.transaction('rodadas').objectStore('rodadas').getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); });
+  return new Promise(res => { const rq = DB.db.transaction('rodadas').objectStore('rodadas').getAll(); rq.onsuccess = () => res((rq.result || []).map(normalizarChavesRodada)); rq.onerror = () => res([]); });
 }
 function dbGravar(r) {
   if (!DB.ok) return Promise.resolve(false);
