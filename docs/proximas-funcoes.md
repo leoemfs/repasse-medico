@@ -11,6 +11,32 @@
 
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
+## SOL-F45 — Estrutura padronizada das pastas na rede — **IMPLEMENTADA na v3.0.0-alpha.14** (pedido de 17/11/2026; guia em `como-usar-pastas.md`; teste: `test/estrutura_pastas.mjs`)
+
+**Pedido do usuário:** padronizar a pasta raiz `App repasse médico`:
+- `01 - Sistema` com os arquivos permanentes;
+- uma pasta por ano (`02 - Repasse 2026`, `03 - Repasse 2027`…);
+- 12 competências por ano (`2026-11 - Novembro`), todas com a mesma estrutura (01 a 08).
+
+Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «construa repasse 2027 baseando-se nesse novo método» e avisar e guiar quando algo precisar ser movido à mão. O que ele disse ao escolher: «essa pasta de relatório de prestador não precisa se preocupar pois é uma pasta onde eu salvo os arquivos depois de toda a conferência», ou seja, o PDF final para o médico, sem o valor total.
+
+**Como ficou:**
+- **Criar pastas:** «Criar pastas da competência», «de 2026» e «de 2027» criam a estrutura completa. Nada é duplicado.
+- **Ler:** a ferramenta lê a estrutura nova e a antiga.
+  - Na 05, só USG, IMG e Curitiba são lidas.
+  - A unidade vem do nome da pasta, que é o nome da unidade.
+  - A correção usa o nome do arquivo (`nome_unidade`).
+- **Gravar:** os Excel vão para a estrutura nova (NCs na 02, correção na 01, conferência ao lado do PDF na 05), sem nunca substituir arquivo.
+- **Arquivos permanentes:** a ferramenta usa `01 - Sistema` quando existe; senão continua na pasta antiga da raiz (para os dois não se separarem no meio da mudança).
+- **Pastas manuais:** 06, 07 e 08 são só criadas; a ferramenta não grava nelas.
+- **Saíram** os nomes de pastas configuráveis (cfg.pastas).
+- **Pacote .zip** com os nomes novos.
+- **A mudança dos arquivos atuais é manual,** guiada:
+  - em Configurações → Pastas e em `como-usar-pastas.md`;
+  - no Início, o cartão da pasta raiz mostra o que ainda está no lugar antigo.
+
+**SOL-F39 e SOL-F10:** a SOL-F45 cobre o «pacote da competência controlando as pastas do mês», nas pastas que são da ferramenta. As pastas de relatórios aos prestadores, NFs e repasses avulsos ficam com a equipe, por decisão do usuário.
+
 ## SOL-F44 — Ajustes de uso pedidos em 17/11/2026 — **IMPLEMENTADA na v3.0.0-alpha.11** (teste: `test/pasta_por_aba.mjs`)
 
 **Pedido do usuário:** «esses log de erro ocupa muito espaço, colocar em um alternante na parte inferior e deixar com bolinha de notificação quando o alternante estiver fechado. Nas pastas de correção, dentro da pasta de correção não precisa de subpastas; os arquivos ficam aqui organizados por nome_unidade. Outra coisa, um botão em cada aba para sincronizar com a pasta em questão […] assim sincroniza só a pasta em questão para não precisar reler todos os PDFs.»
@@ -432,7 +458,7 @@ Pedido de 30/10/2026.
   - lançamento faltante.
 - **Cuidado de privacidade a definir na prévia:** CPF nunca é lido. O que guardar por paciente (nome, atendimento) segue a mesma retenção das NCs; o catálogo sem dados de pacientes pode ficar permanente.
 
-## SOL-F10 — Pasta da competência na rede — A IMPLEMENTAR
+## SOL-F10 — Pasta da competência na rede — **IMPLEMENTADA** em partes: pasta raiz (v2.1.0-alpha.9) e estrutura padronizada (SOL-F45, v3.0.0-alpha.14). O arquivamento dos PDFs por médico ficou com a equipe, por decisão do usuário em 17/11/2026
 
 Organização atual do usuário (30/10/2026), uma pasta por competência («REPASSE MM-AAAA»), salva na rede:
 - **CORREÇÃO DE PRESTADOR:** relatório da unidade 1 com prestador genérico e os demais relatórios.
@@ -494,7 +520,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - o aceite feito na conferência aparece em Rodadas e no Fechamento;
   - competência fechada bloqueia o aceite.
 
-## SOL-F12 — «Marcar como enviado» no Fechamento — PLANEJADO
+## SOL-F12 — «Marcar como enviado» no Fechamento — **IMPLEMENTADA** (menu de situação do Fechamento: «E-mail enviado», «NF recebida» e «NF encaminhada» gravam no controle documental do Fluxo, com desfazer e aviso quando o Fluxo não foi iniciado)
 - **Hoje:** a prévia é copiada no Fechamento, mas o «relatório enviado» é marcado no controle documental do Fluxo (~40 vaivéns por mês).
 - **Proposta:** depois de «Copiar prévia», o botão «Marcar como enviado» grava a data no controle documental do Fluxo. É o mesmo dado, sem cópia; o Fluxo continua sendo o dono.
 - **Aceite:**
@@ -1111,7 +1137,7 @@ Pedido: «pode implementar a conexão com as pastas com as sincronizações nece
 - **Equivalências sincronizadas (SOL-F37):** `equivalencias.json` na pasta Equivalência TUSS; mescla por relação (código × título × escopo) e por regra composta; primeira vez mostra as duas bases e o resultado antes de juntar (cópia da sua base para desfazer); decisões diferentes pedem escolha com o histórico das duas; relações que chegam validadas geram aviso para rodar de novo as conferências afetadas. Barra de sincronização no topo de Equivalências.
 - Testes: `test/pasta_raiz.mjs` (pasta simulada em disco, dois usuários) e `test/fluxo_sync.mjs`.
 
-## SOL-F39 — Pacote da competência controlando todas as pastas do mês — A FAZER (09/11/2026)
+## SOL-F39 — Pacote da competência controlando todas as pastas do mês — **IMPLEMENTADA como SOL-F45** (v3.0.0-alpha.14), nas pastas que são da ferramenta. As pastas de relatórios aos prestadores, NFs e repasses avulsos ficam com a equipe (09/11/2026)
 Pedido: «Não precisa incluir tudo isso agora, mas é assim que organizo atualmente; o pacote da competência deve controlar tudo isso.» Pastas atuais do mês: CORREÇÃO DE PRESTEDOR · NAO CONFORMIDADES · NFs PAGAMENTO · PLANILHAS-CONFERENCIA · RELATORIOS-MV-CONFERENCIA · REPASSE 20% – PAULO ASSHAIAS FELIPE · REPASSE 25% – MARIANA MANFIO · REPASSE EUDES GUERRA – ECO · REPASSE IMG – RELATORIOS PRESTADORES · REPASSE PET – RELATORIOS PRESTADORES · REPASSE SEDAÇÃO – RELATORIOS PRESTADORES · REPASSE USG – RELATORIOS PRESTADORES · REPASSE V3 – RELATORIOS PRESTADORES.
 - O pacote da competência (exportação e pasta do mês) deve conhecer e controlar todas elas: o que existe, o que falta, o que já foi enviado (relatórios aos prestadores, NFs de pagamento), ligado ao Fluxo e ao Fechamento.
 

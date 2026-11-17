@@ -88,7 +88,7 @@ await ir('inicio'); await p.screenshot({ path: out + 'competencia_inicio.png', f
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#compPacote')]);
 const arq = out + 'pacote_competencia.zip'; await dl.saveAs(arq);
 const nomes = execFileSync('python3', ['-I', '-c', 'import zipfile,sys; print(" ".join(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))', arq]).toString().trim();
-ok(/Comp_10-2026\/Controle da ferramenta\/Fluxo_mensal_10-2026\.xlsx/.test(nomes) && /Comp_10-2026\/Controle da ferramenta\/rodadas_10-2026\.json/.test(nomes) && /Comp_10-2026\/LEIA-ME\.txt/.test(nomes) && /Comp_10-2026\/REPASSE_10-2026_CONTROLE/.test(nomes), `pasta da competência: ${nomes.slice(0, 300)}`);
+ok(/2026-10 - Outubro\/Controle da ferramenta\/Fluxo_mensal_10-2026\.xlsx/.test(nomes) && /2026-10 - Outubro\/Controle da ferramenta\/rodadas_10-2026\.json/.test(nomes) && /2026-10 - Outubro\/LEIA-ME\.txt/.test(nomes) && /2026-10 - Outubro\/Controle da ferramenta\/REPASSE_10-2026_CONTROLE/.test(nomes), `pasta da competência: ${nomes.slice(0, 300)}`);
 
 // 7) Reabrir exige justificativa.
 await p.click('#compReabrir'); await okDlg();

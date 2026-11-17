@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.13</title>
+<title>Repasse Médico v3.0.0-alpha.14</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -385,13 +385,14 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 @media (max-width:1100px){.totais-cl{grid-template-columns:repeat(3,minmax(0,1fr))}.tot-cl.pagar{grid-column:1/-1}}
 @media (max-width:760px){.totais-cl{grid-template-columns:1fr 1fr}}
 .st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;white-space:nowrap}
+.arvore{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;line-height:1.5;margin:8px 0}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.13 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.14 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <a href="#inicio" data-pag="inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
@@ -436,7 +437,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.13';
+const MOTOR_VERSAO = '3.0.0-alpha.14';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -6372,13 +6373,19 @@ function desenharConferencia() {
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
+// Excel da conferência ao lado do PDF: 05 - Relatórios de repasse MV › USG | IMG | Curitiba › unidade (estrutura padronizada).
+function subpastaDaConferencia(ctx) {
+  const x = S.relatorios.find(r => r.id === ctx.relId), g = x ? grDoRel(x) : '', u = unidadePorCod(S.cfg, ctx.unidadeCod);
+  if (!GRUPOS_REL[g]) return [];
+  return g === 'curitiba' ? [GRUPOS_REL.curitiba] : [GRUPOS_REL[g], ...(u ? [nomePastaUnidadeRel(u)] : [])];
+}
 const fObsAtual = () => S.conf?.fObs === true ? 'com' : (S.conf?.fObs || '');
 /* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
  * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
 function exportarExcelConf(bt, res, ctx) {
   const idxObs = indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes);
   return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
-    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp), 'a exportação do Excel');
+    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp, subpastaDaConferencia(ctx)), 'a exportação do Excel');
 }
 function textoFiltroConf(vis) {
   const c = S.conf, partes = [];
@@ -7645,19 +7652,18 @@ window.addEventListener('hashchange', () => { if (location.hash === '#fluxo' && 
 
 /* ---- src/ui/29-pasta-raiz.js ---- */
 /* ============================================================
- * Pasta raiz do aplicativo na rede (SOL-F36, F37 e F38)
- *   Repasse Médico (raiz)
- *   ├─ Fluxo mensal                       ← Fluxo sincronizado (1 arquivo por competência)
- *   ├─ Equivalência TUSS (sincronização)  ← equivalencias.json
- *   ├─ Bases de dados / Comp_MM-AAAA      ← planilha de laudos (Apolo) e Power BI do mês
- *   ├─ backups
- *   └─ Competências / Comp_MM-AAAA
- *       ├─ Relatórios para conferência / USG | IMG / Unidade N - Nome ; Curitiba
- *       ├─ Correção de prestador / Unidade N - Nome
- *       ├─ Conferência cruzada
- *       └─ Não conformidades
- * A ferramenta lê os PDFs e as planilhas da pasta do mês, sincroniza Fluxo e equivalências e cria as pastas
- * com os nomes certos. Os arquivos ficam na rede; nada sai para a internet.
+ * Pasta raiz do aplicativo na rede (SOL-F36, F37 e F38) — estrutura padronizada (v3.0.0-alpha.14, pedido de 17/11/2026)
+ *   App repasse médico (raiz escolhida no Edge)
+ *   ├─ 01 - Sistema/            Backups · Configurações compartilhadas · Equivalências TUSS · Fluxo mensal
+ *   │                            · Bases compartilhadas · Outros arquivos permanentes do sistema
+ *   ├─ 02 - Repasse 2026/       2026-01 - Janeiro … 2026-12 - Dezembro
+ *   └─ 03 - Repasse 2027/       (mesma estrutura, um ano por pasta)
+ *  Cada competência: 01 - Correção de prestador · 02 - Não conformidades · 03 - NFS para pagamento (Pagamento 15 | 30)
+ *   · 04 - Planilhas de conferência · 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba › Prestadores
+ *   Unidade | Prestadores SRA) · 06 - Relatórios de prestadores conferidos · 07 - Mutirão unidades · 08 - Repasse final.
+ * Compatibilidade: a estrutura antiga (Fluxo mensal, Equivalência TUSS (sincronização), Configuração compartilhada e
+ * backups na raiz; Competências › Comp_MM-AAAA; Bases de dados › Comp_MM-AAAA) continua sendo lida. Nada é apagado,
+ * renomeado ou movido pela ferramenta: a mudança dos arquivos é manual (guia em docs/como-usar-pastas.md).
  * ============================================================ */
 const PASTAS_RAIZ = {
   fluxo: { nome: 'Fluxo mensal', re: /^FLUXO MENSAL/ },
@@ -7666,17 +7672,45 @@ const PASTAS_RAIZ = {
   backups: { nome: 'backups', re: /^BACKUPS?$/ },
   comps: { nome: 'Competências', re: /^COMPETENCIAS$/ }
 };
-// Pastas do mês: reconhece os nomes da exportação e os que a equipe já usa (ex.: RELATORIOS-MV-CONFERENCIA,
-// PLANILHAS-CONFERENCIA, CORREÇÃO DE PRESTEDOR, NAO CONFORMIDADES). Pastas novas são criadas com o nome padrão.
-const PASTA_REL = { nome: 'Relatórios para conferência', re: /^RELATORIOS? (MV )?(PARA )?CONFERENCIA/ };
-const PASTA_CORR = { nome: 'Correção de prestador', re: /^CORRECAO DE PREST/ };
-const PASTA_PLAN = { nome: 'Planilhas utilizadas para conferência', re: /^PLANILHAS/ };
-const PASTA_CONF = { nome: 'Conferência cruzada', re: /^CONFERENCIA CRUZADA/ };
-const PASTA_NC = { nome: 'Não conformidades', re: /^NAO CONFORMIDADES/ };
+// Estrutura nova: «01 - Sistema» com os arquivos permanentes; um ano por pasta («02 - Repasse 2026»); uma pasta por mês.
+const MESES_PASTA = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+const PASTA_SISTEMA = { nome: '01 - Sistema', re: /^(\d+ )?SISTEMA$/ };
+const SISTEMA = {
+  backups: { nome: 'Backups', re: /^BACKUPS?$/ }, cfg: { nome: 'Configurações compartilhadas', re: /^CONFIGURACO(ES|AO) COMPARTILHADAS?$/ },
+  eq: { nome: 'Equivalências TUSS', re: /^EQUIVALENCIAS? TUSS$/ }, fluxo: { nome: 'Fluxo mensal', re: /^FLUXO MENSAL$/ },
+  bases: { nome: 'Bases compartilhadas', re: /^BASES COMPARTILHADAS$/ }, outros: { nome: 'Outros arquivos permanentes do sistema', re: /^OUTROS ARQUIVOS/ }
+};
+const pastaAno = ano => ({ nome: `${String(Math.max(2, ano - 2024)).padStart(2, '0')} - Repasse ${ano}`, re: new RegExp(`^(\\d+ )?REPASSE ${ano}$`) });
+const nomePastaMes = chave => `${chave} - ${MESES_PASTA[+chave.slice(5) - 1]}`;
+const pastaMes = chave => ({ nome: nomePastaMes(chave), re: new RegExp(`^${chave.slice(0, 4)} ${chave.slice(5)}( |$)`) });
+// Pastas do mês (os nomes antigos continuam reconhecidos na leitura: «Correção de prestador», «Relatórios para conferência»…).
+const PASTA_CORR = { nome: '01 - Correção de prestador', re: /^(\d+ )?CORRECAO DE PREST/ };
+const PASTA_NC = { nome: '02 - Não conformidades', re: /^(\d+ )?NAO CONFORMIDADES/ };
+const PASTA_NFS = { nome: '03 - NFS para pagamento', re: /^(\d+ )?NFS? (PARA )?PAGAMENTO/ };
+const PASTA_PLAN = { nome: '04 - Planilhas de conferência', re: /^(\d+ )?PLANILHAS/ };
+const PASTA_REL = { nome: '05 - Relatórios de repasse MV', re: /^(\d+ )?RELATORIOS? (DE REPASSE MV|(MV )?(PARA )?CONFERENCIA)/ };
+const PASTA_CONFERIDOS = { nome: '06 - Relatórios de prestadores conferidos', re: /^(\d+ )?RELATORIOS? DE PRESTADORES CONFERIDOS/ };
+const PASTA_MUTIRAO = { nome: '07 - Mutirão unidades', re: /^(\d+ )?MUTIRAO/ };
+const PASTA_FINAL = { nome: '08 - Repasse final', re: /^(\d+ )?REPASSE FINAL$/ };
+const PASTA_CONF = { nome: 'Conferência cruzada', re: /^CONFERENCIA CRUZADA/ };   // só da estrutura antiga
+const GRUPOS_REL = { usg: { nome: 'USG', re: /^(USG|ULTRA)/ }, img: { nome: 'IMG', re: /^(IMG|IMAGEM)/ }, curitiba: { nome: 'Curitiba', re: /^(CURITIBA|V3)/ } };
+const SUB_CURITIBA = ['Prestadores Unidade', 'Prestadores SRA'];
+const SUB_CONFERIDOS = ['Repasse Ecodoppler', 'Repasse Sedação', 'Repasse IMG', 'Repasse Curitiba', 'Repasse USG'];
+// Nome da pasta da unidade em USG e IMG: o nome cadastrado, sem o complemento entre parênteses (ex.: «Alphasonic Londrina»).
+const PALAVRAS_MINUSC = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
+const nomePastaUnidadeRel = u => limparNomePasta(String(u.nome || `Unidade ${u.cod}`).replace(/\([^)]*\)/g, '').trim().toLowerCase().split(/\s+/)
+  .map((w, i) => i && PALAVRAS_MINUSC.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
+// Unidade de uma pasta de USG/IMG: «Unidade N - …» (antiga) ou o nome da unidade (nova).
+function unidadeDaPastaRel(nome) {
+  const cod = unidadeDoNomePasta(nome); if (cod) return cod;
+  const n = norm(nome), achou = S.cfg.unidades.filter(u => { const k = norm(nomePastaUnidadeRel(u)); return k && (k === n || n.includes(k) || k.includes(n)); });
+  return achou.length === 1 ? String(achou[0].cod) : '';
+}
 const grupoDaPasta = n => { const t = norm(n); return /^(USG|ULTRA)/.test(t) ? 'usg' : /^(IMG|IMAGEM)/.test(t) ? 'img' : /^(CURITIBA|V3)/.test(t) ? 'curitiba' : ''; };
 const nomeCompPasta = chave => `Comp_${chave.slice(5)}-${chave.slice(0, 4)}`;
 const pastaComp = chave => ({ nome: nomeCompPasta(chave), re: new RegExp(`^COMP(ETENCIA)? ${chave.slice(5)} ${chave.slice(0, 4)}$`) });
-const ehSubpastaConhecida = nome => Object.values(PASTAS_RAIZ).some(p => p.re.test(norm(nome))) || /^COMP(ETENCIA)? \d{2} \d{4}$/.test(norm(nome));
+const ehSubpastaConhecida = nome => Object.values(PASTAS_RAIZ).some(p => p.re.test(norm(nome))) || /^COMP(ETENCIA)? \d{2} \d{4}$/.test(norm(nome))
+  || PASTA_SISTEMA.re.test(norm(nome)) || /^(\d+ )?REPASSE \d{4}$/.test(norm(nome)) || /^\d{4} \d{2}( |$)/.test(norm(nome));
 const ehPastaLegadaFluxo = h => !!h && PASTAS_RAIZ.fluxo.re.test(norm(h.name));
 const limparNomePasta = s => String(s).replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
 const nomePastaUnidade = u => limparNomePasta(`Unidade ${u.cod} - ${u.nome}`);
@@ -7696,50 +7730,73 @@ async function caminho(partes, criar = false) {
   for (const p of partes) { d = await subpasta(d, p, criar); if (!d) return null; }
   return d;
 }
+/* Arquivos permanentes: «01 - Sistema › …» quando existe; senão a pasta antiga da raiz (enquanto os arquivos não forem
+ * movidos à mão); senão cria a nova. Assim os dois navegadores continuam se encontrando durante a mudança. */
+const LOC_SISTEMA = {};   // tipo → caminho em uso (para mostrar na tela)
+async function dirSistema(k, criar = true) {
+  const novo = await caminho([PASTA_SISTEMA, SISTEMA[k]]); if (novo) { LOC_SISTEMA[k] = `${PASTA_SISTEMA.nome}\\${novo.name}`; return novo; }
+  const antigo = PASTAS_RAIZ[k] ? await caminho([PASTAS_RAIZ[k]]) : null; if (antigo) { LOC_SISTEMA[k] = antigo.name; return antigo; }
+  if (!criar) return null;
+  const d = await caminho([PASTA_SISTEMA, SISTEMA[k]], true); LOC_SISTEMA[k] = `${PASTA_SISTEMA.nome}\\${d.name}`; return d;
+}
+const localSistema = k => LOC_SISTEMA[k] || `${PASTA_SISTEMA.nome}\\${SISTEMA[k].nome}`;
 async function dirFluxo() {
   if (SY.legado) return SY.handle;
-  const d = await subpasta(SY.handle, PASTAS_RAIZ.fluxo, true); SY.nomeFluxo = d.name; return d;
+  const d = await dirSistema('fluxo'); SY.nomeFluxo = localSistema('fluxo'); return d;
 }
-const dirEq = () => caminho([PASTAS_RAIZ.eq], true);
+const dirEq = () => dirSistema('eq');
 
-/* ---------- Criar as pastas da competência ---------- */
+/* ---------- Criar as pastas (estrutura padronizada) ---------- */
+// Caminhos da competência na estrutura nova, a partir da raiz. As pastas de 20%, 25% e anestesistas são da equipe: não entram.
 function estruturaCompetencia(chave) {
-  const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod), comp = pastaComp(chave);
-  const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), cam = [];
-  for (const k of ['fluxo', 'eq', 'cfg', 'backups']) if (PASTAS_RAIZ[k]) cam.push([PASTAS_RAIZ[k]]);
-  cam.push([PASTAS_RAIZ.bases, comp]);
-  const base = [PASTAS_RAIZ.comps, comp];
-  const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
-  for (const g of ['USG', 'IMG']) for (const u of normais) cam.push([...base, PASTA_REL, G[g], un(u)]);
-  if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_REL, { nome: 'Curitiba', re: /^(CURITIBA|V3)/ }]);
-  // Correção de prestador: uma pasta só, sem subpastas por unidade (pedido de 17/11/2026). Os arquivos ficam organizados pelo
-  // nome, «nome_unidade» (ex.: «prestador generico_17.pdf» ou «…_Cambe.pdf»); subpastas que já existam continuam sendo lidas.
-  cam.push([...base, PASTA_CORR]);
-  cam.push([...base, PASTA_CONF], [...base, PASTA_NC]);
+  const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod);
+  const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), base = [pastaAno(+chave.slice(0, 4)), pastaMes(chave)], cam = [];
+  cam.push([...base, PASTA_CORR], [...base, PASTA_NC]);
+  for (const s of ['Pagamento 15', 'Pagamento 30']) cam.push([...base, PASTA_NFS, s]);
+  cam.push([...base, PASTA_PLAN]);
+  for (const g of ['usg', 'img']) for (const u of normais) cam.push([...base, PASTA_REL, GRUPOS_REL[g], nomePastaUnidadeRel(u)]);
+  for (const s of SUB_CURITIBA) cam.push([...base, PASTA_REL, GRUPOS_REL.curitiba, s]);
+  for (const s of SUB_CONFERIDOS) cam.push([...base, PASTA_CONFERIDOS, s]);
+  cam.push([...base, PASTA_MUTIRAO], [...base, PASTA_FINAL]);
+  return cam;
+}
+// «01 - Sistema»: só as pastas que ainda não existem nem na estrutura antiga (as antigas são movidas à mão, pelo guia).
+async function estruturaSistema() {
+  const cam = [];
+  for (const k of Object.keys(SISTEMA)) if (!(PASTAS_RAIZ[k] && await caminho([PASTAS_RAIZ[k]]))) cam.push([PASTA_SISTEMA, SISTEMA[k]]);
   return cam;
 }
 const textoCaminho = c => c.map(p => typeof p === 'string' ? p : p.nome).join(' › ');
-// Pasta do mês: Competências › Comp_MM-AAAA (ou Comp_MM-AAAA direto na raiz, se já existir assim).
+// Pasta do mês: a nova (Repasse AAAA › AAAA-MM - Mês) e, se ainda existir, a antiga (Competências › Comp_MM-AAAA ou
+// Comp_MM-AAAA na raiz). Grava na nova quando ela existe (ou ao criar); lê das duas.
+const dirCompetenciaNova = (chave, criar = false) => caminho([pastaAno(+chave.slice(0, 4)), pastaMes(chave)], criar);
+const dirCompetenciaAntiga = async chave => (await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) || (await caminho([pastaComp(chave)]));
 async function dirCompetencia(chave, criar = false) {
-  return (await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) || (await caminho([pastaComp(chave)])) || (criar ? caminho([PASTAS_RAIZ.comps, pastaComp(chave)], true) : null);
+  return (await dirCompetenciaNova(chave)) || (await dirCompetenciaAntiga(chave)) || (criar ? dirCompetenciaNova(chave, true) : null);
 }
+async function dirsCompetencia(chave) { return [await dirCompetenciaNova(chave), await dirCompetenciaAntiga(chave)].filter(Boolean); }
 async function verificarEstrutura(chave = S.comp) {
-  const cam = estruturaCompetencia(chave), faltam = [];
-  const naRaiz = !(await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) && !!(await caminho([pastaComp(chave)]));
-  for (const c of cam) { const cc = naRaiz && c[0] === PASTAS_RAIZ.comps ? c.slice(1) : c; if (!(await caminho(cc, false))) faltam.push(textoCaminho(cc)); }
-  return { total: cam.length, faltam };
+  const cam = [...await estruturaSistema(), ...estruturaCompetencia(chave)], faltam = [];
+  for (const c of cam) if (!(await caminho(c, false))) faltam.push(textoCaminho(c));
+  return { total: cam.length, faltam, antiga: !!(await dirCompetenciaAntiga(chave)), sistemaAntigo: await sistemaAntigo() };
 }
-async function criarEstrutura(chave = S.comp) {
+// Pastas permanentes que ainda estão na raiz, no lugar antigo (para o guia de mudança).
+async function sistemaAntigo() { const out = []; for (const k of Object.keys(SISTEMA)) { const d = PASTAS_RAIZ[k] && await caminho([PASTAS_RAIZ[k]]); if (d && !(await caminho([PASTA_SISTEMA, SISTEMA[k]]))) out.push({ k, de: d.name, para: `${PASTA_SISTEMA.nome} › ${SISTEMA[k].nome}` }); } return out; }
+// Cria o que falta (nunca apaga nem renomeia). chaves: competências (ex.: as 12 de um ano).
+async function criarEstrutura(chave = S.comp, { chaves = null } = {}) {
   if (!SY.handle || SY.legado) return avisar('Conecte primeiro a pasta raiz do aplicativo.', 'warn');
   if (!(await temPermissaoPasta(true))) return avisar('O acesso à pasta não foi liberado.', 'warn');
-  const { faltam } = await verificarEstrutura(chave);
-  if (!faltam.length) { avisar(`As pastas da competência ${rotuloCompetencia(chave)} já existem.`, 'ok'); return RENDER.inicio(); }
-  if (!await confirmar(`Criar ${faltam.length} pasta(s)?`, `Dentro de «${esc(SY.handle.name)}», com os nomes que a ferramenta lê:<ul class="small">${faltam.slice(0, 14).map(f => `<li>${esc(f)}</li>`).join('')}${faltam.length > 14 ? `<li>… e mais ${faltam.length - 14}</li>` : ''}</ul>Pastas que já existem não mudam.`, 'Criar pastas')) return;
-  const naRaiz = !(await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) && !!(await caminho([pastaComp(chave)]));
-  try { for (const c of estruturaCompetencia(chave)) await caminho(naRaiz && c[0] === PASTAS_RAIZ.comps ? c.slice(1) : c, true); avisar(`Pastas da competência ${rotuloCompetencia(chave)} criadas.`, 'ok'); }
+  const lista = chaves || [chave], cam = [...await estruturaSistema(), ...lista.flatMap(estruturaCompetencia)], faltam = [];
+  for (const c of cam) if (!(await caminho(c, false))) faltam.push(c);
+  const rot = chaves ? `do ano ${lista[0].slice(0, 4)}` : `da competência ${rotuloCompetencia(chave)}`;
+  if (!faltam.length) { avisar(`As pastas ${rot} já existem.`, 'ok'); PRI.verifComp = ''; return RENDER.inicio(); }
+  if (!await confirmar(`Criar ${faltam.length} pasta(s)?`, `Dentro de «${esc(SY.handle.name)}», na estrutura padronizada. Nada é apagado, renomeado ou movido.<ul class="small">${faltam.slice(0, 14).map(f => `<li>${esc(textoCaminho(f))}</li>`).join('')}${faltam.length > 14 ? `<li>… e mais ${faltam.length - 14}</li>` : ''}</ul>`, 'Criar')) return;
+  try { for (const c of faltam) await caminho(c, true); avisar(`Pastas ${rot} criadas (${faltam.length}).`, 'ok'); }
   catch (e) { avisar(`Não foi possível criar as pastas (${e.message}).`, 'err'); }
   PRI.verifComp = ''; RENDER.inicio();
 }
+const competenciasDoAno = ano => Array.from({ length: 12 }, (_, i) => `${ano}-${String(i + 1).padStart(2, '0')}`);
+const criarEstruturaAno = ano => criarEstrutura(`${ano}-01`, { chaves: competenciasDoAno(ano) });
 
 /* ---------- Ler PDFs e planilhas da pasta do mês (SOL-F38) ---------- */
 const PR = { lidos: new Map(), ultima: null, lendo: false };   // caminho → «tamanho|data» do que já foi lido nesta sessão
@@ -7770,9 +7827,10 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
   if (!(await temPermissaoPasta(!silencioso))) { if (!silencioso) avisar('O acesso à pasta não foi liberado.', 'warn'); return null; }
   PR.lendo = true; const r = { pdfs: 0, novos: 0, mudaram: 0, planilhas: 0, avisos: [] };
   try {
-    const comp = nomeCompPasta(S.comp), dC = await dirCompetencia(S.comp);
-    // Planilhas do mês: Bases de dados › Comp_MM-AAAA ou PLANILHAS-… dentro da pasta do mês (vale a mais recente de cada tipo).
-    const dirsPl = so ? [] : [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
+    const comp = nomePastaMes(S.comp), dCs = await dirsCompetencia(S.comp);   // estrutura nova e, se ainda existir, a antiga
+    // Planilhas do mês: «04 - Planilhas de conferência» (nova) ou, na antiga, Bases de dados › Comp_MM-AAAA e PLANILHAS-… do mês
+    // (vale a mais recente de cada tipo). Na pasta só ficam as planilhas de entrada: o Excel da conferência vai para a 05.
+    const dirsPl = so ? [] : [...await Promise.all(dCs.map(d => subpasta(d, PASTA_PLAN))), await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)])].filter(Boolean);
     if (so) { /* só a pasta da aba */ } else if (dirsPl.length) {
       const pl = { apolo: null, pbi: null };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
@@ -7786,24 +7844,27 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
         if (PR.lidos.get(k) === sig && carregada) continue;
         await (tipo === 'apolo' ? carregarApolo(x.f) : carregarPBI(x.f)); PR.lidos.set(k, sig); r.planilhas++;
       }
-    } else r.avisos.push(`sem planilhas em Bases de dados › ${comp}`);
-    // Relatórios: pasta do mês › Relatórios para conferência (RELATORIOS-MV-CONFERENCIA) | Correção de prestador.
-    if (!dC) r.avisos.push(`sem a pasta Competências › ${comp}`);
-    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
+    } else r.avisos.push(`sem planilhas em ${PASTA_PLAN.nome}`);
+    // Relatórios: pasta do mês › 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba) | 01 - Correção de prestador.
+    // Na 05, só USG, IMG e Curitiba são da ferramenta: outras pastas (ex.: Repasse 20%) são da equipe e não são lidas.
+    if (!dCs.length) r.avisos.push(`sem a pasta ${pastaAno(+S.comp.slice(0, 4)).nome} › ${comp}`);
+    else for (const dC of dCs) for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
       const d = await subpasta(dC, pasta); if (!d) continue;
       for await (const { h, caminho: c } of arquivosEm(d)) {
         if (!/\.pdf$/i.test(h.name)) continue;
-        const partes = c.split('/'); r.pdfs++;
+        const partes = c.split('/');
         const grupo = finalidade === 'correcao' ? '' : grupoDaPasta(partes[0]);
+        if (finalidade === 'conferencia' && partes.length > 1 && !grupo) continue;   // pasta que não é USG, IMG ou Curitiba
+        r.pdfs++;
         const pai = partes.length > 1 ? partes[partes.length - 2] : '';
-        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDoNomePasta(pai);
-        const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${pasta.nome}/${c}`;
+        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDaPastaRel(pai);
+        const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${d.name}/${c}`;
         // PDF que a pessoa mandou ignorar (ex.: de outra produção): não pergunta de novo enquanto o arquivo não mudar.
         if (pdfIgnorado(k, sig)) { r.ignorados = (r.ignorados || 0) + 1; continue; }
         const atual = S.relatorios.find(x => x.caminhoPasta === k);
         if (atual && PR.lidos.get(k) === sig) continue;
         if (atual) S.relatorios = S.relatorios.filter(x => x !== atual);
-        const n0 = S.relatorios.length; await carregarPDFs([f], { caminho: `${nomeCompPasta(S.comp)} › ${pasta.nome} › ${c.split('/').join(' › ')}`, chave: k, sig });
+        const n0 = S.relatorios.length; await carregarPDFs([f], { caminho: `${dC.name} › ${d.name} › ${c.split('/').join(' › ')}`, chave: k, sig });
         if (S.relatorios.length > n0) {
           const it = S.relatorios.at(-1); it.caminhoPasta = k; it.unidadePasta = un; it.grupoPasta = grupo; if (finalidade === 'correcao') it.finalidade = 'correcao';
           // Mesmo prestador × unidade lido de outro arquivo: fica o mais recente.
@@ -7817,7 +7878,7 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
     PR.ultima = { em: Date.now(), ...r };
   } catch (e) { r.avisos.push(e.message); if (!silencioso) avisar(`Erro ao ler a pasta (${e.message}).`, 'err'); }
   finally { PR.lendo = false; }
-  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';
+  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';   // nomes da estrutura nova
   if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}${ondeSo}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
   if (r.mudaram) avisar(`${r.mudaram} relatório(s) mudaram desde a última leitura: rode a conferência deles de novo.`, 'warn');
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
@@ -7890,7 +7951,7 @@ function barraEq() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="eqSync"><span class="sy-dot"></span><b>Equivalências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo no Início para dividir as validações com a outra pessoa.</span></div>`;
   const ult = SYQ.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYQ.meta.atualizadoPor || '—')}</b> em ${new Date(SYQ.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
   const cls = SYQ.status === 'ok' ? 'ok' : 'warn', txt = { ok: SYQ.ocupado ? 'Sincronizando…' : 'Sincronizado', permissao: 'Acesso à pasta precisa ser liberado', erro: `Sem acesso à pasta — mudanças guardadas neste navegador (${esc(SYQ.erro)})`, conflito: `${SYQ.conflitos} decisão(ões) diferentes para escolher`, juntar: 'Falta juntar a sua base com a da pasta', off: 'Conectando…' }[SYQ.status] || SYQ.status;
-  return `<div class="sy-barra ${cls}" id="eqSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(PASTAS_RAIZ.eq.nome)}\\${ARQ_EQ}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syq="agora">${SYQ.status === 'juntar' ? 'Juntar agora…' : SYQ.status === 'conflito' ? 'Resolver' : SYQ.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
+  return `<div class="sy-barra ${cls}" id="eqSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(localSistema('eq'))}\\${ARQ_EQ}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syq="agora">${SYQ.status === 'juntar' ? 'Juntar agora…' : SYQ.status === 'conflito' ? 'Resolver' : SYQ.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
 }
 function atualizarBarraEq() { const b = $('eqSync'); if (!b) return; b.outerHTML = barraEq(); ligarBarraEq(); }
 function ligarBarraEq() { document.querySelectorAll('#eqSync [data-syq]').forEach(b => b.onclick = () => sincronizarEq({ interativo: true })); }
@@ -7906,9 +7967,11 @@ function cartaoPastaRaiz() {
     <p class="small">Hoje está conectada só a pasta do Fluxo («${esc(SY.handle.name)}»). Conecte a pasta raiz (a de cima) para ler os relatórios e sincronizar as equivalências também.</p></div>`;
   const perm = SY.status === 'permissao', v = PRI.verifComp === S.comp ? PRI.verif : null, u = PR.ultima;
   return `<div class="card pr-card ${perm || (v && v.faltam.length) ? 'warn' : 'ok'}"><div class="fx-topo"><h2 style="margin:0">Pasta raiz: ${esc(SY.handle.name)}</h2>
-    <div class="acoes" style="margin:0">${perm ? '<button id="prLiberar">Liberar acesso</button>' : `<button id="prAtualizar"${PR.lendo ? ' disabled' : ''}>${PR.lendo ? 'Lendo a pasta…' : 'Atualizar da pasta'}</button><button class="sec" id="prCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button>`}<button class="sec" id="prConectar">Trocar pasta raiz…</button></div></div>
+    <div class="acoes" style="margin:0">${perm ? '<button id="prLiberar">Liberar acesso</button>' : `<button id="prAtualizar"${PR.lendo ? ' disabled' : ''}>${PR.lendo ? 'Lendo a pasta…' : 'Atualizar da pasta'}</button><button class="sec" id="prCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button><button class="sec" id="prCriarAno" data-ano="${+S.comp.slice(0, 4) + 1}">Criar pastas de ${+S.comp.slice(0, 4) + 1}</button>`}<button class="sec" id="prConectar">Trocar pasta raiz…</button></div></div>
     ${perm ? '<p class="small"><b>O Edge pede para liberar o acesso à pasta</b> a cada sessão (ou marque «permitir sempre»). Clique em «Liberar acesso».</p>' : `
-    <p class="small muted">Lê de <code>Competências › ${nomeCompPasta(S.comp)} › ${PASTA_REL.nome}</code> (USG, IMG, Curitiba, por unidade), <code>${PASTA_CORR.nome}</code> e <code>Bases de dados › ${nomeCompPasta(S.comp)}</code> (laudos e Power BI). Só lê o que é novo ou mudou; pastas que começam com «_» (ex.: _antigos) ficam de fora.</p>
+    <p class="small muted">Lê de <code>${esc(pastaAno(+S.comp.slice(0, 4)).nome)} › ${esc(nomePastaMes(S.comp))}</code>: <code>${PASTA_REL.nome}</code> (USG e IMG por unidade, Curitiba), <code>${PASTA_CORR.nome}</code> e <code>${PASTA_PLAN.nome}</code> (laudos e Power BI). Só lê o que é novo ou mudou; pastas que começam com «_» (ex.: _antigos) ficam de fora.</p>
+    ${v && (v.antiga || v.sistemaAntigo.length) ? `<div class="aviso-fixo warn small"><b>Estrutura antiga ainda em uso</b> — continua funcionando, e nada se perde. Quando puder, mova à mão (guia em Configurações → Pastas e sincronização):
+      <ul style="margin:4px 0 0">${v.sistemaAntigo.map(x => `<li><code>${esc(x.de)}</code> → <code>${esc(x.para)}</code></li>`).join('')}${v.antiga ? `<li><code>Competências › ${esc(nomeCompPasta(S.comp))}</code> → <code>${esc(pastaAno(+S.comp.slice(0, 4)).nome)} › ${esc(nomePastaMes(S.comp))}</code> (a ferramenta lê as duas enquanto isso)</li>` : ''}</ul></div>` : ''}
     <div class="pr-st"><span>${v ? (v.faltam.length ? `<span class="badge warn">${v.faltam.length} pasta(s) faltando</span> <span class="small muted">${esc(v.faltam.slice(0, 3).join(' · '))}${v.faltam.length > 3 ? ' …' : ''}</span>` : '<span class="badge ok">pastas da competência em ordem</span>') : '<span class="small muted">conferindo as pastas…</span>'}</span>
       <span class="small muted">${u ? `última leitura ${new Date(u.em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}: ${u.pdfs} PDF(s) na pasta · ${u.novos} novo(s) · ${u.mudaram} atualizado(s)` : 'ainda não lida nesta sessão'}</span>${(() => { const ig = Object.values(pdfsIgnorados()).filter(x => x.comp === S.comp); return ig.length ? ` <button class="sec mini" id="prIgnorados">PDFs ignorados (${ig.length})</button>` : ''; })()}
       <span class="small muted">Fluxo: ${esc({ ok: 'sincronizado', erro: 'sem acesso', conflito: 'conflito', permissao: 'liberar acesso' }[SY.status] || SY.status)} · Equivalências: ${esc({ ok: 'sincronizadas', erro: 'sem acesso', conflito: 'conflito', juntar: 'falta juntar', permissao: 'liberar acesso', off: '—' }[SYQ.status] || SYQ.status)}</span></div>`}</div>`;
@@ -7918,6 +7981,7 @@ function ligarPastaRaiz() {
   if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await liberarPastaSync()) await atualizarDaPasta(); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
+  if ($('prCriarAno')) $('prCriarAno').onclick = () => criarEstruturaAno(+$('prCriarAno').dataset.ano);
   if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
     const m = pdfsIgnorados(), ks = Object.keys(m).filter(k => m[k].comp === S.comp);
     const r = await dialogo('PDFs ignorados nesta competência', `<p class="small muted">Estes arquivos da pasta não são lidos enquanto não mudarem. Marque os que devem voltar a ser lidos.</p>${ks.map((k, i) => `<label class="small" style="display:block;margin:4px 0"><input type="checkbox" name="v${i}"> <b>${esc(m[k].nome)}</b> — <code>${esc(m[k].caminho)}</code> <span class="muted">(${esc(m[k].por || '—')}, ${new Date(m[k].em).toLocaleDateString('pt-BR')})</span></label>`).join('')}`, [['', 'Fechar', 'sec'], ['ok', 'Voltar a ler os marcados']]);
@@ -7946,7 +8010,7 @@ function complementoInicioPastaRaiz() {
 PASTAS_RAIZ.cfg = { nome: 'Configuração compartilhada', re: /^CONFIGURACAO/ };
 const SYC = { status: 'off', erro: '', lm: 0, meta: null, ocupado: false, pendente: false, conferidoEm: 0, conflitos: 0 };
 const ARQ_CFG = 'configuracao.json';
-const dirCfg = () => caminho([PASTAS_RAIZ.cfg], true);
+const dirCfg = () => dirSistema('cfg');   // 01 - Sistema › Configurações compartilhadas (ou a pasta antiga da raiz)
 const cfgGravadaLocal = () => lerLocal(CHAVES.cfg);
 const cfgSemSalvar = () => { try { return JSON.stringify(S.cfg) !== JSON.stringify(cfgGravadaLocal()); } catch (e) { return false; } };
 
@@ -8016,44 +8080,30 @@ function barraCfg() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="cfgSync"><span class="sy-dot"></span><b>Configuração só neste navegador.</b><span class="muted">Conecte a pasta raiz (Configurações → Pastas e sincronização) para dividir unidades, prestadores, aliases e regras com a outra pessoa.</span></div>`;
   const cls = SYC.status === 'ok' ? 'ok' : 'warn', ult = SYC.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYC.meta.atualizadoPor || '—')}</b> em ${new Date(SYC.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
   const txt = SYC.ocupado ? 'Sincronizando…' : SYC.status === 'erro' ? `Sem acesso à pasta — mudanças guardadas neste navegador (${esc(SYC.erro)})` : `Configuração ${TXT_SYNC[SYC.status] || SYC.status}`;
-  return `<div class="sy-barra ${cls}" id="cfgSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(PASTAS_RAIZ.cfg.nome)}\\${ARQ_CFG}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syc="agora">${SYC.status === 'conflito' ? 'Resolver' : SYC.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
+  return `<div class="sy-barra ${cls}" id="cfgSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(localSistema('cfg'))}\\${ARQ_CFG}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syc="agora">${SYC.status === 'conflito' ? 'Resolver' : SYC.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
 }
 function atualizarBarraCfg() { const b = $('cfgSync'); if (!b) return; b.outerHTML = barraCfg(); ligarBarraCfg(); }
 function ligarBarraCfg() { document.querySelectorAll('#cfgSync [data-syc]').forEach(b => b.onclick = () => sincronizarCfg({ interativo: true })); }
 window.addEventListener('hashchange', () => { if (['#bases', '#configuracoes'].includes(location.hash) && SY.handle && !SY.legado && SYC.status !== 'permissao') sincronizarCfg({ interativo: SYC.status === 'conflito' }); });
 
-/* ---------- Nomes das pastas, configuráveis (Configurações → Pastas e sincronização) ----------
- * Ficam em cfg.pastas e valem para os dois (vão com a configuração compartilhada). Ao ler, a ferramenta continua
- * reconhecendo também os nomes padrão e os que a equipe já usava; ao criar, usa o nome configurado. */
-// As pastas de sincronização (Fluxo, Equivalências, Configuração) têm nome fixo: é por elas que os dois navegadores se
-// encontram, e renomear de um lado só dividiria os dados. As demais são configuráveis.
-const PASTAS_FIXAS = { fluxo: [PASTAS_RAIZ.fluxo, 'Fluxo mensal sincronizado (um arquivo por competência)'], eq: [PASTAS_RAIZ.eq, 'Base de equivalências TUSS compartilhada'], cfg: [PASTAS_RAIZ.cfg, 'Configuração compartilhada (Bases, regras, parâmetros, modelos)'] };
-const PASTAS_EDITAVEIS = {
-  backups: [PASTAS_RAIZ.backups, 'Backups gravados pela ferramenta'],
-  bases: [PASTAS_RAIZ.bases, 'Planilhas do mês: laudos do Apolo e Power BI (dentro: Comp_MM-AAAA)'],
-  comps: [PASTAS_RAIZ.comps, 'Pastas das competências (dentro: Comp_MM-AAAA)'],
-  rel: [PASTA_REL, 'No mês: PDFs do MV para conferência (USG, IMG, Curitiba)'],
-  corr: [PASTA_CORR, 'No mês: PDFs do prestador genérico para correção'],
-  plan: [PASTA_PLAN, 'No mês: planilhas usadas na conferência (alternativa a Bases de dados)'],
-  conf: [PASTA_CONF, 'No mês: Excel das conferências gravados pela ferramenta'],
-  nc: [PASTA_NC, 'No mês: planilhas de não conformidades']
-};
-const PADRAO_PASTAS = Object.fromEntries(Object.entries(PASTAS_EDITAVEIS).map(([k, [p]]) => [k, { nome: p.nome, re: p.re }]));
-function aplicarPastasConfig() {
-  const c = S.cfg?.pastas || {};
-  for (const [k, [p]] of Object.entries(PASTAS_EDITAVEIS)) {
-    const nome = limparNomePasta(c[k] || '') || PADRAO_PASTAS[k].nome, padrao = PADRAO_PASTAS[k];
-    const reNome = new RegExp('^' + norm(nome).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$');
-    p.nome = nome; p.personalizado = !!limparNomePasta(c[k] || ''); p.re = { test: s => reNome.test(s) || padrao.re.test(s) };
-  }
-}
+/* ---------- Nomes das pastas: padronizados (v3.0.0-alpha.14) ----------
+ * Antes os nomes das subpastas eram configuráveis (cfg.pastas). Com a estrutura padronizada, os nomes são fixos e
+ * iguais para todos; cfg.pastas fica guardado, mas não é mais usado. */
+function aplicarPastasConfig() { }
 
-/* ---------- Onde gravar o que a ferramenta gera (v3.0) ----------
- * Com a pasta raiz conectada e a opção ligada (Configurações → Pastas e sincronização), os Excel da conferência,
- * da correção e das NCs vão direto para a pasta da competência (Comp_MM-AAAA › Conferência cruzada | Não
- * conformidades), sem passar por Downloads. Sem pasta, sem permissão ou com erro, o arquivo é baixado como antes. */
+/* ---------- Onde gravar o que a ferramenta gera (estrutura padronizada, v3.0.0-alpha.14) ----------
+ * Com a pasta raiz conectada e a opção ligada, o Excel também é gravado na pasta da competência (estrutura nova):
+ *   NCs → 02 - Não conformidades · correção → 01 - Correção de prestador · conferência → 05 - Relatórios de repasse MV ›
+ *   USG | IMG | Curitiba › unidade (ao lado do PDF). Nunca substitui: se o nome já existe, grava com « (2)», « (3)»…
+ * Sem pasta, sem permissão ou com erro, o arquivo é só baixado, como antes. */
+// Nome que ainda não existe na pasta (nunca sobrescreve um arquivo): «nome.xlsx», «nome (2).xlsx»…
+async function nomeLivre(d, nome) {
+  const ext = (nome.match(/\.[^.]+$/) || [''])[0], base = nome.slice(0, nome.length - ext.length);
+  for (let i = 1; i < 100; i++) { const n = i === 1 ? nome : `${base} (${i})${ext}`; try { await d.getFileHandle(n); } catch (e) { return n; } }
+  return `${base} (${Date.now()})${ext}`;
+}
 const exportarNaPasta = () => !!SY.handle && !SY.legado && S.cfg?.parametros?.exportarNaPasta !== false;
-async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp) {
+async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp, sub = []) {
   // O arquivo é SEMPRE baixado. Com a pasta conectada e o acesso já liberado, também é gravado na pasta da competência.
   // (Pedir permissão aqui falhava: depois de gerar o Excel o Edge já não considera o clique, e a exportação parava sem aviso.)
   let blob;
@@ -8063,11 +8113,12 @@ async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp
   if (!exportarNaPasta()) return 'download';
   try {
     if (!(await temPermissaoPasta(false))) { avisar(`Excel baixado. Para gravar também na pasta da competência, libere o acesso à pasta (Configurações → Pastas e sincronização).`, 'warn'); return 'download'; }
-    const dC = await dirCompetencia(chave, true), alvo = { conf: PASTA_CONF, nc: PASTA_NC }[destino] || PASTA_CONF;
-    const d = await subpasta(dC, alvo, true), fh = await d.getFileHandle(nome, { create: true });
+    const dC = await dirCompetenciaNova(chave, true), alvo = { conf: PASTA_REL, nc: PASTA_NC, corr: PASTA_CORR }[destino] || PASTA_REL;
+    let d = await subpasta(dC, alvo, true); for (const p of sub) d = await subpasta(d, p, true);
+    const livre = await nomeLivre(d, nome), fh = await d.getFileHandle(livre, { create: true });
     const w = await fh.createWritable(); await w.write(blob); await w.close();
     if ((await fh.getFile()).size !== blob.size) throw new Error('o arquivo gravado ficou com tamanho diferente');
-    avisar(`Excel baixado e gravado na pasta: ${nomeCompPasta(chave)} › ${alvo.nome} › ${nome}`, 'ok');
+    avisar(`Excel baixado e gravado na pasta: ${textoCaminho([pastaAno(+chave.slice(0, 4)), dC.name, d === dC ? '' : alvo, ...sub].filter(Boolean))} › ${livre}`, 'ok');
     return 'pasta';
   } catch (e) { avisar(`Excel baixado, mas não foi gravado na pasta (${e.message}).`, 'warn'); return 'download'; }
 }
@@ -8187,7 +8238,7 @@ function desenharCorrecao() {
     <div class="card"><h2>Equivalências desta rodada</h2><div id="coEq"></div></div></div>`;
   ligarCartaoCandidatosNC(c);
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.corr.filtro; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharCorrecao(); });
-  $('coExcel').onclick = () => entregarArquivo(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx), 'conf', ctx.chaveCompetencia || S.comp);
+  $('coExcel').onclick = () => entregarArquivo(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx), 'corr', ctx.chaveCompetencia || S.comp);
   const filtrar = () => {
     const q = norm(S.corr.busca);
     return res.linhas.filter(o => (!S.corr.filtro.size || S.corr.filtro.has(o.estado)) && (!q || norm([o.r.paciente, o.r.codigo, o.r.procDesc, o.medico].join(' ')).includes(q)));
@@ -10269,14 +10320,12 @@ RENDER.rodadas = async () => {
 /* ============================================================
  * Exportar competência: pasta .zip no padrão de rede do usuário (pedido de 03/11/2026)
  *
- * Comp_MM-AAAA/
- *   REPASSE_MM-AAAA_CONTROLE.xlsx                       (planilha do Fechamento)
- *   Correção de prestador/correcao_prestador_unidade_[un].xlsx (+ o PDF do prestador genérico)
- *   Não conformidades/nc_comp_MM-AAAA.xlsx              (todas as NCs de todas as unidades)
- *   Planilhas utilizadas para conferência/               (Power BI e laudos do Apolo, como carregados)
- *   Relatórios para conferência/[USG|IMG]/Unidade [un]/  (PDFs do MV, com nome identificado)
- *   Conferência cruzada/[USG|IMG]/Unidade [un]/          (Excel da conferência por prestador)
- *   Controle da ferramenta/                              (fluxo, rodadas e resumo)
+ * AAAA-MM - Mês/   (mesmos nomes da estrutura padronizada da pasta da rede, v3.0.0-alpha.14)
+ *   01 - Correção de prestador/      (PDF do prestador genérico e o Excel da correção, por unidade no nome)
+ *   02 - Não conformidades/nc_comp_MM-AAAA.xlsx
+ *   04 - Planilhas de conferência/   (Power BI e laudos do Apolo, como carregados)
+ *   05 - Relatórios de repasse MV/USG | IMG/<unidade>/  (PDFs do MV e o Excel da conferência de cada um); Curitiba/
+ *   Controle da ferramenta/          (planilha de controle do Fechamento, fluxo, rodadas e resumo)
  *   LEIA-ME.txt                                          (o que entrou e o que faltou)
  *
  * Arquivos originais (PDFs, Apolo, Power BI) só existem na memória da sessão: precisam estar
@@ -10294,7 +10343,7 @@ function ultimaRodadaDoRelatorio(x, tipo, ch) {
 async function exportarPastaCompetencia(ch = S.comp) {
   if (ch !== S.comp) return avisar('Exporte a competência que está selecionada no topo.', 'warn');
   S.rodadas = await dbRodadasJanela();
-  const mm = `${ch.slice(5)}-${ch.slice(0, 4)}`, raiz = `Comp_${mm}/`, z = new JSZip(), leia = [], bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  const mm = `${ch.slice(5)}-${ch.slice(0, 4)}`, raiz = `${nomePastaMes(ch)}/`, z = new JSZip(), leia = [], bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
   const usados = new Set(), unico = caminho => { let c = caminho, i = 2; while (usados.has(c)) c = caminho.replace(/(\.\w+)$/, `_${i++}$1`); usados.add(c); return c; };
   const add = (caminho, dados) => z.file(unico(raiz + caminho), dados);
   leia.push(`Competência ${rotuloCompetencia(ch)} (produção ${rotuloMes(producaoEsperada(ch))}) — exportada em ${new Date().toLocaleString('pt-BR')} por ${S.operador || '—'} · Repasse Médico ${MOTOR_VERSAO}`, '');
@@ -10302,7 +10351,7 @@ async function exportarPastaCompetencia(ch = S.comp) {
   // Fechamento
   try {
     const f = fechamentoAtual(), mk = marcosFech(ch);
-    add(`REPASSE_${mm}_CONTROLE${f.previa ? '_PREVIA' : ''}.xlsx`, await bin(xlsxFechamento(f, S.cfg, { pagUSG: mk.pagUSG, pagIMG: mk.pagIMG, pagCuritiba: mk.pagCuritiba })));
+    add(`Controle da ferramenta/REPASSE_${mm}_CONTROLE${f.previa ? '_PREVIA' : ''}.xlsx`, await bin(xlsxFechamento(f, S.cfg, { pagUSG: mk.pagUSG, pagIMG: mk.pagIMG, pagCuritiba: mk.pagCuritiba })));
     leia.push(`Planilha de controle do repasse${f.previa ? ' (PRÉVIA: há prestadores sem aceite)' : ''}.`);
   } catch (e) { leia.push(`Planilha de controle: não gerada (${e.message}).`); }
 
@@ -10310,13 +10359,13 @@ async function exportarPastaCompetencia(ch = S.comp) {
   const ncs = S.nc.itens.filter(x => x.competencia === ch);
   if (ncs.length) {
     const pr = prazosNC(ch);
-    add(`Não conformidades/nc_comp_${mm}.xlsx`, await bin(xlsxNC(ncs, ch, { operador: S.operador, prazos: Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data])) })));
+    add(`${PASTA_NC.nome}/nc_comp_${mm}.xlsx`, await bin(xlsxNC(ncs, ch, { operador: S.operador, prazos: Object.fromEntries(Object.entries(pr.grupos).map(([k, g]) => [k, g.data])) })));
     leia.push(`Não conformidades: ${ncs.length} NC(s) de todas as unidades.`);
   } else leia.push('Não conformidades: nenhuma NC registrada na competência.');
 
   // Planilhas usadas na conferência (originais, como carregadas)
   for (const [obj, rot] of [[S.pbi, 'Power BI'], [S.apolo, 'planilha de laudos do Apolo']]) {
-    if (obj?.bytes) { add(`Planilhas utilizadas para conferência/${nomeArquivo(obj.nome)}`, obj.bytes); leia.push(`${rot}: ${obj.nome}.`); }
+    if (obj?.bytes) { add(`${PASTA_PLAN.nome}/${nomeArquivo(obj.nome)}`, obj.bytes); leia.push(`${rot}: ${obj.nome}.`); }
     else leia.push(`${rot}: não carregada nesta sessão (carregue no Início e exporte de novo para incluir).`);
   }
 
@@ -10326,27 +10375,29 @@ async function exportarPastaCompetencia(ch = S.comp) {
   for (const x of S.relatorios) {
     const cab = x.rel.cab, correcao = (x.finalidade || finalidadePadrao(x.rel)) === 'correcao';
     const rod = ultimaRodadaDoRelatorio(x, correcao ? 'correcao' : 'conferencia', ch);
-    const un = rod?.unidadeCod || unidadeSugeridaPeloArquivo(x.nome) || '';
+    const un = rod?.unidadeCod || x.unidadePasta || unidadeSugeridaPeloArquivo(x.nome) || '';
     const unRot = un && un !== '*' ? un : 'sem_unidade';
     if (correcao) {
-      if (x.bytes) add(`Correção de prestador/relatorio_correcao_prestador_unidade_${unRot}.pdf`, x.bytes);
+      if (x.bytes) add(`${PASTA_CORR.nome}/relatorio_correcao_prestador_${unRot}.pdf`, x.bytes);
       if (rod && S.apolo) {
         const res = corrigirPrestador(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: rod.unidadeCod, tol: rod.parametros?.tol ?? S.cfg.parametros.tolCorrecao });
         const ctx = { chaveCompetencia: ch, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: rod.unidadeCod, unidadeNome: `${rod.unidadeCod} - ${unidadePorCod(S.cfg, rod.unidadeCod)?.nome || ''}`, parametros: rod.parametros || {}, operador: S.operador, em: new Date().toLocaleString('pt-BR'), rodadaId: rod.id };
-        add(`Correção de prestador/correcao_prestador_unidade_${unRot}.xlsx`, await bin(xlsxCorrecao(res, ctx)));
+        add(`${PASTA_CORR.nome}/correcao_prestador_${unRot}.xlsx`, await bin(xlsxCorrecao(res, ctx)));
       } else semRodada.push(`${x.nome} (correção de prestador${S.apolo ? ', sem rodada nesta competência' : ', Apolo não carregado'})`);
       continue;
     }
-    const tipo = tipoDoRelatorio(x.rel).toUpperCase();
+    const tipo = tipoDoRelatorio(x.rel).toUpperCase(), uCad = unidadePorCod(S.cfg, un);
+    // Estrutura padronizada: 05 - Relatórios de repasse MV › USG | IMG › nome da unidade (Curitiba: pasta Curitiba).
+    const pastaRel = `${PASTA_REL.nome}/${uCad && ehUnidadeV3(S.cfg, un) ? 'Curitiba' : `${tipo}/${uCad ? nomePastaUnidadeRel(uCad) : `Unidade ${unRot}`}`}`;
     const nomePdf = `medico_${nomeArquivo(cab.prestadorCod)}_${nomeArquivo(cab.prestadorNome)}_repasse_${tipo.toLowerCase()}_unidade_${unRot}.pdf`;
-    if (x.bytes) add(`Relatórios para conferência/${tipo}/Unidade ${unRot}/${nomePdf}`, x.bytes);
+    if (x.bytes) add(`${pastaRel}/${nomePdf}`, x.bytes);
     if (rod && S.apolo) {
       const medSel = rod.parametros?.medico || '@prest';
       const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, cab.prestadorCod) : [medSel];
       const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: rod.unidadeCod, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
       const ctx = { chaveCompetencia: ch, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: rod.unidadeCod, unidadeNome: `${rod.unidadeCod} - ${unidadePorCod(S.cfg, rod.unidadeCod)?.nome || ''}`,
         medicosNomes: medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '', parametros: rod.parametros || {}, operador: S.operador, rodadaId: rod.id };
-      add(`Conferência cruzada/${tipo}/Unidade ${unRot}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() })));
+      add(`${pastaRel}/${nomeArquivoAnalise('conferencia', ctx)}`, await bin(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() })));
     } else semRodada.push(`${x.nome} (${tipo}${S.apolo ? ', sem conferência nesta competência' : ', Apolo não carregado'})`);
   }
   leia.push(`Relatórios do MV: ${S.relatorios.length} PDF(s) carregado(s) nesta sessão.`);
@@ -10363,8 +10414,8 @@ async function exportarPastaCompetencia(ch = S.comp) {
   leia.push('', 'As planilhas de conferência e de correção foram refeitas na exportação, com os parâmetros da última rodada de cada relatório e a base de equivalências atual', `(revisão ${S.eq.revisao}). O nome de cada uma traz a rodada correspondente (veja Rodadas na ferramenta).`,
     '', 'Atenção: os arquivos têm dados de pacientes. Guarde na rede conforme a política da empresa.');
   z.file(raiz + 'LEIA-ME.txt', leia.join('\r\n'));
-  baixarBlob(await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), `Comp_${mm}.zip`);
-  avisar(`Pasta da competência ${rotuloCompetencia(ch)} gerada (Comp_${mm}.zip).${semRodada.length ? ` ${semRodada.length} relatório(s) sem planilha de análise: veja o LEIA-ME.` : ''}`, semRodada.length ? 'warn' : 'ok');
+  baixarBlob(await z.generateAsync({ type: 'blob', compression: 'DEFLATE' }), `${nomePastaMes(ch)}.zip`);
+  avisar(`Pasta da competência ${rotuloCompetencia(ch)} gerada (${nomePastaMes(ch)}.zip).${semRodada.length ? ` ${semRodada.length} relatório(s) sem planilha de análise: veja o LEIA-ME.` : ''}`, semRodada.length ? 'warn' : 'ok');
 }
 
 /* ---- src/ui/70-configuracoes.js ---- */
@@ -10470,7 +10521,7 @@ function cfgPastas() {
   const MAPA = { ok: 'sincronizado', erro: 'sem acesso', conflito: 'mudanças dos dois para escolher', permissao: 'liberar acesso', juntar: 'falta juntar com a pasta', edicao: 'alterações não salvas', off: '—' };
   const conectada = SY.handle && !SY.legado;
   return `<div class="card"><h2>Pasta raiz na rede ${notaEscopo(false)}</h2>
-    <p class="lead">Uma pasta raiz (ex.: <code>\\\\servidor\\Repasse Médico</code>, mapeada ou não) com as subpastas abaixo. O Edge guarda a pasta escolhida neste navegador e pede para <b>liberar o acesso</b> a cada sessão, a menos que você marque «Permitir sempre» no aviso do Edge. Nenhum caminho fica fixo no código: os nomes das subpastas se configuram aqui.</p>
+    <p class="lead">Uma pasta raiz (ex.: <code>\\\\servidor\\Repasse Médico</code>, mapeada ou não) com as subpastas abaixo. O Edge guarda a pasta escolhida neste navegador e pede para <b>liberar o acesso</b> a cada sessão, a menos que você marque «Permitir sempre» no aviso do Edge. Nenhum caminho do computador fica gravado: tudo é localizado a partir da pasta raiz escolhida, então cada pessoa pode acessá-la pelo seu próprio caminho de rede.</p>
     ${suportaPasta() ? `<dl class="kv"><dt>Pasta conectada</dt><dd>${SY.handle ? `<b>${esc(SY.handle.name)}</b>${SY.legado ? ' (só a pasta do Fluxo — conecte a raiz)' : ''}` : 'nenhuma'}</dd>
       ${conectada ? `<dt>Fluxo mensal</dt><dd>${st(SY.status, MAPA)}</dd><dt>Equivalências TUSS</dt><dd>${st(SYQ.status, MAPA)}</dd><dt>Configuração compartilhada</dt><dd>${st(SYC.status, MAPA)}${SYC.erro ? ` <span class="small muted">(${esc(SYC.erro)})</span>` : ''}</dd>` : ''}</dl>
     <div class="acoes"><button id="psConectar">${SY.handle ? 'Trocar pasta raiz…' : 'Conectar a pasta raiz…'}</button>${SY.handle ? `<button class="sec" id="psLiberar">Liberar acesso / sincronizar agora</button><button class="sec" id="psDesc">Desconectar</button>` : ''}</div>`
@@ -10479,26 +10530,38 @@ function cfgPastas() {
     <label class="small"><input type="checkbox" id="psLerAbrir"${p.lerPastaAoAbrir !== false ? ' checked' : ''}> Ler os PDFs e as planilhas da competência ao abrir a ferramenta</label><br>
     <label class="small"><input type="checkbox" id="psExport"${p.exportarNaPasta !== false ? ' checked' : ''}> Gravar os Excel gerados (conferência, correção e NCs) na pasta da competência, em vez de Downloads</label>
     <div class="acoes"><button id="psSalvarComp">Salvar</button></div></div>
-  <div class="card"><h2>Nomes das pastas ${notaEscopo(true)}</h2><p class="lead">A ferramenta cria as pastas com estes nomes e, ao ler, reconhece também os nomes padrão e os que a equipe já usava. Deixe em branco para usar o padrão.</p>
-    <table><thead><tr><th>Finalidade</th><th>Nome da pasta</th><th>Padrão</th></tr></thead><tbody>
-    ${Object.values(PASTAS_FIXAS).map(([p, desc]) => `<tr><td class="small">${esc(desc)}</td><td><code>${esc(p.nome)}</code> <span class="small muted">fixo: é por ele que os dois navegadores se encontram</span></td><td class="small muted">${esc(p.nome)}</td></tr>`).join('')}
-    ${Object.entries(PASTAS_EDITAVEIS).map(([k, [, desc]]) => `<tr><td class="small">${esc(desc)}</td><td><input type="text" data-pasta="${k}" value="${esc(S.cfg.pastas?.[k] || '')}" placeholder="${esc(PADRAO_PASTAS[k].nome)}"></td><td class="small muted">${esc(PADRAO_PASTAS[k].nome)}</td></tr>`).join('')}</tbody></table>
-    <p class="small muted">Hierarquia: raiz › (Fluxo, Equivalências, Configuração, Backups, Bases de dados › Comp_MM-AAAA, Competências › Comp_MM-AAAA › Relatórios para conferência › USG | IMG › Unidade N…, Correção de prestador, Conferência cruzada, Não conformidades).</p>
-    <div class="acoes"><button id="psSalvarNomes">Salvar nomes</button><button class="sec" id="psPadrao">Voltar aos nomes padrão</button>${conectada ? `<button class="sec" id="psCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button>` : ''}</div></div>`;
+  <div class="card" id="cardEstrutura"><h2>Estrutura das pastas ${notaEscopo(true)}</h2><p class="lead">Padronizada para os dois (pedido de 17/11/2026): a ferramenta cria as pastas com estes nomes, lê os arquivos por eles e nunca apaga, renomeia ou move nada. As pastas da equipe (Repasse 20%, 25%, anestesistas…) ficam fora.</p>
+    <pre class="arvore small">${esc(arvoreEstrutura(S.comp))}</pre>
+    <div class="acoes">${conectada ? `<button class="sec" id="psCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button><button class="sec" data-psano="${+S.comp.slice(0, 4)}">Criar pastas de ${+S.comp.slice(0, 4)}</button><button class="sec" data-psano="${+S.comp.slice(0, 4) + 1}">Criar pastas de ${+S.comp.slice(0, 4) + 1}</button>` : '<span class="small muted">Conecte a pasta raiz para criar as pastas.</span>'}</div>
+    <details style="margin-top:10px"><summary><b>Guia: mudar da estrutura antiga para a nova</b> (manual, sem pressa — a ferramenta lê as duas)</summary>${GUIA_MUDANCA_PASTAS}</details></div>`;
+
 }
+// Árvore da estrutura padronizada (texto), com as unidades cadastradas.
+function arvoreEstrutura(chave) {
+  const ano = +chave.slice(0, 4), uns = S.cfg.unidades.filter(u => (u.apolo || []).length && !ehUnidadeV3(S.cfg, u.cod)).sort((a, b) => +a.cod - +b.cod).map(nomePastaUnidadeRel);
+  return [`(pasta raiz)`, `├─ ${PASTA_SISTEMA.nome}`, ...Object.values(SISTEMA).map((x, i, a) => `│   ${i === a.length - 1 ? '└' : '├'}─ ${x.nome}`),
+    `├─ ${pastaAno(ano).nome}`, `│   ├─ ${nomePastaMes(`${ano}-01`)} … ${nomePastaMes(`${ano}-12`)}`, `│   └─ ${nomePastaMes(chave)}`,
+    `│       ├─ ${PASTA_CORR.nome}            (PDFs «nome_unidade», sem subpastas)`, `│       ├─ ${PASTA_NC.nome}`, `│       ├─ ${PASTA_NFS.nome} › Pagamento 15 | Pagamento 30`,
+    `│       ├─ ${PASTA_PLAN.nome}         (laudos do Apolo e Power BI)`, `│       ├─ ${PASTA_REL.nome}`, `│       │   ├─ USG › ${uns.join(' | ')}`, `│       │   ├─ IMG › (as mesmas unidades)`,
+    `│       │   └─ Curitiba › ${SUB_CURITIBA.join(' | ')}`, `│       ├─ ${PASTA_CONFERIDOS.nome} › ${SUB_CONFERIDOS.join(' | ')}   (manual)`,
+    `│       ├─ ${PASTA_MUTIRAO.nome}                (manual)`, `│       └─ ${PASTA_FINAL.nome}                  (manual; a ferramenta não grava aqui)`, `└─ ${pastaAno(ano + 1).nome}   (mesma estrutura)`].join('\n');
+}
+const GUIA_MUDANCA_PASTAS = `<ol class="small">
+  <li><b>Os dois atualizam a ferramenta</b> para esta versão (ou mais nova) antes de mover qualquer coisa.</li>
+  <li><b>Crie as pastas novas:</b> «Criar pastas de 2026» e «Criar pastas de 2027». As pastas de «01 - Sistema» que já existem no lugar antigo <i>não</i> são criadas, para os dois continuarem se encontrando.</li>
+  <li><b>Arquivos permanentes</b> (com a ferramenta fechada nos dois computadores): crie <code>01 - Sistema</code> se faltar e mova para dentro dela, renomeando:
+    <code>Fluxo mensal</code> (fica «Fluxo mensal») · <code>Equivalência TUSS (sincronização)</code> → «Equivalências TUSS» · <code>Configuração compartilhada</code> → «Configurações compartilhadas» · <code>backups</code> → «Backups». Mova a pasta inteira, com os arquivos .json dentro.</li>
+  <li><b>Competências de 2026:</b> de <code>Competências › Comp_MM-AAAA</code> para <code>02 - Repasse 2026 › AAAA-MM - Mês</code>:
+    Correção de prestador → 01 (os PDFs soltos, com o nome «nome_unidade») · Não conformidades → 02 · NFs → 03 › Pagamento 15 | 30 ·
+    planilhas de <code>Bases de dados › Comp_MM-AAAA</code> → 04 · Relatórios para conferência › USG | IMG › «Unidade N - …» → 05 › USG | IMG › nome da unidade · Curitiba → 05 › Curitiba › Prestadores Unidade | Prestadores SRA.</li>
+  <li><b>Confira</b>: abra a ferramenta, «Atualizar da pasta» e veja se os PDFs e as planilhas aparecem. Só então apague (ou guarde em «_antigos») as pastas antigas. Enquanto existirem, a ferramenta lê as duas.</li></ol>`;
 function ligarPastas() {
   if ($('psConectar')) $('psConectar').onclick = async () => { await escolherPastaSync(); RENDER.configuracoes(); };
   if ($('psLiberar')) $('psLiberar').onclick = async () => { await liberarPastaSync(); RENDER.configuracoes(); };
   if ($('psDesc')) $('psDesc').onclick = async () => { if (await confirmar('Desconectar da pasta?', 'Os dados continuam neste navegador; a pasta e os arquivos não são apagados.', 'Desconectar')) { await definirPastaSync(null); RENDER.configuracoes(); } };
   if ($('psCriar')) $('psCriar').onclick = () => criarEstrutura(S.comp);
   $('psSalvarComp').onclick = () => { S.cfg.parametros = { ...S.cfg.parametros, lerPastaAoAbrir: $('psLerAbrir').checked, exportarNaPasta: $('psExport').checked }; salvarCfg('Preferências de pasta salvas.', 'parametros'); };
-  $('psSalvarNomes').onclick = () => {
-    const n = {}; document.querySelectorAll('[data-pasta]').forEach(i => { const v = limparNomePasta(i.value); if (v) n[i.dataset.pasta] = v; });
-    const nomes = [...Object.keys(PASTAS_EDITAVEIS).map(k => norm(n[k] || PADRAO_PASTAS[k].nome)), ...Object.values(PASTAS_FIXAS).map(([p]) => norm(p.nome))], rep = nomes.find((x, i) => nomes.indexOf(x) !== i);
-    if (rep) return avisar(`Dois destinos com o mesmo nome de pasta («${rep}»).`, 'err');
-    S.cfg.pastas = n; aplicarPastasConfig(); PRI.verifComp = ''; salvarCfg('Nomes das pastas salvos.', 'parametros'); RENDER.configuracoes();
-  };
-  $('psPadrao').onclick = async () => { if (await confirmar('Voltar aos nomes padrão?', 'Os nomes das subpastas voltam ao padrão. Nenhuma pasta é renomeada ou apagada.', 'Voltar')) { S.cfg.pastas = {}; aplicarPastasConfig(); salvarCfg('Nomes das pastas: padrão.', 'parametros'); RENDER.configuracoes(); } };
+  document.querySelectorAll('[data-psano]').forEach(b => b.onclick = () => criarEstruturaAno(+b.dataset.psano));
 }
 
 /* ---------- Exportação: modelos e colunas ---------- */
@@ -10557,7 +10620,7 @@ function cfgBackup() {
   return `<div class="card"><h2>Backup</h2>
     <p class="lead">O backup leva a configuração (Bases, regras, parâmetros, pastas e modelos de exportação), as equivalências e regras compostas, o fluxo mensal, as competências, o controle de prestadores por unidade e as preferências de quem exportou. Cada parte tem a sua impressão digital: arquivo incompleto ou alterado é recusado antes de restaurar.</p>
     <div class="acoes"><button id="bkExp">Baixar backup (.json)</button><label class="small"><input type="checkbox" id="bkRod" checked> incluir as rodadas da competência aberta</label><label class="small"><input type="checkbox" id="bkNC"> incluir não conformidades (contém nomes de pacientes)</label></div>
-    ${SY.handle && !SY.legado ? `<h3>Na pasta da rede (${esc(PASTAS_RAIZ.backups.nome)})</h3>
+    ${SY.handle && !SY.legado ? `<h3>Na pasta da rede (${esc(localSistema('backups'))})</h3>
     <div class="acoes"><button id="bkPastaAgora">Gravar backup na pasta agora</button><label class="small"><input type="checkbox" id="bkAuto"${pb.auto ? ' checked' : ''}> backup automático uma vez por dia, ao abrir</label><label class="small">manter os últimos <input type="number" id="bkManter" min="3" max="365" value="${pb.manter}" style="width:64px"> automáticos</label><label class="small"><input type="checkbox" id="bkPastaNC"${pb.incluirNC ? ' checked' : ''}> incluir NCs (a pasta da rede já guarda os PDFs com dados de pacientes)</label><button class="sec mini" id="bkPrefSalvar">Salvar</button></div>
     <div id="bkLista" class="small muted">Lendo os backups da pasta…</div>` : '<p class="small muted">Conecte a pasta raiz (Pastas e sincronização) para gravar backups automáticos na rede.</p>'}</div>
   <div class="card"><h2>Restaurar</h2><p class="lead">Antes de restaurar, a ferramenta mostra o que tem no arquivo, confere a integridade, e você escolhe as partes. O estado atual vira uma cópia de segurança. Com a pasta conectada, a próxima sincronização compara a versão restaurada com a da pasta <b>sem</b> sobrescrever as decisões mais novas: o que divergir vira escolha sua.</p>
@@ -10599,7 +10662,7 @@ async function restaurarBackup(b, origem) {
 async function gravarBackupPasta(b, { auto = false, silencioso = false } = {}) {
   if (!SY.handle || SY.legado || !(await temPermissaoPasta(!silencioso))) return false;
   try {
-    const d = await caminho([PASTAS_RAIZ.backups], true), nome = nomeArquivoBackup(S.operador, auto), texto = JSON.stringify(b);
+    const d = await dirSistema('backups'), nome = nomeArquivoBackup(S.operador, auto), texto = JSON.stringify(b);
     const fh = await d.getFileHandle(nome, { create: true }), w = await fh.createWritable(); await w.write(texto); await w.close();
     const lido = JSON.parse(await (await fh.getFile()).text()), v = validarBackup(lido, VALIDADORES_BACKUP);
     if (v.erros.length || v.partes.some(p => !p.ok)) throw new Error('o arquivo gravado não passou na conferência');
@@ -10608,7 +10671,7 @@ async function gravarBackupPasta(b, { auto = false, silencioso = false } = {}) {
       for await (const h of d.values()) if (h.kind === 'file' && h.name.endsWith(`_${nomeSeguroBackup(S.operador || 'sem-operador')}_auto.json`)) meus.push(h.name);
       meus.sort(); for (const n of meus.slice(0, Math.max(0, meus.length - Math.max(3, +pb.manter || 30)))) await d.removeEntry(n).catch(() => {});
     }
-    if (!silencioso) avisar(`Backup gravado e conferido: ${PASTAS_RAIZ.backups.nome} › ${nome}`, 'ok');
+    if (!silencioso) avisar(`Backup gravado e conferido: ${localSistema('backups')} › ${nome}`, 'ok');
     return nome;
   } catch (e) { if (!silencioso) avisar(`Backup na pasta não gravado (${e.message}). Baixe um backup pelo botão.`, 'err'); return false; }
 }
@@ -10619,7 +10682,7 @@ async function backupAutomaticoDiario() {
   if (await gravarBackupPasta(b, { auto: true, silencioso: true })) gravarLocal(CHAVES.bkPasta, { ...pb, ultimoAuto: hoje });
 }
 async function listarBackupsPasta() {
-  const d = await caminho([PASTAS_RAIZ.backups]); if (!d) return [];
+  const d = await dirSistema('backups', false); if (!d) return [];
   const l = []; for await (const h of d.values()) if (h.kind === 'file' && /\.json$/i.test(h.name)) { const f = await h.getFile(); l.push({ h, nome: h.name, em: f.lastModified, tam: f.size }); }
   return l.sort((a, b) => b.em - a.em);
 }
@@ -10737,7 +10800,7 @@ function iniciarVerificacaoAtualizacao() {
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
   window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
-    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, aplicarRetencaoObservacoes, estadoCompetenciaObs: c => estadoCompetencia(window.__RM.S.compReg, c).observacoes, modalidadesDoGrupo, hmV3Devido, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
+    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, verificarEstrutura: c => verificarEstrutura(c), criarEstruturaAno: a => criarEstruturaAno(a), entregarArquivo: (...a) => entregarArquivo(...a), aplicarRetencaoObservacoes, estadoCompetenciaObs: c => estadoCompetencia(window.__RM.S.compReg, c).observacoes, modalidadesDoGrupo, hmV3Devido, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 
 </script>
