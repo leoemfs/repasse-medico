@@ -14,13 +14,11 @@ const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apo
 const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;
 const ligarAbasConferencia = raiz => raiz.querySelectorAll('[data-cusub]').forEach(b => b.onclick = () => { CU.sub = b.dataset.cusub; RENDER.conferencia(); });
 
-const _renderConferencia = RENDER.conferencia;
-RENDER.conferencia = () => {
-  if (CU.sub === 'unidades') return desenharControleUnidade();
-  _renderConferencia();
+// Chamado por RENDER.conferencia (20-conferencia.js): abas do topo e o «Abrir conferência» vindo daqui.
+function complementoConferenciaUnidades() {
   const p = $('pag-conferencia'); p.insertAdjacentHTML('afterbegin', abasConferencia()); ligarAbasConferencia(p);
   if (CU.abrir) { const a = CU.abrir; CU.abrir = null; preSelecionarConferencia(a); }
-};
+}
 // «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
 function preSelecionarConferencia(a) {
   const doPrest = S.relatorios.filter(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
@@ -33,7 +31,9 @@ function preSelecionarConferencia(a) {
   $('cfRel').scrollIntoView({ block: 'center' });
 }
 
-async function desenharControleUnidade() {
+// O aviso da divisão do trabalho (28-fluxo-sync.js) entra aqui, explicitamente (P2).
+async function desenharControleUnidade() { await desenharControleUnidadeBase(); avisoDivisaoControle(); }
+async function desenharControleUnidadeBase() {
   const pg = $('pag-conferencia');
   S.rodadas = await dbRodadasJanela();
   if (!S.apolo) { pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade</h2><p class="lead">Carregue a planilha de laudos do Apolo no Início. A lista de quem precisa de repasse sai dela, por unidade.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`; return ligarAbasConferencia(pg); }

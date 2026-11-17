@@ -3,7 +3,14 @@
  * ============================================================ */
 const BS = { sub: 'unidades', soSemTipo: false };
 const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['pbi', 'Power BI']];
+// Bases e regras = categoria das Configurações: abas no topo e a barra da configuração compartilhada (P2; antes em 97-decoracoes.js).
 RENDER.bases = () => {
+  const r = desenharBases(), pg = $('pag-bases');
+  if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
+  if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); }
+  return r;
+};
+function desenharBases() {
   const medApolo = S.apolo ? [...contar(S.apolo.laudos.filter(l => l.medico), l => l.medico)].sort((a, b) => a[0].localeCompare(b[0])) : [];
   const idxP = indicePrestadores(S.cfg);
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));

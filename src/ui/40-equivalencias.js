@@ -4,10 +4,11 @@
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
 const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base', vis: 'lista', gmarcas: new Map() };
 
-RENDER.equivalencias = () => {
+// Barra da base compartilhada no topo, explicitamente (P2; antes em 97-decoracoes.js).
+RENDER.equivalencias = () => { const r = desenharEquivalencias(); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
+function desenharEquivalencias() {
   if (FE.sub === 'destrava') return desenharDestrava();
   if (FE.sub === 'titulos') return desenharTitulos();   // v3.0: manutenção por título do Apolo
-  if (aplicarCobertas(S.eq, S.operador, S.comp)) gravarLocal(CHAVES.eq, S.eq);   // relações resolvidas por regra composta validada
   const it = S.eq.itens, cont = k => it.filter(e => e.status === k).length, todosConf = conflitosEquivalencias(S.eq);
   // Conflito coberto por regra composta validada (um ou outro / juntos) não trava mais a conferência.
   const cpVal = indiceEquivalencias(S.eq).compostas || [], regraDoConf = c => cpVal.find(r => compostaCasaTitulo(r, c.titulo) > 0);

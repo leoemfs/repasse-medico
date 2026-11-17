@@ -11,7 +11,8 @@ function carregarFluxo() {
   const f = lerLocal(CHAVES.fluxo);
   S.fluxo = f && !validarFluxo(f).length ? f : { schema: SCHEMA_FLUXO, versaoSchema: 1, modelo: modeloFluxoPadrao(), competencias: {} };
 }
-function salvarFluxo(msg = '') {
+function salvarFluxo(msg = '') { gravarFluxoLocal(msg); agendarSincronizacao('fluxo'); }
+function gravarFluxoLocal(msg = '') {
   if (!gravarLocal(CHAVES.fluxo, S.fluxo)) avisar('Não foi possível gravar o fluxo neste navegador. Exporte um backup em Configurações.', 'err');
   else if (msg) avisar(msg, 'ok');
   atualizarNavFluxo();
@@ -46,7 +47,9 @@ RENDER.fluxo = async () => {
 };
 
 /* ---------------- Acompanhamento ---------------- */
-function desenharAcompanhamento() {
+// A barra de sincronização (28-fluxo-sync.js) entra aqui, explicitamente (P2).
+function desenharAcompanhamento() { desenharAcompanhamentoBase(); barraSyncAcompanhamento(); }
+function desenharAcompanhamentoBase() {
   const c = $('fxCorpo'), comp = compAtual();
   const cab = `<div class="fx-topo"><h2 class="fx-titulo">Checklist da competência ${rotuloCompetencia(FX.chave)}</h2>
     <div class="acoes" style="margin:0">${comp ? '<button class="sec" id="fxExp">Exportar situação (.xlsx)</button>' : ''}</div></div>`;

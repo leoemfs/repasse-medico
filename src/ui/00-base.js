@@ -91,17 +91,24 @@ function registrarAlteracaoBase(motivo, tipo) {
   if (!motivo || !S.compReg) return;
   registrarAlteracao(S.compReg, S.comp, S.operador, tipo || tipoDaAlteracao(motivo), motivo); salvarCompReg();
 }
-function salvarCfg(motivo = '', tipo = '') {
+// P2 (v3.0.0-alpha.11): salvar = gravar neste navegador + agendar a sincronização com a pasta (29c-sincronizacao.js).
+// A própria sincronização e a restauração usam só o gravar*Local, para não agendar de novo.
+function salvarCfg(motivo = '', tipo = '') { gravarCfgLocal(motivo, tipo); agendarSincronizacao('cfg'); }
+function gravarCfgLocal(motivo = '', tipo = '') {
   registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
 }
 function salvarEq(motivo = '') {
+  // P2 (v3.0.0-alpha.11): relações resolvidas por regra composta validada ficam «cobertas» ao GRAVAR (antes, a tela de
+  // Equivalências fazia isso — e gravava — só por abrir).
+  aplicarCobertas(S.eq, S.operador, S.comp);
   registrarAlteracaoBase(motivo, 'equivalencias');
   if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador. Exporte o JSON para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
   atualizarNavPendencias();
+  agendarSincronizacao('eq');
 }
 // Cópia de segurança antes de substituir uma base inteira (RN-215).
 // v3.0: a base inteira vai ser trocada (backup, desfazer, substituir): a próxima sincronização com a pasta compara

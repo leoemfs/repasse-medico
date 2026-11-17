@@ -118,7 +118,7 @@ function cfgPastas() {
 }
 function ligarPastas() {
   if ($('psConectar')) $('psConectar').onclick = async () => { await escolherPastaSync(); RENDER.configuracoes(); };
-  if ($('psLiberar')) $('psLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await sincronizarCfg({ interativo: true }); } else avisar('O acesso à pasta não foi liberado.', 'warn'); RENDER.configuracoes(); };
+  if ($('psLiberar')) $('psLiberar').onclick = async () => { await liberarPastaSync(); RENDER.configuracoes(); };
   if ($('psDesc')) $('psDesc').onclick = async () => { if (await confirmar('Desconectar da pasta?', 'Os dados continuam neste navegador; a pasta e os arquivos não são apagados.', 'Desconectar')) { await definirPastaSync(null); RENDER.configuracoes(); } };
   if ($('psCriar')) $('psCriar').onclick = () => criarEstrutura(S.comp);
   $('psSalvarComp').onclick = () => { S.cfg.parametros = { ...S.cfg.parametros, lerPastaAoAbrir: $('psLerAbrir').checked, exportarNaPasta: $('psExport').checked }; salvarCfg('Preferências de pasta salvas.', 'parametros'); };
@@ -213,7 +213,7 @@ async function restaurarBackup(b, origem) {
   const atual = montarBackup(partesAtuaisBackup({ nc: true, rodadas: await dbTodas() }), { operador: S.operador, motivo: `antes de restaurar ${origem}` });
   if (!(await gravarBackupPasta(atual, { auto: false, silencioso: true }))) gravarLocal(CHAVES.bkAntes, atual);
   const feito = [];
-  if (quer('configuracao')) { backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); S.cfg = clone(b.configuracao); migrarConfig(S.cfg); aplicarPastasConfig(); salvarCfgSemSync(); feito.push('configuração'); }
+  if (quer('configuracao')) { backupAntesDeSubstituir(CHAVES.cfgAnterior, S.cfg); S.cfg = clone(b.configuracao); migrarConfig(S.cfg); aplicarPastasConfig(); gravarCfgLocal(); feito.push('configuração'); }
   if (quer('equivalencias')) { backupAntesDeSubstituir(CHAVES.eqAnterior, S.eq); S.eq = clone(b.equivalencias); salvarEq(); feito.push('equivalências'); }
   if (quer('fluxo')) { backupAntesDeSubstituir(CHAVES.fluxoAnterior, S.fluxo); S.fluxo = clone(b.fluxo); salvarFluxo(); feito.push('fluxo'); }
   if (quer('competencias')) { S.compReg = clone(b.competencias); salvarCompReg(); feito.push('competências'); }
@@ -248,8 +248,6 @@ async function backupAutomaticoDiario() {
   const b = montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbRodadasJanela(S.comp, true) }), { operador: S.operador, motivo: 'automático diário' });
   if (await gravarBackupPasta(b, { auto: true, silencioso: true })) gravarLocal(CHAVES.bkPasta, { ...pb, ultimoAuto: hoje });
 }
-const _restaurarPastaSyncBk = restaurarPastaSync;
-restaurarPastaSync = async function () { await _restaurarPastaSyncBk(); setTimeout(() => backupAutomaticoDiario().catch(() => {}), 3000); };
 async function listarBackupsPasta() {
   const d = await caminho([PASTAS_RAIZ.backups]); if (!d) return [];
   const l = []; for await (const h of d.values()) if (h.kind === 'file' && /\.json$/i.test(h.name)) { const f = await h.getFile(); l.push({ h, nome: h.name, em: f.lastModified, tam: f.size }); }

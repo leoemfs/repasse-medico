@@ -221,11 +221,8 @@ async function checarEqPasta() {
   if (!SY.handle || SY.legado || SYQ.ocupado || SYQ.status === 'permissao') return;
   try { const f = await (await (await dirEq()).getFileHandle(ARQ_EQ)).getFile(); if (f.lastModified !== SYQ.lm) sincronizarEq(); } catch (e) { if (e.name === 'NotFoundError') sincronizarEq(); }
 }
-// Toda gravação da base de equivalências agenda a sincronização.
+// Gravação usada pela própria sincronização (não agenda outra). As da tela usam salvarEq (00-base.js).
 const gravarEqLocal = () => { if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador.', 'err'); };
-const _salvarEq = salvarEq;
-let syncEqAgendada = 0;
-salvarEq = function (msg = '') { _salvarEq(msg); if (SY.handle && !SY.legado && SYQ.status !== 'permissao') { clearTimeout(syncEqAgendada); syncEqAgendada = setTimeout(() => sincronizarEq(), 800); } };
 function barraEq() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="eqSync"><span class="sy-dot"></span><b>Equivalências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo no Início para dividir as validações com a outra pessoa.</span></div>`;
   const ult = SYQ.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYQ.meta.atualizadoPor || '—')}</b> em ${new Date(SYQ.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
@@ -255,7 +252,7 @@ function cartaoPastaRaiz() {
 }
 function ligarPastaRaiz() {
   if ($('prConectar')) $('prConectar').onclick = () => escolherPastaSync();
-  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await temPermissaoPasta(true)) { SY.status = 'ok'; iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); await atualizarDaPasta(); } else avisar('O acesso à pasta não foi liberado.', 'warn'); };
+  if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await liberarPastaSync()) await atualizarDaPasta(); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
   if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
@@ -269,10 +266,9 @@ function ligarPastaRaiz() {
     PRI.verifComp = S.comp; verificarEstrutura(S.comp).then(v => { PRI.verif = v; if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }).catch(() => {});
   }
 }
-const _renderInicio = RENDER.inicio;
-RENDER.inicio = (...a) => {
-  const r = _renderInicio(...a), pg = $('pag-inicio');
-  const alvo = pg?.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
+// Chamado por RENDER.inicio (10-inicio.js), depois do resto do Início.
+function complementoInicioPastaRaiz() {
+  const pg = $('pag-inicio'); if (!pg) return;
+  const alvo = pg.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
   if (html) { alvo ? alvo.insertAdjacentHTML('afterend', html) : pg.insertAdjacentHTML('afterbegin', html); ligarPastaRaiz(); }
-  return r;
-};
+}

@@ -68,7 +68,9 @@ function cartaoOutraCompetencia(x, nome) {
   return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
 }
 
-RENDER.conferencia = () => {
+// Subaba «Prestadores por unidade» e as abas do topo (22-prestadores-unidade.js) entram aqui, explicitamente (P2).
+RENDER.conferencia = () => { if (CU.sub === 'unidades') return desenharControleUnidade(); desenharPaginaConferencia(); complementoConferenciaUnidades(); };
+function desenharPaginaConferencia() {
   const p = $('pag-conferencia');
   if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }

@@ -10,6 +10,7 @@
   aplicarPastasConfig();   // nomes das pastas configurados (v3.0)
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
+  else if (aplicarCobertas(S.eq, '', S.comp)) gravarLocal(CHAVES.eq, S.eq);   // base gravada antes de a cobertura ir para o salvarEq (P2)
   S.operador = lerLocal(CHAVES.operador) || '';
   carregarCompetencia(); carregarFluxo(); carregarNC();
   iniciarMenu(); mostrarOperador(); atualizarNavPendencias(); atualizarNavFluxo(); atualizarNavNC();
