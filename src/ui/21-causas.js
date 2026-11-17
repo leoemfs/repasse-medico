@@ -95,7 +95,7 @@ function ligarCausas(raiz, CZ, res, ctx) {
       (regra.historico ||= []).push({ em: agoraISO(), por: op, de: regra.status, para: regra.status, motivo: `laudo do mesmo estudo: «${c.titulo}»`, competencia: S.comp });
       S.eq.revisao++; S.eq.atualizadoEm = agoraISO(); salvarEq('Título incluído na regra composta. Conferindo de novo…'); await executarConferencia(); return;
     }
-    if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => { const x = res.linhas[i], cd = candidatoDaLinhaConferencia(x, ctx, S.cfg); const nat = x.pbi && SITUACAO_PBI[x.pbi.situacao]?.natureza; if (nat && nat !== 'prestador-incorreto') { cd.natureza = nat; cd.categoria = categoriaSugerida(cd.campos, nat); cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria }); } return cd; }));
+    if (ac === 'nc') ok = await abrirRegistroNC(c.linhas.map(i => { const x = res.linhas[i], cd = candidatoComObservacao(x, ctx); const nat = x.pbi && SITUACAO_PBI[x.pbi.situacao]?.natureza; if (nat && nat !== 'prestador-incorreto') { cd.natureza = nat; cd.categoria = categoriaSugerida(cd.campos, nat); cd.chave = chaveNC({ ...cd.campos, categoria: cd.categoria }); } return cd; }));
     if (ac === 'corrprest') ok = await abrirRegistroNC(c.linhas.map(i => candidatoCorrecaoPrestador(res.linhas[i], ctx)));
     if (ac === 'alternante') { await tornarAlternante(c.regraId); return; }
     if (ac === 'dispensar') ok = await dispensarLaudos(res, c.linhas);

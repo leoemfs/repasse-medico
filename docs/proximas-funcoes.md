@@ -187,7 +187,20 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
 - **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
 - **Pergunta da F41 (pendente sai ou não do valor): respondida na SOL-F43.** Pendente de análise **não** compõe o fechamento.
 
-## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — **maior parte IMPLEMENTADA na v3.0.0-alpha.6** com a SOL-F43 (pedido de 13/11/2026); «Exportar só o filtrado» e reconferir em um clique na v3.0.0-alpha.10
+## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — **IMPLEMENTADA**: a maior parte na v3.0.0-alpha.6 com a SOL-F43; «Exportar só o filtrado» e reconferir em um clique na alpha.10; o restante na alpha.13 (pedido de 13/11/2026)
+
+**O que entrou na v3.0.0-alpha.13** (teste: `test/f41_conferencia.mjs`):
+- **Filtros novos:** título do laudo, médico do laudo, intervalo de datas («Data» + «até») e observação («Com» ou «Sem»).
+- **Em lote, sobre o filtrado:**
+  - «Dispensar os N laudo(s) «Só no laudo»…»;
+  - «Observação nas N linha(s)…».
+- **Observação:**
+  - coluna «Observação (na linha)» no Excel, com autor e data, no catálogo e no fim do modelo «Padrão»;
+  - «N linha(s) com observação» no quadro do aceite;
+  - vai para as Observações da NC registrada a partir da linha (e em lote);
+  - segue a retenção das NCs (`retencaoNC`): passado o prazo, o texto é apagado e ficam quem escreveu e quando.
+- **Continua em aberto:** a pergunta se a observação vai para o e-mail ou a prévia do prestador no Fechamento. Hoje ela é só interna.
+
 
 **Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
 

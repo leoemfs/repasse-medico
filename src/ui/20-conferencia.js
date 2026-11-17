@@ -191,6 +191,9 @@ function desenharConferencia() {
   const barra = T.total ? ORDEM_CLASSES.map(k => `<span class="cl-${k}" style="width:${T[k].valor / T.total * 100}%" title="${esc(CLASSES_FECH[k].nome)}: R$ ${fmtBR(T[k].valor)}"></span>`).join('') : '';
   const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
   const comV = res.linhas.filter(x => x.r), opc = (f, rot) => [...new Map(comV.map(x => [f(x), rot(x)])).entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  // SOL-F41 (v3.0.0-alpha.13): dias de todas as linhas (MV e «Só no laudo»), título e médico do laudo, observação com/sem.
+  const diasF = [...new Map(res.linhas.map(x => x.r?.data || x.l?.data).filter(Boolean).map(d => [isoDia(d), fmtData(d)])).entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  const opcL = f => [...contar(res.linhas.filter(x => x.l && f(x.l)), x => f(x.l))].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
   const tile = k => `<button class="tot-cl${S.conf.filtroClasse === k ? ' sel' : ''}" data-cl="${k}" title="${esc(CLASSES_FECH[k].def)}"><span class="faixa cl-${k}"></span><b>R$ ${fmtBR(T[k].valor)}</b><small>${esc(CLASSES_FECH[k].nome)} · ${T[k].n} linha(s) · ${CLASSES_FECH[k].entra ? 'entra no fechamento' : 'fora do fechamento'}</small></button>`;
   const secao = (k, html) => `<section class="cf-sec" data-cfsec="${k}"${aba === k ? '' : ' hidden'} role="tabpanel" aria-labelledby="cfAba-${k}">${html}</section>`;
   c.innerHTML = `<div class="card cf-frase"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
@@ -208,9 +211,13 @@ function desenharConferencia() {
       <div class="cf-filtros">
         <label class="campo">Buscar<input type="search" id="cfBusca" placeholder="paciente, código, título ou médico…" value="${esc(S.conf.busca)}"></label>
         <label class="campo">Procedimento<select id="cfFProc"><option value="*">Todos</option>${opc(x => x.r.codigo, x => `${x.r.codigo} · ${x.r.procDesc}`).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fProc === v ? ' selected' : ''}>${esc(t)} (${comV.filter(x => x.r.codigo === v).length})</option>`).join('')}</select></label>
-        <label class="campo">Data<select id="cfFData"><option value="*">Todas</option>${opc(x => isoDia(x.r.data), x => fmtData(x.r.data)).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fData === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <label class="campo">Data${S.conf.fDataAte && S.conf.fDataAte !== '*' ? ' (de)' : ''}<select id="cfFData"><option value="*">${S.conf.fDataAte && S.conf.fDataAte !== '*' ? 'Desde o início' : 'Todas'}</option>${diasF.map(([v, t]) => `<option value="${esc(v)}"${S.conf.fData === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <label class="campo">até<select id="cfFDataAte" aria-label="Data até"><option value="*">—</option>${diasF.map(([v, t]) => `<option value="${esc(v)}"${S.conf.fDataAte === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
         <label class="campo">Convênio<select id="cfFConv"><option value="*">Todos</option>${opc(x => x.r.convenio, x => x.r.convenio).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fConv === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
-        <div class="cf-fchk"><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label><label class="small"><input type="checkbox" id="cfFObs"${S.conf.fObs ? ' checked' : ''}> com observação</label></div></div>
+        <label class="campo">Título do laudo<select id="cfFTit"><option value="*">Todos</option>${opcL(l => l.titulo).map(([v, n]) => `<option value="${esc(v)}"${S.conf.fTit === v ? ' selected' : ''}>${esc(v)} (${n})</option>`).join('')}</select></label>
+        <label class="campo">Médico do laudo<select id="cfFMed"><option value="*">Todos</option>${opcL(l => l.medico).map(([v, n]) => `<option value="${esc(v)}"${S.conf.fMed === v ? ' selected' : ''}>${esc(v)} (${n})</option>`).join('')}</select></label>
+        <label class="campo">Observação<select id="cfFObs">${opcoes([['', 'Todas'], ['com', 'Com observação'], ['sem', 'Sem observação']], fObsAtual())}</select></label>
+        <div class="cf-fchk"><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label></div></div>
       <div class="cf-selinfo small" id="cfSelInfo"></div>
       ${S.conf.filtroLinhas ? `<div class="cf-fl small"><b>Mostrando as ${S.conf.filtroLinhas.idx.length} linha(s) de:</b> ${esc(S.conf.filtroLinhas.titulo)} <button class="sec mini" id="cfFlLimpar">Mostrar todas</button></div>` : ''}
       <div id="cfTab" style="margin-top:10px"></div></div>`)}
@@ -239,6 +246,9 @@ function desenharConferencia() {
   if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
   ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
+  // Um dia, ou de… até… (só «até»: desde o início).
+  const naFaixaDeData = d => { const de = S.conf.fData && S.conf.fData !== '*' ? S.conf.fData : '', ate = S.conf.fDataAte && S.conf.fDataAte !== '*' ? S.conf.fDataAte : '';
+    if (!de && !ate) return true; if (!ate) return d === de; return (!de || d >= de) && d <= ate; };
   const filtrar = () => {
     const q = norm(S.conf.busca);
     const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
@@ -247,21 +257,26 @@ function desenharConferencia() {
       && (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
       && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => m.startsWith('dec-') ? x.decisao?.tipo === m.slice(4) : x.marcadores.has(m)))
       && (!S.conf.fProc || S.conf.fProc === '*' || x.r?.codigo === S.conf.fProc)
-      && (!S.conf.fData || S.conf.fData === '*' || isoDia(x.r?.data || x.l?.data) === S.conf.fData)
+      && naFaixaDeData(isoDia(x.r?.data || x.l?.data))
       && (!S.conf.fConv || S.conf.fConv === '*' || (x.r?.convenio || '') === S.conf.fConv)
-      && (!S.conf.fObs || observacoesDaLinha(idxObs, x.r, x.l).length)
+      && (!S.conf.fTit || S.conf.fTit === '*' || x.l?.titulo === S.conf.fTit)
+      && (!S.conf.fMed || S.conf.fMed === '*' || x.l?.medico === S.conf.fMed)
+      && (!fObsAtual() || (observacoesDaLinha(idxObs, x.r, x.l).length > 0) === (fObsAtual() === 'com'))
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
   };
   // Contagem e soma do filtro + ações em lote sobre as linhas pendentes visíveis.
   const infoSel = vis => {
     const pend = vis.filter(x => x.r && classeDaLinhaConf(x) === 'pend' && !x.decisao), el = $('cfSelInfo'); if (!el) return;
+    const slVis = vis.filter(x => x.l && !x.r && x.status === 'so-laudo' && !x.decisao);   // SOL-F41: dispensar em lote
     el.innerHTML = `<b>${vis.length} linha(s) no filtro · R$ ${fmtBR(vis.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0))}</b>${S.conf.filtroClasse ? ` · ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)}` : ''}<span class="sy-esp"></span>
-      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>${vis.length < res.linhas.length ? `<button class="sec mini" id="cfExcelFiltro">Exportar só o filtrado (${vis.length})</button>` : ''}`;
+      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button>${slVis.length ? `<button class="sec mini" id="cfLoteDisp">Dispensar os ${slVis.length} laudo(s) «Só no laudo»…</button>` : ''}<button class="sec mini" id="cfLoteObs"${vis.length ? '' : ' disabled'}>Observação nas ${vis.length} linha(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>${vis.length < res.linhas.length ? `<button class="sec mini" id="cfExcelFiltro">Exportar só o filtrado (${vis.length})</button>` : ''}`;
     $('cfExcel2').onclick = () => exportarExcelConf($('cfExcel2'), res, ctx);
     if ($('cfExcelFiltro')) $('cfExcelFiltro').onclick = () => exportarExcelConf($('cfExcelFiltro'), resultadoFiltrado(res, vis), { ...ctx, filtroTexto: textoFiltroConf(vis) });
-    $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fConv: '*', fObs: false }); desenharConferencia(); };
+    $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fDataAte: '*', fConv: '*', fTit: '*', fMed: '*', fObs: '' }); desenharConferencia(); };
     $('cfLoteAceitar').onclick = async () => { if (await considerarLinhas(res, pend.map(x => res.linhas.indexOf(x)), `${pend.length} linha(s) pendente(s) do filtro · R$ ${fmtBR(pend.reduce((s, x) => s + x.r.vlRepasse, 0))}`, '')) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
-    $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoDaLinhaConferencia(x, ctx, S.cfg)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
+    $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoComObservacao(x, ctx)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
+    if ($('cfLoteDisp')) $('cfLoteDisp').onclick = async () => { if (await dispensarLaudos(res, slVis.map(x => res.linhas.indexOf(x)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
+    $('cfLoteObs').onclick = async () => { if (await observacaoEmLote(vis)) desenharConferencia(); };
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
@@ -287,11 +302,14 @@ function desenharConferencia() {
   $('cfFData').onchange = e => { S.conf.fData = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfFConv').onchange = e => { S.conf.fConv = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
-  $('cfFObs').onchange = e => { S.conf.fObs = e.target.checked; desenharConferencia(); };
+  $('cfFObs').onchange = e => { S.conf.fObs = e.target.value; if (e.target.value) S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFDataAte').onchange = e => { S.conf.fDataAte = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFTit').onchange = e => { S.conf.fTit = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFMed').onchange = e => { S.conf.fMed = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfTab').addEventListener('click', async e => {
     const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar],[data-resolvido],[data-escolher],[data-obs-salvar]'); if (!b) return;
     let ok = false;
-    if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
+    if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoComObservacao(res.linhas[+b.dataset.ncLinha], ctx)]);
     else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
     else if (b.dataset.dispensar !== undefined) ok = await dispensarLaudos(res, [+b.dataset.dispensar]);
     else if (b.dataset.resolvido !== undefined) ok = await resolvidoNoMV(res.linhas[+b.dataset.resolvido], ctx);
@@ -302,10 +320,12 @@ function desenharConferencia() {
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
+const fObsAtual = () => S.conf?.fObs === true ? 'com' : (S.conf?.fObs || '');
 /* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
  * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
 function exportarExcelConf(bt, res, ctx) {
-  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
+  const idxObs = indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes);
+  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
     nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp), 'a exportação do Excel');
 }
 function textoFiltroConf(vis) {
@@ -314,9 +334,12 @@ function textoFiltroConf(vis) {
   if (c.filtroStatus.size) partes.push(`situação ${[...c.filtroStatus].map(k => STATUS_CONF[k]?.nome || k).join(', ')}`);
   if (c.filtroMarc.size) partes.push(`marcador ${[...c.filtroMarc].map(k => k.startsWith('dec-') ? TIPOS_DECISAO[k.slice(4)] : MARCADORES[k] || k).join(', ')}`);
   if (c.fProc && c.fProc !== '*') partes.push(`procedimento ${c.fProc}`);
-  if (c.fData && c.fData !== '*') partes.push(`data ${fmtData(paraData(c.fData))}`);
+  if (c.fDataAte && c.fDataAte !== '*') partes.push(`data ${c.fData && c.fData !== '*' ? `de ${fmtData(paraData(c.fData))} ` : ''}até ${fmtData(paraData(c.fDataAte))}`);
+  else if (c.fData && c.fData !== '*') partes.push(`data ${fmtData(paraData(c.fData))}`);
   if (c.fConv && c.fConv !== '*') partes.push(`convênio ${c.fConv}`);
-  if (c.fObs) partes.push('com observação');
+  if (c.fTit && c.fTit !== '*') partes.push(`título «${c.fTit}»`);
+  if (c.fMed && c.fMed !== '*') partes.push(`médico ${c.fMed}`);
+  if (fObsAtual()) partes.push(fObsAtual() === 'com' ? 'com observação' : 'sem observação');
   if (c.busca) partes.push(`busca «${c.busca}»`);
   if (c.filtroLinhas) partes.push(c.filtroLinhas.titulo);
   if (c.soFalta !== false && !c.filtroLinhas && !c.filtroStatus.size && !c.filtroClasse) partes.push('só o que falta decidir');
@@ -442,6 +465,25 @@ async function dispensarLaudos(res, idxs) {
   salvarCompReg(); avisar(`${ls.length} laudo(s) dispensado(s) nesta competência.`, 'ok');
   return true;
 }
+/* SOL-F41 (v3.0.0-alpha.13) — A observação da linha vai para a NC registrada a partir dela (no campo Observações). */
+function candidatoComObservacao(x, ctx) {
+  const c = candidatoDaLinhaConferencia(x, ctx, S.cfg);
+  const obs = observacoesDaLinha(indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes), x.r, x.l);
+  if (obs.length) c.obsLinha = textoObservacoes(obs);
+  return c;
+}
+// Observação em lote: o mesmo texto em todas as linhas visíveis do filtro (cada uma pela sua chave, sem nome de paciente).
+async function observacaoEmLote(vis) {
+  if (!exigirAberta(S.comp, 'registrar observações')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const r = await dialogo(`Observação em ${vis.length} linha(s)`, `<p class="small muted">O texto entra em cada linha visível do filtro, com quem e quando. Fica na competência ${rotuloCompetencia(S.comp)} e aparece nas próximas rodadas; não muda a classe nem a situação.</p>
+    <label class="campo">Observação<textarea name="txt" rows="3"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Salvar']]);
+  if (r.botao !== 'ok') return false;
+  if (!r.campos.txt.trim()) { avisar('Escreva a observação.', 'warn'); return false; }
+  for (const x of vis) registrarObservacao(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.txt, op);
+  salvarCompReg(); avisar(`Observação registrada em ${vis.length} linha(s).`, 'ok');
+  return true;
+}
 async function removerDecisaoConsiderar(x) {
   if (!exigirAberta(S.comp, 'alterar decisões')) return false;
   if (!await confirmar('Remover decisão?', 'A linha volta a aparecer como pendente na conferência.', 'Remover')) return false;
@@ -461,7 +503,9 @@ function quadroAceite() {
   const r = rodadaDaConf(); if (!r) return '';
   const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
   const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => decisaoDaLinhaRodada(idx, l));
-  const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}</p>`;
+  // SOL-F41: quantas linhas desta conferência têm observação.
+  const idxObsA = indiceObservacoes(estadoCompetencia(S.compReg, chave).observacoes), nObs = S.conf?.ctx?.rodadaId === r.id ? S.conf.res.linhas.filter(x => observacoesDaLinha(idxObsA, x.r, x.l).length).length : 0;
+  const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}${nObs ? ` · <span id="cfAceiteObsN">${nObs} linha(s) com observação</span>` : ''}</p>`;
   const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => decisaoDaLinhaRodada(idx, l)?.tipo === 'nc').length;
   if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite do relatório</b> <span class="badge ok">aceito</span>${resumoCl}
     <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
