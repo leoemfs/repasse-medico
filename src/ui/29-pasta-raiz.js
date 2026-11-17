@@ -66,7 +66,8 @@ function estruturaCompetencia(chave) {
   const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
   for (const g of ['USG', 'IMG']) for (const u of normais) cam.push([...base, PASTA_REL, G[g], un(u)]);
   if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_REL, { nome: 'Curitiba', re: /^(CURITIBA|V3)/ }]);
-  for (const u of normais) cam.push([...base, PASTA_CORR, un(u)]);
+  // Correção de prestador vale para todas as unidades, inclusive Curitiba (V3): o fluxo de Curitiba também tem correção.
+  for (const u of uns) cam.push([...base, PASTA_CORR, un(u)]);
   cam.push([...base, PASTA_CONF], [...base, PASTA_NC]);
   return cam;
 }
