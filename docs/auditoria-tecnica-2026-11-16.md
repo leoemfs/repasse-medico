@@ -21,7 +21,22 @@ Os dois foram reproduzidos por teste. Escrever um teste para cada um junto com a
 - Decisões gravadas antes na chave sem a ordem valem para **uma** linha só: a do mesmo laudo; sem laudo, a 1ª; a NC de duplicidade, as repetidas (2ª em diante). Nenhuma decisão antiga passa a pagar uma cobrança a mais.
 - Rodadas gravadas antes são lidas com a ordem nas linhas repetidas (`normalizarChavesRodada`), sem regravar.
 
-## P1
+## P1 — **FEITOS na v3.0.0-alpha.10** (teste: `test/p1_otimizacoes.mjs`)
+
+**Como ficou:**
+- **Candidatos a NC.**
+  - Com «Todos os médicos da unidade» e o prestador com cadastro na unidade, os «Só no laudo» de outros médicos continuam na tabela, mas não viram candidatos deste relatório. O cartão diz quantos ficaram fora.
+  - Ficam os do prestador, os sem médico e os que o Power BI mostra lançados para outro prestador.
+  - Guardados compactos: origem e competência uma vez por análise, sem campos vazios, motivo até 300 caracteres. 2.000 candidatos: de ~2,2 MB para ~1,2 MB.
+- **Rodadas.**
+  - IndexedDB v3 com índice por competência. As telas leem a competência aberta e as vizinhas (4 antes, 1 depois). «Rodadas → todas as competências» lê tudo. Trocar a competência relê.
+  - Retenção por relatório (competência × tipo × prestador × unidade): ficam inteiras as com aceite e a mais recente de cada um dos 3 últimos PDFs do MV. As outras ficam «resumidas»: sem as linhas, com entradas, versões, contagens e o id, que as NCs continuam usando. A resumida não aceita aceite.
+  - O backup (manual, na pasta e diário) leva só as rodadas da competência aberta. O backup «antes de restaurar» continua com todas.
+- **Reconferir em um clique.** No resultado: «Reler o PDF da pasta e conferir de novo» (com a pasta) ou «Carregar o PDF novo e conferir de novo» (sem a pasta). Mantém unidade, médico, tolerância e a aba aberta, e recusa PDF de outro prestador.
+- **Excel.** O botão mostra «Processando…». Com filtro, aparece «Exportar só o filtrado (N)»: arquivo `…_filtrado.xlsx`, com o Resumo do filtro e a aba Informações dizendo qual filtro.
+- **Escopo do «Só no laudo».** O médico do prestador já era o padrão quando há cadastro na unidade (também na conferência em lote). O que faltava era o volume de candidatos com «Todos os médicos», resolvido acima.
+
+### Lista original
 
 - **Candidatos a NC crescem sem limite.** `guardarCandidatosNC` (`src/ui/35-nc.js`) grava todos os candidatos de cada conferência, com nome de paciente, em `rm2.nc`. Uma conferência de 2.000 linhas sem filtro de médico gerou 4.000 itens, cerca de 2,4 MB. Guardar só o escopo do médico, ou só as chaves, e regerar ao abrir.
 - **Rodadas sem retenção e lidas inteiras a cada tela.** Uma rodada de 2.000 linhas ocupa ~650 KB. `dbTodas()` é chamada ao abrir Conferência, Fechamento, Fluxo, Rodadas, Compostas, Destrava e Prestadores por unidade. Ler só a competência atual (índice no IndexedDB), ter retenção e incluir no backup só as rodadas da competência.

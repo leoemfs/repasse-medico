@@ -68,6 +68,8 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 
 **Linha repetida no MV** (mesma conta, atendimento, código e data): cada repetição tem decisão própria. «Esta é a repetida → NC» tira do fechamento só a duplicata; a cobrança legítima continua Devido.
 
+**Reconferir em um clique** (desde a v3.0.0-alpha.10): no topo do resultado, «Reler o PDF da pasta e conferir de novo» (com a pasta raiz conectada) ou «Carregar o PDF novo e conferir de novo». A conferência roda de novo com a mesma unidade, o mesmo médico, a mesma tolerância e na mesma aba.
+
 ## 6. Fechamento
 - Cada prestador × unidade usa o **valor para pagamento** da rodada. Isso vale também para a produção de USG (classe A/B/C/D), a V3, a planilha de controle e o e-mail.
 - Embaixo do valor aparece o detalhe: para pagamento, pendente, NC, excluído e o total do MV.
@@ -77,3 +79,14 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 ## 7. Excel
 - A aba «Resumo» traz o quadro por classe e o valor para pagamento.
 - A coluna «Classe (fechamento)» está no catálogo de colunas e no modelo «Completo» (Configurações → Exportação).
+- Desde a v3.0.0-alpha.10:
+  - o botão mostra «Processando…» enquanto o arquivo é montado;
+  - com algum filtro na tabela, aparece «Exportar só o filtrado (N)». O arquivo termina em `_filtrado.xlsx`, e a aba Informações diz qual filtro foi usado.
+
+## 8. Rodadas guardadas (desde a v3.0.0-alpha.10)
+- A ferramenta lê as rodadas da competência aberta e das vizinhas. Para ver todas, use Rodadas → «mostrar todas as competências».
+- **Rodadas que ficam inteiras**, de cada relatório:
+  - as que têm aceite;
+  - a mais recente de cada um dos 3 últimos PDFs.
+- **Rodadas resumidas:** as outras guardam só o resumo (arquivos, versões, contagens). Aparecem como «resumida» e não recebem aceite.
+- O backup leva as rodadas da competência aberta.

@@ -173,7 +173,8 @@ async function carregarPDFs(files, origem = null) {
       avisar(`${f.name}: ${rel.regs.length} linhas · ${rel.ok ? 'totais conferem com o PDF' : 'há avisos na conferência de totais'}.`, rel.ok ? 'ok' : 'warn');
     } catch (e) { avisar(`${f.name}: erro ao ler o PDF (${e.message}).`, 'err'); }
   }
-  RENDER.inicio();
+  // Só redesenha o Início se ele está aberto (a reconferência carrega o PDF a partir da Conferência).
+  if (paginaAtual === 'inicio') RENDER.inicio();
 }
 
 async function carregarApolo(f) {

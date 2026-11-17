@@ -33,9 +33,11 @@ function atualizarNavNC() {
 /* ---------- Candidatos das análises (SOL-F17) ----------
  * Guardados na base de NCs, por competência, com a mesma retenção (60 dias): ao recarregar a página
  * a revisão continua de onde parou. A análise rodada de novo substitui os candidatos dela. */
-function guardarCandidatosNC(chave, rotulo, curto, itens) {
+// v3.0.0-alpha.10 (P1): guardados compactos (compactarCandidatosNC); «fora» = laudos de outros médicos que ficaram fora do escopo.
+function guardarCandidatosNC(chave, rotulo, curto, lista, fora = 0) {
+  const { itens, comum } = compactarCandidatosNC(lista);
   S.nc.candidatos = (S.nc.candidatos || []).filter(f => f.chave !== chave);
-  S.nc.candidatos.push({ chave, rotulo, curto, itens, competencia: S.comp, em: agoraISO() });
+  S.nc.candidatos.push({ chave, rotulo, curto, itens, comum, ...(fora ? { fora } : {}), competencia: S.comp, em: agoraISO() });
   S.ncCand = S.nc.candidatos; salvarNC();
 }
 function dispensarCandidatosNC(cands) {
@@ -49,8 +51,9 @@ function candidatosNC(filtro = {}) {
   const reg = chavesRegistradasNC(), disp = S.ncDispensados || new Set(), out = [];
   for (const f of S.ncCand || []) {
     if (filtro.fonte ? f.chave !== filtro.fonte : f.competencia !== S.comp) continue;
-    for (const c of f.itens) {
-      if (filtro.tipo && c.tipo !== filtro.tipo) continue;
+    for (const c0 of f.itens) {
+      if (filtro.tipo && c0.tipo !== filtro.tipo) continue;
+      const c = expandirCandidatoNC(c0, f);
       out.push({ c, fonte: f, estado: reg.has(c.chave) ? 'registrada' : disp.has(c.chave) ? 'dispensada' : 'nova' });
     }
   }
@@ -59,8 +62,9 @@ function candidatosNC(filtro = {}) {
 // Cartão usado na conferência e na correção: resumo dos candidatos desta análise e atalho para a revisão.
 function cartaoCandidatosNC(fonte) {
   const lista = candidatosNC({ fonte }), novos = lista.filter(x => x.estado === 'nova');
-  const porTipo = [...contar(lista, x => x.c.tipo)];
+  const porTipo = [...contar(lista, x => x.c.tipo)], fora = (S.ncCand || []).find(f => f.chave === fonte)?.fora || 0;
   return `<div class="card nc-cartao"><h2>Possíveis não conformidades <span class="muted small">${novos.length} para revisar · ${lista.length - novos.length} já registradas ou dispensadas</span></h2>
+    ${fora ? `<p class="small muted">${fora} laudo(s) «Só no laudo» de outros médicos da unidade não viraram candidatos: pelo cadastro, são do relatório de outro prestador (continuam na tabela).</p>` : ''}
     <p class="lead">O sistema só separa os candidatos. Você revisa, aponta o que é NC e escolhe a natureza e o responsável. Também dá para apontar qualquer linha da tabela: abra o detalhe e use «Apontar como NC».</p>
     ${porTipo.length ? `<div class="marcadores">${porTipo.map(([t, n]) => `<span class="marc">${esc(TIPOS_CANDIDATO_NC[t].nome)} · ${n}</span>`).join('')}</div>
     <div class="acoes"><button data-revisar-nc="${esc(fonte)}">Revisar na aba Não conformidades</button></div>` : '<p class="muted small">Nenhum candidato nesta análise.</p>'}</div>`;

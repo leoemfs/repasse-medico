@@ -74,7 +74,7 @@ const listaExemplosCP = ex => ex.length ? `<ul class="small">${ex.map(x => `<li>
  * e conta o que ela sustenta. Não grava rodadas nem muda nada. */
 async function simularComposta(regra) {
   if (!S.apolo) { avisar('Carregue a planilha de laudos do Apolo no Início para simular.', 'warn'); return null; }
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   const eqTemp = { ...S.eq, compostas: [...(S.eq.compostas || []).filter(c => c.id !== regra.id), { ...regra, status: 'validada' }] };
   const r = { contas: 0, linhas: 0, falta: 0, sobra: 0, relatorios: 0, semRodada: 0, exemplos: [] }, contas = new Set();
   for (const x of S.relatorios) {

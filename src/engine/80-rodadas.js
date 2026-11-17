@@ -22,7 +22,7 @@ function registroRodada(res, ctx) {
 
 // Rodada anterior comparável: mesma competência, tipo, unidade e prestador do cabeçalho.
 function rodadaAnterior(rodadas, atual) {
-  return rodadas.filter(r => r.id !== atual.id && competenciaDaRodada(r) === competenciaDaRodada(atual) && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
+  return rodadas.filter(r => r.id !== atual.id && !r.resumida && competenciaDaRodada(r) === competenciaDaRodada(atual) && r.tipo === atual.tipo && r.unidadeCod === atual.unidadeCod && r.prestadorCod === atual.prestadorCod && r.em < atual.em)
     .sort((a, b) => b.em.localeCompare(a.em))[0] || null;
 }
 
@@ -64,4 +64,36 @@ function desfazerAceiteRodada(r, por, motivo = '') {
   r.aceitesDesfeitos = [...(r.aceitesDesfeitos || []), { ...r.aceite, desfeitoPor: por, desfeitoEm: agoraISO(), motivo }];
   r.aceite = null;
   return true;
+}
+
+/* ============================================================
+ * P1 (auditoria 16/11/2026) — Rodadas sem crescer à toa e lidas por competência.
+ * - Janela: as telas leem só as rodadas da competência aberta e das vizinhas (4 antes, 1 depois), que é o que o Início
+ *   (histórico de cobertura), o Fluxo e o Fechamento usam. «Rodadas → todas as competências» e a restauração leem tudo.
+ * - Retenção: cada execução da conferência grava uma rodada (~650 KB com 2.000 linhas). Por relatório (competência ×
+ *   tipo × prestador × unidade) ficam INTEIRAS: as com aceite e a mais recente de cada um dos 3 últimos PDFs do MV
+ *   (o PDF anterior é o que a reconferência compara). As outras ficam «resumidas»: sem as linhas, com arquivos,
+ *   contagens, versões e aceite — o id continua valendo para as NCs e decisões que apontam para ela.
+ * ============================================================ */
+const somarMeses = (ch, n) => { const [a, m] = ch.split('-').map(Number), d = new Date(Date.UTC(a, m - 1 + n, 1)); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`; };
+const janelaCompetencias = (ch, antes = 4, depois = 1) => [somarMeses(ch, -antes), somarMeses(ch, depois)];
+const RETENCAO_RODADAS = { pdfs: 3 };
+const grupoRodada = r => [competenciaDaRodada(r), r.tipo, r.prestadorCod, r.unidadeCod].join('|');
+const hashMVRodada = r => (r.arquivos || []).find(a => a.papel === 'MV')?.hash || r.id;
+// Devolve as rodadas que devem ficar resumidas agora (as que já estão resumidas não voltam).
+function rodadasParaResumir(rodadas, grupos = null) {
+  const porGrupo = new Map();
+  for (const r of rodadas) { const g = grupoRodada(r); if (grupos && !grupos.has(g)) continue; (porGrupo.get(g) || porGrupo.set(g, []).get(g)).push(r); }
+  const out = [];
+  for (const lista of porGrupo.values()) {
+    lista.sort((a, b) => String(b.em).localeCompare(String(a.em)));
+    const manter = new Set(), hashes = [];
+    for (const r of lista) { const h = hashMVRodada(r); if (!hashes.includes(h)) { hashes.push(h); if (hashes.length <= RETENCAO_RODADAS.pdfs) manter.add(r); } }
+    for (const r of lista) if (!manter.has(r) && !r.aceite && !r.resumida && (r.linhas || []).length) out.push(r);
+  }
+  return out;
+}
+function resumirRodada(r) {
+  r.nLinhas = (r.linhas || []).length; r.linhas = []; r.resumida = agoraISO();
+  return r;
 }

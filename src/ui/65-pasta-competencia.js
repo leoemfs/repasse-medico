@@ -25,7 +25,7 @@ function ultimaRodadaDoRelatorio(x, tipo, ch) {
 
 async function exportarPastaCompetencia(ch = S.comp) {
   if (ch !== S.comp) return avisar('Exporte a competência que está selecionada no topo.', 'warn');
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   const mm = `${ch.slice(5)}-${ch.slice(0, 4)}`, raiz = `Comp_${mm}/`, z = new JSZip(), leia = [], bin = zip => zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
   const usados = new Set(), unico = caminho => { let c = caminho, i = 2; while (usados.has(c)) c = caminho.replace(/(\.\w+)$/, `_${i++}$1`); usados.add(c); return c; };
   const add = (caminho, dados) => z.file(unico(raiz + caminho), dados);
