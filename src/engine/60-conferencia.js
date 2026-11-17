@@ -60,6 +60,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
+  aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);

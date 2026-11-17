@@ -43,7 +43,7 @@ async function sincronizarCfg({ interativo = false } = {}) {
       const sem = c => JSON.stringify({ ...c, revisao: 0, atualizadoEm: '' });
       if (sem(cfg) !== sem(local)) {
         if (!base) backupAntesDeSubstituirSemReset(CHAVES.cfgAnterior, local);
-        S.cfg = cfg; gravarLocal(CHAVES.cfg, S.cfg); aplicarPastasConfig?.();
+        S.cfg = cfg; gravarLocal(CHAVES.cfg, S.cfg); aplicarPastasConfig?.(); aplicarRegrasConfig(S.cfg);
         if (remoto) avisar(`Configuração atualizada com as mudanças de ${remoto.atualizadoPor || 'outra pessoa'} (pasta compartilhada).`, 'ok');
         if (['#configuracoes', '#bases'].includes(location.hash)) RENDER[location.hash.slice(1)]();
       }

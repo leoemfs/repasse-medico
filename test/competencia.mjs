@@ -97,11 +97,5 @@ await p.click('#compReabrir'); await p.waitForSelector('#dlg[open]'); await p.fi
 const h = await S(() => window.__RM.S.compReg.itens['2026-10']);
 ok(h.status === 'aberta' && h.historico.map(x => x.acao).join() === 'fechada,reaberta' && h.historico[1].obs === 'NF chegou depois', 'reaberta com justificativa no histórico');
 
-// 8) Celular.
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
-m.on('pageerror', e => erros.push(e.message));
-await m.goto(html + '#inicio'); await m.waitForSelector('#compGlobal button');
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular: seletor no topo sem rolagem horizontal');
-await m.screenshot({ path: out + 'competencia_celular.png' });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

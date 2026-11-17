@@ -95,6 +95,7 @@ function registrarAlteracaoBase(motivo, tipo) {
 // A própria sincronização e a restauração usam só o gravar*Local, para não agendar de novo.
 function salvarCfg(motivo = '', tipo = '') { gravarCfgLocal(motivo, tipo); agendarSincronizacao('cfg'); }
 function gravarCfgLocal(motivo = '', tipo = '') {
+  aplicarRegrasConfig(S.cfg);   // modalidade por grupo e HM da V3 (P3)
   registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
@@ -206,7 +207,7 @@ async function exigirOperador() {
   if (r.botao === 'ok' && nome) { S.operador = nome; gravarLocal(CHAVES.operador, nome); mostrarOperador(); return nome; }
   return '';
 }
-function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; if ($('operadorGaveta')) $('operadorGaveta').textContent = $('operadorTopo').textContent; }
+function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; }
 async function baixarZip(zip, nome) {
   const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
   baixarBlob(blob, nome);
@@ -289,8 +290,7 @@ function irPara(pag) {
   paginaAtual = pag;
   desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
-  document.querySelectorAll('.nav a, .barra-cel a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
-  sincronizarPontos();
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
   $('titulo').textContent = PAGINAS[pag];
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
@@ -298,10 +298,9 @@ function irPara(pag) {
 function atualizarNavPendencias() {
   const n = S.eq ? S.eq.itens.filter(e => e.status === 'pendente').length : 0;
   const b = $('navPend'); b.hidden = !n; b.textContent = n; b.title = `${n} equivalências pendentes de validação`;
-  // A dica e o nome lido pelo leitor de tela levam o número; recolhido/celular, o selo vira só um ponto.
+  // A dica e o nome lido pelo leitor de tela levam o número; recolhido, o selo vira só um ponto.
   const a = b.closest('a'), nome = n ? `Equivalências TUSS · ${n} pendentes` : 'Equivalências TUSS';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
-  sincronizarPontos();
 }
 
 /* ---------- Menu lateral recolhível (☰ e Ctrl+B); a escolha fica salva neste navegador ---------- */
@@ -309,57 +308,13 @@ function aplicarMenu(recolhido) {
   document.querySelector('.shell').classList.toggle('recolhido', recolhido);
   const b = $('btnMenu'); b.setAttribute('aria-expanded', String(!recolhido)); b.setAttribute('aria-label', recolhido ? 'Expandir menu' : 'Recolher menu');
 }
-/* Celular: ☰ ao lado do logo abre a gaveta com todas as abas; a barra de baixo tem 6 atalhos. */
-const BARRA_CEL = ['inicio', 'fluxo', 'conferencia', 'correcao', 'nc', 'fechamento'];
-const ehCelular = () => window.matchMedia('(max-width:760px)').matches;
-function abrirGaveta(abrir) {
-  document.querySelector('.shell').classList.toggle('gaveta-aberta', abrir);
-  $('veuGaveta').hidden = !abrir;
-  $('btnMenu').setAttribute('aria-expanded', String(abrir));
-  document.body.style.overflow = abrir ? 'hidden' : '';
-}
-function montarBarraCel() {
-  $('barraCel').innerHTML = BARRA_CEL.map(pag => {
-    const a = document.querySelector(`.nav a[data-pag="${pag}"]`);
-    return `<a href="#${pag}" data-pag="${pag}" aria-label="${esc(PAGINAS[pag])}">${a.querySelector('svg').outerHTML}<span>${esc(a.querySelector('.curto').textContent)}</span><i class="ponto" hidden></i></a>`;
-  }).join('');
-}
-// Pontos da barra e do ☰: mesma informação dos selos do menu (o menu é a fonte).
-function sincronizarPontos() {
-  const barra = $('barraCel'); if (!barra || !barra.children.length) return;
-  let foraDaBarra = false;
-  document.querySelectorAll('.nav a[data-pag]').forEach(a => {
-    const pill = a.querySelector('.pill'), tem = !!pill && !pill.hidden, pag = a.dataset.pag;
-    const ponto = barra.querySelector(`a[data-pag="${pag}"] .ponto`);
-    if (ponto) { ponto.hidden = !tem; barra.querySelector(`a[data-pag="${pag}"]`).setAttribute('aria-label', a.getAttribute('aria-label')); }
-    else if (tem) foraDaBarra = true;
-  });
-  $('btnMenu').classList.toggle('com-ponto', foraDaBarra);
-}
 function alternarMenu() {
-  if (ehCelular()) return abrirGaveta(!document.querySelector('.shell').classList.contains('gaveta-aberta'));
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
 function iniciarMenu() {
   aplicarMenu(lerLocal(CHAVES.menu) === true);
   $('btnMenu').onclick = alternarMenu;
-  montarBarraCel();
-  $('btFecharGaveta').onclick = () => abrirGaveta(false);
-  $('veuGaveta').onclick = () => abrirGaveta(false);
-  $('navPrincipal').addEventListener('click', e => { if (e.target.closest('a[data-pag]') && ehCelular()) abrirGaveta(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.shell').classList.contains('gaveta-aberta')) abrirGaveta(false); });
-  // Deslizar da borda esquerda abre; deslizar para a esquerda fecha.
-  let x0 = null, y0 = 0;
-  document.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (x0 === null || !ehCelular()) return;
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0), aberta = document.querySelector('.shell').classList.contains('gaveta-aberta');
-    if (!aberta && x0 < 24 && dx > 60 && dy < 50) abrirGaveta(true);
-    else if (aberta && dx < -60 && dy < 50) abrirGaveta(false);
-    x0 = null;
-  }, { passive: true });
-  window.matchMedia('(max-width:760px)').addEventListener('change', () => abrirGaveta(false));
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
 

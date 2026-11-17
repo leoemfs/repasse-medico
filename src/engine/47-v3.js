@@ -27,10 +27,21 @@ const regraV3Padrao = () => ({
 
 const ehUnidadeV3 = (cfg, cod) => { const u = unidadePorCod(cfg, cod); return u?.empresa ? norm(u.empresa) === 'V3' : String(cod) === '5'; };
 const ehUSGouDoppler = (grupo, desc) => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(`${grupo || ''} ${desc || ''}`));
-const ehUnimed = convenio => /UNIMED/.test(norm(convenio || ''));
 const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm(l.grupo || '')) || /(^|\s)HM$/.test(norm(l.desc || '')));
-// HM de uma linha da unidade V3: devido (USG/Doppler Unimed) ou a excluir.
-const hmV3Devido = (grupo, desc, convenio) => ehUSGouDoppler(grupo, desc) && ehUnimed(convenio);
+/* HM de uma linha da unidade V3: devido ou a excluir. P3 (v3.0.0-alpha.12): configurável em Bases e regras →
+ * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed. */
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED' };
+let _hmV3Ativa = { proc: trechosPadrao(HM_V3_PADRAO.procedimentos), conv: trechosPadrao(HM_V3_PADRAO.convenios) };
+const hmV3Devido = (grupo, desc, convenio) => casaTrechos(_hmV3Ativa.proc, `${grupo || ''} ${desc || ''}`) && casaTrechos(_hmV3Ativa.conv, convenio || '');
+/* Aplica as regras configuráveis de uma configuração (chamado pela conferência, correção e fechamento, e pela tela ao
+ * carregar ou gravar a configuração). Sem nada configurado, valem os padrões. */
+let _regrasCfgChave = '';
+function aplicarRegrasConfig(cfg) {
+  const mod = cfg?.modalidadesGrupo?.length ? cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(cfg?.hmV3 || {}) };
+  const chave = JSON.stringify([mod, hm]); if (chave === _regrasCfgChave) return;
+  _regrasCfgChave = chave; _modalidadesAtivas = compilarModalidades(mod); _cacheModGrupo = new Map();
+  _hmV3Ativa = { proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios) };
+}
 // Grupo do MV escolhido na regra: casa pelo nome do grupo (ou parte dele); «|» separa alternativas.
 const casaGrupoV3 = (padrao, l) => { const t = norm(`${l.grupo || ''} ${l.desc || ''}`); return String(padrao || '').split('|').map(norm).filter(Boolean).some(x => t.includes(x)); };
 // Entrada da regra por valor fixo para uma linha: grupo exato primeiro, depois o grupo especial de USG.

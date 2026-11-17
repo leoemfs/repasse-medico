@@ -12,11 +12,6 @@ const celulasMV = (r, tipo, f = {}) => r ? [
   { v: r.remessa, st: { ...f, ...T } }, { v: r.conta, st: { ...f, ...T } }, { v: r.atendimento, st: { ...f, ...T } }, { v: r.paciente, st: f }, { v: r.convenio, st: f },
   { v: r.data, st: f }, { v: r.quant, st: f }, { v: r.vlRepasse, st: { ...f, fmt: 'money' } }, { v: r2(r.pct * 10000) / 10000, st: { ...f, fmt: 'pct' } }, { v: r.vlTotal, st: { ...f, fmt: 'money' } }, { v: TIPOS_ITEM[tipo] || tipo || '', st: f }
 ] : colunasMV.map(() => ({ v: '', st: f }));
-const colunasLaudo = ['Laudo: ID', 'Laudo: linha da planilha', 'Laudo: unidade', 'Laudo: paciente', 'Laudo: ID paciente', 'Laudo: TITLE', 'Laudo: STUDY_DESCRIPTION', 'Laudo: data', 'Laudo: convênio', 'Laudo: modalidade', 'Laudo: médico'];
-const celulasLaudo = (l, f = {}) => l ? [
-  { v: l.idLaudo, st: { ...f, ...T } }, { v: l.linhaPlanilha, st: f }, { v: l.unidade, st: f }, { v: l.paciente, st: f }, { v: l.idPac, st: { ...f, ...T } }, { v: l.titulo, st: f },
-  { v: l.descricao, st: f }, { v: l.data || '', st: f }, { v: l.convenio, st: f }, { v: l.modalidade, st: f }, { v: l.medico, st: f }
-] : colunasLaudo.map(() => ({ v: '', st: f }));
 const linhasMeta = meta => meta.map(([a, b]) => [{ v: a, st: { b: true } }, { v: b ?? '', st: { wrap: true } }]);
 
 // Excel da extração (MV original), um por PDF.
