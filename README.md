@@ -57,6 +57,7 @@ node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com
 node test/exames.mjs             # v3.0: exame (USG com Doppler em uma ou duas páginas) e «Dispensar laudo»
 node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (complementar e manual)
 node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, lote, observação, resolvido no MV, reconferência e fechamento
+node test/usg_mesmo_dia.mjs      # v3.0: vários USG do mesmo paciente no mesmo dia — o título do laudo desempata (dados fictícios)
 ```
 
 ## Publicação (GitHub Pages)

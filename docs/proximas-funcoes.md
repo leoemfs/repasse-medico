@@ -1,8 +1,38 @@
 # Próximas funções — requisitos registrados
 
-**SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
+**SOL-F44 implementada na v3.0.0-alpha.7** (vários USG no mesmo dia: o título desempata). **SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F44 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.7** (17/11/2026)
+
+**Problema (reproduzido com dados fictícios):** paciente com USG de abdome total, transvaginal e tireoide no mesmo atendimento, sem equivalência validada para esses títulos. O pareamento escolhia o laudo pela ordem da planilha:
+- o código do abdome total (40901122) ficava com o laudo de **tireoide**, e assim por diante;
+- as três linhas viravam «Mais de um laudo plausível»;
+- «O que falta decidir» propunha **validar pares errados** («Sem equivalência: «USG de tireoide» × 40901122»);
+- faltando um dos laudos, a linha **que tinha laudo** podia ficar «Só no faturamento», gerando um **candidato a NC errado**.
+
+**O que mudou** (motor `60-conferencia.js`, `54-titulos.js` e `61-causas.js`; as faixas e as regras de bloqueio não mudaram):
+1. **Afinidade título × descrição do MV** (0 a 100%):
+   - mede quanto do título do laudo aparece na descrição do procedimento no MV;
+   - o nome do procedimento (antes do parêntese) pesa mais do que a lista de estruturas da descrição TUSS: «USG de abdome superior» fica mais perto de «US - ABDOME SUPERIOR» do que de «US - ABDOME TOTAL (ABDOME SUPERIOR, RINS…)»;
+   - a palavra da modalidade (ultrassonografia, tomografia…) não conta, e sinônimos como mamária = mamas, renal = rins e pelve = pélvica são reconhecidos.
+2. **Pareamento:** dentro da mesma faixa, o par de maior afinidade escolhe primeiro. Laudo com título validado para **outro** código fica atrás dos laudos sem cadastro. A ordem das linhas e da planilha deixa de importar.
+3. **Ambiguidade:** quando o laudo escolhido tem afinidade de pelo menos **40%** e fica **25 pontos acima** de cada alternativa, a linha não é mais «ambígua». Ela ganha o marcador **«Laudo escolhido pelo título»**, com os percentuais no motivo.
+   - A situação não muda: sem equivalência validada, a linha segue Pendente até validar a equivalência.
+   - O desempate só vale onde a equivalência não decide (pendente, sem cadastro, título validado para outro código). Com equivalência validada, quem decide é a base, como antes. Par por **regra composta** também fica fora: o título da regra descreve vários procedimentos (ex.: «bolsa escrotal com Doppler» × a página só do Doppler de outro médico continua ambíguo, para você decidir quem laudou).
+4. **«O que falta decidir»:** linha que **continua** ambígua e não tem equivalência (ou o título está validado para outro código) vai para a decisão linha a linha («Mais de um laudo plausível»), e não para «Cadastrar e validar a equivalência» em lote. Assim um par que é palpite não vira equivalência validada.
+5. **Detalhe da linha:** cada laudo candidato mostra «título N%».
+
+**Critérios de aceite** (`test/usg_mesmo_dia.mjs`, dados fictícios):
+- 3 USG no mesmo dia sem equivalência → cada linha com o laudo do seu exame, sem «ambíguo», em qualquer ordem;
+- falta o laudo de um exame → é a linha desse exame que fica «Só no faturamento»;
+- abdome total × aparelho urinário (o abdome também cita os rins) → cada um com o seu laudo;
+- títulos que não dizem o exame («Exame de imagem») → continuam ambíguos e vão para a decisão linha a linha;
+- equivalências validadas ou pendentes já cadastradas → resultado igual ao de antes;
+- duas linhas do mesmo código e um laudo → a 2ª continua «Só no faturamento» (bilateral fica para a próxima melhoria).
+
+**A conferir com os relatórios reais:** os testes com a pasta `dados/` (`motor`, `e2e`, `competencia10`, `conferencia_causas`…) não rodaram no ambiente desta entrega. Vale rodá-los e comparar a quantidade de «Mais de um laudo plausível» antes e depois.
 
 ## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — **IMPLEMENTADA na v3.0.0-alpha.6** (pedido de 13/11/2026; guia em `como-usar-conferencia-oficial.md`)
 

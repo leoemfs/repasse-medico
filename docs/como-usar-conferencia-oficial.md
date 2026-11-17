@@ -74,3 +74,11 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 ## 7. Excel
 - A aba «Resumo» traz o quadro por classe e o valor para pagamento.
 - A coluna «Classe (fechamento)» está no catálogo de colunas e no modelo «Completo» (Configurações → Exportação).
+
+## Vários exames do paciente no mesmo dia (v3.0.0-alpha.7)
+Quando o paciente fez mais de um USG no mesmo atendimento (ex.: abdome total, transvaginal e tireoide) e as equivalências desses títulos ainda não estão validadas, a ferramenta usa o **título do laudo** para saber qual laudo é de qual linha do MV.
+
+- No detalhe da linha, cada laudo candidato mostra **«título N%»**: quanto do título aparece na descrição do procedimento no MV.
+- Se o laudo escolhido fica claramente acima dos outros (pelo menos 40% e 25 pontos acima de cada alternativa), a linha recebe o marcador **«Laudo escolhido pelo título»** e não fica «Mais de um laudo plausível».
+- A linha **continua Pendente** enquanto a equivalência não for validada. Em «O que falta decidir», o grupo «Sem equivalência cadastrada» já traz o par certo: validando, as próximas conferências ficam «Conferido».
+- Se os títulos não dizem o exame (ex.: «Exame de imagem»), a linha continua «Mais de um laudo plausível» e aparece na decisão linha a linha. Escolha o laudo certo no detalhe da linha.
