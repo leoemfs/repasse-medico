@@ -60,6 +60,7 @@ node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (compl
 node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, lote, observação, resolvido no MV, reconferência e fechamento
 node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
 node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
+node test/f41_conferencia.mjs   # v3.0: SOL-F41 — filtros por título, médico, intervalo de datas e observação; lote de dispensa e observação; observação no Excel, aceite, NC e retenção
 node test/p3_regras_config.mjs # v3.0: modalidade por grupo e HM da V3 configuráveis em Bases e regras; texto de privacidade
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
 node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios

@@ -167,7 +167,7 @@ await ana.screenshot({ path: out + 'v3_titulos_apolo.png' });
 
 // 7) Modelos de exportação: «Padrão» = layout atual; modelo próprio muda só a aba principal.
 const exp = await ana.evaluate(() => { const { t } = window.__RM; return { padrao: t.colunasDoModelo(null).map(c => c.rotulo), custom: t.colunasDoModelo(['paciente', 'conta', 'situacao', 'xx']).map(c => c.rotulo) }; });
-ok(exp.padrao.join('|') === 'Situação|Decisão na competência|Paciente|Data|Cód. TUSS MV|Procedimento no MV|Laudo (TITLE)|O que falta / por quê|Vl Repasse|Convênio MV|Unidade MV|Grupo de procedimento MV|Médico MV|Paciente MV|Paciente Apolo|Data Apolo|Descrição do estudo (STUDY)|Convênio Apolo|Unidade Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise', 'modelo «Padrão» tem exatamente as 23 colunas e a ordem do layout operacional');
+ok(exp.padrao.join('|') === 'Situação|Decisão na competência|Paciente|Data|Cód. TUSS MV|Procedimento no MV|Laudo (TITLE)|O que falta / por quê|Vl Repasse|Convênio MV|Unidade MV|Grupo de procedimento MV|Médico MV|Paciente MV|Paciente Apolo|Data Apolo|Descrição do estudo (STUDY)|Convênio Apolo|Unidade Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise|Observação (na linha)', 'modelo «Padrão» tem as 23 colunas do layout operacional + «Observação (na linha)» (SOL-F41, alpha.13) e a ordem do layout operacional');
 ok(exp.custom.join('|') === 'Paciente|Conta|Situação', `modelo próprio: escolhe e ordena colunas, ignora id desconhecido (${exp.custom})`);
 await ana.evaluate(() => window.__RM.irPara('configuracoes'));
 await ana.locator('[data-cfsub=\"exportacao\"]:visible').click(); await ana.waitForSelector('#exSalvarComo');

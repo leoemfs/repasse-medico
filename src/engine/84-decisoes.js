@@ -104,3 +104,17 @@ function normalizarChavesRodada(r) {
   r.chavesV = 2;
   return r;
 }
+
+/* SOL-F41 (v3.0.0-alpha.13) — Observação por linha: texto para o Excel e para a NC, e retenção.
+ * A observação é texto livre e pode ter dado de paciente: segue a mesma retenção das NCs (retencaoNC, em dias). Passado o
+ * prazo, o texto é apagado; ficam quem escreveu e quando. */
+const textoObservacoes = obs => (obs || []).map(o => `${o.texto} (${o.por || '—'}, ${String(o.em || '').slice(0, 10)})`).join(' | ');
+const TEXTO_OBS_RETIDA = '(texto apagado pela retenção de dados de pacientes)';
+function aplicarRetencaoObservacoes(reg, dias, hoje = new Date()) {
+  let n = 0;
+  for (const c of Object.values(reg?.itens || {})) for (const o of c.observacoes || []) {
+    if (o.anonimizada || !o.em || idadeDias(o.em, hoje) <= dias) continue;
+    o.texto = TEXTO_OBS_RETIDA; o.anonimizada = agoraISO(); n++;
+  }
+  return n;
+}

@@ -16,6 +16,8 @@ function carregarNC() {
   S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos;
   S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave));
   if (n) { salvarNC(); setTimeout(() => avisar(`${n} não conformidade(s) passaram de ${retencaoNC()} dias: nome e ID do paciente foram apagados (retenção).`, 'info'), 400); }
+  // SOL-F41: observações das linhas seguem a mesma retenção (texto livre pode ter dado de paciente).
+  if (S.compReg && aplicarRetencaoObservacoes(S.compReg, retencaoNC())) salvarCompReg();
 }
 function salvarNC(msg = '') {
   if (!gravarLocal(CHAVES.nc, S.nc)) avisar('Não foi possível gravar as não conformidades neste navegador. Exporte a planilha para não perder o trabalho.', 'err');
@@ -250,7 +252,8 @@ async function abrirRegistroNC(cands) {
     ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', dica: pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : '' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['', 'Padrão da natureza'], ['sim', 'Sim'], ['nao', 'Não']], '')}</select></label>
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(compSug)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+    <label class="campo">Observações<textarea name="obs" rows="2">${cands.length === 1 && cands[0].obsLinha ? esc(`Observação da linha: ${cands[0].obsLinha}`) : ''}</textarea></label>
+    ${cands.length > 1 && cands.some(c => c.obsLinha) ? `<p class="small muted">${cands.filter(c => c.obsLinha).length} linha(s) têm observação: ela vai para as Observações da NC de cada uma.</p>` : ''}`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return false;
   const e = r.campos;
   await cadastrosNovosDoDialogo();
@@ -259,7 +262,8 @@ async function abrirRegistroNC(cands) {
   if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
   const dados = cands.map(c => {
     const responsavel = e.responsavel.trim() || faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta) || (c.categoria === 'particular' && !e.categoria ? 'PARTICULAR - EQUIPE UNIDADE' : '');
-    return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs: e.obs.trim(), impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
+    const obs = cands.length > 1 && c.obsLinha ? [e.obs.trim(), `Observação da linha: ${c.obsLinha}`].filter(Boolean).join(' · ') : e.obs.trim();
+    return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs, impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
   });
   const { novas, repetidas } = registrarNCs(S.nc, dados, op);
   salvarNC(`${novas.length} NC(s) registrada(s) em ${rotuloCompetencia(e.competencia)}${repetidas.length ? ` · ${repetidas.length} já existiam e não foram repetidas` : ''}.`);

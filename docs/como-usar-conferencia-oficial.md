@@ -34,13 +34,17 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
   - data;
   - convênio;
   - busca livre;
+  - título do laudo e médico do laudo;
+  - intervalo de datas: escolha «Data» e «até»;
   - «só o que falta decidir»;
-  - «com observação»;
+  - observação: «Com observação» ou «Sem observação»;
   - classe (clicando no valor) e situação.
 - A faixa azul mostra **quantas linhas e quanto valem** no filtro.
 - **Em lote**, sobre as linhas pendentes do filtro:
   - «Aceitar para pagamento as N pendente(s)…», com uma justificativa para todas;
-  - «Registrar NC das N pendente(s)…».
+  - «Registrar NC das N pendente(s)…»;
+  - «Dispensar os N laudo(s) «Só no laudo»…», para os laudos sem lançamento que não precisam de lançamento;
+  - «Observação nas N linha(s)…»: o mesmo texto em todas as linhas do filtro.
 
 ## 4. Decisões na linha (clique na linha para abrir)
 - **Aceitar para pagamento…** — entra no fechamento (classe Aceito).
@@ -53,7 +57,11 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 - **Observação** — anotação livre na linha:
   - fica na competência e aparece nas próximas rodadas (marca ✎);
   - não muda a classe;
-  - tem o filtro «com observação».
+  - tem o filtro «Com observação» / «Sem observação»;
+  - sai no Excel, na coluna «Observação (na linha)», com autor e data;
+  - o quadro do aceite mostra quantas linhas têm observação;
+  - ao apontar a linha como NC, a observação já vem nas Observações da NC;
+  - segue a retenção dos dados de pacientes das NCs: passado o prazo, o texto é apagado e ficam autor e data.
 - **Remover decisão** — desfaz o aceite, o resolvido ou a dispensa. Para NC, use «não procede» na aba Não conformidades.
 
 ## 5. Reconferência (depois de corrigir no MV)
