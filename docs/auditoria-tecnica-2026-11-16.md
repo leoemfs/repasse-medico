@@ -73,7 +73,23 @@ Os dois foram reproduzidos por teste. Escrever um teste para cada um junto com a
 - **Testes.** Criar testes com dados fictícios para os fluxos que hoje dependem de `dados/`, e rodar os testes no GitHub a cada envio.
 - **Expressões regulares.** `classificarItem` compila as expressões a cada linha. Pré-compilar uma vez por conferência.
 
-## P3
+## P3 — **FEITOS na v3.0.0-alpha.12** (teste: `test/p3_regras_config.mjs`; `test/menu.mjs` atualizado)
+
+**Como ficou:**
+- **Código sem uso removido:**
+  - `celulasLaudo`, `colunasLaudo`, `conferirProducao`, `datalistFaturistas`, `datalistUnidades`;
+  - `regraDoFormulario` e `lerCodigos`;
+  - `ligarCorrecoesMV` e o CSS `.cf-b-*`.
+- **Modo celular removido** (confirmado pelo usuário em 17/11/2026): saíram a gaveta, o véu, a barra inferior e os títulos de grupo do menu. Em janela estreita no computador fica o mesmo menu lateral, recolhível com ☰ ou Ctrl+B; as grades viram uma coluna.
+- **Textos atualizados:** saiu «Modo local: nada é enviado à internet». Agora:
+  - PDFs, planilhas e dados de pacientes ficam só no navegador;
+  - da internet vêm só a página e o aviso de versão;
+  - o que é compartilhado fica na pasta da rede.
+- **Regras configuráveis** em Bases e regras → «Modalidades e HM V3». Vão para a configuração compartilhada pela pasta; «Restaurar padrão» volta ao de sempre, e com o padrão as assinaturas do motor não mudam.
+  - **Modalidade do Apolo por grupo do MV** (`cfg.modalidadesGrupo`): trechos do grupo separados por «|» → modalidades.
+  - **HM da V3** (`cfg.hmV3`): trechos de procedimento e de convênio.
+
+### Lista original
 
 - **Código sem uso.** Remover `celulasLaudo`, `conferirProducao`, `datalistFaturistas`, `datalistUnidades`, `regraDoFormulario`, `ligarCorrecoesMV` (vazia) e o CSS `.cf-b-*`.
 - **Modo celular.** Gaveta, barra inferior e `test/menu.mjs`. Confirmar com o usuário se pode sair.

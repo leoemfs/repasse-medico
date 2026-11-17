@@ -27,7 +27,7 @@ function atualizarNavNC() {
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Não conformidades · ${n} aberta(s), não enviadas` : 'Não conformidades';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 
 /* ---------- Candidatos das análises (SOL-F17) ----------
@@ -235,8 +235,6 @@ function desenharRevisao() {
 }
 
 /* ---------- Registro a partir de candidatos ---------- */
-const datalistFaturistas = () => `<datalist id="dlFat">${S.cfg.faturistas.filter(f => f.ativo !== false).map(f => `<option value="${esc(f.nome)}"></option>`).join('')}</datalist>`;
-const datalistUnidades = () => `<datalist id="dlUn">${[...new Set(S.cfg.unidades.flatMap(u => [...(u.apolo || []), u.nome]))].map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
 // Devolve verdadeiro se registrou algo.
 async function abrirRegistroNC(cands) {
   if (!exigirAberta(S.comp, 'registrar NCs')) return false;

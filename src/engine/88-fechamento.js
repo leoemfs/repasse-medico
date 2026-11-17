@@ -78,6 +78,7 @@ const somaLinhas = (r, campo) => r2(r.linhas.reduce((s, l) => s + (+l[campo] || 
  * ctx: { rodadas, cfg, chave, decisoes (índice), fluxoComp, fech (ajustes/blocos), anterior (fechamento da competência anterior, opcional) } */
 function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior, fechada = false }) {
   fech = fech || fechamentoVazio();
+  aplicarRegrasConfig(cfg);   // HM da V3 configurável (P3)
   const tol = cfg.fechamento || FECHAMENTO_PADRAO, prestPorCod = new Map(cfg.prestadores.map(p => [String(p.cod), p]));
   const grupos = rodadasDoFechamento(rodadas, chave), linhasPrest = new Map();
   // Médicos da V3 (Curitiba) têm fechamento próprio: tudo deles vai para «curitiba» (SOL-F30).

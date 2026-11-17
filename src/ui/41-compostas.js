@@ -98,22 +98,7 @@ async function simularComposta(regra) {
   return r;
 }
 
-const lerCodigos = t => [...new Set(String(t || '').split(/[\s,;+]+/).map(x => x.replace(/\D/g, '')).filter(x => x.length >= 5))];
 const lerPalavras = t => String(t || '').split(/[,;·]+/).map(x => x.trim().toUpperCase()).filter(Boolean);
-// Lê o formulário do diálogo para uma regra (sem gravar).
-function regraDoFormulario(k, base) {
-  const itens = [];
-  for (let i = 0; i < MAX_ITENS_CP; i++) {
-    const codigos = [...lerCodigos(k['cod' + i]), ...lerCodigos(k['alt' + i])].filter((c, j, a) => a.indexOf(c) === j);
-    if (!codigos.length) continue;
-    const exc = (k['excConv' + i] || '').trim() && k['excTipo' + i] ? [{ convenio: k['excConv' + i].trim().toUpperCase(), tipo: k['excTipo' + i], qtd: k['excTipo' + i] === 'quantidade' ? Math.max(0, +k['excQtd' + i] || 0) : 0 }] : [];
-    itens.push({ rotulo: (k['rot' + i] || '').trim(), codigos, qtd: Math.max(0, Math.round(+k['qtd' + i] || 1)), excecoes: exc });
-  }
-  if (k.modo === 'ou' && itens.length) { const cods = [...new Set(itens.flatMap(it => it.codigos))]; itens.splice(0, itens.length, { rotulo: 'um dos códigos', codigos: cods, qtd: 1, excecoes: [] }); }
-  const titulos = String(k.titulos || '').split('\n').map(t => t.trim()).filter(Boolean);
-  const palavras = { todas: lerPalavras(k.palTodas), umaDe: lerPalavras(k.palUmaDe) };
-  return { ...base, nome: (k.nome || '').trim(), titulos, palavras: palavras.todas.length || palavras.umaDe.length ? palavras : null, itens, escopo: { unidade: k.unidade || '*', modalidade: '*' }, justificativa: (k.just || '').trim() };
-}
 function validarRegraComposta(c, outras) {
   const e = [];
   if (!c.nome) e.push('dê um nome à regra');

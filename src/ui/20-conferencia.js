@@ -239,7 +239,6 @@ function desenharConferencia() {
   if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
   ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
-  ligarCorrecoesMV(c, res, ctx);
   const filtrar = () => {
     const q = norm(S.conf.busca);
     const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
@@ -374,7 +373,6 @@ function cartaoCorrecoesMV(corr) {
     <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
     <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
-function ligarCorrecoesMV() { }
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.11</title>
+<title>Repasse Médico v3.0.0-alpha.12</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -104,36 +104,9 @@ dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-bo
 .rodape{margin-top:28px;font-size:12px;color:var(--muted)}
 code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
 @media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
-/* Partes do menu que só existem no celular */
-.grupo-nav,.gaveta-cab,.gaveta-rod,.barra-cel,.veu-gaveta{display:none}
-@media (max-width:760px){
-  /* Celular: topo com ☰ ao lado do logo; gaveta com todas as abas; barra de 6 atalhos no rodapé */
-  .shell,.shell.recolhido{display:block;background:var(--bg)}
-  .sidebar,.recolhido .sidebar{position:sticky;top:0;height:auto;padding:10px 16px;gap:0;overflow:visible;z-index:7}
-  .brand,.recolhido .brand{border:0;padding:0;justify-content:flex-start;gap:10px}
-  .brand-mark,.recolhido .brand-mark{display:block;width:30px;height:30px}.recolhido .brand-nome{display:block}.brand small,.side-note{display:none!important}
-  .brand .hamb,.recolhido .brand .hamb{display:grid;order:-1;margin:0;width:36px;height:36px;border:1px solid #3b4d63;position:relative}
-  .hamb.com-ponto::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}
-  /* Gaveta: o próprio menu, deslizando da esquerda */
-  .nav,.recolhido .nav{position:fixed;top:0;bottom:0;left:0;width:min(82vw,310px);flex-direction:column;gap:2px;background:var(--side);padding:12px 10px calc(12px + env(safe-area-inset-bottom));z-index:30;overflow-y:auto;transform:translateX(-105%);transition:transform .22s ease;box-shadow:4px 0 18px rgba(0,0,0,.3)}
-  .gaveta-aberta .nav{transform:none}
-  .gaveta-aberta .sidebar{z-index:40}   /* o menu fica acima do véu (a barra do topo cria o contexto de empilhamento) */
-  .nav a,.recolhido .nav a{justify-content:flex-start;padding:10px 10px;font-size:14px}
-  .nav .rot,.recolhido .nav .rot{display:inline}.nav .curto,.nav .dica{display:none}
-  .pill,.recolhido .pill{position:static;width:auto;height:auto;padding:1px 7px;font-size:11px;border:0;margin-left:auto}
-  .grupo-nav{display:block;font-size:10px;letter-spacing:1.3px;color:#7f93ab;margin:12px 10px 4px;font-weight:800}
-  .gaveta-cab{display:flex;align-items:center;justify-content:space-between;color:#fff;padding:2px 4px 10px 10px;border-bottom:1px solid #2a3a4e}
-  .gaveta-cab .hamb{display:grid;margin:0;font-size:18px}
-  .gaveta-rod{display:block;margin-top:auto;border-top:1px solid #2a3a4e;padding:10px 10px 0;font-size:11.5px;color:var(--side-t)}
-  .veu-gaveta{display:block;position:fixed;inset:0;background:rgba(10,18,28,.45);z-index:25}.veu-gaveta[hidden]{display:none}
-  /* Barra de atalhos */
-  .barra-cel{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--side);border-top:1px solid #2c3b4e;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
-  .barra-cel a{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;border-radius:10px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:10px}
-  .barra-cel a.ativo{background:#2a5d8c;color:#fff}
-  .barra-cel svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  .barra-cel .ponto{position:absolute;top:5px;left:calc(50% + 7px);width:9px;height:9px;border-radius:50%;background:#d97b29;border:2px solid var(--side)}.barra-cel .ponto[hidden]{display:none}
-  .main{padding:16px 16px calc(84px + env(safe-area-inset-bottom))}.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}
-}
+/* Janela estreita no computador (v3.0.0-alpha.12: sem modo celular): o menu continua o mesmo, recolhível com ☰ ou Ctrl+B;
+ * só as grades viram uma coluna. */
+@media (max-width:760px){.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}.main{padding:16px}}
 /* ===== Fluxo mensal ===== */
 .txt-err{color:var(--err);font-weight:700}.txt-warn{color:var(--warn);font-weight:700}.txt-ok{color:var(--ok);font-weight:700}
 button.ic{padding:5px 10px}
@@ -327,7 +300,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cf-fil{margin-bottom:6px}.cf-fil .campo{min-width:180px}
 /* SOL-F40 — Conferência por causa */
 .cf-barra{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:8px 0}
-.cf-barra span{display:block;height:100%}.cf-b-ok{background:#3f9b62}.cf-b-ress{background:#e0b23c}.cf-b-pend{background:#e08a3c}.cf-b-sf{background:#c9473d}
+.cf-barra span{display:block;height:100%}
 .cf-det{margin-top:10px}.cf-det summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
 .cz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
 .cz small{color:var(--muted);display:block;font-size:12px;margin-top:2px}.cz.cz-sl{background:var(--infobg)}
@@ -418,11 +391,9 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.11 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.12 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
-      <div class="gaveta-cab"><strong>Menu</strong><button type="button" id="btFecharGaveta" class="hamb" aria-label="Fechar menu">✕</button></div>
-      <h4 class="grupo-nav">TRABALHO DO MÊS</h4>
       <a href="#inicio" data-pag="inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
       <a href="#fluxo" data-pag="fluxo" aria-label="Fluxo mensal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.2 1.2L7 5M3.5 12l1.2 1.2L7 11M3.5 18l1.2 1.2L7 17"/></svg><span class="rot">Fluxo mensal</span><span class="curto" aria-hidden="true">Fluxo</span><b id="navFluxo" class="pill" hidden></b><span class="dica" aria-hidden="true">Fluxo mensal</span></a>
       <a href="#conferencia" data-pag="conferencia" aria-label="Conferência cruzada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13"/><path d="M14 4l4 4-4 4"/><path d="M20 16H7"/><path d="M10 12l-4 4 4 4"/></svg><span class="rot">Conferência cruzada</span><span class="curto" aria-hidden="true">Conferir</span><span class="dica" aria-hidden="true">Conferência cruzada</span></a>
@@ -431,15 +402,11 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
       <a href="#nc" data-pag="nc" aria-label="Não conformidades"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5L2.8 19.5h18.4z"/><path d="M12 10v4.5"/><path d="M12 17.2v.1"/></svg><span class="rot">Não conformidades</span><span class="curto" aria-hidden="true">NCs</span><b id="navNC" class="pill" hidden></b><span class="dica" aria-hidden="true">Não conformidades</span></a>
       <a href="#fechamento" data-pag="fechamento" aria-label="Fechamento"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/><path d="M8.5 16.5l1.8 1.8 3.7-3.7"/></svg><span class="rot">Fechamento</span><span class="curto" aria-hidden="true">Fechar</span><span class="dica" aria-hidden="true">Fechamento</span></a>
       <a href="#rodadas" data-pag="rodadas" aria-label="Rodadas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg><span class="rot">Rodadas</span><span class="curto" aria-hidden="true">Rodadas</span><span class="dica" aria-hidden="true">Rodadas</span></a>
-      <h4 class="grupo-nav">CONFIGURAÇÕES</h4>
       <a href="#bases" data-pag="bases" aria-label="Bases e regras"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="rot">Bases e regras</span><span class="curto" aria-hidden="true">Bases</span><span class="dica" aria-hidden="true">Bases e regras</span></a>
       <a href="#configuracoes" data-pag="configuracoes" aria-label="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="rot">Configurações</span><span class="curto" aria-hidden="true">Ajustes</span><span class="dica" aria-hidden="true">Configurações</span></a>
-      <div class="gaveta-rod"><span id="operadorGaveta"></span><br>Modo local: nada é enviado à internet.</div>
     </nav>
-    <div class="side-note"><strong>Modo local</strong><p>Os arquivos são lidos só neste navegador. Nada é enviado à internet.</p></div>
+    <div class="side-note"><strong>Processamento local</strong><p>PDFs e planilhas são lidos só neste navegador e não vão para a internet. O que é compartilhado fica na pasta da rede.</p></div>
   </aside>
-  <div class="veu-gaveta" id="veuGaveta" hidden></div>
-  <nav class="barra-cel" id="barraCel" aria-label="Atalhos"></nav>
   <main class="main">
     <header class="topo">
       <div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
@@ -469,7 +436,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.11';
+const MOTOR_VERSAO = '3.0.0-alpha.12';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1088,18 +1055,25 @@ async function lerPowerBI(bytes, nome) {
 
 /* ---------- Modalidade ---------- */
 // Grupo de procedimento do MV → modalidades do Apolo (MODALITY) que podem conter o laudo.
-const GRUPO_MODALIDADES = [
-  [/ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA/, ['US']],   // Doppler é sempre do grupo de USG
-  [/TOMOGRAFIA/, ['CT']],
-  [/RESSONANCIA/, ['MR']],
-  [/RADIOLOGIA/, ['CR', 'DX']],
-  [/MAMOGRAFIA/, ['MG']],
-  [/DENSITOMETRIA/, ['OT']]
+/* Modalidade do Apolo esperada para cada grupo de procedimento do MV. P3 (v3.0.0-alpha.12): configurável em
+ * Bases e regras → «Modalidades e HM V3» (cfg.modalidadesGrupo); o padrão abaixo é o de sempre. Cada padrão é uma lista
+ * de trechos separados por «|», procurados no nome do grupo (sem acento, maiúsculas). A primeira linha que casar vale. */
+const MODALIDADES_GRUPO_PADRAO = [
+  { padrao: 'ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA', modalidades: 'US' },   // Doppler é sempre do grupo de USG
+  { padrao: 'TOMOGRAFIA', modalidades: 'CT' },
+  { padrao: 'RESSONANCIA', modalidades: 'MR' },
+  { padrao: 'RADIOLOGIA', modalidades: 'CR, DX' },
+  { padrao: 'MAMOGRAFIA', modalidades: 'MG' },
+  { padrao: 'DENSITOMETRIA', modalidades: 'OT' }
 ];
+const trechosPadrao = p => String(p || '').split('|').map(norm).filter(Boolean);
+const casaTrechos = (trechos, texto) => { const t = norm(texto); return trechos.some(x => t.includes(x)); };
+const compilarModalidades = lista => (lista || []).map(x => ({ trechos: trechosPadrao(x.padrao), mods: String(x.modalidades || '').split(/[\s,;|]+/).map(m => m.trim().toUpperCase()).filter(Boolean) })).filter(x => x.trechos.length && x.mods.length);
+let _modalidadesAtivas = compilarModalidades(MODALIDADES_GRUPO_PADRAO), _cacheModGrupo = new Map();
 function modalidadesDoGrupo(grupoNome) {
-  const n = norm(grupoNome);
-  for (const [re, mods] of GRUPO_MODALIDADES) if (re.test(n)) return mods;
-  return null;   // desconhecido: não restringe, e o resultado informa
+  const k = String(grupoNome ?? ''); if (_cacheModGrupo.has(k)) return _cacheModGrupo.get(k);
+  const n = norm(k), r = _modalidadesAtivas.find(x => x.trechos.some(t => n.includes(t)))?.mods || null;   // null: desconhecido, não restringe
+  _cacheModGrupo.set(k, r); return r;
 }
 const NOME_MODALIDADE = { US: 'Ultrassonografia', CT: 'Tomografia', MR: 'Ressonância', CR: 'Radiografia (CR)', DX: 'Radiografia (DX)', MG: 'Mamografia', OT: 'Densitometria / outros' };
 
@@ -1600,10 +1574,21 @@ const regraV3Padrao = () => ({
 
 const ehUnidadeV3 = (cfg, cod) => { const u = unidadePorCod(cfg, cod); return u?.empresa ? norm(u.empresa) === 'V3' : String(cod) === '5'; };
 const ehUSGouDoppler = (grupo, desc) => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(`${grupo || ''} ${desc || ''}`));
-const ehUnimed = convenio => /UNIMED/.test(norm(convenio || ''));
 const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm(l.grupo || '')) || /(^|\s)HM$/.test(norm(l.desc || '')));
-// HM de uma linha da unidade V3: devido (USG/Doppler Unimed) ou a excluir.
-const hmV3Devido = (grupo, desc, convenio) => ehUSGouDoppler(grupo, desc) && ehUnimed(convenio);
+/* HM de uma linha da unidade V3: devido ou a excluir. P3 (v3.0.0-alpha.12): configurável em Bases e regras →
+ * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed. */
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED' };
+let _hmV3Ativa = { proc: trechosPadrao(HM_V3_PADRAO.procedimentos), conv: trechosPadrao(HM_V3_PADRAO.convenios) };
+const hmV3Devido = (grupo, desc, convenio) => casaTrechos(_hmV3Ativa.proc, `${grupo || ''} ${desc || ''}`) && casaTrechos(_hmV3Ativa.conv, convenio || '');
+/* Aplica as regras configuráveis de uma configuração (chamado pela conferência, correção e fechamento, e pela tela ao
+ * carregar ou gravar a configuração). Sem nada configurado, valem os padrões. */
+let _regrasCfgChave = '';
+function aplicarRegrasConfig(cfg) {
+  const mod = cfg?.modalidadesGrupo?.length ? cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(cfg?.hmV3 || {}) };
+  const chave = JSON.stringify([mod, hm]); if (chave === _regrasCfgChave) return;
+  _regrasCfgChave = chave; _modalidadesAtivas = compilarModalidades(mod); _cacheModGrupo = new Map();
+  _hmV3Ativa = { proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios) };
+}
 // Grupo do MV escolhido na regra: casa pelo nome do grupo (ou parte dele); «|» separa alternativas.
 const casaGrupoV3 = (padrao, l) => { const t = norm(`${l.grupo || ''} ${l.desc || ''}`); return String(padrao || '').split('|').map(norm).filter(Boolean).some(x => t.includes(x)); };
 // Entrada da regra por valor fixo para uma linha: grupo exato primeiro, depois o grupo especial de USG.
@@ -2727,6 +2712,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
+  aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
@@ -3128,6 +3114,7 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   const linhas = [], ocorrencias = new Map(), usoLaudo = new Map();
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
+  aplicarRegrasConfig(cfg);
 
   for (const r of relatorio.regs) {
     const cls = classificarItem(r, cfg.classificacao);
@@ -3360,11 +3347,6 @@ function mesDominante(datas) {
   const v = datas.filter(Boolean); if (!v.length) return null;
   const [mes, n] = [...contar(v, d => isoDia(d).slice(0, 7))].sort((a, b) => b[1] - a[1])[0];
   return { mes, parcela: n / v.length };
-}
-function conferirProducao(datas, chave) {
-  const dom = mesDominante(datas), esperado = producaoEsperada(chave);
-  if (!dom) return { estado: 'sem-data', esperado, encontrado: '' };
-  return { estado: dom.mes === esperado ? 'ok' : 'outro', esperado, encontrado: dom.mes, parcela: dom.parcela };
 }
 const rotuloMes = m => m ? `${m.slice(5)}/${m.slice(0, 4)}` : '—';
 // Competência de uma rodada: a escolhida no topo quando ela foi executada (rodadas antigas: mês da execução).
@@ -4406,6 +4388,7 @@ const somaLinhas = (r, campo) => r2(r.linhas.reduce((s, l) => s + (+l[campo] || 
  * ctx: { rodadas, cfg, chave, decisoes (índice), fluxoComp, fech (ajustes/blocos), anterior (fechamento da competência anterior, opcional) } */
 function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, anterior, fechada = false }) {
   fech = fech || fechamentoVazio();
+  aplicarRegrasConfig(cfg);   // HM da V3 configurável (P3)
   const tol = cfg.fechamento || FECHAMENTO_PADRAO, prestPorCod = new Map(cfg.prestadores.map(p => [String(p.cod), p]));
   const grupos = rodadasDoFechamento(rodadas, chave), linhasPrest = new Map();
   // Médicos da V3 (Curitiba) têm fechamento próprio: tudo deles vai para «curitiba» (SOL-F30).
@@ -4834,11 +4817,6 @@ const celulasMV = (r, tipo, f = {}) => r ? [
   { v: r.remessa, st: { ...f, ...T } }, { v: r.conta, st: { ...f, ...T } }, { v: r.atendimento, st: { ...f, ...T } }, { v: r.paciente, st: f }, { v: r.convenio, st: f },
   { v: r.data, st: f }, { v: r.quant, st: f }, { v: r.vlRepasse, st: { ...f, fmt: 'money' } }, { v: r2(r.pct * 10000) / 10000, st: { ...f, fmt: 'pct' } }, { v: r.vlTotal, st: { ...f, fmt: 'money' } }, { v: TIPOS_ITEM[tipo] || tipo || '', st: f }
 ] : colunasMV.map(() => ({ v: '', st: f }));
-const colunasLaudo = ['Laudo: ID', 'Laudo: linha da planilha', 'Laudo: unidade', 'Laudo: paciente', 'Laudo: ID paciente', 'Laudo: TITLE', 'Laudo: STUDY_DESCRIPTION', 'Laudo: data', 'Laudo: convênio', 'Laudo: modalidade', 'Laudo: médico'];
-const celulasLaudo = (l, f = {}) => l ? [
-  { v: l.idLaudo, st: { ...f, ...T } }, { v: l.linhaPlanilha, st: f }, { v: l.unidade, st: f }, { v: l.paciente, st: f }, { v: l.idPac, st: { ...f, ...T } }, { v: l.titulo, st: f },
-  { v: l.descricao, st: f }, { v: l.data || '', st: f }, { v: l.convenio, st: f }, { v: l.modalidade, st: f }, { v: l.medico, st: f }
-] : colunasLaudo.map(() => ({ v: '', st: f }));
 const linhasMeta = meta => meta.map(([a, b]) => [{ v: a, st: { b: true } }, { v: b ?? '', st: { wrap: true } }]);
 
 // Excel da extração (MV original), um por PDF.
@@ -5281,6 +5259,7 @@ function registrarAlteracaoBase(motivo, tipo) {
 // A própria sincronização e a restauração usam só o gravar*Local, para não agendar de novo.
 function salvarCfg(motivo = '', tipo = '') { gravarCfgLocal(motivo, tipo); agendarSincronizacao('cfg'); }
 function gravarCfgLocal(motivo = '', tipo = '') {
+  aplicarRegrasConfig(S.cfg);   // modalidade por grupo e HM da V3 (P3)
   registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
@@ -5392,7 +5371,7 @@ async function exigirOperador() {
   if (r.botao === 'ok' && nome) { S.operador = nome; gravarLocal(CHAVES.operador, nome); mostrarOperador(); return nome; }
   return '';
 }
-function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; if ($('operadorGaveta')) $('operadorGaveta').textContent = $('operadorTopo').textContent; }
+function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; }
 async function baixarZip(zip, nome) {
   const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
   baixarBlob(blob, nome);
@@ -5475,8 +5454,7 @@ function irPara(pag) {
   paginaAtual = pag;
   desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
-  document.querySelectorAll('.nav a, .barra-cel a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
-  sincronizarPontos();
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
   $('titulo').textContent = PAGINAS[pag];
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
@@ -5484,10 +5462,9 @@ function irPara(pag) {
 function atualizarNavPendencias() {
   const n = S.eq ? S.eq.itens.filter(e => e.status === 'pendente').length : 0;
   const b = $('navPend'); b.hidden = !n; b.textContent = n; b.title = `${n} equivalências pendentes de validação`;
-  // A dica e o nome lido pelo leitor de tela levam o número; recolhido/celular, o selo vira só um ponto.
+  // A dica e o nome lido pelo leitor de tela levam o número; recolhido, o selo vira só um ponto.
   const a = b.closest('a'), nome = n ? `Equivalências TUSS · ${n} pendentes` : 'Equivalências TUSS';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
-  sincronizarPontos();
 }
 
 /* ---------- Menu lateral recolhível (☰ e Ctrl+B); a escolha fica salva neste navegador ---------- */
@@ -5495,57 +5472,13 @@ function aplicarMenu(recolhido) {
   document.querySelector('.shell').classList.toggle('recolhido', recolhido);
   const b = $('btnMenu'); b.setAttribute('aria-expanded', String(!recolhido)); b.setAttribute('aria-label', recolhido ? 'Expandir menu' : 'Recolher menu');
 }
-/* Celular: ☰ ao lado do logo abre a gaveta com todas as abas; a barra de baixo tem 6 atalhos. */
-const BARRA_CEL = ['inicio', 'fluxo', 'conferencia', 'correcao', 'nc', 'fechamento'];
-const ehCelular = () => window.matchMedia('(max-width:760px)').matches;
-function abrirGaveta(abrir) {
-  document.querySelector('.shell').classList.toggle('gaveta-aberta', abrir);
-  $('veuGaveta').hidden = !abrir;
-  $('btnMenu').setAttribute('aria-expanded', String(abrir));
-  document.body.style.overflow = abrir ? 'hidden' : '';
-}
-function montarBarraCel() {
-  $('barraCel').innerHTML = BARRA_CEL.map(pag => {
-    const a = document.querySelector(`.nav a[data-pag="${pag}"]`);
-    return `<a href="#${pag}" data-pag="${pag}" aria-label="${esc(PAGINAS[pag])}">${a.querySelector('svg').outerHTML}<span>${esc(a.querySelector('.curto').textContent)}</span><i class="ponto" hidden></i></a>`;
-  }).join('');
-}
-// Pontos da barra e do ☰: mesma informação dos selos do menu (o menu é a fonte).
-function sincronizarPontos() {
-  const barra = $('barraCel'); if (!barra || !barra.children.length) return;
-  let foraDaBarra = false;
-  document.querySelectorAll('.nav a[data-pag]').forEach(a => {
-    const pill = a.querySelector('.pill'), tem = !!pill && !pill.hidden, pag = a.dataset.pag;
-    const ponto = barra.querySelector(`a[data-pag="${pag}"] .ponto`);
-    if (ponto) { ponto.hidden = !tem; barra.querySelector(`a[data-pag="${pag}"]`).setAttribute('aria-label', a.getAttribute('aria-label')); }
-    else if (tem) foraDaBarra = true;
-  });
-  $('btnMenu').classList.toggle('com-ponto', foraDaBarra);
-}
 function alternarMenu() {
-  if (ehCelular()) return abrirGaveta(!document.querySelector('.shell').classList.contains('gaveta-aberta'));
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
 function iniciarMenu() {
   aplicarMenu(lerLocal(CHAVES.menu) === true);
   $('btnMenu').onclick = alternarMenu;
-  montarBarraCel();
-  $('btFecharGaveta').onclick = () => abrirGaveta(false);
-  $('veuGaveta').onclick = () => abrirGaveta(false);
-  $('navPrincipal').addEventListener('click', e => { if (e.target.closest('a[data-pag]') && ehCelular()) abrirGaveta(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.shell').classList.contains('gaveta-aberta')) abrirGaveta(false); });
-  // Deslizar da borda esquerda abre; deslizar para a esquerda fecha.
-  let x0 = null, y0 = 0;
-  document.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (x0 === null || !ehCelular()) return;
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0), aberta = document.querySelector('.shell').classList.contains('gaveta-aberta');
-    if (!aberta && x0 < 24 && dx > 60 && dy < 50) abrirGaveta(true);
-    else if (aberta && dx < -60 && dy < 50) abrirGaveta(false);
-    x0 = null;
-  }, { passive: true });
-  window.matchMedia('(max-width:760px)').addEventListener('change', () => abrirGaveta(false));
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
 
@@ -6342,7 +6275,6 @@ function desenharConferencia() {
   if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
   ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
-  ligarCorrecoesMV(c, res, ctx);
   const filtrar = () => {
     const q = norm(S.conf.busca);
     const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
@@ -6477,7 +6409,6 @@ function cartaoCorrecoesMV(corr) {
     <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
     <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
-function ligarCorrecoesMV() { }
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;
@@ -6947,7 +6878,7 @@ function atualizarNavFluxo() {
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 const nomeTarefaRef = (comp, gId, ref) => {
   const [g, t] = ref.includes('.') ? ref.split('.') : [gId, ref];
@@ -7991,7 +7922,7 @@ async function sincronizarCfg({ interativo = false } = {}) {
       const sem = c => JSON.stringify({ ...c, revisao: 0, atualizadoEm: '' });
       if (sem(cfg) !== sem(local)) {
         if (!base) backupAntesDeSubstituirSemReset(CHAVES.cfgAnterior, local);
-        S.cfg = cfg; gravarLocal(CHAVES.cfg, S.cfg); aplicarPastasConfig?.();
+        S.cfg = cfg; gravarLocal(CHAVES.cfg, S.cfg); aplicarPastasConfig?.(); aplicarRegrasConfig(S.cfg);
         if (remoto) avisar(`Configuração atualizada com as mudanças de ${remoto.atualizadoPor || 'outra pessoa'} (pasta compartilhada).`, 'ok');
         if (['#configuracoes', '#bases'].includes(location.hash)) RENDER[location.hash.slice(1)]();
       }
@@ -8248,7 +8179,7 @@ function atualizarNavNC() {
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Não conformidades · ${n} aberta(s), não enviadas` : 'Não conformidades';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 
 /* ---------- Candidatos das análises (SOL-F17) ----------
@@ -8456,8 +8387,6 @@ function desenharRevisao() {
 }
 
 /* ---------- Registro a partir de candidatos ---------- */
-const datalistFaturistas = () => `<datalist id="dlFat">${S.cfg.faturistas.filter(f => f.ativo !== false).map(f => `<option value="${esc(f.nome)}"></option>`).join('')}</datalist>`;
-const datalistUnidades = () => `<datalist id="dlUn">${[...new Set(S.cfg.unidades.flatMap(u => [...(u.apolo || []), u.nome]))].map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
 // Devolve verdadeiro se registrou algo.
 async function abrirRegistroNC(cands) {
   if (!exigirAberta(S.comp, 'registrar NCs')) return false;
@@ -9269,22 +9198,7 @@ async function simularComposta(regra) {
   return r;
 }
 
-const lerCodigos = t => [...new Set(String(t || '').split(/[\s,;+]+/).map(x => x.replace(/\D/g, '')).filter(x => x.length >= 5))];
 const lerPalavras = t => String(t || '').split(/[,;·]+/).map(x => x.trim().toUpperCase()).filter(Boolean);
-// Lê o formulário do diálogo para uma regra (sem gravar).
-function regraDoFormulario(k, base) {
-  const itens = [];
-  for (let i = 0; i < MAX_ITENS_CP; i++) {
-    const codigos = [...lerCodigos(k['cod' + i]), ...lerCodigos(k['alt' + i])].filter((c, j, a) => a.indexOf(c) === j);
-    if (!codigos.length) continue;
-    const exc = (k['excConv' + i] || '').trim() && k['excTipo' + i] ? [{ convenio: k['excConv' + i].trim().toUpperCase(), tipo: k['excTipo' + i], qtd: k['excTipo' + i] === 'quantidade' ? Math.max(0, +k['excQtd' + i] || 0) : 0 }] : [];
-    itens.push({ rotulo: (k['rot' + i] || '').trim(), codigos, qtd: Math.max(0, Math.round(+k['qtd' + i] || 1)), excecoes: exc });
-  }
-  if (k.modo === 'ou' && itens.length) { const cods = [...new Set(itens.flatMap(it => it.codigos))]; itens.splice(0, itens.length, { rotulo: 'um dos códigos', codigos: cods, qtd: 1, excecoes: [] }); }
-  const titulos = String(k.titulos || '').split('\n').map(t => t.trim()).filter(Boolean);
-  const palavras = { todas: lerPalavras(k.palTodas), umaDe: lerPalavras(k.palUmaDe) };
-  return { ...base, nome: (k.nome || '').trim(), titulos, palavras: palavras.todas.length || palavras.umaDe.length ? palavras : null, itens, escopo: { unidade: k.unidade || '*', modalidade: '*' }, justificativa: (k.just || '').trim() };
-}
 function validarRegraComposta(c, outras) {
   const e = [];
   if (!c.nome) e.push('dê um nome à regra');
@@ -9618,7 +9532,7 @@ function ligarPainelTitulo(t, lista) {
  * Bases: unidades, prestadores (código MV ↔ médico do Apolo), regras de tipo de item e Power BI
  * ============================================================ */
 const BS = { sub: 'unidades', soSemTipo: false };
-const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['pbi', 'Power BI']];
+const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['modalidades', 'Modalidades e HM V3'], ['pbi', 'Power BI']];
 // Bases e regras = categoria das Configurações: abas no topo e a barra da configuração compartilhada (P2; antes em 97-decoracoes.js).
 RENDER.bases = () => {
   const r = desenharBases(), pg = $('pag-bases');
@@ -9671,6 +9585,7 @@ function desenharBases() {
       <td><input type="text" data-cl="${i}" data-c="nota" value="${esc(r.nota || '')}"></td><td><button class="perigo" data-clrm="${i}">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="clSalvar">Salvar regras</button><button id="clAdd" class="sec">+ Regra</button><button id="clPad" class="sec">Restaurar padrão</button></div></div>
 
+${cardModalidadesHM()}
   <div class="card" data-sub="pbi"><h2>Power BI (consulta)</h2><p class="lead">Base auxiliar: cataloga o que existe no faturamento. Não participa da conferência nem da identificação de prestador.</p>
     ${S.pbi ? `<dl class="kv"><dt>Arquivo</dt><dd>${esc(S.pbi.nome)}</dd><dt>Período</dt><dd>${S.pbi.periodo ? `${fmtData(S.pbi.periodo[0])} a ${fmtData(S.pbi.periodo[1])}` : '—'}</dd><dt>Linhas</dt><dd>${S.pbi.linhas.length.toLocaleString('pt-BR')}</dd></dl>
       <div class="grid3" style="margin-top:10px"><div><h3>Unidades</h3><ul class="small">${S.pbi.unidades.map(([u, n]) => `<li>${esc(u)} — ${n}</li>`).join('')}</ul></div>
@@ -9814,6 +9729,42 @@ async function cadastrarMedicoApolo(nome, laudos) {
   }
   BS.semVincAberto = true; RENDER.bases();
 }
+
+/* P3 (v3.0.0-alpha.12) — Regras que antes só mudavam com nova versão: modalidade do Apolo por grupo do MV e HM da V3. */
+function cardModalidadesHM() {
+  const mod = S.cfg.modalidadesGrupo?.length ? S.cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(S.cfg.hmV3 || {}) };
+  const grupos = [...new Set((S.relatorios || []).flatMap(x => x.rel.regs.map(r => r.grupoNome)).filter(Boolean))].sort();
+  return `<div class="card" data-sub="modalidades" id="cardModHM"><h2>Modalidade do Apolo por grupo do MV</h2>
+    <p class="lead">A conferência só procura laudos da modalidade do grupo de procedimento (ex.: ULTRASSONOGRAFIA → US). Em cada linha, os trechos do nome do grupo separados por «|» e as modalidades do Apolo separadas por vírgula. A primeira linha que casar vale; grupo sem linha não restringe a modalidade.</p>
+    <div class="tw"><table><thead><tr><th>Trechos do grupo do MV</th><th>Modalidades do Apolo</th><th></th></tr></thead><tbody>${mod.map((x, i) => `<tr>
+      <td><input type="text" data-mg="${i}" data-c="padrao" value="${esc(x.padrao)}" style="width:100%"></td><td><input type="text" data-mg="${i}" data-c="modalidades" value="${esc(x.modalidades)}" style="width:110px"></td>
+      <td><button class="perigo mini" data-mgrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
+    ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
+    <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
+    <p class="lead">O HM de uma linha da V3 é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio. Os demais HM não compõem o repasse (excluir do MV).</p>
+    <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
+      <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
+    <div class="acoes"><button id="mhSalvar">Salvar</button><button id="mgAdd" class="sec">+ Grupo</button><button id="mhPad" class="sec">Restaurar padrão</button></div>
+    <p class="small muted">Valem a partir da próxima conferência. Rodadas já feitas não mudam: execute a conferência de novo.</p></div>`;
+}
+function lerModalidadesHM() {
+  const linhas = [], pg = $('cardModHM');
+  pg.querySelectorAll('[data-mg][data-c="padrao"]').forEach(inp => { const i = inp.dataset.mg, m = pg.querySelector(`[data-mg="${i}"][data-c="modalidades"]`).value.trim(); if (inp.value.trim() || m) linhas.push({ padrao: inp.value.trim(), modalidades: m.toUpperCase() }); });
+  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim() } };
+}
+document.addEventListener('click', async e => {
+  const c = $('cardModHM'); if (!c || !c.contains(e.target)) return;
+  const b = e.target.closest('#mhSalvar,#mgAdd,#mhPad,[data-mgrm]'); if (!b) return;
+  const { linhas, hm } = lerModalidadesHM();
+  if (b.id === 'mgAdd') { S.cfg.modalidadesGrupo = [...linhas, { padrao: '', modalidades: '' }]; S.cfg.hmV3 = hm; return RENDER.bases(); }
+  if (b.dataset.mgrm !== undefined) { S.cfg.modalidadesGrupo = linhas.filter((_, i) => i !== +b.dataset.mgrm); S.cfg.hmV3 = hm; return RENDER.bases(); }
+  if (b.id === 'mhPad') { if (!await confirmar('Restaurar o padrão?', 'Modalidades por grupo e HM da V3 voltam ao padrão da ferramenta.', 'Restaurar')) return; delete S.cfg.modalidadesGrupo; delete S.cfg.hmV3; salvarCfg('Modalidades por grupo e HM da V3 restaurados ao padrão.', 'regras'); return RENDER.bases(); }
+  const ruim = linhas.filter(x => !x.padrao.trim() || !x.modalidades.trim());
+  if (ruim.length) return avisar('Cada linha precisa dos trechos do grupo e das modalidades (ou remova a linha).', 'warn');
+  if (!hm.procedimentos || !hm.convenios) return avisar('Informe os trechos de procedimento e de convênio do HM da V3.', 'warn');
+  S.cfg.modalidadesGrupo = linhas; S.cfg.hmV3 = hm;
+  salvarCfg('Modalidades por grupo e HM da V3 salvos. Valem a partir da próxima conferência.', 'regras'); RENDER.bases();
+});
 
 /* ---- src/ui/55-regras.js ---- */
 /* ============================================================
@@ -10635,7 +10586,7 @@ function ligarBackup() {
 
 /* ---------- Sobre ---------- */
 function cfgSobre() {
-  return `<div class="card"><h2>Sobre</h2><dl class="kv"><dt>Versão</dt><dd>${MOTOR_VERSAO}</dd><dt>Atualização</dt><dd id="sbAtual">${esc(textoAtualizacao())}</dd><dt>Instalação</dt><dd>No Edge, abra o site e use <b>…</b> → <b>Aplicativos</b> → <b>Instalar este site como aplicativo</b>: a ferramenta abre em janela própria. Os dados e a pasta conectada continuam os mesmos do site.</dd><dt>Especificação</dt><dd>Documentação v1.6 — RN-178 a RN-215; auditoria da v3.0 em docs/v3.0-auditoria.md</dd><dt>Bibliotecas</dt><dd>pdf.js (Apache-2.0) e JSZip (MIT/GPLv3), embutidas</dd><dt>Privacidade</dt><dd>Os arquivos são lidos só no navegador; nada é enviado à internet. A pasta da rede é a única cópia compartilhada.</dd></dl>
+  return `<div class="card"><h2>Sobre</h2><dl class="kv"><dt>Versão</dt><dd>${MOTOR_VERSAO}</dd><dt>Atualização</dt><dd id="sbAtual">${esc(textoAtualizacao())}</dd><dt>Instalação</dt><dd>No Edge, abra o site e use <b>…</b> → <b>Aplicativos</b> → <b>Instalar este site como aplicativo</b>: a ferramenta abre em janela própria. Os dados e a pasta conectada continuam os mesmos do site.</dd><dt>Especificação</dt><dd>Documentação v1.6 — RN-178 a RN-215; auditoria da v3.0 em docs/v3.0-auditoria.md</dd><dt>Bibliotecas</dt><dd>pdf.js (Apache-2.0) e JSZip (MIT/GPLv3), embutidas</dd><dt>Privacidade</dt><dd>PDFs, planilhas e dados de pacientes são lidos só neste navegador e nunca vão para a internet. Da internet vêm só a página do site e o aviso de versão nova; o que é dividido com a outra pessoa (Fluxo, equivalências, configuração e backups) fica na pasta da rede.</dd></dl>
     <div class="acoes"><button class="sec" id="sbVerificar">Verificar atualização agora</button></div></div>`;
 }
 function ligarSobre() { $('sbVerificar').onclick = async () => { await verificarAtualizacao(true); const e = $('sbAtual'); if (e) e.textContent = textoAtualizacao(); }; }
@@ -10695,7 +10646,7 @@ function iniciarVerificacaoAtualizacao() {
   S.cfg = lerLocal(CHAVES.cfg);
   if (!S.cfg || validarConfig(S.cfg).length) { S.cfg = configPadrao(); gravarLocal(CHAVES.cfg, S.cfg); }
   else if (migrarConfig(S.cfg)) gravarLocal(CHAVES.cfg, S.cfg);
-  aplicarPastasConfig();   // nomes das pastas configurados (v3.0)
+  aplicarPastasConfig(); aplicarRegrasConfig(S.cfg);   // nomes das pastas configurados (v3.0)
   S.eq = lerLocal(CHAVES.eq);
   if (!S.eq || validarEq(S.eq).length) { S.eq = eqVazia(); gravarLocal(CHAVES.eq, S.eq); }
   else if (aplicarCobertas(S.eq, '', S.comp)) gravarLocal(CHAVES.eq, S.eq);   // base gravada antes de a cobertura ir para o salvarEq (P2)
@@ -10722,7 +10673,7 @@ function iniciarVerificacaoAtualizacao() {
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
   window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
-    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
+    sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, modalidadesDoGrupo, hmV3Devido, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 
 </script>

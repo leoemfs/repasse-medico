@@ -92,17 +92,24 @@ async function lerPowerBI(bytes, nome) {
 
 /* ---------- Modalidade ---------- */
 // Grupo de procedimento do MV → modalidades do Apolo (MODALITY) que podem conter o laudo.
-const GRUPO_MODALIDADES = [
-  [/ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA/, ['US']],   // Doppler é sempre do grupo de USG
-  [/TOMOGRAFIA/, ['CT']],
-  [/RESSONANCIA/, ['MR']],
-  [/RADIOLOGIA/, ['CR', 'DX']],
-  [/MAMOGRAFIA/, ['MG']],
-  [/DENSITOMETRIA/, ['OT']]
+/* Modalidade do Apolo esperada para cada grupo de procedimento do MV. P3 (v3.0.0-alpha.12): configurável em
+ * Bases e regras → «Modalidades e HM V3» (cfg.modalidadesGrupo); o padrão abaixo é o de sempre. Cada padrão é uma lista
+ * de trechos separados por «|», procurados no nome do grupo (sem acento, maiúsculas). A primeira linha que casar vale. */
+const MODALIDADES_GRUPO_PADRAO = [
+  { padrao: 'ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA', modalidades: 'US' },   // Doppler é sempre do grupo de USG
+  { padrao: 'TOMOGRAFIA', modalidades: 'CT' },
+  { padrao: 'RESSONANCIA', modalidades: 'MR' },
+  { padrao: 'RADIOLOGIA', modalidades: 'CR, DX' },
+  { padrao: 'MAMOGRAFIA', modalidades: 'MG' },
+  { padrao: 'DENSITOMETRIA', modalidades: 'OT' }
 ];
+const trechosPadrao = p => String(p || '').split('|').map(norm).filter(Boolean);
+const casaTrechos = (trechos, texto) => { const t = norm(texto); return trechos.some(x => t.includes(x)); };
+const compilarModalidades = lista => (lista || []).map(x => ({ trechos: trechosPadrao(x.padrao), mods: String(x.modalidades || '').split(/[\s,;|]+/).map(m => m.trim().toUpperCase()).filter(Boolean) })).filter(x => x.trechos.length && x.mods.length);
+let _modalidadesAtivas = compilarModalidades(MODALIDADES_GRUPO_PADRAO), _cacheModGrupo = new Map();
 function modalidadesDoGrupo(grupoNome) {
-  const n = norm(grupoNome);
-  for (const [re, mods] of GRUPO_MODALIDADES) if (re.test(n)) return mods;
-  return null;   // desconhecido: não restringe, e o resultado informa
+  const k = String(grupoNome ?? ''); if (_cacheModGrupo.has(k)) return _cacheModGrupo.get(k);
+  const n = norm(k), r = _modalidadesAtivas.find(x => x.trechos.some(t => n.includes(t)))?.mods || null;   // null: desconhecido, não restringe
+  _cacheModGrupo.set(k, r); return r;
 }
 const NOME_MODALIDADE = { US: 'Ultrassonografia', CT: 'Tomografia', MR: 'Ressonância', CR: 'Radiografia (CR)', DX: 'Radiografia (DX)', MG: 'Mamografia', OT: 'Densitometria / outros' };

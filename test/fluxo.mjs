@@ -80,13 +80,5 @@ const persist = await p.evaluate(() => { const c = window.__RM.S.fluxo.competenc
 ok(JSON.stringify(persist) === JSON.stringify(['ok', 1, 'Aguardando 2 NFs.', 16]), `persistência após recarregar (${persist})`);
 const dica = await p.$eval('a[data-pag="fluxo"]', a => a.getAttribute('aria-label'));
 ok(/^Fluxo mensal/.test(dica), `menu: «${dica}»`);
-// Celular
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true })).newPage();
-await m.clock.install({ time: new Date('2026-10-29T10:00:00') });
-m.on('pageerror', e => erros.push(e.message));
-await m.goto(html + '#fluxo'); await m.waitForSelector('#fxCriar'); await m.click('#fxCriar'); await m.waitForSelector('.marco'); await m.click('[data-tg="usg"]');
-await m.screenshot({ path: out + 'fluxo_celular.png', fullPage: false });
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
-ok(await m.$eval('.barra-cel a[data-pag="fluxo"] span', e => e.textContent) === 'Fluxo', 'barra do celular: «Fluxo»');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
