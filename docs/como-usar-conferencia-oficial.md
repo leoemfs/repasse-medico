@@ -61,7 +61,8 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
   - sai no Excel, na coluna «Observação (na linha)», com autor e data;
   - o quadro do aceite mostra quantas linhas têm observação;
   - ao apontar a linha como NC, a observação já vem nas Observações da NC;
-  - segue a retenção dos dados de pacientes das NCs: passado o prazo, o texto é apagado e ficam autor e data.
+  - segue a retenção dos dados de pacientes das NCs: passado o prazo, o texto é apagado e ficam autor e data;
+  - é só interna: não vai para o e-mail nem para a prévia do prestador.
 - **Remover decisão** — desfaz o aceite, o resolvido ou a dispensa. Para NC, use «não procede» na aba Não conformidades.
 
 ## 5. Reconferência (depois de corrigir no MV)

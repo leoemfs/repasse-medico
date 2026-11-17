@@ -199,7 +199,7 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
   - «N linha(s) com observação» no quadro do aceite;
   - vai para as Observações da NC registrada a partir da linha (e em lote);
   - segue a retenção das NCs (`retencaoNC`): passado o prazo, o texto é apagado e ficam quem escreveu e quando.
-- **Continua em aberto:** a pergunta se a observação vai para o e-mail ou a prévia do prestador no Fechamento. Hoje ela é só interna.
+- **Decisão do usuário (17/11/2026):** a observação é **só interna**. Não vai para o e-mail nem para a prévia do prestador no Fechamento.
 
 
 **Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
@@ -304,7 +304,7 @@ Para fechar o ciclo (conferência → NCs → produção → fechamento), cada a
 
 ### Perguntas em aberto
 - ~~Quais ajustes são feitos hoje na planilha?~~ Respondido em 13/11 (item 3.1).
-- A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?
+- ~~A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?~~ Respondido em 17/11: só interna.
 - ~~Ajuste de valor existe?~~ Respondido em 13/11: é consideração sem aceite (item 3.1). Fica a pergunta nova do item 3.1 (pendente sai ou não do valor).
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
