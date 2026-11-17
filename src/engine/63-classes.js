@@ -35,7 +35,8 @@ function classeDaLinha(tipo, estado, decisao) {
 // Linha do resultado da conferência (só as que vêm do MV têm classe; laudos «Só no laudo» não têm valor).
 const classeDaLinhaConf = x => x.r ? classeDaLinha(x.tipo, x.status, x.decisao?.tipo || '') : null;
 // Linha guardada numa rodada, com as decisões atuais da competência.
-const decisaoDaLinhaRodada = (idx, l) => (idx && (idx.get(l.kd) || (l.kl && idx.get(l.kl)))) || null;
+// Linhas da rodada são todas do MV: a decisão vem da chave do MV (a do laudo só desempata a linha repetida). v3.0.0-alpha.9.
+const decisaoDaLinhaRodada = (idx, l) => decisaoPorChaveMV(idx, l.kd, l.kl || '');
 const classeDaLinhaRodada = (l, idx) => classeDaLinha(l.tipoItem || 'procedimento', l.estado, idx ? (decisaoDaLinhaRodada(idx, l)?.tipo || '') : (l.decisao || ''));
 
 function totaisPorClasse(linhas, classeDe, campo = 'vlRepasse') {
@@ -54,12 +55,26 @@ const usaRegraF43 = r => r?.regraValor === REGRA_VALOR_F43;
  * Devolve {ncs:[{nc, situacao, linha}], resolvidos:[{d, situacao, linha}], hm:[{linha, continua}]}. */
 function situacaoCorrecoesMV(res, ctx, ncs, decisoes, rodadas) {
   const hashAtual = (ctx.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
-  const porKd = new Map(res.linhas.filter(x => x.r).map(x => [chaveMVDecisao(x.r), x]));
+  const doMV = res.linhas.filter(x => x.r), porKd = new Map(doMV.map(x => [chaveMVDecisao(x.r), x]));
+  const porLaudo = new Map(); for (const x of res.linhas) { const k = chaveLaudoDecisao(x.l); if (k && !porLaudo.has(k)) porLaudo.set(k, x); }
   const hashDaRodada = id => (rodadas.find(r => r.id === id)?.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
   const doRelatorio = k => String(k).startsWith('M|');
-  const avaliar = (chaves, hashOrigem) => {
-    const kd = (chaves || []).find(doRelatorio); if (!kd) return null;
-    const x = porKd.get(kd);
+  // Linha do relatório atual que leva a decisão gravada nas chaves (a mesma regra da classe, também para a linha repetida).
+  const linhaDaChave = (kd, chaves, dup) => {
+    if (porKd.has(kd)) return porKd.get(kd);
+    const idx = new Map([[kd, { kls: (chaves || []).filter(k => String(k).startsWith('L|')), dup }]]);
+    return doMV.find(x => decisaoPorChaveMV(idx, chaveMVDecisao(x.r), chaveLaudoDecisao(x.l))) || null;
+  };
+  const avaliar = (chaves, hashOrigem, dup = false) => {
+    const kd = (chaves || []).find(doRelatorio);
+    if (!kd) {
+      // v3.0.0-alpha.9: NC de laudo sem lançamento («Só no laudo»). Se o laudo agora tem par no MV, o lançamento foi feito:
+      // a NC está corrigida e a linha segue a própria classe (a NC não passa para ela).
+      const kl = (chaves || []).find(k => String(k).startsWith('L|')), x = kl && porLaudo.get(kl);
+      if (!x) return null;
+      return x.r ? { situacao: 'lancada', linha: x } : { situacao: 'aguardando', linha: null };
+    }
+    const x = linhaDaChave(kd, chaves, dup);
     if (!x) return { situacao: 'corrigida', linha: null };
     return { situacao: hashOrigem && hashOrigem !== hashAtual ? 'continua' : 'aguardando', linha: x };
   };
@@ -68,7 +83,7 @@ function situacaoCorrecoesMV(res, ctx, ncs, decisoes, rodadas) {
   const desteRelatorio = nc => { const r = rodadas.find(y => y.id === nc.origem?.rodadaId); return r ? String(r.prestadorCod) === String(ctx.relatorio.cab.prestadorCod) && String(r.unidadeCod) === String(ctx.unidadeCod) : null; };
   for (const nc of ncs || []) {
     if (nc.situacao === 'nao-procede') continue;
-    const a = avaliar(nc.origem?.chavesLinha, hashDaRodada(nc.origem?.rodadaId)); if (!a) continue;
+    const a = avaliar(nc.origem?.chavesLinha, hashDaRodada(nc.origem?.rodadaId), nc.origem?.tipoCandidato === 'duplicidade'); if (!a) continue;
     const deste = desteRelatorio(nc);
     if (deste === true || (deste === null && a.linha)) out.ncs.push({ nc, ...a });
   }

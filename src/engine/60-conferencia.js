@@ -59,6 +59,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
+  marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);

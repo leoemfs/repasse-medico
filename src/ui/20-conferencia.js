@@ -288,7 +288,7 @@ function desenharConferencia() {
 function cartaoCorrecoesMV(corr) {
   const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
   const cont = [...corr.ncs.filter(x => x.situacao === 'continua'), ...corr.resolvidos.filter(x => x.situacao === 'continua'), ...corr.hm.filter(x => x.continua)];
-  const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'] };
+  const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'], lancada: ['ok', 'Corrigida: lançada no MV (o laudo agora tem par; a NC não passa para a linha)'] };
   return `<div class="card"><h2>Correções no MV</h2>
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
     <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
@@ -383,9 +383,9 @@ function proximoRelatorioConf() {
 function quadroAceite() {
   const r = rodadaDaConf(); if (!r) return '';
   const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
-  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => idx.has(l.kd) || (l.kl && idx.has(l.kl)));
+  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => decisaoDaLinhaRodada(idx, l));
   const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}</p>`;
-  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => idx.get(l.kd)?.tipo === 'nc' || (l.kl && idx.get(l.kl)?.tipo === 'nc')).length;
+  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => decisaoDaLinhaRodada(idx, l)?.tipo === 'nc').length;
   if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite do relatório</b> <span class="badge ok">aceito</span>${resumoCl}
     <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
     <div class="acoes" style="margin:0">${fechada ? '<span class="small muted">Competência fechada: reabra no Início para desfazer.</span>' : '<button class="sec mini" id="cfDesfazer">Desfazer aceite</button>'}<a href="#rodadas" class="small">Ver em Rodadas</a>
