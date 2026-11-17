@@ -29,7 +29,7 @@ function fechamentoAtual() {
 }
 
 RENDER.fechamento = async () => {
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   const f = fechamentoAtual(), mk = marcosFech(S.comp), fechada = compFechada();
   const lista = FH.sub === 'img' ? f.img : FH.sub === 'curitiba' ? f.curitiba : f.usg;
   const cont = k => lista.filter(x => x.situacao === k).length;

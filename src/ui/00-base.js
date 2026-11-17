@@ -119,29 +119,58 @@ function abrirDB() {
   return new Promise(res => {
     try {
       // v2: «arquivos» guarda as planilhas de laudos e do Power BI por competência (já lidas, sem CPF).
-      const rq = indexedDB.open('repasse-medico-v2', 2);
-      rq.onupgradeneeded = () => { const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' }); };
+      // v3 (3.0.0-alpha.10): índice «comp» nas rodadas, para ler só a competência aberta e as vizinhas.
+      const rq = indexedDB.open('repasse-medico-v2', 3);
+      rq.onupgradeneeded = e => {
+        const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' });
+        const st = rq.transaction.objectStore('rodadas');
+        if (!st.indexNames.contains('comp')) {
+          st.createIndex('comp', 'comp');
+          st.openCursor().onsuccess = ev => { const c = ev.target.result; if (!c) return; const r = c.value; if (r.comp !== competenciaDaRodada(r)) { r.comp = competenciaDaRodada(r); c.update(r); } c.continue(); };
+        }
+      };
       rq.onsuccess = () => { DB.db = rq.result; DB.ok = true; res(true); };
       rq.onerror = () => res(false);
     } catch (e) { res(false); }
   });
 }
+// Todas as rodadas (Rodadas → todas as competências, restauração). As telas usam dbRodadasJanela.
 function dbTodas() {
   if (!DB.ok) return Promise.resolve(S.rodadas);
   return new Promise(res => { const rq = DB.db.transaction('rodadas').objectStore('rodadas').getAll(); rq.onsuccess = () => res((rq.result || []).map(normalizarChavesRodada)); rq.onerror = () => res([]); });
 }
+// P1: só as rodadas da competência aberta e das vizinhas (índice «comp»), ou só as de uma competência (para o backup).
+function dbRodadasJanela(ch = S.comp, so = false) {
+  const [de, ate] = so ? [ch, ch] : janelaCompetencias(ch);
+  if (!DB.ok) return Promise.resolve(S.rodadas.filter(r => { const c = competenciaDaRodada(r); return c >= de && c <= ate; }));
+  return new Promise(res => {
+    try {
+      const rq = DB.db.transaction('rodadas').objectStore('rodadas').index('comp').getAll(IDBKeyRange.bound(de, ate));
+      rq.onsuccess = () => res((rq.result || []).map(normalizarChavesRodada)); rq.onerror = () => res([]);
+    } catch (e) { dbTodas().then(t => res(t.filter(r => { const c = competenciaDaRodada(r); return c >= de && c <= ate; }))); }
+  });
+}
 function dbGravar(r) {
   if (!DB.ok) return Promise.resolve(false);
+  r.comp = competenciaDaRodada(r);
   return new Promise(res => { const tx = DB.db.transaction('rodadas', 'readwrite'); tx.objectStore('rodadas').put(r); tx.oncomplete = () => res(true); tx.onerror = () => res(false); });
 }
 function dbApagar(id) {
   if (!DB.ok) return Promise.resolve(false);
   return new Promise(res => { const tx = DB.db.transaction('rodadas', 'readwrite'); id ? tx.objectStore('rodadas').delete(id) : tx.objectStore('rodadas').clear(); tx.oncomplete = () => res(true); tx.onerror = () => res(false); });
 }
-async function guardarRodada(r) {
+async function guardarRodada(r, { reter = true } = {}) {
   const i = S.rodadas.findIndex(x => x.id === r.id);
   if (i >= 0) S.rodadas[i] = r; else S.rodadas.push(r);
-  return dbGravar(r);
+  const ok = await dbGravar(r);
+  if (reter) await reterRodadas(new Set([grupoRodada(r)]));
+  return ok;
+}
+// Retenção (P1): resume as rodadas substituídas dos grupos indicados (ou de todos, na abertura).
+async function reterRodadas(grupos = null, base = S.rodadas) {
+  const lista = rodadasParaResumir(base, grupos);
+  for (const r of lista) { resumirRodada(r); await dbGravar(r); const j = S.rodadas.findIndex(x => x.id === r.id); if (j >= 0) S.rodadas[j] = r; }
+  return lista.length;
 }
 
 /* ---------- Mensagens, diálogos e downloads ---------- */
@@ -209,6 +238,8 @@ function carregarCompetencia() {
 function mudarCompetencia(chave) {
   if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
   S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  // P1: as telas usam as rodadas da competência aberta e das vizinhas; recarrega e redesenha.
+  if (typeof DB !== 'undefined' && DB.ok) dbRodadasJanela(chave).then(r => { if (S.comp !== chave) return; S.rodadas = r; irPara(paginaAtual, true); });
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
   atualizarNavFluxo();
   irPara(paginaAtual, true);

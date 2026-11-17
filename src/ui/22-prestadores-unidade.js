@@ -35,7 +35,7 @@ function preSelecionarConferencia(a) {
 
 async function desenharControleUnidade() {
   const pg = $('pag-conferencia');
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   if (!S.apolo) { pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade</h2><p class="lead">Carregue a planilha de laudos do Apolo no Início. A lista de quem precisa de repasse sai dela, por unidade.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`; return ligarAbasConferencia(pg); }
   const ctl = controleAtual(), uns = ctl.unidades.filter(u => u.grupos.some(G => G.itens.length));
   const gruposDe = u => u.grupos.map(G => G.grupo);

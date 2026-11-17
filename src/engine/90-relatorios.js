@@ -93,6 +93,7 @@ function xlsxConferencia(res, ctx) {
     ['Modalidades do relatório', res.modalidades.join(', ') || '—'], ['Tolerância de data (dias)', ctx.parametros.tol],
     ['Linhas do MV', res.nMV], ['Procedimentos do MV', res.nProcedimentos], ['Laudos da unidade', res.nLaudosUnidade], ['Laudos no escopo «Só no laudo»', res.nLaudosEscopo], ['Pares formados', res.nPares],
     ['Equivalências validadas usadas (revisão da base)', `${res.eqValidadas} validadas · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
+    ...(ctx.filtroTexto ? [['Exportação', `SÓ O FILTRADO NA TELA: ${ctx.filtroTexto}. O Resumo e as abas valem só para essas linhas.`]] : []),
     ['Leitura', '«Conferido» = existe um laudo único e consistente; não prova que o valor está correto. Valores não são critério desta conferência.'],
     ['Decisões', 'NC e «aceitar para pagamento» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
   // Técnico: chaves, faixa do par e equivalência usada

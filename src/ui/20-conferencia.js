@@ -134,13 +134,16 @@ async function rodarConferencia(x, un, tol, medSel) {
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
   ctx.fonteNC = `conf|${x.id}|${un}`;
   // Conciliação com o Power BI (SOL-F9): explica os «Só no laudo» e sugere natureza e responsável.
-  const cands = candidatosDaConferencia(res, ctx, S.cfg);
+  let cands = candidatosDaConferencia(res, ctx, S.cfg);
   if (S.pbi) {
     const opcPBI = { unidadeCod: un, tol, prestadorCod: x.rel.cab.prestadorCod, cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), idxPrest: indicePrestadores(S.cfg) };
     for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } }
     ctx.pbiResumo = enriquecerCandidatosComPBI(cands, S.pbi, opcPBI); ctx.pbiNome = S.pbi.nome;
   }
-  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, cands);
+  // P1: com todos os médicos no escopo, os candidatos «Só no laudo» ficam só os do prestador (quando há cadastro dele na unidade).
+  let fora = 0;
+  if (!medicos) { const ligados = medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod); if (ligados.length && laudosDaUnidade(S.apolo, S.cfg, un).some(l => ligados.includes(l.mn))) { const e = escopoCandidatosNC(cands, ligados); cands = e.dentro; fora = e.fora.length; } }
+  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, cands, fora);
   return { res, ctx, rodada };
 }
 /* Depois de validar equivalências: roda de novo, com os mesmos parâmetros, a última conferência de cada
@@ -179,7 +182,7 @@ function desenharConferencia() {
   c.innerHTML = `<div class="card cf-frase"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
     <div class="cf-barra cf-barra-cl">${barra}</div>
     <p style="margin:6px 0"><b>${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0}%.</b> <b>R$ ${fmtBR(T.pagar)} para pagamento</b> (Devido + Aceito) de R$ ${fmtBR(T.total)} no relatório do MV. ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}; R$ ${fmtBR(T.pend.valor)} pendente(s) ficam fora do fechamento até decidir.` : 'Nada falta decidir neste relatório: é só registrar o aceite.'}${alertas ? ` <b style="color:var(--err)">${alertas} item(ns) que deviam ter saído do MV continuam no relatório.</b>` : ''}</p>
-    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button class="sec" id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button></div>
+    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button class="sec" id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button>${botaoReconferir(ctx)}</div>
     ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}</div>
     <nav class="cf-abas" id="cfAbas" role="tablist" aria-label="Áreas da conferência">${ABAS_CONF.map(([k, t]) => { const n = k === 'decidir' ? CZ.faltam : k === 'nc' ? alertas : 0; return `<button role="tab" id="cfAba-${k}" data-cfaba="${k}" aria-selected="${aba === k}" class="${aba === k ? 'on' : ''}">${t}${n ? `<span class="n${k === 'nc' ? ' alerta' : ''}">${n}</span>` : ''}</button>`; }).join('')}</nav>
     ${secao('previa', `<div class="card"><div class="totais-cl">
@@ -213,8 +216,9 @@ function desenharConferencia() {
   c.querySelectorAll('[data-cl]').forEach(b => b.onclick = () => { S.conf.filtroClasse = S.conf.filtroClasse === b.dataset.cl ? null : b.dataset.cl; if (S.conf.filtroClasse) S.conf.soFalta = false; desenharConferencia(); });
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
-  // Os dois botões de Excel (topo e tabela) fazem a mesma coisa.
-  c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp));
+  // Os dois botões de Excel (topo e tabela) exportam tudo; «só o filtrado» fica na faixa do filtro. Com «Processando…» (P1).
+  c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => exportarExcelConf(bt, res, ctx));
+  ligarReconferir(c);
   if ($('cfIrCausas')) $('cfIrCausas').onclick = () => irAbaConf('decidir');
   if ($('cfIrAceite')) $('cfIrAceite').onclick = () => irAbaConf('aceite');
   $('cfVerTodas').onclick = () => { Object.assign(S.conf, { soFalta: false, filtroLinhas: null, filtroClasse: null, aba: 'previa' }); desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
@@ -239,8 +243,9 @@ function desenharConferencia() {
   const infoSel = vis => {
     const pend = vis.filter(x => x.r && classeDaLinhaConf(x) === 'pend' && !x.decisao), el = $('cfSelInfo'); if (!el) return;
     el.innerHTML = `<b>${vis.length} linha(s) no filtro · R$ ${fmtBR(vis.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0))}</b>${S.conf.filtroClasse ? ` · ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)}` : ''}<span class="sy-esp"></span>
-      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>`;
-    $('cfExcel2').onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp);
+      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>${vis.length < res.linhas.length ? `<button class="sec mini" id="cfExcelFiltro">Exportar só o filtrado (${vis.length})</button>` : ''}`;
+    $('cfExcel2').onclick = () => exportarExcelConf($('cfExcel2'), res, ctx);
+    if ($('cfExcelFiltro')) $('cfExcelFiltro').onclick = () => exportarExcelConf($('cfExcelFiltro'), resultadoFiltrado(res, vis), { ...ctx, filtroTexto: textoFiltroConf(vis) });
     $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fConv: '*', fObs: false }); desenharConferencia(); };
     $('cfLoteAceitar').onclick = async () => { if (await considerarLinhas(res, pend.map(x => res.linhas.indexOf(x)), `${pend.length} linha(s) pendente(s) do filtro · R$ ${fmtBR(pend.reduce((s, x) => s + x.r.vlRepasse, 0))}`, '')) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
     $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoDaLinhaConferencia(x, ctx, S.cfg)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
@@ -283,6 +288,66 @@ function desenharConferencia() {
     if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
+}
+/* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
+ * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
+function exportarExcelConf(bt, res, ctx) {
+  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
+    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp), 'a exportação do Excel');
+}
+function textoFiltroConf(vis) {
+  const c = S.conf, partes = [];
+  if (c.filtroClasse) partes.push(`classe ${CLASSES_FECH[c.filtroClasse].nome}`);
+  if (c.filtroStatus.size) partes.push(`situação ${[...c.filtroStatus].map(k => STATUS_CONF[k]?.nome || k).join(', ')}`);
+  if (c.filtroMarc.size) partes.push(`marcador ${[...c.filtroMarc].map(k => k.startsWith('dec-') ? TIPOS_DECISAO[k.slice(4)] : MARCADORES[k] || k).join(', ')}`);
+  if (c.fProc && c.fProc !== '*') partes.push(`procedimento ${c.fProc}`);
+  if (c.fData && c.fData !== '*') partes.push(`data ${fmtData(paraData(c.fData))}`);
+  if (c.fConv && c.fConv !== '*') partes.push(`convênio ${c.fConv}`);
+  if (c.fObs) partes.push('com observação');
+  if (c.busca) partes.push(`busca «${c.busca}»`);
+  if (c.filtroLinhas) partes.push(c.filtroLinhas.titulo);
+  if (c.soFalta !== false && !c.filtroLinhas && !c.filtroStatus.size && !c.filtroClasse) partes.push('só o que falta decidir');
+  return `${vis.length} linha(s) · ${partes.join(' · ') || 'filtro da tela'}`;
+}
+/* P1 — Reconferir em um clique: relê o PDF (da pasta da competência, ou um arquivo escolhido) e confere de novo com a mesma
+ * unidade, médico, tolerância e aba. Antes eram 4 ou 5 passos (Início → atualizar → Conferência → escolher → executar). */
+const pastaConectadaConf = () => typeof SY !== 'undefined' && !!SY.handle && !SY.legado;
+function botaoReconferir(ctx) {
+  const x = S.relatorios.find(r => r.id === ctx.relId), daPasta = pastaConectadaConf() && !!x?.caminhoPasta;
+  return `<button class="sec" id="cfReconferir" title="Mantém unidade, médico, tolerância e a aba aberta">${daPasta ? 'Reler o PDF da pasta e conferir de novo' : 'Carregar o PDF novo e conferir de novo'}</button><input type="file" id="cfReArq" accept=".pdf,application/pdf" hidden>`;
+}
+function ligarReconferir(c) {
+  const bt = c.querySelector('#cfReconferir'), arq = c.querySelector('#cfReArq'); if (!bt) return;
+  bt.onclick = () => {
+    const x = S.relatorios.find(r => r.id === S.conf.ctx.relId);
+    if (pastaConectadaConf() && x?.caminhoPasta) return comProcessando(bt, () => reconferir(null), 'a reconferência');
+    arq.value = ''; arq.click();
+  };
+  arq.onchange = () => arq.files[0] && comProcessando(bt, () => reconferir(arq.files[0]), 'a reconferência');
+}
+async function reconferir(arquivo) {
+  if (!exigirAberta(S.comp, 'executar uma conferência')) return;
+  const { ctx } = S.conf, aba = S.conf.aba || 'previa', atual = S.relatorios.find(r => r.id === ctx.relId);
+  const prest = String(ctx.relatorio.cab.prestadorCod), hashAntes = (ctx.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
+  let x = null;
+  if (!arquivo) {
+    await atualizarDaPasta({ silencioso: true });
+    x = S.relatorios.find(r => r.caminhoPasta && r.caminhoPasta === atual?.caminhoPasta)
+      || S.relatorios.find(r => r.caminhoPasta && String(r.rel.cab.prestadorCod) === prest && r.unidadePasta === atual?.unidadePasta && (r.grupoPasta || '') === (atual?.grupoPasta || ''));
+    if (!x) return avisar('O PDF deste relatório não foi encontrado na pasta da competência. Use «Carregar o PDF novo» ou confira no Início.', 'warn');
+  } else {
+    const n0 = S.relatorios.length; await carregarPDFs([arquivo]);
+    if (S.relatorios.length === n0) { x = S.relatorios.find(r => r.nome === arquivo.name && String(r.rel.cab.prestadorCod) === prest); if (!x) return; }
+    else {
+      x = S.relatorios.at(-1);
+      if (String(x.rel.cab.prestadorCod) !== prest) { S.relatorios.pop(); return avisar(`${arquivo.name} é do prestador ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}, não do ${prest}. Nada foi conferido.`, 'warn'); }
+      if (atual) { for (const k of ['unidadePasta', 'grupoPasta', 'caminhoPasta']) if (atual[k] !== undefined) x[k] = atual[k]; x.finalidade = atual.finalidade || x.finalidade; S.relatorios = S.relatorios.filter(r => r !== atual); }
+    }
+  }
+  await rodarConferencia(x, ctx.unidadeCod, ctx.parametros?.tol ?? S.cfg.parametros.tolConferencia, ctx.medicoSel || '@prest');
+  S.conf.aba = aba;
+  RENDER.conferencia();
+  avisar(x.hash === hashAntes ? 'Conferido de novo com o mesmo PDF (o arquivo não mudou). As decisões e equivalências atuais já valem.' : 'PDF novo lido e conferido de novo: veja a aba «NCs e correções no MV» para a reconferência.', x.hash === hashAntes ? 'info' : 'ok');
 }
 // Aba «NCs e correções no MV»: o que devia ter saído do MV e o que já saiu (reconferência, SOL-F42).
 function cartaoCorrecoesMV(corr) {
@@ -458,7 +523,7 @@ document.addEventListener('click', async e => {
     await rodarConferencia(x, un, tol, presente ? '@prest' : '*');
     await new Promise(r => setTimeout(r, 0));
   }
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.`, 'ok');
   RENDER.conferencia();
 });

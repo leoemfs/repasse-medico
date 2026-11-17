@@ -186,7 +186,7 @@ function cfgBackup() {
   const pb = prefBackup(), est = KV.estimativa, mb = n => (n / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
   return `<div class="card"><h2>Backup</h2>
     <p class="lead">O backup leva a configuração (Bases, regras, parâmetros, pastas e modelos de exportação), as equivalências e regras compostas, o fluxo mensal, as competências, o controle de prestadores por unidade e as preferências de quem exportou. Cada parte tem a sua impressão digital: arquivo incompleto ou alterado é recusado antes de restaurar.</p>
-    <div class="acoes"><button id="bkExp">Baixar backup (.json)</button><label class="small"><input type="checkbox" id="bkRod" checked> incluir rodadas</label><label class="small"><input type="checkbox" id="bkNC"> incluir não conformidades (contém nomes de pacientes)</label></div>
+    <div class="acoes"><button id="bkExp">Baixar backup (.json)</button><label class="small"><input type="checkbox" id="bkRod" checked> incluir as rodadas da competência aberta</label><label class="small"><input type="checkbox" id="bkNC"> incluir não conformidades (contém nomes de pacientes)</label></div>
     ${SY.handle && !SY.legado ? `<h3>Na pasta da rede (${esc(PASTAS_RAIZ.backups.nome)})</h3>
     <div class="acoes"><button id="bkPastaAgora">Gravar backup na pasta agora</button><label class="small"><input type="checkbox" id="bkAuto"${pb.auto ? ' checked' : ''}> backup automático uma vez por dia, ao abrir</label><label class="small">manter os últimos <input type="number" id="bkManter" min="3" max="365" value="${pb.manter}" style="width:64px"> automáticos</label><label class="small"><input type="checkbox" id="bkPastaNC"${pb.incluirNC ? ' checked' : ''}> incluir NCs (a pasta da rede já guarda os PDFs com dados de pacientes)</label><button class="sec mini" id="bkPrefSalvar">Salvar</button></div>
     <div id="bkLista" class="small muted">Lendo os backups da pasta…</div>` : '<p class="small muted">Conecte a pasta raiz (Pastas e sincronização) para gravar backups automáticos na rede.</p>'}</div>
@@ -245,7 +245,7 @@ async function gravarBackupPasta(b, { auto = false, silencioso = false } = {}) {
 async function backupAutomaticoDiario() {
   const pb = prefBackup(), hoje = new Date().toISOString().slice(0, 10);
   if (!pb.auto || pb.ultimoAuto === hoje || !SY.handle || SY.legado || SY.status === 'permissao') return;
-  const b = montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbTodas() }), { operador: S.operador, motivo: 'automático diário' });
+  const b = montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbRodadasJanela(S.comp, true) }), { operador: S.operador, motivo: 'automático diário' });
   if (await gravarBackupPasta(b, { auto: true, silencioso: true })) gravarLocal(CHAVES.bkPasta, { ...pb, ultimoAuto: hoje });
 }
 const _restaurarPastaSyncBk = restaurarPastaSync;
@@ -256,7 +256,7 @@ async function listarBackupsPasta() {
   return l.sort((a, b) => b.em - a.em);
 }
 function ligarBackup() {
-  $('bkExp').onclick = async () => baixarJSON(montarBackup(partesAtuaisBackup({ nc: $('bkNC').checked, rodadas: $('bkRod').checked ? await dbTodas() : null }), { operador: S.operador }), `backup_repasse_medico_${carimbo()}.json`);
+  $('bkExp').onclick = async () => baixarJSON(montarBackup(partesAtuaisBackup({ nc: $('bkNC').checked, rodadas: $('bkRod').checked ? await dbRodadasJanela(S.comp, true) : null }), { operador: S.operador }), `backup_repasse_medico_${carimbo()}.json`);
   $('bkImp').onclick = () => $('bkArq').click();
   $('bkArq').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; let b; try { b = JSON.parse(await f.text()); } catch (err) { return avisar('Backup não restaurado: o arquivo não é um JSON válido (incompleto?).', 'err'); } restaurarBackup(b, f.name); };
   $('bkDesfazerEq').onclick = async () => {
@@ -270,7 +270,7 @@ function ligarBackup() {
     await dbApagar(null); location.reload();
   };
   if ($('bkPastaAgora')) {
-    $('bkPastaAgora').onclick = async () => { const pb = prefBackup(); await gravarBackupPasta(montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbTodas() }), { operador: S.operador, motivo: 'manual' })); RENDER.configuracoes(); };
+    $('bkPastaAgora').onclick = async () => { const pb = prefBackup(); await gravarBackupPasta(montarBackup(partesAtuaisBackup({ nc: pb.incluirNC, rodadas: await dbRodadasJanela(S.comp, true) }), { operador: S.operador, motivo: 'manual' })); RENDER.configuracoes(); };
     $('bkPrefSalvar').onclick = () => { gravarLocal(CHAVES.bkPasta, { ...prefBackup(), auto: $('bkAuto').checked, manter: Math.min(365, Math.max(3, +$('bkManter').value || 30)), incluirNC: $('bkPastaNC').checked }); avisar('Preferências de backup salvas.', 'ok'); };
     listarBackupsPasta().then(l => {
       const el = $('bkLista'); if (!el) return;

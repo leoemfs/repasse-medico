@@ -3,7 +3,7 @@
  * ============================================================ */
 const RD = { todas: false };
 RENDER.rodadas = async () => {
-  S.rodadas = await dbTodas();
+  S.rodadas = RD.todas ? await dbTodas() : await dbRodadasJanela();
   const lista = [...S.rodadas].filter(r => RD.todas || competenciaDaRodada(r) === S.comp).sort((a, b) => b.em.localeCompare(a.em));
   $('pag-rodadas').innerHTML = `<div class="card"><h2>Rodadas registradas</h2>
     <p class="lead">Cada execução guarda entradas (nome e impressão digital dos arquivos), parâmetros, versões do motor e das bases, contagens e o estado de cada linha (sem nomes de pacientes). O aceite final é sempre humano e fica registrado.</p>
@@ -15,15 +15,15 @@ RENDER.rodadas = async () => {
       { t: 'Competência', v: r => rotuloCompetencia(competenciaDaRodada(r)) }, { t: 'Rodada', html: r => `<code class="small">${esc(r.id)}</code>` }, { t: 'Data', v: r => new Date(r.em).toLocaleString('pt-BR') }, { t: 'Tipo', v: r => r.tipo === 'conferencia' ? 'Conferência' : 'Correção de prestador' },
       { t: 'Prestador', v: r => `${r.prestadorCod} - ${r.prestadorNome}` }, { t: 'Repasse', v: r => `${r.repasse} · ${r.descricao}` }, { t: 'Unidade', v: r => r.unidadeCod },
       { t: 'Resultado', v: r => Object.entries(r.contagens).filter(([, n]) => n).map(([k, n]) => `${(STATUS_CONF[k] || ESTADO_CORR[k])?.nome || k}: ${n}`).join(' · ') },
-      { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span> <button class="sec mini" data-desfazer="${r.id}" title="Desfazer aceite">↺</button>` : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }
+      { t: 'Operador', v: r => r.operador }, { t: 'Aceite', html: r => r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span> <button class="sec mini" data-desfazer="${r.id}" title="Desfazer aceite">↺</button>` : r.resumida ? '<span class="small muted" title="Rodada substituída por outra mais nova do mesmo relatório: ficou só o resumo (retenção)">resumida</span>' : `<button class="sec" data-ac="${r.id}">Registrar aceite</button>` }
     ],
     detalhe: r => {
-      const ant = rodadaAnterior(S.rodadas, r), g = ant ? compararRodadas(ant, r) : null;
+      const ant = r.resumida ? null : rodadaAnterior(S.rodadas, r), g = ant ? compararRodadas(ant, r) : null;
       return `<div class="det"><div><h4>Entradas e versões</h4><ul class="small">${r.arquivos.map(a => `<li>${esc(a.papel)}: ${esc(a.nome)} <code>${esc(a.hash || '')}</code></li>`).join('')}
         <li>Motor ${esc(r.versoes.motor)} · equivalências rev. ${r.versoes.equivalencias} · configuração rev. ${r.versoes.configuracao}</li><li>Parâmetros: ${esc(JSON.stringify(r.parametros))}</li></ul>
         ${(r.aceitesDesfeitos || []).length ? `<h4>Aceites desfeitos</h4><ul class="small">${r.aceitesDesfeitos.map(a => `<li>${esc(a.por)} em ${new Date(a.em).toLocaleString('pt-BR')} — desfeito por ${esc(a.desfeitoPor)} em ${new Date(a.desfeitoEm).toLocaleString('pt-BR')}</li>`).join('')}</ul>` : ''}
         ${r.aceite ? `<h4>Aceite</h4><p class="small">${esc(r.aceite.por)} em ${new Date(r.aceite.em).toLocaleString('pt-BR')}: ${esc(r.aceite.obs || '')} (${r.aceite.pendencias} pendência(s) abertas no aceite)</p>` : ''}</div>
-        <div><h4>Comparação com a rodada anterior</h4>${g ? `<ul class="small"><li>Agora conferidos/identificados: ${g.agoraIdentificados.length}</li><li>Continuam pendentes: ${g.continuamPendentes.length}</li><li>Mudaram de categoria: ${g.mudaramEstado.length}</li><li>Mudaram de médico: ${g.mudaramMedico.length}</li><li>Novas linhas: ${g.novos.length}</li><li>Saíram da extração: ${g.desapareceram.length}</li><li>Sem mudança: ${g.semMudanca.length}</li></ul>` : '<p class="muted small">Sem rodada anterior comparável (mesma competência, tipo, unidade e prestador).</p>'}</div></div>`;
+        <div><h4>Comparação com a rodada anterior</h4>${r.resumida ? `<p class="small muted">Rodada resumida em ${new Date(r.resumida).toLocaleDateString('pt-BR')}: havia outra mais nova do mesmo relatório, e as ${r.nLinhas || 0} linhas não são mais guardadas (retenção). Ficam as entradas, as versões, as contagens e o aceite.</p>` : ''}${g ? `<ul class="small"><li>Agora conferidos/identificados: ${g.agoraIdentificados.length}</li><li>Continuam pendentes: ${g.continuamPendentes.length}</li><li>Mudaram de categoria: ${g.mudaramEstado.length}</li><li>Mudaram de médico: ${g.mudaramMedico.length}</li><li>Novas linhas: ${g.novos.length}</li><li>Saíram da extração: ${g.desapareceram.length}</li><li>Sem mudança: ${g.semMudanca.length}</li></ul>` : '<p class="muted small">Sem rodada anterior comparável (mesma competência, tipo, unidade e prestador).</p>'}</div></div>`;
     }
   });
   $('rdTab').addEventListener('click', async e => {
