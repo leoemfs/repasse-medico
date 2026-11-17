@@ -62,6 +62,7 @@ node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra 
 node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
 node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios
+node test/pasta_por_aba.mjs    # v3.0: «Sincronizar pasta» por aba, Correção de prestador sem subpastas (unidade pelo nome) e avisos do Fechamento recolhíveis
 node test/bench_pior_caso.mjs  # desempenho: 3.000 linhas × 30 mil laudos com homônimos; resultado idêntico (assinatura) e limite de tempo (precisa do --harness)
 ```
 

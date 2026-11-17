@@ -3,11 +3,11 @@
  * ============================================================ */
 RENDER.correcao = () => {
   const p = $('pag-correcao');
-  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
+  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos('co'); return; }
   if (!relatoriosPara('co').length) { p.innerHTML = semRelatorioPara('co'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2><p class="lead">Identifica o médico do laudo de cada linha do relatório só com evidência verificável: nome idêntico ou truncado, data dentro da tolerância e equivalência TUSS validada. Não há sugestão de prestador para os casos não identificados.</p>
     ${seletoresAnalise('co', S.cfg.parametros.tolCorrecao)}
-    <div class="acoes"><button id="coRodar">Executar identificação</button></div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
+    <div class="acoes"><button id="coRodar">Executar identificação</button>${botaoSyncPasta('co')}</div></div><div id="coRes">${cartaoOutraCompetencia(S.corr, 'correção de prestador')}</div>`;
   if (!$('coRel')) { $('coRodar').disabled = true; return; }
   $('coExtra').innerHTML = '';
   $('coRodar').onclick = () => comProcessando($('coRodar'), executarCorrecao, 'a identificação');

@@ -50,11 +50,11 @@ await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].grupos
 const rod = await p.evaluate(() => { const t = window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf; return [t.rodada, t.status]; });
 ok(rod[0] === 'rodteste' && rod[1] === 'ni', `rodada escolhida (entre 2) vinculada sem concluir a etapa (${rod})`);
 // Ajuste de marco com justificativa recalcula dependentes
-await p.click('[data-marco="pagIMG"]'); await p.fill('#dlgCorpo input[name=data]', '2026-10-29'); await p.fill('#dlgCorpo input[name=just]', 'pagamento antecipado'); await p.click('#dlgBotoes button[value=ok]');
+await p.click('[data-marco="pagIMG"]'); await p.fill('#dlgCorpo input[name=data]', '2026-10-29'); await p.fill('#dlgCorpo input[name=just]', 'pagamento antecipado'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(300);   // a tela redesenha depois do diálogo (no GitHub, mais devagar)
 const envio = await p.$eval('[data-marco="envioIMG"] b', e => e.textContent);
 ok(envio.startsWith('23/10'), `envio IMG recalculado após ajuste do pagamento (${envio})`);
 // Anotação e observação de seção
-await p.fill('#fxNotaTxt', 'Jhonas avisou atraso da planilha de novembro.'); await p.click('#fxNotaAdd');
+await p.fill('#fxNotaTxt', 'Jhonas avisou atraso da planilha de novembro.'); await p.click('#fxNotaAdd'); await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].anotacoes.length > 0, null, { timeout: 5000 }).catch(() => {});
 ok(await p.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].anotacoes.length) === 1, 'anotação registrada');
 await p.fill('[data-obs="usg"]', 'Aguardando 2 NFs.'); await p.dispatchEvent('[data-obs="usg"]', 'change');
 // Filtro de vencidas abre grupos com etapas vencidas
