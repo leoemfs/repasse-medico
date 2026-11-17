@@ -1,17 +1,16 @@
 /* ============================================================
- * Pasta raiz do aplicativo na rede (SOL-F36, F37 e F38)
- *   Repasse Médico (raiz)
- *   ├─ Fluxo mensal                       ← Fluxo sincronizado (1 arquivo por competência)
- *   ├─ Equivalência TUSS (sincronização)  ← equivalencias.json
- *   ├─ Bases de dados / Comp_MM-AAAA      ← planilha de laudos (Apolo) e Power BI do mês
- *   ├─ backups
- *   └─ Competências / Comp_MM-AAAA
- *       ├─ Relatórios para conferência / USG | IMG / Unidade N - Nome ; Curitiba
- *       ├─ Correção de prestador / Unidade N - Nome
- *       ├─ Conferência cruzada
- *       └─ Não conformidades
- * A ferramenta lê os PDFs e as planilhas da pasta do mês, sincroniza Fluxo e equivalências e cria as pastas
- * com os nomes certos. Os arquivos ficam na rede; nada sai para a internet.
+ * Pasta raiz do aplicativo na rede (SOL-F36, F37 e F38) — estrutura padronizada (v3.0.0-alpha.14, pedido de 17/11/2026)
+ *   App repasse médico (raiz escolhida no Edge)
+ *   ├─ 01 - Sistema/            Backups · Configurações compartilhadas · Equivalências TUSS · Fluxo mensal
+ *   │                            · Bases compartilhadas · Outros arquivos permanentes do sistema
+ *   ├─ 02 - Repasse 2026/       2026-01 - Janeiro … 2026-12 - Dezembro
+ *   └─ 03 - Repasse 2027/       (mesma estrutura, um ano por pasta)
+ *  Cada competência: 01 - Correção de prestador · 02 - Não conformidades · 03 - NFS para pagamento (Pagamento 15 | 30)
+ *   · 04 - Planilhas de conferência · 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba › Prestadores
+ *   Unidade | Prestadores SRA) · 06 - Relatórios de prestadores conferidos · 07 - Mutirão unidades · 08 - Repasse final.
+ * Compatibilidade: a estrutura antiga (Fluxo mensal, Equivalência TUSS (sincronização), Configuração compartilhada e
+ * backups na raiz; Competências › Comp_MM-AAAA; Bases de dados › Comp_MM-AAAA) continua sendo lida. Nada é apagado,
+ * renomeado ou movido pela ferramenta: a mudança dos arquivos é manual (guia em docs/como-usar-pastas.md).
  * ============================================================ */
 const PASTAS_RAIZ = {
   fluxo: { nome: 'Fluxo mensal', re: /^FLUXO MENSAL/ },
@@ -20,17 +19,45 @@ const PASTAS_RAIZ = {
   backups: { nome: 'backups', re: /^BACKUPS?$/ },
   comps: { nome: 'Competências', re: /^COMPETENCIAS$/ }
 };
-// Pastas do mês: reconhece os nomes da exportação e os que a equipe já usa (ex.: RELATORIOS-MV-CONFERENCIA,
-// PLANILHAS-CONFERENCIA, CORREÇÃO DE PRESTEDOR, NAO CONFORMIDADES). Pastas novas são criadas com o nome padrão.
-const PASTA_REL = { nome: 'Relatórios para conferência', re: /^RELATORIOS? (MV )?(PARA )?CONFERENCIA/ };
-const PASTA_CORR = { nome: 'Correção de prestador', re: /^CORRECAO DE PREST/ };
-const PASTA_PLAN = { nome: 'Planilhas utilizadas para conferência', re: /^PLANILHAS/ };
-const PASTA_CONF = { nome: 'Conferência cruzada', re: /^CONFERENCIA CRUZADA/ };
-const PASTA_NC = { nome: 'Não conformidades', re: /^NAO CONFORMIDADES/ };
+// Estrutura nova: «01 - Sistema» com os arquivos permanentes; um ano por pasta («02 - Repasse 2026»); uma pasta por mês.
+const MESES_PASTA = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+const PASTA_SISTEMA = { nome: '01 - Sistema', re: /^(\d+ )?SISTEMA$/ };
+const SISTEMA = {
+  backups: { nome: 'Backups', re: /^BACKUPS?$/ }, cfg: { nome: 'Configurações compartilhadas', re: /^CONFIGURACO(ES|AO) COMPARTILHADAS?$/ },
+  eq: { nome: 'Equivalências TUSS', re: /^EQUIVALENCIAS? TUSS$/ }, fluxo: { nome: 'Fluxo mensal', re: /^FLUXO MENSAL$/ },
+  bases: { nome: 'Bases compartilhadas', re: /^BASES COMPARTILHADAS$/ }, outros: { nome: 'Outros arquivos permanentes do sistema', re: /^OUTROS ARQUIVOS/ }
+};
+const pastaAno = ano => ({ nome: `${String(Math.max(2, ano - 2024)).padStart(2, '0')} - Repasse ${ano}`, re: new RegExp(`^(\\d+ )?REPASSE ${ano}$`) });
+const nomePastaMes = chave => `${chave} - ${MESES_PASTA[+chave.slice(5) - 1]}`;
+const pastaMes = chave => ({ nome: nomePastaMes(chave), re: new RegExp(`^${chave.slice(0, 4)} ${chave.slice(5)}( |$)`) });
+// Pastas do mês (os nomes antigos continuam reconhecidos na leitura: «Correção de prestador», «Relatórios para conferência»…).
+const PASTA_CORR = { nome: '01 - Correção de prestador', re: /^(\d+ )?CORRECAO DE PREST/ };
+const PASTA_NC = { nome: '02 - Não conformidades', re: /^(\d+ )?NAO CONFORMIDADES/ };
+const PASTA_NFS = { nome: '03 - NFS para pagamento', re: /^(\d+ )?NFS? (PARA )?PAGAMENTO/ };
+const PASTA_PLAN = { nome: '04 - Planilhas de conferência', re: /^(\d+ )?PLANILHAS/ };
+const PASTA_REL = { nome: '05 - Relatórios de repasse MV', re: /^(\d+ )?RELATORIOS? (DE REPASSE MV|(MV )?(PARA )?CONFERENCIA)/ };
+const PASTA_CONFERIDOS = { nome: '06 - Relatórios de prestadores conferidos', re: /^(\d+ )?RELATORIOS? DE PRESTADORES CONFERIDOS/ };
+const PASTA_MUTIRAO = { nome: '07 - Mutirão unidades', re: /^(\d+ )?MUTIRAO/ };
+const PASTA_FINAL = { nome: '08 - Repasse final', re: /^(\d+ )?REPASSE FINAL$/ };
+const PASTA_CONF = { nome: 'Conferência cruzada', re: /^CONFERENCIA CRUZADA/ };   // só da estrutura antiga
+const GRUPOS_REL = { usg: { nome: 'USG', re: /^(USG|ULTRA)/ }, img: { nome: 'IMG', re: /^(IMG|IMAGEM)/ }, curitiba: { nome: 'Curitiba', re: /^(CURITIBA|V3)/ } };
+const SUB_CURITIBA = ['Prestadores Unidade', 'Prestadores SRA'];
+const SUB_CONFERIDOS = ['Repasse Ecodoppler', 'Repasse Sedação', 'Repasse IMG', 'Repasse Curitiba', 'Repasse USG'];
+// Nome da pasta da unidade em USG e IMG: o nome cadastrado, sem o complemento entre parênteses (ex.: «Alphasonic Londrina»).
+const PALAVRAS_MINUSC = new Set(['de', 'da', 'do', 'das', 'dos', 'e']);
+const nomePastaUnidadeRel = u => limparNomePasta(String(u.nome || `Unidade ${u.cod}`).replace(/\([^)]*\)/g, '').trim().toLowerCase().split(/\s+/)
+  .map((w, i) => i && PALAVRAS_MINUSC.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)).join(' '));
+// Unidade de uma pasta de USG/IMG: «Unidade N - …» (antiga) ou o nome da unidade (nova).
+function unidadeDaPastaRel(nome) {
+  const cod = unidadeDoNomePasta(nome); if (cod) return cod;
+  const n = norm(nome), achou = S.cfg.unidades.filter(u => { const k = norm(nomePastaUnidadeRel(u)); return k && (k === n || n.includes(k) || k.includes(n)); });
+  return achou.length === 1 ? String(achou[0].cod) : '';
+}
 const grupoDaPasta = n => { const t = norm(n); return /^(USG|ULTRA)/.test(t) ? 'usg' : /^(IMG|IMAGEM)/.test(t) ? 'img' : /^(CURITIBA|V3)/.test(t) ? 'curitiba' : ''; };
 const nomeCompPasta = chave => `Comp_${chave.slice(5)}-${chave.slice(0, 4)}`;
 const pastaComp = chave => ({ nome: nomeCompPasta(chave), re: new RegExp(`^COMP(ETENCIA)? ${chave.slice(5)} ${chave.slice(0, 4)}$`) });
-const ehSubpastaConhecida = nome => Object.values(PASTAS_RAIZ).some(p => p.re.test(norm(nome))) || /^COMP(ETENCIA)? \d{2} \d{4}$/.test(norm(nome));
+const ehSubpastaConhecida = nome => Object.values(PASTAS_RAIZ).some(p => p.re.test(norm(nome))) || /^COMP(ETENCIA)? \d{2} \d{4}$/.test(norm(nome))
+  || PASTA_SISTEMA.re.test(norm(nome)) || /^(\d+ )?REPASSE \d{4}$/.test(norm(nome)) || /^\d{4} \d{2}( |$)/.test(norm(nome));
 const ehPastaLegadaFluxo = h => !!h && PASTAS_RAIZ.fluxo.re.test(norm(h.name));
 const limparNomePasta = s => String(s).replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim();
 const nomePastaUnidade = u => limparNomePasta(`Unidade ${u.cod} - ${u.nome}`);
@@ -50,50 +77,73 @@ async function caminho(partes, criar = false) {
   for (const p of partes) { d = await subpasta(d, p, criar); if (!d) return null; }
   return d;
 }
+/* Arquivos permanentes: «01 - Sistema › …» quando existe; senão a pasta antiga da raiz (enquanto os arquivos não forem
+ * movidos à mão); senão cria a nova. Assim os dois navegadores continuam se encontrando durante a mudança. */
+const LOC_SISTEMA = {};   // tipo → caminho em uso (para mostrar na tela)
+async function dirSistema(k, criar = true) {
+  const novo = await caminho([PASTA_SISTEMA, SISTEMA[k]]); if (novo) { LOC_SISTEMA[k] = `${PASTA_SISTEMA.nome}\\${novo.name}`; return novo; }
+  const antigo = PASTAS_RAIZ[k] ? await caminho([PASTAS_RAIZ[k]]) : null; if (antigo) { LOC_SISTEMA[k] = antigo.name; return antigo; }
+  if (!criar) return null;
+  const d = await caminho([PASTA_SISTEMA, SISTEMA[k]], true); LOC_SISTEMA[k] = `${PASTA_SISTEMA.nome}\\${d.name}`; return d;
+}
+const localSistema = k => LOC_SISTEMA[k] || `${PASTA_SISTEMA.nome}\\${SISTEMA[k].nome}`;
 async function dirFluxo() {
   if (SY.legado) return SY.handle;
-  const d = await subpasta(SY.handle, PASTAS_RAIZ.fluxo, true); SY.nomeFluxo = d.name; return d;
+  const d = await dirSistema('fluxo'); SY.nomeFluxo = localSistema('fluxo'); return d;
 }
-const dirEq = () => caminho([PASTAS_RAIZ.eq], true);
+const dirEq = () => dirSistema('eq');
 
-/* ---------- Criar as pastas da competência ---------- */
+/* ---------- Criar as pastas (estrutura padronizada) ---------- */
+// Caminhos da competência na estrutura nova, a partir da raiz. As pastas de 20%, 25% e anestesistas são da equipe: não entram.
 function estruturaCompetencia(chave) {
-  const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod), comp = pastaComp(chave);
-  const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), cam = [];
-  for (const k of ['fluxo', 'eq', 'cfg', 'backups']) if (PASTAS_RAIZ[k]) cam.push([PASTAS_RAIZ[k]]);
-  cam.push([PASTAS_RAIZ.bases, comp]);
-  const base = [PASTAS_RAIZ.comps, comp];
-  const G = { USG: { nome: 'USG', re: /^(USG|ULTRA)/ }, IMG: { nome: 'IMG', re: /^(IMG|IMAGEM)/ } }, un = u => ({ nome: nomePastaUnidade(u), re: new RegExp(`^(UNIDADE |UN )?${u.cod}\\b`) });
-  for (const g of ['USG', 'IMG']) for (const u of normais) cam.push([...base, PASTA_REL, G[g], un(u)]);
-  if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_REL, { nome: 'Curitiba', re: /^(CURITIBA|V3)/ }]);
-  // Correção de prestador: uma pasta só, sem subpastas por unidade (pedido de 17/11/2026). Os arquivos ficam organizados pelo
-  // nome, «nome_unidade» (ex.: «prestador generico_17.pdf» ou «…_Cambe.pdf»); subpastas que já existam continuam sendo lidas.
-  cam.push([...base, PASTA_CORR]);
-  cam.push([...base, PASTA_CONF], [...base, PASTA_NC]);
+  const uns = S.cfg.unidades.filter(u => (u.apolo || []).length).sort((a, b) => +a.cod - +b.cod);
+  const normais = uns.filter(u => !ehUnidadeV3(S.cfg, u.cod)), base = [pastaAno(+chave.slice(0, 4)), pastaMes(chave)], cam = [];
+  cam.push([...base, PASTA_CORR], [...base, PASTA_NC]);
+  for (const s of ['Pagamento 15', 'Pagamento 30']) cam.push([...base, PASTA_NFS, s]);
+  cam.push([...base, PASTA_PLAN]);
+  for (const g of ['usg', 'img']) for (const u of normais) cam.push([...base, PASTA_REL, GRUPOS_REL[g], nomePastaUnidadeRel(u)]);
+  for (const s of SUB_CURITIBA) cam.push([...base, PASTA_REL, GRUPOS_REL.curitiba, s]);
+  for (const s of SUB_CONFERIDOS) cam.push([...base, PASTA_CONFERIDOS, s]);
+  cam.push([...base, PASTA_MUTIRAO], [...base, PASTA_FINAL]);
+  return cam;
+}
+// «01 - Sistema»: só as pastas que ainda não existem nem na estrutura antiga (as antigas são movidas à mão, pelo guia).
+async function estruturaSistema() {
+  const cam = [];
+  for (const k of Object.keys(SISTEMA)) if (!(PASTAS_RAIZ[k] && await caminho([PASTAS_RAIZ[k]]))) cam.push([PASTA_SISTEMA, SISTEMA[k]]);
   return cam;
 }
 const textoCaminho = c => c.map(p => typeof p === 'string' ? p : p.nome).join(' › ');
-// Pasta do mês: Competências › Comp_MM-AAAA (ou Comp_MM-AAAA direto na raiz, se já existir assim).
+// Pasta do mês: a nova (Repasse AAAA › AAAA-MM - Mês) e, se ainda existir, a antiga (Competências › Comp_MM-AAAA ou
+// Comp_MM-AAAA na raiz). Grava na nova quando ela existe (ou ao criar); lê das duas.
+const dirCompetenciaNova = (chave, criar = false) => caminho([pastaAno(+chave.slice(0, 4)), pastaMes(chave)], criar);
+const dirCompetenciaAntiga = async chave => (await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) || (await caminho([pastaComp(chave)]));
 async function dirCompetencia(chave, criar = false) {
-  return (await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) || (await caminho([pastaComp(chave)])) || (criar ? caminho([PASTAS_RAIZ.comps, pastaComp(chave)], true) : null);
+  return (await dirCompetenciaNova(chave)) || (await dirCompetenciaAntiga(chave)) || (criar ? dirCompetenciaNova(chave, true) : null);
 }
+async function dirsCompetencia(chave) { return [await dirCompetenciaNova(chave), await dirCompetenciaAntiga(chave)].filter(Boolean); }
 async function verificarEstrutura(chave = S.comp) {
-  const cam = estruturaCompetencia(chave), faltam = [];
-  const naRaiz = !(await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) && !!(await caminho([pastaComp(chave)]));
-  for (const c of cam) { const cc = naRaiz && c[0] === PASTAS_RAIZ.comps ? c.slice(1) : c; if (!(await caminho(cc, false))) faltam.push(textoCaminho(cc)); }
-  return { total: cam.length, faltam };
+  const cam = [...await estruturaSistema(), ...estruturaCompetencia(chave)], faltam = [];
+  for (const c of cam) if (!(await caminho(c, false))) faltam.push(textoCaminho(c));
+  return { total: cam.length, faltam, antiga: !!(await dirCompetenciaAntiga(chave)), sistemaAntigo: await sistemaAntigo() };
 }
-async function criarEstrutura(chave = S.comp) {
+// Pastas permanentes que ainda estão na raiz, no lugar antigo (para o guia de mudança).
+async function sistemaAntigo() { const out = []; for (const k of Object.keys(SISTEMA)) { const d = PASTAS_RAIZ[k] && await caminho([PASTAS_RAIZ[k]]); if (d && !(await caminho([PASTA_SISTEMA, SISTEMA[k]]))) out.push({ k, de: d.name, para: `${PASTA_SISTEMA.nome} › ${SISTEMA[k].nome}` }); } return out; }
+// Cria o que falta (nunca apaga nem renomeia). chaves: competências (ex.: as 12 de um ano).
+async function criarEstrutura(chave = S.comp, { chaves = null } = {}) {
   if (!SY.handle || SY.legado) return avisar('Conecte primeiro a pasta raiz do aplicativo.', 'warn');
   if (!(await temPermissaoPasta(true))) return avisar('O acesso à pasta não foi liberado.', 'warn');
-  const { faltam } = await verificarEstrutura(chave);
-  if (!faltam.length) { avisar(`As pastas da competência ${rotuloCompetencia(chave)} já existem.`, 'ok'); return RENDER.inicio(); }
-  if (!await confirmar(`Criar ${faltam.length} pasta(s)?`, `Dentro de «${esc(SY.handle.name)}», com os nomes que a ferramenta lê:<ul class="small">${faltam.slice(0, 14).map(f => `<li>${esc(f)}</li>`).join('')}${faltam.length > 14 ? `<li>… e mais ${faltam.length - 14}</li>` : ''}</ul>Pastas que já existem não mudam.`, 'Criar pastas')) return;
-  const naRaiz = !(await caminho([PASTAS_RAIZ.comps, pastaComp(chave)])) && !!(await caminho([pastaComp(chave)]));
-  try { for (const c of estruturaCompetencia(chave)) await caminho(naRaiz && c[0] === PASTAS_RAIZ.comps ? c.slice(1) : c, true); avisar(`Pastas da competência ${rotuloCompetencia(chave)} criadas.`, 'ok'); }
+  const lista = chaves || [chave], cam = [...await estruturaSistema(), ...lista.flatMap(estruturaCompetencia)], faltam = [];
+  for (const c of cam) if (!(await caminho(c, false))) faltam.push(c);
+  const rot = chaves ? `do ano ${lista[0].slice(0, 4)}` : `da competência ${rotuloCompetencia(chave)}`;
+  if (!faltam.length) { avisar(`As pastas ${rot} já existem.`, 'ok'); PRI.verifComp = ''; return RENDER.inicio(); }
+  if (!await confirmar(`Criar ${faltam.length} pasta(s)?`, `Dentro de «${esc(SY.handle.name)}», na estrutura padronizada. Nada é apagado, renomeado ou movido.<ul class="small">${faltam.slice(0, 14).map(f => `<li>${esc(textoCaminho(f))}</li>`).join('')}${faltam.length > 14 ? `<li>… e mais ${faltam.length - 14}</li>` : ''}</ul>`, 'Criar')) return;
+  try { for (const c of faltam) await caminho(c, true); avisar(`Pastas ${rot} criadas (${faltam.length}).`, 'ok'); }
   catch (e) { avisar(`Não foi possível criar as pastas (${e.message}).`, 'err'); }
   PRI.verifComp = ''; RENDER.inicio();
 }
+const competenciasDoAno = ano => Array.from({ length: 12 }, (_, i) => `${ano}-${String(i + 1).padStart(2, '0')}`);
+const criarEstruturaAno = ano => criarEstrutura(`${ano}-01`, { chaves: competenciasDoAno(ano) });
 
 /* ---------- Ler PDFs e planilhas da pasta do mês (SOL-F38) ---------- */
 const PR = { lidos: new Map(), ultima: null, lendo: false };   // caminho → «tamanho|data» do que já foi lido nesta sessão
@@ -124,9 +174,10 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
   if (!(await temPermissaoPasta(!silencioso))) { if (!silencioso) avisar('O acesso à pasta não foi liberado.', 'warn'); return null; }
   PR.lendo = true; const r = { pdfs: 0, novos: 0, mudaram: 0, planilhas: 0, avisos: [] };
   try {
-    const comp = nomeCompPasta(S.comp), dC = await dirCompetencia(S.comp);
-    // Planilhas do mês: Bases de dados › Comp_MM-AAAA ou PLANILHAS-… dentro da pasta do mês (vale a mais recente de cada tipo).
-    const dirsPl = so ? [] : [await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)]), dC ? await subpasta(dC, PASTA_PLAN) : null].filter(Boolean);
+    const comp = nomePastaMes(S.comp), dCs = await dirsCompetencia(S.comp);   // estrutura nova e, se ainda existir, a antiga
+    // Planilhas do mês: «04 - Planilhas de conferência» (nova) ou, na antiga, Bases de dados › Comp_MM-AAAA e PLANILHAS-… do mês
+    // (vale a mais recente de cada tipo). Na pasta só ficam as planilhas de entrada: o Excel da conferência vai para a 05.
+    const dirsPl = so ? [] : [...await Promise.all(dCs.map(d => subpasta(d, PASTA_PLAN))), await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)])].filter(Boolean);
     if (so) { /* só a pasta da aba */ } else if (dirsPl.length) {
       const pl = { apolo: null, pbi: null };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
@@ -140,24 +191,27 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
         if (PR.lidos.get(k) === sig && carregada) continue;
         await (tipo === 'apolo' ? carregarApolo(x.f) : carregarPBI(x.f)); PR.lidos.set(k, sig); r.planilhas++;
       }
-    } else r.avisos.push(`sem planilhas em Bases de dados › ${comp}`);
-    // Relatórios: pasta do mês › Relatórios para conferência (RELATORIOS-MV-CONFERENCIA) | Correção de prestador.
-    if (!dC) r.avisos.push(`sem a pasta Competências › ${comp}`);
-    else for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
+    } else r.avisos.push(`sem planilhas em ${PASTA_PLAN.nome}`);
+    // Relatórios: pasta do mês › 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba) | 01 - Correção de prestador.
+    // Na 05, só USG, IMG e Curitiba são da ferramenta: outras pastas (ex.: Repasse 20%) são da equipe e não são lidas.
+    if (!dCs.length) r.avisos.push(`sem a pasta ${pastaAno(+S.comp.slice(0, 4)).nome} › ${comp}`);
+    else for (const dC of dCs) for (const [pasta, finalidade] of [[PASTA_REL, 'conferencia'], [PASTA_CORR, 'correcao']].filter(([, f]) => !so || f === so)) {
       const d = await subpasta(dC, pasta); if (!d) continue;
       for await (const { h, caminho: c } of arquivosEm(d)) {
         if (!/\.pdf$/i.test(h.name)) continue;
-        const partes = c.split('/'); r.pdfs++;
+        const partes = c.split('/');
         const grupo = finalidade === 'correcao' ? '' : grupoDaPasta(partes[0]);
+        if (finalidade === 'conferencia' && partes.length > 1 && !grupo) continue;   // pasta que não é USG, IMG ou Curitiba
+        r.pdfs++;
         const pai = partes.length > 1 ? partes[partes.length - 2] : '';
-        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDoNomePasta(pai);
-        const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${pasta.nome}/${c}`;
+        const un = grupo === 'curitiba' ? String(S.cfg.unidades.find(u => ehUnidadeV3(S.cfg, u.cod))?.cod || '5') : finalidade === 'correcao' ? unidadeDoArquivoCorrecao(h.name, pai) : unidadeDaPastaRel(pai);
+        const f = await h.getFile(), sig = `${f.size}|${f.lastModified}`, k = `${S.comp}|${d.name}/${c}`;
         // PDF que a pessoa mandou ignorar (ex.: de outra produção): não pergunta de novo enquanto o arquivo não mudar.
         if (pdfIgnorado(k, sig)) { r.ignorados = (r.ignorados || 0) + 1; continue; }
         const atual = S.relatorios.find(x => x.caminhoPasta === k);
         if (atual && PR.lidos.get(k) === sig) continue;
         if (atual) S.relatorios = S.relatorios.filter(x => x !== atual);
-        const n0 = S.relatorios.length; await carregarPDFs([f], { caminho: `${nomeCompPasta(S.comp)} › ${pasta.nome} › ${c.split('/').join(' › ')}`, chave: k, sig });
+        const n0 = S.relatorios.length; await carregarPDFs([f], { caminho: `${dC.name} › ${d.name} › ${c.split('/').join(' › ')}`, chave: k, sig });
         if (S.relatorios.length > n0) {
           const it = S.relatorios.at(-1); it.caminhoPasta = k; it.unidadePasta = un; it.grupoPasta = grupo; if (finalidade === 'correcao') it.finalidade = 'correcao';
           // Mesmo prestador × unidade lido de outro arquivo: fica o mais recente.
@@ -171,7 +225,7 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
     PR.ultima = { em: Date.now(), ...r };
   } catch (e) { r.avisos.push(e.message); if (!silencioso) avisar(`Erro ao ler a pasta (${e.message}).`, 'err'); }
   finally { PR.lendo = false; }
-  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';
+  const ondeSo = so ? ` (${so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome})` : '';   // nomes da estrutura nova
   if (!silencioso || r.novos || r.mudaram || r.planilhas) avisar(`Pasta da competência ${rotuloCompetencia(S.comp)}${ondeSo}: ${r.novos} PDF(s) novo(s), ${r.mudaram} atualizado(s)${r.planilhas ? `, ${r.planilhas} planilha(s)` : ''}${r.pdfs ? ` (${r.pdfs} na pasta)` : ''}${r.ignorados ? ` · ${r.ignorados} ignorado(s)` : ''}${r.avisos.length ? ' · ' + r.avisos.join(' · ') : ''}.`, r.avisos.length ? 'warn' : 'ok');
   if (r.mudaram) avisar(`${r.mudaram} relatório(s) mudaram desde a última leitura: rode a conferência deles de novo.`, 'warn');
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
@@ -244,7 +298,7 @@ function barraEq() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="eqSync"><span class="sy-dot"></span><b>Equivalências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo no Início para dividir as validações com a outra pessoa.</span></div>`;
   const ult = SYQ.meta?.atualizadoEm ? ` · última mudança de <b>${esc(SYQ.meta.atualizadoPor || '—')}</b> em ${new Date(SYQ.meta.atualizadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : '';
   const cls = SYQ.status === 'ok' ? 'ok' : 'warn', txt = { ok: SYQ.ocupado ? 'Sincronizando…' : 'Sincronizado', permissao: 'Acesso à pasta precisa ser liberado', erro: `Sem acesso à pasta — mudanças guardadas neste navegador (${esc(SYQ.erro)})`, conflito: `${SYQ.conflitos} decisão(ões) diferentes para escolher`, juntar: 'Falta juntar a sua base com a da pasta', off: 'Conectando…' }[SYQ.status] || SYQ.status;
-  return `<div class="sy-barra ${cls}" id="eqSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(PASTAS_RAIZ.eq.nome)}\\${ARQ_EQ}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syq="agora">${SYQ.status === 'juntar' ? 'Juntar agora…' : SYQ.status === 'conflito' ? 'Resolver' : SYQ.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
+  return `<div class="sy-barra ${cls}" id="eqSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(localSistema('eq'))}\\${ARQ_EQ}</code><span class="muted">${ult}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syq="agora">${SYQ.status === 'juntar' ? 'Juntar agora…' : SYQ.status === 'conflito' ? 'Resolver' : SYQ.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
 }
 function atualizarBarraEq() { const b = $('eqSync'); if (!b) return; b.outerHTML = barraEq(); ligarBarraEq(); }
 function ligarBarraEq() { document.querySelectorAll('#eqSync [data-syq]').forEach(b => b.onclick = () => sincronizarEq({ interativo: true })); }
@@ -260,9 +314,11 @@ function cartaoPastaRaiz() {
     <p class="small">Hoje está conectada só a pasta do Fluxo («${esc(SY.handle.name)}»). Conecte a pasta raiz (a de cima) para ler os relatórios e sincronizar as equivalências também.</p></div>`;
   const perm = SY.status === 'permissao', v = PRI.verifComp === S.comp ? PRI.verif : null, u = PR.ultima;
   return `<div class="card pr-card ${perm || (v && v.faltam.length) ? 'warn' : 'ok'}"><div class="fx-topo"><h2 style="margin:0">Pasta raiz: ${esc(SY.handle.name)}</h2>
-    <div class="acoes" style="margin:0">${perm ? '<button id="prLiberar">Liberar acesso</button>' : `<button id="prAtualizar"${PR.lendo ? ' disabled' : ''}>${PR.lendo ? 'Lendo a pasta…' : 'Atualizar da pasta'}</button><button class="sec" id="prCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button>`}<button class="sec" id="prConectar">Trocar pasta raiz…</button></div></div>
+    <div class="acoes" style="margin:0">${perm ? '<button id="prLiberar">Liberar acesso</button>' : `<button id="prAtualizar"${PR.lendo ? ' disabled' : ''}>${PR.lendo ? 'Lendo a pasta…' : 'Atualizar da pasta'}</button><button class="sec" id="prCriar">Criar pastas da competência ${rotuloCompetencia(S.comp)}</button><button class="sec" id="prCriarAno" data-ano="${+S.comp.slice(0, 4) + 1}">Criar pastas de ${+S.comp.slice(0, 4) + 1}</button>`}<button class="sec" id="prConectar">Trocar pasta raiz…</button></div></div>
     ${perm ? '<p class="small"><b>O Edge pede para liberar o acesso à pasta</b> a cada sessão (ou marque «permitir sempre»). Clique em «Liberar acesso».</p>' : `
-    <p class="small muted">Lê de <code>Competências › ${nomeCompPasta(S.comp)} › ${PASTA_REL.nome}</code> (USG, IMG, Curitiba, por unidade), <code>${PASTA_CORR.nome}</code> e <code>Bases de dados › ${nomeCompPasta(S.comp)}</code> (laudos e Power BI). Só lê o que é novo ou mudou; pastas que começam com «_» (ex.: _antigos) ficam de fora.</p>
+    <p class="small muted">Lê de <code>${esc(pastaAno(+S.comp.slice(0, 4)).nome)} › ${esc(nomePastaMes(S.comp))}</code>: <code>${PASTA_REL.nome}</code> (USG e IMG por unidade, Curitiba), <code>${PASTA_CORR.nome}</code> e <code>${PASTA_PLAN.nome}</code> (laudos e Power BI). Só lê o que é novo ou mudou; pastas que começam com «_» (ex.: _antigos) ficam de fora.</p>
+    ${v && (v.antiga || v.sistemaAntigo.length) ? `<div class="aviso-fixo warn small"><b>Estrutura antiga ainda em uso</b> — continua funcionando, e nada se perde. Quando puder, mova à mão (guia em Configurações → Pastas e sincronização):
+      <ul style="margin:4px 0 0">${v.sistemaAntigo.map(x => `<li><code>${esc(x.de)}</code> → <code>${esc(x.para)}</code></li>`).join('')}${v.antiga ? `<li><code>Competências › ${esc(nomeCompPasta(S.comp))}</code> → <code>${esc(pastaAno(+S.comp.slice(0, 4)).nome)} › ${esc(nomePastaMes(S.comp))}</code> (a ferramenta lê as duas enquanto isso)</li>` : ''}</ul></div>` : ''}
     <div class="pr-st"><span>${v ? (v.faltam.length ? `<span class="badge warn">${v.faltam.length} pasta(s) faltando</span> <span class="small muted">${esc(v.faltam.slice(0, 3).join(' · '))}${v.faltam.length > 3 ? ' …' : ''}</span>` : '<span class="badge ok">pastas da competência em ordem</span>') : '<span class="small muted">conferindo as pastas…</span>'}</span>
       <span class="small muted">${u ? `última leitura ${new Date(u.em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}: ${u.pdfs} PDF(s) na pasta · ${u.novos} novo(s) · ${u.mudaram} atualizado(s)` : 'ainda não lida nesta sessão'}</span>${(() => { const ig = Object.values(pdfsIgnorados()).filter(x => x.comp === S.comp); return ig.length ? ` <button class="sec mini" id="prIgnorados">PDFs ignorados (${ig.length})</button>` : ''; })()}
       <span class="small muted">Fluxo: ${esc({ ok: 'sincronizado', erro: 'sem acesso', conflito: 'conflito', permissao: 'liberar acesso' }[SY.status] || SY.status)} · Equivalências: ${esc({ ok: 'sincronizadas', erro: 'sem acesso', conflito: 'conflito', juntar: 'falta juntar', permissao: 'liberar acesso', off: '—' }[SYQ.status] || SYQ.status)}</span></div>`}</div>`;
@@ -272,6 +328,7 @@ function ligarPastaRaiz() {
   if ($('prLiberar')) $('prLiberar').onclick = async () => { if (await liberarPastaSync()) await atualizarDaPasta(); };
   if ($('prAtualizar')) $('prAtualizar').onclick = () => atualizarDaPasta();
   if ($('prCriar')) $('prCriar').onclick = () => criarEstrutura(S.comp);
+  if ($('prCriarAno')) $('prCriarAno').onclick = () => criarEstruturaAno(+$('prCriarAno').dataset.ano);
   if ($('prIgnorados')) $('prIgnorados').onclick = async () => {
     const m = pdfsIgnorados(), ks = Object.keys(m).filter(k => m[k].comp === S.comp);
     const r = await dialogo('PDFs ignorados nesta competência', `<p class="small muted">Estes arquivos da pasta não são lidos enquanto não mudarem. Marque os que devem voltar a ser lidos.</p>${ks.map((k, i) => `<label class="small" style="display:block;margin:4px 0"><input type="checkbox" name="v${i}"> <b>${esc(m[k].nome)}</b> — <code>${esc(m[k].caminho)}</code> <span class="muted">(${esc(m[k].por || '—')}, ${new Date(m[k].em).toLocaleDateString('pt-BR')})</span></label>`).join('')}`, [['', 'Fechar', 'sec'], ['ok', 'Voltar a ler os marcados']]);

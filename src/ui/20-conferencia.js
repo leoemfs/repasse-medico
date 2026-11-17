@@ -320,13 +320,19 @@ function desenharConferencia() {
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
 }
+// Excel da conferência ao lado do PDF: 05 - Relatórios de repasse MV › USG | IMG | Curitiba › unidade (estrutura padronizada).
+function subpastaDaConferencia(ctx) {
+  const x = S.relatorios.find(r => r.id === ctx.relId), g = x ? grDoRel(x) : '', u = unidadePorCod(S.cfg, ctx.unidadeCod);
+  if (!GRUPOS_REL[g]) return [];
+  return g === 'curitiba' ? [GRUPOS_REL.curitiba] : [GRUPOS_REL[g], ...(u ? [nomePastaUnidadeRel(u)] : [])];
+}
 const fObsAtual = () => S.conf?.fObs === true ? 'com' : (S.conf?.fObs || '');
 /* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
  * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
 function exportarExcelConf(bt, res, ctx) {
   const idxObs = indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes);
   return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
-    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp), 'a exportação do Excel');
+    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp, subpastaDaConferencia(ctx)), 'a exportação do Excel');
 }
 function textoFiltroConf(vis) {
   const c = S.conf, partes = [];
