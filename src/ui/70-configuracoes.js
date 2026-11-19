@@ -123,7 +123,8 @@ function arvoreEstrutura(chave) {
     `│       ├─ ${PASTA_CORR.nome}            (PDFs «nome_unidade», sem subpastas)`, `│       ├─ ${PASTA_NC.nome}`, `│       ├─ ${PASTA_NFS.nome} › Pagamento 15 | Pagamento 30`,
     `│       ├─ ${PASTA_PLAN.nome}         (laudos do Apolo e Power BI)`, `│       ├─ ${PASTA_REL.nome}`, `│       │   ├─ USG › ${uns.join(' | ')}`, `│       │   ├─ IMG › (as mesmas unidades)`,
     `│       │   └─ Curitiba › ${SUB_CURITIBA.join(' | ')}`, `│       ├─ ${PASTA_CONFERIDOS.nome} › ${SUB_CONFERIDOS.join(' | ')}   (manual)`,
-    `│       ├─ ${PASTA_MUTIRAO.nome}                (manual)`, `│       └─ ${PASTA_FINAL.nome}                  (manual; a ferramenta não grava aqui)`, `└─ ${pastaAno(ano + 1).nome}   (mesma estrutura)`].join('\n');
+    `│       ├─ ${PASTA_MUTIRAO.nome}                (manual)`, `│       ├─ ${PASTA_FINAL.nome}                  (manual; a ferramenta não grava aqui)`,
+    `│       └─ ${PASTA_PLAN_CONF.nome}   (planilha única por unidade: USG | IMG › unidade; Curitiba)`, `└─ ${pastaAno(ano + 1).nome}   (mesma estrutura)`].join('\n');
 }
 const GUIA_MUDANCA_PASTAS = `<ol class="small">
   <li><b>Os dois atualizam a ferramenta</b> para esta versão (ou mais nova) antes de mover qualquer coisa.</li>

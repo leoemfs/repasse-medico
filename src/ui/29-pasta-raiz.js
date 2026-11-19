@@ -7,7 +7,8 @@
  *   └─ 03 - Repasse 2027/       (mesma estrutura, um ano por pasta)
  *  Cada competência: 01 - Correção de prestador · 02 - Não conformidades · 03 - NFS para pagamento (Pagamento 15 | 30)
  *   · 04 - Planilhas de conferência · 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba › Prestadores
- *   Unidade | Prestadores SRA) · 06 - Relatórios de prestadores conferidos · 07 - Mutirão unidades · 08 - Repasse final.
+ *   Unidade | Prestadores SRA) · 06 - Relatórios de prestadores conferidos · 07 - Mutirão unidades · 08 - Repasse final
+ *   · 09 - Planilhas de repasse conferidos (USG | IMG › unidade; Curitiba): planilha única da unidade × grupo (SOL-F45).
  * Compatibilidade: a estrutura antiga (Fluxo mensal, Equivalência TUSS (sincronização), Configuração compartilhada e
  * backups na raiz; Competências › Comp_MM-AAAA; Bases de dados › Comp_MM-AAAA) continua sendo lida. Nada é apagado,
  * renomeado ou movido pela ferramenta: a mudança dos arquivos é manual (guia em docs/como-usar-pastas.md).
@@ -34,11 +35,14 @@ const pastaMes = chave => ({ nome: nomePastaMes(chave), re: new RegExp(`^${chave
 const PASTA_CORR = { nome: '01 - Correção de prestador', re: /^(\d+ )?CORRECAO DE PREST/ };
 const PASTA_NC = { nome: '02 - Não conformidades', re: /^(\d+ )?NAO CONFORMIDADES/ };
 const PASTA_NFS = { nome: '03 - NFS para pagamento', re: /^(\d+ )?NFS? (PARA )?PAGAMENTO/ };
-const PASTA_PLAN = { nome: '04 - Planilhas de conferência', re: /^(\d+ )?PLANILHAS/ };
+// «09 - Planilhas de repasse conferidos» também começa com «Planilhas»: fica fora da 04 (senão o Excel da 09 seria lido como laudos).
+const PASTA_PLAN = { nome: '04 - Planilhas de conferência', re: /^(\d+ )?PLANILHAS(?! DE REPASSE CONFERIDOS)/ };
 const PASTA_REL = { nome: '05 - Relatórios de repasse MV', re: /^(\d+ )?RELATORIOS? (DE REPASSE MV|(MV )?(PARA )?CONFERENCIA)/ };
 const PASTA_CONFERIDOS = { nome: '06 - Relatórios de prestadores conferidos', re: /^(\d+ )?RELATORIOS? DE PRESTADORES CONFERIDOS/ };
 const PASTA_MUTIRAO = { nome: '07 - Mutirão unidades', re: /^(\d+ )?MUTIRAO/ };
 const PASTA_FINAL = { nome: '08 - Repasse final', re: /^(\d+ )?REPASSE FINAL$/ };
+// SOL-F45: planilha única de cada unidade × grupo (IMG | USG › unidade; Curitiba), gravada pela ferramenta.
+const PASTA_PLAN_CONF = { nome: '09 - Planilhas de repasse conferidos', re: /^(\d+ )?PLANILHAS DE REPASSE CONFERIDOS/ };
 const PASTA_CONF = { nome: 'Conferência cruzada', re: /^CONFERENCIA CRUZADA/ };   // só da estrutura antiga
 const GRUPOS_REL = { usg: { nome: 'USG', re: /^(USG|ULTRA)/ }, img: { nome: 'IMG', re: /^(IMG|IMAGEM)/ }, curitiba: { nome: 'Curitiba', re: /^(CURITIBA|V3)/ } };
 const SUB_CURITIBA = ['Prestadores Unidade', 'Prestadores SRA'];
@@ -105,6 +109,8 @@ function estruturaCompetencia(chave) {
   for (const s of SUB_CURITIBA) cam.push([...base, PASTA_REL, GRUPOS_REL.curitiba, s]);
   for (const s of SUB_CONFERIDOS) cam.push([...base, PASTA_CONFERIDOS, s]);
   cam.push([...base, PASTA_MUTIRAO], [...base, PASTA_FINAL]);
+  for (const g of ['usg', 'img']) for (const u of normais) cam.push([...base, PASTA_PLAN_CONF, GRUPOS_REL[g], nomePastaUnidadeRel(u)]);
+  if (uns.some(u => ehUnidadeV3(S.cfg, u.cod))) cam.push([...base, PASTA_PLAN_CONF, GRUPOS_REL.curitiba]);
   return cam;
 }
 // «01 - Sistema»: só as pastas que ainda não existem nem na estrutura antiga (as antigas são movidas à mão, pelo guia).

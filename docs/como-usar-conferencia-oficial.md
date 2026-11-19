@@ -92,6 +92,24 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
   - o botão mostra «Processando…» enquanto o arquivo é montado;
   - com algum filtro na tabela, aparece «Exportar só o filtrado (N)». O arquivo termina em `_filtrado.xlsx`, e a aba Informações diz qual filtro foi usado.
 
+### Excel único da unidade (desde a v3.0.0-alpha.17)
+Uma planilha de controle por unidade e grupo (IMG, USG ou Curitiba), com todos os prestadores.
+1. Na Conferência, escolha **«Relatórios da unidade»** e **«Grupo»** no filtro dos relatórios.
+2. **«Conferir os N relatórios filtrados»** confere todos de uma vez. Cada um vira uma rodada.
+3. **«Excel único: IMG · unidade N»** gera o arquivo. O mesmo botão está em **Prestadores por unidade**, no título da unidade e do grupo.
+
+O arquivo (`conferidos_img_unidade_17_comp_11-2026.xlsx`) é baixado e, com a pasta conectada, gravado em `09 - Planilhas de repasse conferidos › IMG › nome da unidade`. Abas:
+- **Prestadores:** uma linha por prestador, com:
+  - situação e aceite;
+  - laudos no Apolo e linhas do MV;
+  - Devido, Aceito, Para pagamento, Pendente, NC e Excluído.
+
+  Também entra quem laudou e não tem relatório (Gerar no MV, Sem cadastro). A última linha é o TOTAL da unidade.
+- **Conferência:** as linhas de todos os prestadores, com o código e o nome do prestador nas duas primeiras colunas, para filtrar.
+- **O que falta decidir**, **Por procedimento** e **Informações**.
+
+Cada relatório é conferido de novo na hora, com os parâmetros da última rodada dele e as decisões já registradas. Gerar o Excel único **não** grava rodada nova. Relatório ainda sem conferência aparece só na aba Prestadores, como «Relatório sem conferência».
+
 ## 8. Rodadas guardadas (desde a v3.0.0-alpha.10)
 - A ferramenta lê as rodadas da competência aberta e das vizinhas. Para ver todas, use Rodadas → «mostrar todas as competências».
 - **Rodadas que ficam inteiras**, de cada relatório:
