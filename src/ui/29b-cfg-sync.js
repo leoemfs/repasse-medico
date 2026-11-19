@@ -110,7 +110,7 @@ async function entregarArquivo(zipOuBlob, nome, destino = 'conf', chave = S.comp
   if (!exportarNaPasta()) return 'download';
   try {
     if (!(await temPermissaoPasta(false))) { avisar(`Excel baixado. Para gravar também na pasta da competência, libere o acesso à pasta (Configurações → Pastas e sincronização).`, 'warn'); return 'download'; }
-    const dC = await dirCompetenciaNova(chave, true), alvo = { conf: PASTA_REL, nc: PASTA_NC, corr: PASTA_CORR }[destino] || PASTA_REL;
+    const dC = await dirCompetenciaNova(chave, true), alvo = { conf: PASTA_REL, nc: PASTA_NC, corr: PASTA_CORR, conferidos: PASTA_PLAN_CONF }[destino] || PASTA_REL;
     let d = await subpasta(dC, alvo, true); for (const p of sub) d = await subpasta(d, p, true);
     const livre = await nomeLivre(d, nome), fh = await d.getFileHandle(livre, { create: true });
     const w = await fh.createWritable(); await w.write(blob); await w.close();

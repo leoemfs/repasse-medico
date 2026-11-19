@@ -39,7 +39,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
   const uns = [...new Set(todos.map(unDoRel).filter(Boolean))].sort((a, b) => +a - +b), grs = [...new Set(todos.map(grDoRel))];
   const filtro = todos.length > 1 ? `<div class="filtros cf-fil"><label class="campo">Relatórios da unidade<select id="${prefixo}FUn">${opcoes([['*', 'Todas'], ...uns.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`])], F.un)}</select></label>
     <label class="campo">Grupo<select id="${prefixo}FGr">${opcoes([['*', 'Todos'], ...grs.map(g => [g, rotGr(g)])], F.gr)}</select></label>
-    <div class="campo"><span class="small muted">${rels.length} de ${todos.length} relatório(s)</span>${prefixo === 'cf' && rels.length > 1 && (F.un !== '*' || F.gr !== '*') ? `<button type="button" class="sec mini" data-cflote>Conferir os ${rels.length} relatórios filtrados</button>` : ''}</div></div>` : '';
+    <div class="campo"><span class="small muted">${rels.length} de ${todos.length} relatório(s)</span>${prefixo === 'cf' && rels.length > 1 && (F.un !== '*' || F.gr !== '*') ? `<button type="button" class="sec mini" data-cflote>Conferir os ${rels.length} relatórios filtrados</button>` : ''}${prefixo === 'cf' && rels.length && F.un !== '*' && F.gr !== '*' ? `<button type="button" class="sec mini" data-cfunica title="Todos os prestadores desta unidade e grupo num Excel só, gravado em ${esc(PASTA_PLAN_CONF.nome)}">Excel único: ${esc(rotGr(F.gr))} · unidade ${esc(F.un)} (${rels.length})</button>` : ''}</div></div>` : '';
   if (!rels.length) return filtro + '<p class="muted">Nenhum relatório com esse filtro.</p>';
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
@@ -586,6 +586,43 @@ document.addEventListener('click', async e => {
     await new Promise(r => setTimeout(r, 0));
   }
   S.rodadas = await dbRodadasJanela();
-  avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.`, 'ok');
+  avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.${F.un !== '*' && F.gr !== '*' ? ' Para a planilha de controle da unidade, use «Excel único».' : ''}`, 'ok');
   RENDER.conferencia();
+});
+
+/* SOL-F45 (v3.0.0-alpha.17) — Excel único da unidade × grupo: todos os prestadores dos relatórios filtrados (unidade e
+ * grupo escolhidos no seletor) e quem laudou sem relatório, num arquivo só, gravado em «09 - Planilhas de repasse
+ * conferidos › IMG | USG › unidade» (Curitiba: «09 › Curitiba»). Cada relatório é conferido de novo na hora, com os
+ * parâmetros da última rodada dele na competência; nenhuma rodada é gravada. Relatório sem rodada entra como «sem conferência». */
+function itensPlanilhaUnidade(un, gr, ch = S.comp) {
+  const rels = relatoriosPara('cf').filter(x => unDoRel(x) === un && grDoRel(x) === gr), idxDec = indiceDecisoesComp(ch), uNome = `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
+  return rels.map(x => {
+    const rod = (S.rodadas || []).filter(r => r.tipo === 'conferencia' && competenciaDaRodada(r) === ch && String(r.unidadeCod) === String(un) && (r.arquivos || []).some(a => a.papel === 'MV' && a.hash === x.hash))
+      .sort((a, b) => b.em.localeCompare(a.em))[0] || null;
+    const ctx = { chaveCompetencia: ch, relId: x.id, relatorio: { ...x.rel, arquivo: x.rel.arquivo || x.nome }, apoloNome: S.apolo?.nome || '', unidadeCod: un, unidadeNome: uNome, parametros: rod?.parametros || {}, operador: S.operador, rodadaId: rod?.id || '' };
+    if (!rod || !S.apolo) return { res: null, ctx, rodada: null };
+    const medSel = rod.parametros?.medico || '@prest', medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
+    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
+    return { res, ctx, rodada: rod };
+  });
+}
+const nomePlanilhaUnidade = (un, gr, ch = S.comp) => `conferidos_${gr === 'curitiba' ? 'curitiba' : gr}_unidade_${String(un).replace(/[^\w-]/g, '')}_comp_${ch.slice(5)}-${ch.slice(0, 4)}.xlsx`;
+const subpastaPlanilhaUnidade = (un, gr) => { const u = unidadePorCod(S.cfg, un); return gr === 'curitiba' ? [GRUPOS_REL.curitiba] : [GRUPOS_REL[gr], ...(u ? [nomePastaUnidadeRel(u)] : [])]; };
+async function gerarPlanilhaUnidade(bt, un, gr) {
+  if (!S.apolo) return avisar('Carregue a planilha de laudos no Início.', 'warn');
+  return comProcessando(bt, async () => {
+    S.rodadas = await dbRodadasJanela();
+    const itens = itensPlanilhaUnidade(un, gr), ctl = controleAtual();
+    const G = ctl?.unidades.find(u => String(u.cod) === String(un))?.grupos.find(g => g.grupo === gr);
+    const xlsx = xlsxConferenciaUnidade(itens, G?.itens || [], { chave: S.comp, unidadeCod: un, unidadeNome: `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`, grupo: gr, operador: S.operador, apoloNome: S.apolo.nome, eqRevisao: S.eq.revisao,
+      colunasExportacao: colunasExportacaoAtuais(), compostas: S.eq.compostas || [], idxObs: indiceObservacoes(estadoCompetencia(S.compReg, S.comp).observacoes) });
+    const sem = itens.filter(x => !x.res).length;
+    await entregarArquivo(xlsx, nomePlanilhaUnidade(un, gr), 'conferidos', S.comp, subpastaPlanilhaUnidade(un, gr));
+    if (sem) avisar(`${sem} de ${itens.length} relatório(s) ainda sem conferência nesta competência: entram na aba «Prestadores» como «Relatório sem conferência». Use «Conferir os relatórios filtrados» e gere de novo.`, 'warn');
+  }, 'o Excel único da unidade');
+}
+document.addEventListener('click', e => {
+  const bt = e.target.closest('[data-cfunica]'); if (!bt) return;
+  const F = FILTRO_REL.cf; if (F.un === '*' || F.gr === '*') return avisar('Escolha a unidade e o grupo no filtro dos relatórios.', 'warn');
+  gerarPlanilhaUnidade(bt, F.un, F.gr);
 });

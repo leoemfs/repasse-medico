@@ -1,5 +1,7 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F45 implementada na v3.0.0-alpha.17** (19/11/2026): Excel único da unidade × grupo, gravado em `09 - Planilhas de repasse conferidos`. Detalhes abaixo.
+
 **Atualização de 17/11/2026 — v3.0.0-alpha.9 a alpha.12.** A auditoria técnica de 16/11/2026 (`auditoria-tecnica-2026-11-16.md`) foi feita inteira, do P0 ao P3, e entraram os pedidos de 17/11 (SOL-F44, abaixo). Resumo:
 
 | Versão | O que entrou |
@@ -36,6 +38,24 @@ Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «c
   - no Início, o cartão da pasta raiz mostra o que ainda está no lugar antigo.
 
 **SOL-F39 e SOL-F10:** a SOL-F45 cobre o «pacote da competência controlando as pastas do mês», nas pastas que são da ferramenta. As pastas de relatórios aos prestadores, NFs e repasses avulsos ficam com a equipe, por decisão do usuário.
+
+## SOL-F45 — Excel único da unidade × grupo (planilha de controle por unidade) — **IMPLEMENTADA na v3.0.0-alpha.17** (pedido de 19/11/2026; teste: `test/planilha_unidade.mjs`)
+
+**Pedido:** «Na conferência cruzada, quando executo a conferência de um prestador posso gerar um Excel para controle e salvar na pasta da competência; posso conferir todos os relatórios da unidade ao mesmo tempo; posso gerar um único Excel com todos os prestadores conferidos? Assim poderei trabalhar com os filtros e manter uma planilha de controle, uma por unidade, por categoria (IMG, USG…).» Pasta: `09 - Planilhas de repasse conferidos › IMG › unidade` — planilha geral dos prestadores que produziram na competência, naquela modalidade e unidade.
+
+**O que já existia:** Excel por prestador («Exportar Excel», gravado em `05 › USG | IMG › unidade`, ao lado do PDF) e a conferência em lote («Conferir os N relatórios filtrados»), sem planilha única.
+
+**Como ficou:**
+- **Conferência → filtro «Relatórios da unidade» + «Grupo»**: com os dois escolhidos, aparece **«Excel único: IMG · unidade N (k)»** ao lado do lote. Também em **Prestadores por unidade**, no título de cada unidade × grupo.
+- **Um arquivo por unidade × grupo:** `conferidos_img_unidade_17_comp_11-2026.xlsx`, sempre baixado e, com a pasta conectada, gravado em `09 - Planilhas de repasse conferidos › IMG | USG › nome da unidade` (Curitiba: `09 › Curitiba`). Mesmo nome: grava « (2)», nunca substitui.
+- **Abas:**
+  - **Prestadores** — uma linha por prestador: situação (Aceito · Conferindo — faltam N decisões · Conferido sem aceite · Relatório sem conferência), aceite (quem e quando), laudos no Apolo, linhas e total do MV, **Devido · Aceito · Para pagamento · Pendente · NC · Excluído**, decisões que faltam, «Só no laudo» sem decisão, arquivo e última rodada. Entram também **quem laudou e não tem relatório** (situação de Prestadores por unidade: Gerar no MV, Sem cadastro…). Linha TOTAL da unidade.
+  - **Conferência** — as linhas de todos os prestadores, com **Cód. prestador** e **Prestador** nas duas primeiras colunas e as demais no modelo de exportação escolhido (Configurações → Exportação). Filtro ligado.
+  - **O que falta decidir** — com o prestador em cada linha.
+  - **Por procedimento** — código TUSS somado na unidade, com os prestadores.
+  - **Informações** — competência, unidade, grupo, relatórios e rodadas usados.
+- **Como é montado:** cada relatório é conferido de novo na hora, com os parâmetros da última rodada dele na competência (unidade, tolerância, médico), a base de equivalências atual e as decisões registradas — as mesmas regras da conferência de cada prestador. **Não grava rodada nova.** Relatório sem conferência entra só na aba Prestadores.
+- **Correção junto:** a `09 - Planilhas de repasse conferidos` começa com «Planilhas» e seria confundida com a `04 - Planilhas de conferência` na leitura da pasta (o Excel da 09 seria lido como planilha de laudos). A leitura agora ignora a 09. «Criar pastas da competência» cria a 09 com USG | IMG › unidades e Curitiba.
 
 ## SOL-F44 — Ajustes de uso pedidos em 17/11/2026 — **IMPLEMENTADA na v3.0.0-alpha.11** (teste: `test/pasta_por_aba.mjs`)
 

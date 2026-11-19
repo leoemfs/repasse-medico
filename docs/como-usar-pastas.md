@@ -30,6 +30,7 @@ Cada competência tem:
 | `06 - Relatórios de prestadores conferidos` › Ecodoppler, Sedação, IMG, Curitiba, USG | Só cria as pastas (preenchimento manual) |
 | `07 - Mutirão unidades` | Só cria a pasta |
 | `08 - Repasse final` | Só cria a pasta. A ferramenta **não grava** aqui |
+| `09 - Planilhas de repasse conferidos` › `USG` \| `IMG` › unidade; `Curitiba` | Grava o **Excel único** de cada unidade e grupo (todos os prestadores num arquivo só, para trabalhar com filtros). **Não é lida** como planilha de laudos |
 
 - **Nomes das pastas das unidades** (em USG e IMG): saem do cadastro de unidades (Bases e regras → Unidades), sem o complemento entre parênteses. Exemplo: «17 - ALPHASONIC LONDRINA (PALHANO)» vira `Alphasonic Londrina`.
 - **Mesmo nome de arquivo:** quando já existe um arquivo com o mesmo nome, a ferramenta grava como « (2)», « (3)»… Nunca substitui.
