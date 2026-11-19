@@ -45,7 +45,8 @@ node test/prestadores_unidade.mjs # prestadores por unidade (SOL-F35) com a comp
 node test/conferencia_causas.mjs # conferência por causa: o que falta decidir, validar e conferir de novo, Excel (comp. 10/2026 real)
 node test/conferencia_lote.mjs  # vários PDFs do mesmo prestador: filtro por unidade e grupo e conferência em lote (comp. 10/2026 real)
 node test/pasta_raiz.mjs        # pasta raiz na rede: criar pastas, ler PDFs e planilhas, sincronizar equivalências (SOL-F37/F38)
-node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36)
+node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36), com blocos USG/IMG/Curitiba e fichas de filtro por usuário
+# (inclui a divisão em blocos USG, IMG e Curitiba e as fichas de filtro por usuário)
 node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
