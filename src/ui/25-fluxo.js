@@ -1,7 +1,7 @@
 /* ============================================================
  * Fluxo mensal: acompanhamento da competência e manutenção do modelo de fluxos
  * ============================================================ */
-const FX = { sub: 'acomp', chave: null, abertos: new Set(), filtro: 'todos', busca: '' };
+const FX = { sub: 'acomp', chave: null, abertos: new Set(), filtro: 'todos', busca: '', dvFiltro: 'todos' };
 const OPCOES_STATUS = Object.entries(STATUS_TAREFA);
 const CLS_STATUS = { ni: 's-ni', and: 's-and', ter: 's-ter', cor: 's-cor', ok: 's-ok', na: 's-na' };
 const stTarefa = k => `<span class="stt ${CLS_STATUS[k]}">${esc(STATUS_TAREFA[k])}</span>`;

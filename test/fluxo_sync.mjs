@@ -54,6 +54,17 @@ ok((await ana.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].divisao
 await leo.locator('details.dv-feed summary').click();
 ok(/Ana Teste.*assumiu a unidade 1 · USG/s.test(await leo.textContent('.dv-feed')), '«Últimas mudanças» mostra quem assumiu o quê');
 await leo.screenshot({ path: out + 'fluxo_sync_divisao.png', fullPage: false });
+// 3b) USG, IMG e Curitiba em blocos separados; fichas de filtro por usuário.
+ok(await leo.isVisible('[data-dvg="usg"] [data-dvk="1|usg"]') && await leo.isVisible('[data-dvg="img"] [data-dvk="1|img"]') && !(await leo.locator('[data-dvg="usg"] [data-dvk$="|img"]').count()), 'USG e IMG ficam em blocos separados');
+const fichas = (await leo.locator('[data-dvf]').allTextContents()).map(t => t.replace(/\s+\d+$/, '').trim());
+ok(fichas.join('|') === 'Todos|Você|Ana Teste|Livres', `fichas de filtro: ${fichas.join(', ')}`);
+await leo.click('[data-dvf="p:Ana Teste"]');
+ok((await leo.locator('.dv-cel').count()) === 1 && await leo.isVisible('[data-dvk="1|usg"]'), 'filtro «Ana Teste» mostra só a unidade dela');
+await leo.click('[data-dvf="eu"]');
+ok((await leo.locator('.dv-cel').count()) === 1 && await leo.isVisible('[data-dvk="17|usg"]'), 'filtro «Você» mostra só as minhas');
+await leo.click('[data-dvf="livres"]');
+ok(!(await leo.locator('[data-dvk="1|usg"], [data-dvk="17|usg"]').count()) && (await leo.locator('.dv-cel').count()) > 0, 'filtro «Livres» esconde as assumidas');
+await leo.click('[data-dvf="todos"]'); await leo.locator('#fxDivisao').screenshot({ path: out + 'fluxo_sync_divisao_blocos.png' });
 // 4) Mudanças em etapas diferentes: sem conflito.
 await mudar(ana, 'usg', 'conf', 'and'); await sinc(ana);
 await mudar(leo, 'img', 'cruzada', 'and'); await sinc(leo); await sinc(ana);

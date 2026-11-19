@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.15</title>
+<title>Repasse Médico v3.0.0-alpha.16</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -280,6 +280,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .sy-barra code{font-size:12px;word-break:break-all}.sy-esp{flex:1}
 .sy-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}.sy-barra.ok .sy-dot{background:var(--ok)}.sy-barra.warn .sy-dot{background:var(--warn)}
 .sy-conf{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-direction:column;gap:4px}
+.dv-fichas .marc.sel .muted{color:inherit;opacity:.8}.dv-bloco{margin-top:14px}.dv-bloco h3{margin:0 0 4px;font-size:14px}
 .dv-quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
 .dv-cel{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
 .dv-cel small{color:var(--muted)}.dv-cel .acoes{margin-top:6px}
@@ -404,7 +405,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.15 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.16 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <a href="#inicio" data-pag="inicio" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
@@ -449,7 +450,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.15';
+const MOTOR_VERSAO = '3.0.0-alpha.16';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -6954,7 +6955,7 @@ document.addEventListener('click', e => { if (e.target.closest('#btCtlUn')) { CU
 /* ============================================================
  * Fluxo mensal: acompanhamento da competência e manutenção do modelo de fluxos
  * ============================================================ */
-const FX = { sub: 'acomp', chave: null, abertos: new Set(), filtro: 'todos', busca: '' };
+const FX = { sub: 'acomp', chave: null, abertos: new Set(), filtro: 'todos', busca: '', dvFiltro: 'todos' };
 const OPCOES_STATUS = Object.entries(STATUS_TAREFA);
 const CLS_STATUS = { ni: 's-ni', and: 's-and', ter: 's-ter', cor: 's-cor', ok: 's-ok', na: 's-na' };
 const stTarefa = k => `<span class="stt ${CLS_STATUS[k]}">${esc(STATUS_TAREFA[k])}</span>`;
@@ -7617,8 +7618,14 @@ function atualizarResumosDivisao(comp) {
 function cartaoDivisao(comp) {
   if (atualizarResumosDivisao(comp)) salvarFluxo();
   const hora = iso => { const d = new Date(iso), hoje = isoDia(new Date()) === iso.slice(0, 10); return `${hoje ? 'hoje' : d.toLocaleDateString('pt-BR').slice(0, 5)} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; };
-  const cels = celulasDivisao().map(c => {
-    const d = comp.divisao?.[chaveDivisao(c.un, c.gr)], st = d?.status || 'livre', meu = d?.por === S.operador;
+  const todas = celulasDivisao().map(c => ({ ...c, d: comp.divisao?.[chaveDivisao(c.un, c.gr)] }));
+  // Fichas de filtro por usuário: Todos · Você · cada pessoa com unidade · Livres.
+  const pessoas = [...new Set(todas.filter(c => c.d && c.d.status !== 'livre' && c.d.por && c.d.por !== S.operador).map(c => c.d.por))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const passa = (c, f) => f === 'todos' ? true : f === 'livres' ? (!c.d || c.d.status === 'livre') : (c.d && c.d.status !== 'livre' && c.d.por === (f === 'eu' ? S.operador : f.slice(2)));
+  const fichas = [['todos', 'Todos'], ...(S.operador ? [['eu', 'Você']] : []), ...pessoas.map(p => ['p:' + p, p]), ['livres', 'Livres']];
+  if (!fichas.some(([k]) => k === FX.dvFiltro)) FX.dvFiltro = 'todos';
+  const cartao = c => {
+    const d = c.d, st = d?.status || 'livre', meu = d?.por === S.operador;
     const r = (st !== 'livre' && !meu && d?.resumo) ? d.resumo : (c.resumo || d?.resumo);
     const falta = r ? (r.falta ? `faltam ${r.falta}${r.gerar ? ` · ${r.gerar} a gerar no MV` : ''}${r.conferindo ? ` · ${r.conferindo} conferindo` : ''}` : (r.laudaram ? 'todos com aceite' : 'sem laudos')) + (r.por && r.por !== S.operador ? ` <span class="muted">(resumo de ${esc(r.por)})</span>` : '') : '<span class="muted">carregue a planilha de laudos para ver o que falta</span>';
     const cls = st === 'concluida' ? 'ok' : st === 'assumida' ? (meu ? 'eu' : 'outro') : '';
@@ -7626,14 +7633,25 @@ function cartaoDivisao(comp) {
     const acoes = st === 'livre' ? `<button class="mini" data-dv="assumir">Assumir</button>` : st === 'assumida' ? (meu ? `<button class="sec mini" data-dv="liberar">Liberar</button><button class="${r && !r.falta && r.laudaram ? '' : 'sec '}mini" data-dv="concluir">Concluir</button>` : `<button class="sec mini" data-dv="assumir">Assumir eu</button>`) : `<button class="sec mini" data-dv="reabrir">Reabrir</button>`;
     return `<div class="dv-cel ${cls}" data-dvk="${c.un}|${c.gr}"><b>Unidade ${esc(c.un)} · ${c.gr === 'curitiba' ? 'Curitiba' : c.gr.toUpperCase()}</b><span class="dv-quem">${quem}</span>
       <small>${st === 'livre' ? '—' : `${st === 'concluida' ? 'concluiu' : 'assumiu'} ${hora(d.em)}`}</small><small>${falta}</small><div class="acoes">${acoes}</div></div>`;
+  };
+  // USG, IMG e Curitiba em blocos separados.
+  const blocos = [['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba']].map(([g, t]) => {
+    const doGrupo = todas.filter(c => c.gr === g); if (!doGrupo.length) return '';
+    const vis = doGrupo.filter(c => passa(c, FX.dvFiltro)), conc = doGrupo.filter(c => c.d?.status === 'concluida').length;
+    return `<section class="dv-bloco" data-dvg="${g}"><h3>${t} <span class="muted small">${conc} de ${doGrupo.length} concluída${doGrupo.length > 1 ? 's' : ''}</span></h3>
+      ${vis.length ? `<div class="dv-quadro">${vis.map(cartao).join('')}</div>` : '<p class="small muted">Nenhuma unidade neste filtro.</p>'}</section>`;
   }).join('');
+  const conta = k => todas.filter(c => passa(c, k)).length;
+  const barraFichas = `<div class="marcadores dv-fichas" style="margin:4px 0 0">${fichas.map(([k, t]) => `<button class="marc${FX.dvFiltro === k ? ' sel' : ''}" data-dvf="${esc(k)}">${esc(t)} <span class="muted">${conta(k)}</span></button>`).join('')}</div>`;
   const feed = feedFluxo(comp, 8);
   return `<div class="card" id="fxDivisao"><div class="fx-topo"><h2 style="margin:0">Divisão do trabalho <span class="muted small">competência ${rotuloCompetencia(comp.chave)}</span></h2></div>
     <p class="small muted">Quem está com cada unidade. «Assumir» marca o seu nome; os outros veem pela pasta da rede (barra acima). O «faltam» vem de Prestadores por unidade, gravado por quem está com a unidade.</p>
-    <div class="dv-quadro">${cels}</div>
+    ${barraFichas}
+    ${blocos}
     ${feed.length ? `<details class="dv-feed"${FX.feedAberto ? ' open' : ''}><summary>Últimas mudanças</summary>${feed.map(f => `<div><b>${esc(f.por || '—')}</b> ${esc(f.texto)} <small class="muted">· ${hora(f.em)}</small></div>`).join('')}</details>` : ''}</div>`;
 }
 function ligarDivisao(raiz, comp) {
+  raiz.querySelectorAll('[data-dvf]').forEach(b => b.onclick = () => { FX.dvFiltro = b.dataset.dvf; desenharDivisaoFluxo(); });
   raiz.querySelectorAll('[data-dv]').forEach(b => b.onclick = async () => {
     if (!exigirAberta(comp.chave, 'mudar a divisão do trabalho')) return;
     const op = await exigirOperador(); if (!op) return;
