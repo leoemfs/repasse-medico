@@ -394,6 +394,18 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .qd-tag{font-size:11px;border-radius:6px;padding:1px 6px;align-self:flex-start}
 .qd-tag.warn{background:var(--warnbg);color:var(--warn)}.qd-tag.err{background:var(--errbg);color:var(--err)}.qd-tag.info{background:var(--infobg);color:var(--info)}
 .qd-concluido .qd-card{border-left-color:var(--ok)}.qd-terceiros .qd-card{border-left-color:var(--warn)}
+/* SOL-F20 — Retrospectiva (Fluxo mensal) */
+.rt-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.rt-kpi{margin:0;padding:12px 14px}.rt-kpi h3{margin:0 0 4px;font-size:12px;color:var(--muted);font-weight:700}.rt-kpi b{display:block;font-size:22px}.rt-kpi small{display:block;font-size:12px;margin-top:2px}
+.rt-tend{font-size:11px;font-weight:700}.rt-tend.melhor{color:var(--ok)}.rt-tend.pior{color:var(--err)}
+.rt-comp td.rt-atual{background:var(--infobg);font-weight:600}.rt-comp th.rt-atual{text-decoration:underline;text-underline-offset:3px}
+.rt-barra{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 70px;gap:4px 10px;align-items:center;margin:6px 0}
+.rt-barra>div{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.rt-barra i{display:block;height:100%;background:var(--accent2)}
+.rt-barra.gargalo i{background:var(--err)}.rt-barra b{text-align:right;font-size:13px}.rt-barra small{grid-column:2/4;margin-top:-4px}
+.rt-lista{list-style:none;padding:0;margin:8px 0 0}.rt-lista li{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-top:1px solid var(--line);padding:8px 0}.rt-lista p{margin:0 0 2px;white-space:pre-wrap}
+.rt-lista select{max-width:150px}
+.rt-nova{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:8px;align-items:start}.rt-nova textarea{width:100%}
+@media (max-width:760px){.rt-nova{grid-template-columns:minmax(0,1fr)}.rt-barra{grid-template-columns:minmax(0,1fr) 60px}.rt-barra>div{grid-column:1/3;grid-row:2}.rt-barra small{grid-column:1/3}.rt-grid{grid-template-columns:minmax(0,1fr)}}
 
 
 .prev-banner{background:var(--infobg);color:var(--info);border:1px dashed var(--info);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
@@ -404,6 +416,16 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .prev-fech{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
 .prev-avanc{margin:10px 0;border:1px solid var(--line);border-radius:8px;padding:8px 10px}.prev-avanc summary{cursor:pointer;font-weight:600;color:var(--muted)}
 .prev-indic{font-size:12px}
+
+.prev-pede li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.prev-pede li>span:first-child{min-width:28px;text-align:center}
+.badge.neutro{background:var(--line);color:var(--text)}
+.prev-hoje-topo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.prev-minha{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.prev-and{display:flex;flex-direction:column;gap:10px}.prev-and-t{display:flex;justify-content:space-between;align-items:baseline}
+.prev-barra{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line);margin:3px 0}.prev-barra span{display:block;height:100%}
+.prev-leg{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 3px 0 8px;vertical-align:-1px}
+.prev-carregar summary{cursor:pointer;color:var(--accent)}
+.prev-feito summary{cursor:pointer}
 @media (max-width:1100px){.prev-grid3{grid-template-columns:1fr}.prev-fech{grid-template-columns:1fr}}
 
 </style>
@@ -425,17 +447,61 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
     <div class="prev-banner"><b>Prévia da simplificação (10 → 7 itens no menu).</b> Saem do menu: Correção de prestador (vai para dentro da Conferência), Rodadas (vira «Detalhes e histórico» da Conferência) e Fluxo mensal (junta com o Fechamento). Nenhuma regra muda.</div>
     <header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
       <div class="topo-dir"><span class="chip">Competência 11/2026</span><span class="chip prev-indic">Pasta: conectada ✓</span><span class="chip">Operador: Leo</span></div></header>
-    <section class="pag" id="prev-inicio"><div class="prev-nota"><b>O que muda:</b> o Início mostra só o que falta fazer hoje. A pasta raiz virou um indicador no topo (configurar fica em Configurações). Painel da competência, preparação e lista longa de relatórios saem daqui e ficam nas telas próprias.</div>
-<div class="grid3 prev-grid3">
+    <section class="pag" id="prev-inicio"><div class="prev-nota"><b>O que muda:</b> o Início vira o <b>painel do dia</b>: o que falta fazer, em uma tela. Saem daqui o passo a passo «Preparar o repasse», os 3 quadros grandes de upload (viram «Carregar manualmente», fechado), os 2 cartões que só levavam à Conferência e à Correção (o menu já faz isso) e a lista longa de relatórios carregados — que vira a tabela «Relatórios do mês» com situação e ação. A pasta raiz vira o aviso no topo; configurar fica em Configurações. Os marcos completos e as etapas continuam no «Fechamento e envio».</div>
+<div class="card prev-hoje">
+ <div class="prev-hoje-topo"><div><span class="eyebrow">COMPETÊNCIA 11/2026 · ABERTA</span><h2 style="margin:2px 0 0">Segunda, 24/11 · produção 10/2026</h2></div>
+  <div class="prev-minha"><span class="small muted">Divisão do trabalho:</span> <span class="badge info">Você: USG un. 1 e 17 · IMG un. 1</span> <span class="badge neutro">Ana: USG un. 2, 4 e 10 · Curitiba</span> <label class="small"><input type="checkbox" checked> só a minha parte</label></div></div>
+ <div class="marcos-linha" style="margin-top:10px">
+  <button class="marco passado"><b>10/11</b>Envio de relatórios USG<small>5 dias antes do pagamento</small></button>
+  <button class="marco passado"><b>16/11</b>Pagamento USG<small>dia 15 (útil anterior)</small></button>
+  <button class="marco hoje"><b>24/11 · hoje</b>NCs de USG<small>15º dia útil</small></button>
+  <button class="marco hoje"><b>24/11 · hoje</b>Início da classificação / IMG<small>15º dia útil</small></button>
+  <button class="marco prox"><b>25/11</b>Envio de relatórios IMG<small>5 dias antes do pagamento IMG</small></button>
+  <button class="marco prox"><b>25/11</b>Envio Curitiba<small>o que vier primeiro</small></button>
+  <button class="marco"><b>30/11</b>Pagamento IMG e Sedação<small>último dia útil</small></button>
+  <a class="small" href="#fechamento" data-ir="fechamento" style="align-self:center;white-space:nowrap">Todos os marcos e etapas →</a></div></div>
+
+<div class="prev-grid3">
  <div class="card"><h2>Arquivos do mês</h2>
-  <ul class="prev-lista"><li><span class="badge ok">ok</span> 14 PDFs do MV <span class="small muted">(2 novos desde ontem)</span></li><li><span class="badge ok">ok</span> Laudos do Apolo · produção 10/2026</li><li><span class="badge warn">falta</span> Power BI · produção 10/2026</li></ul>
-  <div class="acoes"><button>Atualizar da pasta</button></div></div>
- <div class="card"><h2>A conferir</h2>
-  <ul class="prev-lista"><li><span class="st st-pendente">sem conferência</span> 7873 - Gabriel Bianchini · un. 1 · USG <button class="mini">Conferir</button></li><li><span class="st st-ressalva">24 decisões</span> 15 - Marcelo Miyazaki · un. 1 · IMG <button class="mini sec">Continuar</button></li><li><span class="st st-conferido">aceito</span> 3 - Rafael · un. 17 · USG</li></ul>
-  <p class="small muted">11 de 14 relatórios com aceite.</p></div>
- <div class="card"><h2>Pendências</h2>
-  <ul class="prev-lista"><li><b style="color:var(--err)">2</b> procedimentos com NC continuam no MV <button class="mini sec">Ver</button></li><li><b>3</b> NCs aguardando correção no MV</li><li><b>5</b> títulos do Apolo sem equivalência</li><li>Envio USG vence em <b>2 dias úteis</b></li></ul></div>
-</div></section><section class="pag" id="prev-conferencia" hidden><div class="prev-nota"><b>O que muda:</b> Conferência cruzada e Correção de prestador viram uma tela só: o PDF escolhido já diz a finalidade (genérico vai para «Correção»), e dá para trocar no seletor. «Rodadas» sai do menu: o histórico do relatório fica na aba «Detalhes e histórico».</div>
+  <div class="painel-comp" style="padding:0;border:0;box-shadow:none">
+   <div class="l"><div>Relatórios do MV <small>Comp_11-2026 › Relatórios para conferência</small></div><span class="v"><span class="badge ok">14 PDFs</span></span></div>
+   <div class="l"><div>Laudos do Apolo <small>apolo_10-2026.xlsx · 27.412 laudos · guardada</small></div><span class="v"><span class="badge ok">ok</span></span></div>
+   <div class="l"><div>Power BI <small>explica os «Só no laudo» e sugere o responsável da NC</small></div><span class="v"><span class="badge warn">falta</span></span></div>
+   <div class="l"><div>Última leitura da pasta <small>hoje 08:12 · 2 PDFs novos · 1 atualizado</small></div><span class="v"><span class="badge neutro">1 ignorado</span></span></div></div>
+  <div class="acoes"><button>Atualizar da pasta</button><details class="prev-carregar"><summary class="small">Carregar manualmente…</summary><div class="dz" style="margin-top:6px">Arraste PDFs do MV, a planilha do Apolo ou do Power BI<small>a ferramenta reconhece qual é qual</small></div></details></div></div>
+
+ <div class="card"><h2>Andamento por repasse</h2>
+  <div class="prev-and">
+   <div><div class="prev-and-t"><b>USG</b><span class="small muted">14 prestadores</span></div><div class="prev-barra"><span class="cl-devido" style="width:57%"></span><span class="cl-aceito" style="width:21%"></span><span class="cl-pend" style="width:14%"></span></div><div class="small muted">8 enviados · 3 aceitos · 2 conferindo · 1 a conferir</div></div>
+   <div><div class="prev-and-t"><b>IMG</b><span class="small muted">10 prestadores</span></div><div class="prev-barra"><span class="cl-aceito" style="width:20%"></span><span class="cl-pend" style="width:50%"></span></div><div class="small muted">2 aceitos · 5 conferindo · 3 a conferir</div></div>
+   <div><div class="prev-and-t"><b>Curitiba (V3)</b><span class="small muted">3 médicos</span></div><div class="prev-barra"><span class="cl-pend" style="width:33%"></span></div><div class="small muted">1 conferindo · 2 a conferir · <b style="color:var(--warn)">envio amanhã</b></div></div>
+   <div><div class="prev-and-t"><b>Sedação</b><span class="small muted">2 prestadores</span></div><div class="prev-barra"></div><div class="small muted">aguardando relatórios das máquinas</div></div></div>
+  <p class="small muted" style="margin:6px 0 0"><span class="prev-leg cl-devido"></span>enviado <span class="prev-leg cl-aceito"></span>aceito <span class="prev-leg cl-pend"></span>conferindo</p></div>
+
+ <div class="card"><h2>Pede você</h2>
+  <ul class="prev-lista prev-pede">
+   <li><span class="badge err">2</span> <span>procedimentos com NC <b>continuam no MV</b> (R$ 52,50)</span> <button class="mini sec">Ver</button></li>
+   <li><span class="badge warn">24</span> <span>decisões em 3 relatórios</span> <button class="mini sec">Continuar</button></li>
+   <li><span class="badge warn">2</span> <span>médicos laudaram e não têm relatório no MV</span> <button class="mini sec">Gerar no MV</button></li>
+   <li><span class="badge info">5</span> <span>títulos do Apolo sem equivalência</span> <button class="mini sec">Resolver</button></li>
+   <li><span class="badge info">3</span> <span>NCs aguardando correção no MV</span><span></span></li>
+   <li><span class="badge neutro">1</span> <span>PDF de outra produção ignorado na pasta</span><span></span></li></ul></div>
+</div>
+
+<div class="card"><div class="fx-topo" style="margin-bottom:8px"><h2 style="margin:0">Relatórios do mês</h2>
+  <div class="marcadores" style="margin:0"><button class="marc sel">Todos · 14</button><button class="marc">A conferir · 3</button><button class="marc">Com decisões · 3</button><button class="marc">Aceitos · 5</button><button class="marc">Enviados · 3</button></div></div>
+ <div class="tw"><table><thead><tr><th>Prestador</th><th>Unidade · grupo</th><th>Repasse</th><th>Situação</th><th class="n">Para pagamento</th><th class="n">Pendente</th><th></th></tr></thead><tbody>
+  <tr><td>7873 - Gabriel Bianchini</td><td>1 · USG</td><td class="small">25037</td><td><span class="st st-pendente">a conferir</span></td><td class="n">—</td><td class="n">—</td><td><button class="mini">Conferir</button></td></tr>
+  <tr><td>15 - Marcelo Miyazaki</td><td>1 · IMG</td><td class="small">25022 + 25029</td><td><span class="st st-ressalva">24 decisões</span></td><td class="n">3.792,44</td><td class="n" style="color:var(--warn)">875,13</td><td><button class="mini sec">Continuar</button></td></tr>
+  <tr><td>10264 - Melanie Butarello</td><td>1 · IMG</td><td class="small">25022</td><td><span class="st st-ressalva">2 decisões</span></td><td class="n">397,80</td><td class="n" style="color:var(--warn)">35,00</td><td><button class="mini sec">Continuar</button></td></tr>
+  <tr><td>3 - Rafael</td><td>17 · USG</td><td class="small">25031</td><td><span class="st st-conferido">aceito</span></td><td class="n">2.693,49</td><td class="n">—</td><td><button class="mini sec">Copiar e-mail</button></td></tr>
+  <tr><td>7 - Marcelo Marini</td><td>17 · USG</td><td class="small">25031</td><td><span class="badge info">e-mail enviado</span></td><td class="n">8.084,46</td><td class="n">—</td><td><button class="mini sec">Ver</button></td></tr>
+  <tr><td>2 - Prestador genérico</td><td>10 · Correção</td><td class="small">25040</td><td><span class="st st-pendente">a identificar</span></td><td class="n">—</td><td class="n">—</td><td><button class="mini">Corrigir prestador</button></td></tr></tbody></table></div>
+ <p class="small muted" style="margin:6px 0 0">Clique numa linha para abrir a conferência desse relatório já com unidade e médico escolhidos. Mostrando 6 de 14 (só a minha parte).</p></div>
+
+<details class="card prev-feito"><summary><b>Feito nesta competência</b> <span class="small muted">— 31 rodadas · 18 aceites · 12 NCs registradas · 4 alterações nas bases</span></summary>
+ <div class="painel-comp" style="padding:0;border:0;box-shadow:none;margin-top:8px"><div class="l"><div>Ana validou 6 equivalências <small>«USG DE MAMAS COM DOPPLER», «ULTRASSONOGRAFIA DE TIREOIDE»…</small></div><span class="v small">ontem 17:40</span></div><div class="l"><div>Leo cadastrou o alias «Marcelo Yuiti Miyazaki» → 15 <small>Bases e regras</small></div><span class="v small">22/11 10:05</span></div></div></details>
+</section><section class="pag" id="prev-conferencia" hidden><div class="prev-nota"><b>O que muda:</b> Conferência cruzada e Correção de prestador viram uma tela só: o PDF escolhido já diz a finalidade (genérico vai para «Correção»), e dá para trocar no seletor. «Rodadas» sai do menu: o histórico do relatório fica na aba «Detalhes e histórico».</div>
 <div class="card"><div class="prev-modo" role="tablist"><button class="on">Conferência cruzada</button><button>Correção de prestador</button></div>
  <div class="grid4" style="margin-top:10px">
   <label class="campo">Relatório MV<select><option>15 - MARCELO MIYAZAKI · un. 1 · IMG (25022 + 25029)</option></select></label>
@@ -476,6 +542,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 </div>
 <script>
 const T = {'inicio': 'Início', 'conferencia': 'Conferência', 'equivalencias': 'Equivalências TUSS', 'nc': 'Não conformidades', 'fechamento': 'Fechamento e envio', 'bases': 'Bases e regras', 'configuracoes': 'Configurações'};
+document.addEventListener('click', e => { const a = e.target.closest('[data-ir]'); if (a) { e.preventDefault(); ir(a.dataset.ir); } });
 function ir(k) { if (!T[k]) k = 'inicio'; document.querySelectorAll('.pag').forEach(s => s.hidden = s.id !== 'prev-' + k); document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === k)); document.getElementById('titulo').textContent = T[k]; window.scrollTo(0, 0); }
 document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); ir(a.dataset.pag); }));
 document.querySelectorAll('.subabas, .cf-abas, .prev-modo').forEach(g => g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); })));
