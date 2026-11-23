@@ -186,18 +186,27 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
     // (vale a mais recente de cada tipo). Na pasta só ficam as planilhas de entrada: o Excel da conferência vai para a 05.
     const dirsPl = [...await Promise.all(dCs.map(d => subpasta(d, PASTA_PLAN))), await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)])].filter(Boolean);
     if (dirsPl.length) {
-      const pl = { apolo: null, pbi: null };
+      // Vale a mais recente de cada tipo que de fato for a planilha certa: um .xlsx a mais na pasta (que não é a de laudos)
+      // não pode tomar o lugar da planilha do Apolo. Se a mais recente não abrir como Apolo/Power BI, tenta a seguinte.
+      const pl = { apolo: [], pbi: [] };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
         if (!/\.xlsx$/i.test(h.name)) continue;
         const f = await h.getFile(), tipo = /POWER ?BI|PBI|FATURAMENTO/.test(norm(h.name)) ? 'pbi' : 'apolo';
-        if (!pl[tipo] || f.lastModified > pl[tipo].f.lastModified) pl[tipo] = { f, c: dB.name + '/' + c };
+        pl[tipo].push({ f, c: dB.name + '/' + c });
       }
-      if (!pl.apolo && !S.apolo) r.avisos.push(`nenhuma planilha .xlsx de laudos do Apolo em ${PASTA_PLAN.nome}`);
-      for (const [tipo, x] of Object.entries(pl)) {
-        if (!x) continue; const sig = `${x.f.size}|${x.f.lastModified}`, k = `${S.comp}|${x.c}`;
-        const carregada = tipo === 'apolo' ? S.apolo?.nome === x.f.name : S.pbi?.nome === x.f.name;
-        if (PR.lidos.get(k) === sig && carregada) continue;
-        await (tipo === 'apolo' ? carregarApolo(x.f) : carregarPBI(x.f)); PR.lidos.set(k, sig); r.planilhas++;
+      if (!pl.apolo.length && !S.apolo) r.avisos.push(`nenhuma planilha .xlsx de laudos do Apolo em ${PASTA_PLAN.nome}`);
+      for (const [tipo, lista] of Object.entries(pl)) {
+        lista.sort((x, y) => y.f.lastModified - x.f.lastModified);
+        const ignoradas = [];
+        for (const x of lista) {
+          const sig = `${x.f.size}|${x.f.lastModified}`, k = `${S.comp}|${x.c}`, atual = () => (tipo === 'apolo' ? S.apolo : S.pbi)?.nome === x.f.name;
+          if (PR.lidos.get(k) === 'X' + sig) { ignoradas.push(x.f.name); continue; }   // já vista: não é desse tipo
+          if (PR.lidos.get(k) === sig && atual()) break;
+          await (tipo === 'apolo' ? carregarApolo(x.f) : carregarPBI(x.f));
+          if (atual()) { PR.lidos.set(k, sig); r.planilhas++; break; }
+          PR.lidos.set(k, 'X' + sig); ignoradas.push(x.f.name);
+        }
+        if (ignoradas.length) r.avisos.push(`${ignoradas.length} planilha(s) ignorada(s) por não serem ${tipo === 'apolo' ? 'de laudos do Apolo' : 'do Power BI'}: ${ignoradas.join(', ')}`);
       }
     } else if (dCs.length) r.avisos.push(`sem a pasta ${PASTA_PLAN.nome} em ${nomePastaMes(S.comp)}`);
     // Relatórios: pasta do mês › 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba) | 01 - Correção de prestador.
