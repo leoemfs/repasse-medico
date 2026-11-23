@@ -173,6 +173,11 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
     const d = [doc(x.tipo, x.cod)].filter(Boolean);
     x.doc = d[0] || {};
     x.situacao = !x.temValores ? 'sem' : x.semAceite.length ? 'verificar' : d.some(y => y.nfFinanceiro) ? 'concluido' : d.some(y => y.relatorio) ? 'enviado' : 'conferido';
+    // SOL-F49: desconto que muda todo mês sem valor lançado deixa o prestador em «Verificar» até alguém conferir no portal.
+    if (x.temValores && (x.descontoAConferir || []).length) {
+      x.avisos.push(`desconto a conferir: ${x.descontoAConferir.join(', ')}`);
+      if (x.situacao === 'conferido') x.situacao = 'verificar';
+    }
     // Marca manual «Verificar» (SOL-F32) fica por cima do cálculo até ser retirada.
     const manual = legado(fech.manual, x.tipo);
     if (manual) { x.situacaoCalculada = x.situacao; x.situacao = 'verificar'; x.manual = manual; x.avisos.push(`marcado para verificar: ${manual.motivo}`); }

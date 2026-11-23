@@ -63,11 +63,25 @@ O Doppler sempre conta como USG: entra no volume de exames e no faturamento de U
 - A coluna **Avisos** mostra só um botão («⚠ 3 avisos»). Clique nele ou na linha para abrir a lista embaixo do prestador; clique de novo para recolher.
 - O botão agora se chama **Exportar competência**. Na planilha, cada categoria de NF complementar (Curso Cetrus, Laudos PET-CT…) sai num bloco próprio, por unidade/CNPJ de emissão. Quando há quantidade, o bloco traz QUANTIDADE × VALOR UNITÁRIO com fórmula.
 
-### Descontos parcelados
-1. Em **Bases → Prestadores e regras → Descontos parcelados**, clique em **+ Desconto**. Informe prestador, motivo, valor da parcela, número de parcelas (vazio para recorrente, como pensão), a competência da primeira parcela e em qual fechamento entra.
+### Descontos do prestador
+1. Em **Bases → Prestadores e regras → Descontos do prestador**, clique em **+ Desconto**. Informe prestador, motivo, valor da parcela, número de parcelas (vazio para recorrente, como pensão), a competência da primeira parcela e em qual fechamento entra.
 2. No Fechamento, a parcela do mês já aparece em DESCONTOS com o selo «auto» e a observação «parcela 7/10».
 3. Para mudar só neste mês, digite o valor (fica «manual» e registrado). Apague o valor para voltar ao automático.
-4. Leia os alertas no cartão «Descontos parcelados do mês». Quando o prestador estiver sem valores, use **Levar para o próximo mês**.
+4. Leia os alertas no cartão «Descontos do mês». Quando o prestador estiver sem valores, use **Levar para o próximo mês**.
+
+### Descontos que mudam todo mês (desde a v3.0.0-alpha.23)
+Para adiantamento da Unimed, plano de saúde e outros descontos cujo valor é conferido no portal a cada mês.
+1. No cadastro do desconto, escolha **Valor → Muda todo mês** e informe **Onde conferir** (ex.: «Portal da Unimed»). Em «Aplica em», escolha o repasse em que o desconto é feito (ex.: **IMG**, pago no último dia útil).
+2. Todo mês, o desconto aparece **a conferir**:
+   - no **Início**, em «Pede você»: «Descontos a conferir no portal: N», com o prazo do pagamento;
+   - no menu, com a contagem em «Fechamento e envio»;
+   - no Fechamento, no cartão «Descontos do mês».
+   Enquanto não for lançado, o prestador fica em **Verificar**.
+3. Confira o valor no portal e, no cartão, digite o valor e clique em **Lançar**. Se não houver desconto no mês, clique em **Sem desconto este mês**. Fica registrado quem lançou e quando; **✎ Corrigir** desfaz o lançamento.
+4. Desconto de valor fixo (ex.: pensão) continua entrando sozinho, na mesma tabela.
+
+### Reajuste anual (desde a v3.0.0-alpha.23)
+Em **Bases → Prestadores e regras → Reajuste anual**, escolha o mês do lembrete (padrão: janeiro; o primeiro lembrete é em janeiro de 2027). A partir desse mês, o Início mostra «Reajuste anual de AAAA» até alguém clicar em **Reajuste de AAAA feito**. O cartão lista o que revisar: percentuais de USG, BOARD, valores do IMG, descontos fixos e regras da V3.
 
 ## Novidades da v2.0.0-alpha.11
 
@@ -105,3 +119,4 @@ Na subaba **Quadro** do Fechamento, cada prestador é um cartão numa destas col
 - **Clique no cartão** para marcar e-mail, NF ou «Aguardando terceiros…», ou para abrir a conferência do prestador.
 - **«Aguardando terceiros»:** fica até você tirar a marca ou a NF ser encaminhada ao Financeiro.
 - **Excel de indicadores:** tem a aba «Quadro», com a coluna de cada prestador.
+

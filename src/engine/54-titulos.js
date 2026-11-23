@@ -59,6 +59,27 @@ function semelhancaTexto(ta, tb) {
   for (const a of ta) { const j = tb.findIndex((b, i) => !usados.has(i) && tokenCasa(a, b)); if (j >= 0) { usados.add(j); comuns++; } }
   return (2 * comuns) / (ta.length + tb.length);
 }
+/* Afinidade (0..1) entre a descrição do procedimento no MV e o título do laudo, para desempatar laudos do mesmo
+ * paciente e dia (vários USG no mesmo atendimento) quando a equivalência ainda não decide. Mede quanto do título
+ * aparece na descrição, dando mais peso ao nome do procedimento (antes do parêntese) do que à lista de estruturas
+ * que a descrição TUSS costuma trazer: «US - ABDOME TOTAL (ABDOME SUPERIOR, RINS, BEXIGA…)».
+ * A palavra da modalidade (ultrassonografia, tomografia…) não distingue um exame do outro e fica de fora. */
+const MODALIDADE_EQ = new Set(['ULTRASSONOGRAFIA', 'TOMOGRAFIA', 'COMPUTADORIZADA', 'RESSONANCIA', 'MAGNETICA', 'RADIOGRAFIA']);
+const SINONIMOS_AFINIDADE = { MAMARIA: 'MAMAS', MAMARIAS: 'MAMAS', PELVE: 'PELVICA', PELVICO: 'PELVICA', RENAL: 'RINS', RENAIS: 'RINS', RIM: 'RINS', TIROIDE: 'TIREOIDE', TIREOIDEA: 'TIREOIDE', ESCROTO: 'ESCROTAL', ESCROTAIS: 'ESCROTAL', MAMARIO: 'MAMAS' };
+const tokensAfinidade = s => [...new Set(tokensEq(s).map(t => SINONIMOS_AFINIDADE[t] || t).filter(t => !MODALIDADE_EQ.has(t)))];
+const _cacheAfinidade = new Map();
+function afinidadeTitulo(descMV, titulo) {
+  const k = `${descMV}\u0001${titulo}`;
+  let v = _cacheAfinidade.get(k);
+  if (v !== undefined) return v;
+  const tt = tokensAfinidade(titulo), cabeca = tokensAfinidade(String(descMV || '').split('(')[0]), tudo = tokensAfinidade(descMV);
+  const cobre = alvo => tt.length ? tt.filter(a => alvo.some(b => tokenCasa(a, b))).length / tt.length : 0;
+  v = tt.length && tudo.length ? Math.round((0.6 * cobre(cabeca) + 0.4 * cobre(tudo)) * 100) / 100 : 0;
+  if (_cacheAfinidade.size > 50000) _cacheAfinidade.clear();
+  _cacheAfinidade.set(k, v);
+  return v;
+}
+
 /* Sugere procedimentos para o título. catalogoTuss: [{cod, nome, info(grupo), origem}] (catalogo('tuss')).
  * Devolve até `limite` sugestões: {codigo, desc, grupo, nota, motivos:[...]}, da mais forte para a mais fraca. */
 function sugerirCodigos(titulo, catalogoTuss, eqBase, { modalidade = '', limite = 8 } = {}) {

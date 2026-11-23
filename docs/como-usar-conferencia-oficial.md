@@ -119,3 +119,11 @@ Cada relatório é conferido de novo na hora, com os parâmetros da última roda
   - a mais recente de cada um dos 3 últimos PDFs.
 - **Rodadas resumidas:** as outras guardam só o resumo (arquivos, versões, contagens). Aparecem como «resumida» e não recebem aceite.
 - O backup leva as rodadas da competência aberta.
+
+## Vários exames do paciente no mesmo dia (v3.0.0-alpha.23)
+Quando o paciente fez mais de um USG no mesmo atendimento (ex.: abdome total, transvaginal e tireoide) e as equivalências desses títulos ainda não estão validadas, a ferramenta usa o **título do laudo** para saber qual laudo é de qual linha do MV.
+
+- No detalhe da linha, cada laudo candidato mostra **«título N%»**: quanto do título aparece na descrição do procedimento no MV.
+- Se o laudo escolhido fica claramente acima dos outros (pelo menos 40% e 25 pontos acima de cada alternativa), a linha recebe o marcador **«Laudo escolhido pelo título»** e não fica «Mais de um laudo plausível».
+- A linha **continua Pendente** enquanto a equivalência não for validada. Em «O que falta decidir», o grupo «Sem equivalência cadastrada» já traz o par certo: validando, as próximas conferências ficam «Conferido».
+- Se os títulos não dizem o exame (ex.: «Exame de imagem»), a linha continua «Mais de um laudo plausível» e aparece na decisão linha a linha. Escolha o laudo certo no detalhe da linha.
