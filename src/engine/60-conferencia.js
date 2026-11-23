@@ -172,7 +172,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (sit.devido) {
         const base = baseDoHM.get(b);
         if (base) {
-          marc.add('hm-v3-devido'); out.status = 'conferido'; out.baseHM = base.r.seq;
+          marc.add('hm-v3-devido'); out.status = 'conferido'; out.baseHM = base.r.seq; out.baseConvenio = base.r.convenio || '';
           motivos.push(`HM V3 devido: HM de USG/Doppler Unimed entra no repasse da V3 sem precisar de laudo; exame base no relatório: ${base.r.codigo} - ${base.r.procDesc} (${fmtData(base.r.data)}).`);
         } else {
           marc.add('hm-v3-sem-base'); out.status = 'hm-sem-base';

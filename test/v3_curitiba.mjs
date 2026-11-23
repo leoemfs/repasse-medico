@@ -75,6 +75,20 @@ const fx = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.
   return { total: c.total, hm: c.hm.valor, pac: c.pacotes.valor, texto: textoEmailV3(c) }; });
 ok(fx.hm === 132 && fx.pac === 45 && fx.total === 330 + 132 + 90 + 45, `valor fixo: 10 USG × 33 + 4 HM × 33 (o valor de HM antigo, 10, é ignorado) + 2 RM × 45 + pacote 45 = ${fx.total}`);
 ok(/Pacotes \(ressonância\/mamografia\): 1 = R\$ 45,00/.test(fx.texto), 'o e-mail mostra o pacote');
+// HM de USG Unimed = valor do exame base correspondente, para todos na V3 (23/11/2026): se a USG muda (exceção), o HM muda junto.
+const hmb = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.__RM.t;
+  const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, excecoes: [{ convenio: 'UNIMED', valorLaudo: 40 }] }] };
+  const c = calcularV3(regra, [
+    { grupo: 'ULTRASSONOGRAFIA', desc: 'US MAMAS', convenio: 'UNIMED CURITIBA -', quant: 2, vlTotal: 200, vlRepasse: 66, tipoItem: 'procedimento' },
+    { grupo: 'ULTRASSONOGRAFIA', desc: 'US TIREOIDE', convenio: 'PARTICULAR', quant: 1, vlTotal: 100, vlRepasse: 33, tipoItem: 'procedimento' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA -', baseConvenio: 'UNIMED CURITIBA -', quant: 2, vlTotal: 120, vlRepasse: 66, tipoItem: 'hm' }]);
+  return { hm: c.hm.valor, total: c.total, texto: textoEmailV3(c) }; });
+ok(hmb.hm === 80 && hmb.total === 80 + 33 + 80 && /Honorários USG UNIMED: 2 × R\$ 40,00 = R\$ 80,00/.test(hmb.texto), `HM segue o exame base: USG Unimed R$ 40 (exceção) → HM R$ 40 (2 HM = R$ ${hmb.hm}); total ${hmb.total}`);
+const bc = await p.evaluate(() => { const { S, t } = window.__RM, d = new Date(Date.UTC(2026, 9, 3));
+  const r = (seq, desc, grupoNome, convenio) => ({ seq, pagina: 1, codigo: '40901114', procDesc: desc, grupoNome, conta: 'C', atendimento: 'AT9', paciente: 'GIL SOUZA', convenio, data: d, vlRepasse: 33, vlTotal: 60, pct: .5, quant: 1, prestadorCod: '1', prestadorNome: 'X' });
+  const res = t.conferirCruzado({ regs: [r(1, 'USG MAMAS - OP', 'ULTRASSONOGRAFIA - OUTROS', 'UNIMED CURITIBA -'), r(2, 'USG MAMAS - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA -')], cab: {} }, { laudos: [] }, S.cfg, S.eq, { unidadeCod: '5', tol: 0 });
+  return res.linhas.find(x => x.tipo === 'hm')?.baseConvenio; });
+ok(bc === 'UNIMED CURITIBA -', `a conferência guarda o convênio do exame base do HM (${bc})`);
 
 // 5) Médicos de Londrina por produção: lista padrão e contagem na unidade 5 só dos laudos que não são de USG.
 const prod = await p.evaluate(() => { const { S, t } = window.__RM, cfg = JSON.parse(JSON.stringify(S.cfg));

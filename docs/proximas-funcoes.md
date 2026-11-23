@@ -1351,6 +1351,14 @@ Material de 23/11/2026, na pasta `dados/comp_11-2026_curitiba/` (fora do Git): r
 - **Prestadores por unidade (5):** o 7 conta 236 laudos por produção e o 14 conta 26.
 - **Pacotes:** não houve nenhum nestes relatórios, então a regra do pacote ainda não foi vista em dado real.
 
+### HM de USG Unimed = valor do exame base correspondente (regra para todos na V3, 23/11/2026)
+Pedido: «caso o valor de USG mude, o de HM terá que ser o mesmo valor do exame base correspondente; regra para HM USG Unimed sempre, para todos na V3».
+- **Regra de valor fixo:** o HM vale o valor da USG do médico para o convênio do exame base que a conferência achou, com a exceção por convênio, se houver.
+  - Ex.: USG R$ 33,00, mas R$ 40,00 na Unimed → o HM Unimed vale R$ 40,00.
+  - A conferência guarda o convênio do exame base na linha do HM (`baseConvenio`, também na rodada). Rodadas antigas usam o convênio do próprio HM, que é o mesmo do exame base, porque os dois são do mesmo atendimento.
+  - O e-mail e a memória mostram «Honorários USG UNIMED: 9 × R$ 35,00 = R$ 315,00» e, se houver mais de um valor, a soma por valor.
+- **Regra percentual (Dr. Ian):** sem mudança. O HM entra no faturamento da USG pelo valor do MV, como no e-mail de 10/2026.
+
 ### Cadastro dos médicos V3 (pedido de 23/11/2026: «cadastre esses médicos também»)
 As regras foram lidas dos relatórios do MV de 11/2026 e entram sozinhas na configuração (migração `aplicarCadastroV3Padrao`, em `47-v3.js`).
 
