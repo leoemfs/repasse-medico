@@ -31,7 +31,9 @@ async function definirPastaSync(handle) {
   SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off';
   if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
   iniciarTimerSync();
-  if (handle) await sincronizarTudo({ interativo: true });
+  // Ao conectar (ou trocar) a pasta raiz, já lê os PDFs e as planilhas da competência: antes só as bases eram sincronizadas
+  // e a Conferência ficava em «Faltam arquivos» até alguém clicar em «Atualizar da pasta» no Início.
+  if (handle) { await sincronizarTudo({ interativo: true }); if (!SY.legado) await atualizarDaPasta(); }
   else { SY.status = 'off'; SYC.status = 'off'; atualizarBarraSync(); }
   if (location.hash === '#inicio' || !location.hash) RENDER.inicio();
 }
