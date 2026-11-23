@@ -5,7 +5,8 @@
   await abrirKV();   // valores guardados no IndexedDB entram antes da primeira leitura (v3.0)
   aplicarTema();
   S.cfg = lerLocal(CHAVES.cfg);
-  if (!S.cfg || validarConfig(S.cfg).length) { S.cfg = configPadrao(); gravarLocal(CHAVES.cfg, S.cfg); }
+  // Instalação nova também recebe as migrações (ex.: cadastro padrão dos médicos da V3, SOL-F46); antes só a configuração antiga recebia.
+  if (!S.cfg || validarConfig(S.cfg).length) { S.cfg = configPadrao(); migrarConfig(S.cfg); gravarLocal(CHAVES.cfg, S.cfg); }
   else if (migrarConfig(S.cfg)) gravarLocal(CHAVES.cfg, S.cfg);
   aplicarPastasConfig(); aplicarRegrasConfig(S.cfg);   // nomes das pastas configurados (v3.0)
   S.eq = lerLocal(CHAVES.eq);
