@@ -4,6 +4,7 @@
 import { createRequire } from 'module';
 import fs from 'fs';
 import { execFileSync } from 'child_process';
+const abrirF = async () => { if (!(await p.isVisible('#cfGaveta'))) await p.click('#cfFiltrosBt'); };
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/ficticio/';
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
@@ -70,9 +71,13 @@ const classes = () => p.evaluate(() => window.__RM.S.conf.res.linhas.filter(x =>
 const totais = () => p.evaluate(() => window.__RM.t.totaisPorClasse(window.__RM.S.conf.res.linhas, window.__RM.t.classeDaLinhaConf));
 ok(await classes() === 'ANA:devido BRUNA:devido CARLA:pend DORA:pend ELIS:pend', `classes da conferência: ${await classes()}`);
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.some(x => !x.r && x.status === 'so-laudo' && x.l.paciente === 'FABIO NUNES LEAL')), 'laudo sem lançamento aparece «Só no laudo»');
+await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
+ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
+await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
+await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
-await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
 await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito'); await okDlg();
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // NC na linha sem laudo, pelo detalhe da linha.

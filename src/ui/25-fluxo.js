@@ -28,7 +28,7 @@ function atualizarNavFluxo() {
   const c = S.fluxo?.competencias[S.comp || chaveAtual()], b = $('navFluxo'); if (!b) return;
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
-  const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
+  const a = b.closest('a'), nome = n ? `Fechamento e envio · ${n} etapa(s) com prazo vencido` : 'Fechamento e envio';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 const nomeTarefaRef = (comp, gId, ref) => {

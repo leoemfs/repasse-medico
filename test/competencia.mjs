@@ -17,7 +17,7 @@ await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify(
 await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 const S = expr => p.evaluate(expr);
-const ir = async pag => { await p.goto(html + '#' + pag); await p.waitForFunction(t => document.getElementById('titulo').textContent === t, { inicio: 'Início', conferencia: 'Conferência cruzada', rodadas: 'Rodadas', fluxo: 'Fluxo mensal', nc: 'Não conformidades', bases: 'Bases' }[pag]); await p.waitForTimeout(150); };
+const ir = async pag => { await p.goto(html + '#' + pag); await p.waitForFunction(t => document.getElementById('titulo').textContent === t, { inicio: 'Início', conferencia: 'Conferência', rodadas: 'Conferência', fluxo: 'Fechamento e envio', nc: 'Não conformidades', bases: 'Bases' }[pag]); await p.waitForTimeout(150); };
 const manterArquivos = async () => { await p.waitForTimeout(300); if (await p.$('#dlg[open]')) { await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open); } };
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(150); };
 const seletor = () => p.textContent('#compGlobal');

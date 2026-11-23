@@ -12,7 +12,7 @@ await p.clock.install({ time: new Date('2026-10-29T10:00:00') });
 p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
 await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Fluxo')));
 await p.goto(html + '#fluxo'); await p.waitForFunction(() => window.__RM && document.querySelector('#fxCriar'));
-ok(await p.textContent('#titulo') === 'Fluxo mensal', 'título «Fluxo mensal»');
+ok(await p.textContent('#titulo') === 'Fechamento e envio' && /Etapas do mês/.test(await p.textContent('#subnav')), 'Fluxo mensal agora é «Etapas do mês» dentro do Fechamento e envio');
 await p.click('#fxCriar'); await p.waitForSelector('.marco');
 const marcos = await p.$$eval('.marco b', els => els.map(e => e.textContent));
 ok(marcos.includes('07/10') && marcos.includes('09/10') && marcos.some(t => t.startsWith('29/10 · HOJE')) && marcos.includes('30/10'), `marcos calculados: ${marcos.join(' ')}`);
@@ -78,7 +78,7 @@ ok(compPag === 15, 'competência já iniciada mantém o modelo antigo (históric
 await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.fluxo && window.__RM.S.fluxo.competencias['2026-10'], null, { polling: 200, timeout: 30000 });
 const persist = await p.evaluate(() => { const c = window.__RM.S.fluxo.competencias['2026-10']; return [c.grupos.usg.tarefas.gerar.status, c.anotacoes.length, c.grupos.usg.obs, window.__RM.S.fluxo.modelo.marcos.find(m => m.id === 'pagUSG').regra.dia]; });
 ok(JSON.stringify(persist) === JSON.stringify(['ok', 1, 'Aguardando 2 NFs.', 16]), `persistência após recarregar (${persist})`);
-const dica = await p.$eval('a[data-pag="fluxo"]', a => a.getAttribute('aria-label'));
-ok(/^Fluxo mensal/.test(dica), `menu: «${dica}»`);
+const dica = await p.$eval('a[data-pag="fechamento"]', a => a.getAttribute('aria-label'));
+ok(/^Fechamento e envio/.test(dica), `menu: «${dica}»`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

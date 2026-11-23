@@ -283,15 +283,31 @@ function desenharSeletorCompetencia() {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+// v3.0.0-alpha.20 (simplificação): menu com 7 itens. Correção de prestador e Rodadas ficam dentro da Conferência;
+// o Fluxo mensal (etapas e marcos) fica dentro do Fechamento e envio. As rotas antigas continuam valendo.
+const PAGINAS = { inicio: 'Início', fluxo: 'Fechamento e envio', conferencia: 'Conferência', correcao: 'Conferência', nc: 'Não conformidades', fechamento: 'Fechamento e envio', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Conferência', configuracoes: 'Configurações' };
+const PAI_PAGINA = { correcao: 'conferencia', rodadas: 'conferencia', fluxo: 'fechamento' };
+const SUBNAV = {
+  conferencia: [['conferencia', 'Conferência cruzada'], ['correcao', 'Correção de prestador'], ['rodadas', 'Histórico de rodadas']],
+  fechamento: [['fluxo', 'Etapas do mês'], ['fechamento', 'Repasses e envio']]
+};
 const RENDER = {};
+function desenharSubnav(pag) {
+  const el = $('subnav'); if (!el) return;
+  const grupo = SUBNAV[PAI_PAGINA[pag] || pag];
+  el.hidden = !grupo;
+  el.innerHTML = grupo ? grupo.map(([k, t]) => `<a href="#${k}" class="${k === pag ? 'on' : ''}"${k === pag ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('') : '';
+  el.setAttribute('aria-label', grupo ? PAGINAS[pag] : '');
+}
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';
   paginaAtual = pag;
   desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
-  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
+  const ativo = PAI_PAGINA[pag] || pag;
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === ativo));
   $('titulo').textContent = PAGINAS[pag];
+  desenharSubnav(pag);
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
 }
@@ -332,7 +348,7 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
     if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(); });
   };
   desenhar();
-  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); } };
+  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');

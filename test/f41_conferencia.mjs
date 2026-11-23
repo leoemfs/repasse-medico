@@ -3,6 +3,7 @@
 import { createRequire } from 'module';
 import fs from 'fs';
 import { execFileSync } from 'child_process';
+const abrirF = async () => { if (!(await p.isVisible('#cfGaveta'))) await p.click('#cfFiltrosBt'); };
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/f41/';
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
@@ -33,32 +34,32 @@ await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('
 const vis = () => p.evaluate(() => [...document.querySelectorAll('#cfTab tbody tr.clicavel')].length);
 const info = () => p.textContent('#cfSelInfo');
 // 1) Filtros novos.
-await p.selectOption('#cfFTit', 'USG MAMAS'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFTit', 'USG MAMAS'); await p.waitForTimeout(150);
 ok(/2 linha\(s\) no filtro/.test(await info()), `título do laudo «USG MAMAS»: 2 linhas (${(await info()).match(/\d+ linha\(s\)/)?.[0]})`);
-await p.selectOption('#cfFTit', '*'); await p.selectOption('#cfFMed', 'DR Y'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFTit', '*'); await abrirF(); await p.selectOption('#cfFMed', 'DR Y'); await p.waitForTimeout(150);
 ok(/2 linha\(s\) no filtro/.test(await info()), 'médico do laudo «DR Y»: 2 linhas');
-await p.selectOption('#cfFMed', '*'); await p.selectOption('#cfFData', '2026-10-04'); await p.selectOption('#cfFDataAte', '2026-10-06'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFMed', '*'); await abrirF(); await p.selectOption('#cfFData', '2026-10-04'); await abrirF(); await p.selectOption('#cfFDataAte', '2026-10-06'); await p.waitForTimeout(150);
 ok(/3 linha\(s\) no filtro · R\$ 90,00/.test(await info()), `intervalo 04/10 a 06/10: 3 linhas, R$ 90 (${(await info()).match(/\d+ linha\(s\) no filtro · R\$ [\d.,]+/)?.[0]})`);
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // 2) Lote: dispensar os laudos «Só no laudo» do filtro (DR X, 2ª página).
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
-await p.selectOption('#cfFMed', 'DR X'); await p.selectOption('#cfFData', '2026-10-03'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFMed', 'DR X'); await abrirF(); await p.selectOption('#cfFData', '2026-10-03'); await p.waitForTimeout(150);
 ok(await p.isVisible('#cfLoteDisp') && /Dispensar os 1 laudo/.test(await p.textContent('#cfLoteDisp')), 'lote: «Dispensar os 1 laudo(s) «Só no laudo»…» para o filtrado');
 await p.click('#cfLoteDisp'); await p.waitForSelector('#dlg[open]'); await okDlg();
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.find(x => !x.r && x.l?.titulo === 'DOPPLER TIREOIDE PAGINA 2')?.decisao?.tipo) === 'dispensado', 'laudo da 2ª página dispensado em lote');
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // 3) Lote: observação nas linhas do DR Y.
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
-await p.selectOption('#cfFMed', 'DR Y'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFMed', 'DR Y'); await p.waitForTimeout(150);
 await p.click('#cfLoteObs'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="txt"]', 'Conferir no relatório do DR Y'); await okDlg();
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
-await p.selectOption('#cfFObs', 'com'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFObs', 'com'); await p.waitForTimeout(150);
 ok(/2 linha\(s\) no filtro/.test(await info()), 'observação em lote nas 2 linhas; filtro «Com observação» mostra as 2');
-await p.selectOption('#cfFObs', 'sem'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFObs', 'sem'); await p.waitForTimeout(150);
 const nTot = await p.evaluate(() => window.__RM.S.conf.res.linhas.length);
 ok(new RegExp(`${nTot - 2} linha\\(s\\) no filtro`).test(await info()), `filtro «Sem observação»: as outras ${nTot - 2}`);
-await p.selectOption('#cfFObs', ''); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFObs', ''); await p.waitForTimeout(150);
 // 4) NC a partir de uma linha com observação: a observação vai para a NC.
 await p.locator('#cfTab tr', { hasText: 'DORA NUNES PIRES' }).first().click(); await p.waitForTimeout(150);
 const iD = await p.evaluate(() => window.__RM.S.conf.res.linhas.findIndex(x => x.r?.paciente === 'DORA NUNES PIRES'));

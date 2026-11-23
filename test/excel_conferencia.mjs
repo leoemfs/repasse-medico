@@ -28,10 +28,9 @@ ok(/^conferencia_medico_10714_.*\.xlsx$/.test(n1), `sem pasta: Excel baixado (${
 // Pasta conectada, mas o Edge ainda não liberou o acesso nesta sessão: antes a exportação parava sem aviso.
 await p.evaluate(() => window.__RM.t.definirPastaSync({ name: 'Repasse Medico', kind: 'directory', queryPermission: async () => 'prompt', requestPermission: async () => { throw new DOMException('precisa de gesto do usuário', 'SecurityError'); }, async *values() {} }).catch(() => {}));
 const n2 = await baixar().catch(e => 'ERRO ' + e.message);
-// O botão ao lado da busca (tabela de linhas) também baixa — antes tinha o mesmo id do de cima e não fazia nada.
+// v3.0.0-alpha.20: um só «Exportar Excel» (o de baixo, que repetia o de cima, saiu); «Exportar só o filtrado» continua com filtro.
 await p.evaluate(() => { const a = document.getElementById('aviso'); a.hidden = true; });
-const [dl3] = await Promise.all([p.waitForEvent('download', { timeout: 15000 }).catch(() => null), p.click('#cfExcel2')]);
-ok(!!dl3 && /\.xlsx$/.test(dl3.suggestedFilename()), `botão «Exportar Excel» ao lado da busca baixa o Excel (${dl3?.suggestedFilename() || 'nada'})`);
+ok(!(await p.$('#cfExcel2')) && (await p.$$('[data-cfexcel]')).length === 1, 'um só botão «Exportar Excel» no resultado');
 ok(/\.xlsx$/.test(n2) && /libere o acesso/.test(await p.textContent('#aviso')), `pasta sem acesso liberado: Excel baixado mesmo assim, com aviso (${n2})`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
