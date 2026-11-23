@@ -173,7 +173,8 @@ function unidadeDoArquivoCorrecao(nomeArq, pastaPai = '') {
   }
   return unidadeSugeridaPeloArquivo(nomeArq) || unidadeDoNomePasta(pastaPai);
 }
-// so: 'conferencia' ou 'correcao' lê só aquela pasta (botão «Sincronizar pasta» de cada aba), sem as planilhas e a outra pasta.
+// so: 'conferencia' ou 'correcao' lê só aquela pasta de PDFs (botão «Sincronizar pasta» de cada aba), sem a outra pasta.
+// As planilhas do mês (04) entram também: as duas abas precisam da planilha de laudos do Apolo, e a planilha só é relida se mudou.
 async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
   if (!SY.handle || SY.legado) { if (!silencioso) avisar('Conecte a pasta raiz do aplicativo no Início.', 'warn'); return null; }
   if (PR.lendo) return null;
@@ -183,21 +184,22 @@ async function atualizarDaPasta({ silencioso = false, so = null } = {}) {
     const comp = nomePastaMes(S.comp), dCs = await dirsCompetencia(S.comp);   // estrutura nova e, se ainda existir, a antiga
     // Planilhas do mês: «04 - Planilhas de conferência» (nova) ou, na antiga, Bases de dados › Comp_MM-AAAA e PLANILHAS-… do mês
     // (vale a mais recente de cada tipo). Na pasta só ficam as planilhas de entrada: o Excel da conferência vai para a 05.
-    const dirsPl = so ? [] : [...await Promise.all(dCs.map(d => subpasta(d, PASTA_PLAN))), await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)])].filter(Boolean);
-    if (so) { /* só a pasta da aba */ } else if (dirsPl.length) {
+    const dirsPl = [...await Promise.all(dCs.map(d => subpasta(d, PASTA_PLAN))), await caminho([PASTAS_RAIZ.bases, pastaComp(S.comp)])].filter(Boolean);
+    if (dirsPl.length) {
       const pl = { apolo: null, pbi: null };
       for (const dB of dirsPl) for await (const { h, caminho: c } of arquivosEm(dB)) {
         if (!/\.xlsx$/i.test(h.name)) continue;
         const f = await h.getFile(), tipo = /POWER ?BI|PBI|FATURAMENTO/.test(norm(h.name)) ? 'pbi' : 'apolo';
         if (!pl[tipo] || f.lastModified > pl[tipo].f.lastModified) pl[tipo] = { f, c: dB.name + '/' + c };
       }
+      if (!pl.apolo && !S.apolo) r.avisos.push(`nenhuma planilha .xlsx de laudos do Apolo em ${PASTA_PLAN.nome}`);
       for (const [tipo, x] of Object.entries(pl)) {
         if (!x) continue; const sig = `${x.f.size}|${x.f.lastModified}`, k = `${S.comp}|${x.c}`;
         const carregada = tipo === 'apolo' ? S.apolo?.nome === x.f.name : S.pbi?.nome === x.f.name;
         if (PR.lidos.get(k) === sig && carregada) continue;
         await (tipo === 'apolo' ? carregarApolo(x.f) : carregarPBI(x.f)); PR.lidos.set(k, sig); r.planilhas++;
       }
-    } else r.avisos.push(`sem planilhas em ${PASTA_PLAN.nome}`);
+    } else if (dCs.length) r.avisos.push(`sem a pasta ${PASTA_PLAN.nome} em ${nomePastaMes(S.comp)}`);
     // Relatórios: pasta do mês › 05 - Relatórios de repasse MV (USG | IMG › unidade; Curitiba) | 01 - Correção de prestador.
     // Na 05, só USG, IMG e Curitiba são da ferramenta: outras pastas (ex.: Repasse 20%) são da equipe e não são lidas.
     if (!dCs.length) r.avisos.push(`sem a pasta ${pastaAno(+S.comp.slice(0, 4)).nome} › ${comp}`);
