@@ -1360,6 +1360,7 @@ As regras foram lidas dos relatórios do MV de 11/2026 e entram sozinhas na conf
 | 11467 | Gilson Yoiti Ogassawara | valor fixo: USG R$ 30,00 · ressonância R$ 45,00 |
 | 6703 | Alexandre Romanus | valor fixo: USG R$ 33,00 · raio-X (RADIOLOGIA DIAGNOSTICA) R$ 6,00 · ressonância R$ 45,00 |
 | 8016 | Elen Akiko Nakano | valor fixo: mamografia R$ 15,00, **R$ 10,00 no HOSPITAL UNIVERSITARIO** |
+| 17771 | Matheus Leite Ramos de Souza | valor fixo: USG R$ 35,00 · mamografia R$ 15,00, **R$ 10,00 no HOSPITAL UNIVERSITARIO** |
 
 - **Como entra:** uma vez por prestador (`regras.v3padrao`), com autor e data fixos, para os dois computadores gravarem o mesmo.
   - Não sobrescreve regra já cadastrada.
@@ -1371,12 +1372,15 @@ As regras foram lidas dos relatórios do MV de 11/2026 e entram sozinhas na conf
 - **Conferido com os relatórios reais:**
   - Alexandre: R$ 11.964,00, contra R$ 12.059,00 do MV. A diferença são 5 HM de raio-X pagos a 100% (R$ 95,00), que vão para «HM a excluir do MV». Os 30 HM de USG Unimed acharam o exame base.
   - Elen: R$ 3.905,00, igual ao MV, com os 3 pacotes de mamografia Bradesco a R$ 15,00. Nenhum exame base a 100% foi substituído.
-- **Prévia aguardando aprovação** (regra do `CLAUDE.md`): `docs/prototipos/v3-excecao-convenio.html`.
-  - Coluna «Exceções por convênio» no diálogo «Regra da V3», com «+ Convênio» e ✕.
-  - Feita a partir da tela real capturada da ferramenta, com dados fictícios e sem código do app.
-  - Enquanto não for aprovada, a exceção só vem pelo cadastro padrão e não é editável na tela.
+  - Matheus: **R$ 9.225,00**, contra R$ 15.087,16 do MV. Saem 85 HM de mamografia lançados a 100% (R$ 5.168,00, «HM a excluir do MV») e 4 mamografias Bradesco lançadas a 100% (R$ 694,16), substituídas pelos pacotes. É o caso do erro do MV que o pacote corrige, visto pela primeira vez em dado real.
+    - Entram 5 pacotes de mamografia Bradesco a R$ 15,00; um deles não tinha exame base a 100% e fica só no aviso.
+    - Os 9 HM de USG Unimed (R$ 35,00, igual à USG) acharam o exame base.
+- **Prévia aprovada em 23/11/2026 e implementada:** `docs/prototipos/v3-excecao-convenio.html`.
+  - No diálogo «Regra da V3», cada grupo tem a coluna «Exceções por convênio», com «+ Convênio» (convênio com sugestões do cadastro e dos relatórios carregados, e R$ por laudo), «Incluir» e ✕.
+  - Um convênio preenchido e não incluído também entra ao salvar.
+  - O resumo da regra no cartão mostra as exceções.
+  - Teste: `test/v3_curitiba.mjs`.
 
 ### A confirmar com o usuário
-- Os 5 prestadores da V3: estão cadastrados 4 (Ian, Gilson, Alexandre e Elen). Na planilha de laudos, o Matheus Leite Ramos de Souza lauda 573 exames em Curitiba. É o quinto? Qual a regra dele?
 - O «Honorario Medico PF» pedido como «nunca pago» é o 78 PF dos relatórios? Nele está o HM de USG Unimed. Por isso a ferramenta paga só o de USG Unimed dele e exclui o resto. Se existir outro grupo «77 … PF», basta acrescentá-lo em «Modalidades e HM V3».
 - Se o exame base do HM pode estar em outro relatório (de outro médico). Hoje é procurado só no mesmo relatório; sem ele, o HM fica pendente para decisão.

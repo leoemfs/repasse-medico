@@ -92,7 +92,28 @@ ok(prod.ehProd === 'true,false,false', `por produção: 15 sim (padrão), 777 n�
 ok(prod.it && prod.it.producao && prod.it.laudos === 2 && prod.it.fora === 'Ultrassonografia:1', `unidade 5: o 15 conta 2 laudos (mamo e RX) e a USG fica fora (${JSON.stringify(prod.it)})`);
 ok(prod.outros === '777', `médico fora da lista e sem regra V3 continua em «não pagos pela SRA» (${prod.outros})`);
 
-// 6) Telas: Bases (lista por produção e HM V3) sem erro.
+// 6) Exceção por convênio na regra da V3 (prévia aprovada em 23/11/2026): incluir, tirar e salvar pela tela.
+await p.evaluate(() => { const { S } = window.__RM; S.cfg.prestadores.push({ cod: '9003', nomeMV: 'MEDICA EXEMPLO MAMOGRAFIA', aliases: [], regras: { tipo: 'medico', v3: true, v3regra: { modo: 'fixo', grupos: [{ grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL EXEMPLO', valorLaudo: 10 }] }] } } }); });
+await p.goto(html + '#inicio'); await p.goto(html + '#bases'); await p.waitForTimeout(400); await p.click('[data-bsub="prestadores"]').catch(() => {}); await p.waitForTimeout(300);
+const iP = await p.evaluate(() => window.__RM.S.cfg.prestadores.findIndex(x => x.cod === '9003'));
+const abrirRegra = async () => { await p.click(`[data-v3regra="${iP}"]`); await p.waitForSelector('#dlg[open]'); };
+await abrirRegra();
+ok(/HOSPITAL EXEMPLO/.test(await p.textContent('[data-fxexc="0"]')), 'diálogo mostra a exceção cadastrada (chip «HOSPITAL EXEMPLO R$ 10,00»)');
+await p.click('[data-excadd="0"]'); await p.fill('[data-excconv="0"]', 'convenio exemplo a'); await p.fill('[data-excval="0"]', '12'); await p.click('[data-excok="0"]');
+await p.fill('[name="fxGrupo1"]', 'USG (inclui Doppler)'); await p.fill('[name="fxLaudo1"]', '35');
+await p.click('[data-excadd="1"]'); await p.fill('[data-excconv="1"]', 'HOSPITAL EXEMPLO'); await p.fill('[data-excval="1"]', '30');   // sem «Incluir»: entra ao salvar
+await p.click('[data-excrm="0:0"]');
+await p.screenshot({ path: out + 'v3_excecao_convenio.png' });
+await p.click('#dlgBotoes button[value="ok"]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(200);
+const gs = await p.evaluate(() => window.__RM.S.cfg.prestadores.find(x => x.cod === '9003').regras.v3regra.grupos);
+ok(JSON.stringify(gs) === JSON.stringify([{ grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'CONVENIO EXEMPLO A', valorLaudo: 12 }] }, { grupo: '*USG*', valorLaudo: 35, excecoes: [{ convenio: 'HOSPITAL EXEMPLO', valorLaudo: 30 }] }]), `salvar grava as exceções por grupo (incluída, tirada e a preenchida sem «Incluir») (${JSON.stringify(gs)})`);
+ok(/MAMOGRAFIA DIAGNOSTICA: R\$ 15,00 \(CONVENIO EXEMPLO A R\$ 12,00\)/.test(await p.textContent('#cardV3')), 'resumo da regra no cartão mostra a exceção');
+await abrirRegra(); await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open);
+await abrirRegra(); await p.click('[data-excadd="0"]');
+ok(await p.$$eval('[data-excconv="0"]', e => e.length) === 1, 'reabrir o diálogo não acumula cliques (um formulário só)');
+await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open);
+
+// 7) Telas: Bases (lista por produção e HM V3) sem erro.
 await p.goto(html + '#bases'); await p.waitForTimeout(400);
 const tela = await p.evaluate(() => ({ prod: !!document.getElementById('v3ProdAdd'), exc: document.getElementById('hmExc')?.value || '' }));
 ok(tela.prod, 'Bases → Médicos V3 mostra a lista dos médicos por produção');

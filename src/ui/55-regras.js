@@ -254,6 +254,9 @@ async function editarRegraV3(p) {
   const outrosV3 = S.cfg.prestadores.filter(x => x !== p && x.regras?.v3 && x.regras.v3regra);
   const grupos = gruposMVConhecidos();
   const linhasFixo = [...gFixo.grupos]; while (linhasFixo.length < 8) linhasFixo.push({ grupo: '', valorLaudo: '' });
+  // Exceções por convênio de cada linha (prévia aprovada em 23/11/2026: docs/prototipos/v3-excecao-convenio.html).
+  const excs = linhasFixo.slice(0, 8).map(g => (g.excecoes || []).map(x => ({ ...x })));
+  const convs = [...new Set([...(S.cfg.convenios || []).map(c => c.nome), ...(S.relatorios || []).flatMap(x => x.rel.regs.map(r => String(r.convenio || '').replace(/\s*-\s*$/, '')))].filter(Boolean))].sort();
   const faixas = [...gPerc.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
   const outros = [...gPerc.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
   const valGrupo = g => g === GRUPO_USG_V3 ? rotuloGrupoV3(g) : g;
@@ -265,9 +268,11 @@ async function editarRegraV3(p) {
 
     <div data-modo="fixo"${modo === 'fixo' ? '' : ' hidden'}>
       <h4 style="margin:10px 0 4px">Valor por grupo de procedimento <span class="muted small">(escolha o grupo na lista; «USG (inclui Doppler)» pega todos os procedimentos de ultrassom)</span></h4>
-      <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
+      <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th><th>Exceções por convênio</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
         <td><input type="text" name="fxGrupo${k}" list="dlGruposV3" value="${esc(valGrupo(g.grupo))}" placeholder="${k === 0 ? 'USG (inclui Doppler)' : k === 1 ? 'ex.: RESSONANCIA MAGNETICA' : ''}" style="min-width:300px"></td>
-        <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td></tr>`).join('')}</tbody></table></div>
+        <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td><td class="v3-exc" data-fxexc="${k}"></td></tr>`).join('')}</tbody></table></div>
+      <datalist id="dlConvV3">${convs.map(c => `<option value="${esc(c)}"></option>`).join('')}</datalist>
+      <p class="small muted v3-exc-nota"><b>Exceção por convênio:</b> um grupo pode ter valor diferente em um convênio (ex.: mamografia R$ 15,00, mas R$ 10,00 no HOSPITAL UNIVERSITARIO). O convênio é procurado pelo trecho do nome, como no MV. A conta aparece separada no e-mail e na memória de cálculo.</p>
       <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, <b>pelo mesmo valor do laudo de USG</b> deste médico, sem precisar de laudo (basta o exame base no relatório). HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e fica no aviso «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
 
     <div data-modo="percentual"${modo === 'percentual' ? '' : ' hidden'}>
@@ -286,6 +291,31 @@ async function editarRegraV3(p) {
     <datalist id="dlGruposV3"><option value="USG (inclui Doppler)"></option>${grupos.map(g => `<option value="${esc(g)}"></option>`).join('')}</datalist>
     ${grupos.length ? '' : '<p class="small muted">A lista de grupos vem dos relatórios do MV, das rodadas e do Power BI carregados. Sem eles, digite o nome do grupo como aparece no MV.</p>'}`,
     [['', 'Cancelar', 'sec'], ...(atual ? [['limpar', 'Apagar regra', 'perigo']] : []), ['ok', 'Salvar regra']]);
+  const corpo = $('dlgCorpo'), tdExc = k => corpo.querySelector(`[data-fxexc="${k}"]`);
+  // Redesenha só a linha que mudou (as outras podem ter um convênio sendo digitado).
+  const desenharExc = so => corpo.querySelectorAll(so === undefined ? '[data-fxexc]' : `[data-fxexc="${so}"]`).forEach(td => {
+    const k = +td.dataset.fxexc, grupo = corpo.querySelector(`[name="fxGrupo${k}"]`).value.trim();
+    if (!grupo && !excs[k].length) { td.innerHTML = '<span class="small muted">—</span>'; return; }
+    td.innerHTML = excs[k].map((x, i) => `<span class="v3-chip"><b>${esc(x.convenio)}</b> R$ ${fmtBR(x.valorLaudo)} por laudo<button type="button" title="Tirar a exceção" aria-label="Tirar a exceção de ${esc(x.convenio)}" data-excrm="${k}:${i}">✕</button></span>`).join('')
+      + (td.dataset.form ? `<div class="v3-exc-form"><input type="text" list="dlConvV3" placeholder="Convênio (trecho do nome)" aria-label="Convênio" data-excconv="${k}"><input type="number" step="0.01" min="0" placeholder="R$ por laudo" aria-label="R$ por laudo no convênio" data-excval="${k}"><button type="button" class="mini" data-excok="${k}">Incluir</button><button type="button" class="sec mini" data-excnao="${k}">Cancelar</button></div>`
+        : `<button type="button" class="sec mini" data-excadd="${k}">+ Convênio</button>`);
+  });
+  const incluirExc = k => {
+    const c = corpo.querySelector(`[data-excconv="${k}"]`), v = corpo.querySelector(`[data-excval="${k}"]`);
+    if (!c || !c.value.trim() || v.value === '') return false;
+    excs[k].push({ convenio: c.value.trim().toUpperCase(), valorLaudo: +v.value }); delete tdExc(k).dataset.form; return true;
+  };
+  // onclick (e não addEventListener): o #dlgCorpo é o mesmo em todos os diálogos e não pode acumular ouvintes.
+  corpo.onclick = e => {
+    const b = e.target.closest('[data-excadd],[data-excnao],[data-excok],[data-excrm]'); if (!b) return;
+    e.preventDefault();
+    if (b.dataset.excadd !== undefined) { tdExc(b.dataset.excadd).dataset.form = '1'; desenharExc(b.dataset.excadd); corpo.querySelector(`[data-excconv="${b.dataset.excadd}"]`).focus(); return; }
+    if (b.dataset.excnao !== undefined) { delete tdExc(b.dataset.excnao).dataset.form; return desenharExc(b.dataset.excnao); }
+    if (b.dataset.excok !== undefined) { if (!incluirExc(+b.dataset.excok)) return avisar('Informe o convênio e o valor por laudo.', 'warn'); return desenharExc(b.dataset.excok); }
+    const [k, i] = b.dataset.excrm.split(':'); excs[+k].splice(+i, 1); desenharExc(k);
+  };
+  corpo.querySelectorAll('[name^="fxGrupo"]').forEach(i => i.addEventListener('input', () => { const k = i.name.slice(7); if (!tdExc(k).dataset.form) desenharExc(k); }));
+  desenharExc();
   $('dlgCorpo').querySelectorAll('[name="modo"]').forEach(r => r.onchange = () => $('dlgCorpo').querySelectorAll('[data-modo]').forEach(d => { d.hidden = d.dataset.modo !== r.value; }));
   const d = await pr;
   if (d.botao === 'limpar') {
@@ -298,9 +328,9 @@ async function editarRegraV3(p) {
   if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
   else if (c.modo === 'fixo') {
     const lerGrupo = t => { const v = String(t || '').trim(); return norm(v) === norm(rotuloGrupoV3(GRUPO_USG_V3)) ? GRUPO_USG_V3 : v; };
-    // Exceções por convênio (cadastro padrão da V3) ficam com o grupo de mesmo nome; a tela ainda não as edita (prévia).
-    const excDe = g => (atual?.modo === 'fixo' ? atual.grupos || [] : []).find(x => norm(x.grupo) === norm(g))?.excecoes;
-    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => { const grupo = lerGrupo(c['fxGrupo' + k]), ex = excDe(grupo); return { grupo, valorLaudo: +c['fxLaudo' + k] || 0, ...(ex?.length ? { excecoes: ex } : {}) }; }).filter(g => g.grupo) };
+    // Exceções por convênio de cada linha; um convênio preenchido e não incluído entra também.
+    for (let k = 0; k < 8; k++) incluirExc(k);
+    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => { const grupo = lerGrupo(c['fxGrupo' + k]); return { grupo, valorLaudo: +c['fxLaudo' + k] || 0, ...(excs[k].length ? { excecoes: excs[k] } : {}) }; }).filter(g => g.grupo) };
   } else {
     regra = {
       modo: 'percentual', impostos: +c.impostos || 0,

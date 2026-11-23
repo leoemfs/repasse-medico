@@ -77,9 +77,9 @@ await leo.evaluate(() => { const { S } = window.__RM; S.cfg.prestadores.push({ c
 await conectar(leo);
 const leoP = await leo.evaluate(() => window.__RM.S.cfg.prestadores.map(p => p.cod).sort().join(','));
 // 10490, 11467, 6703 e 8016: cadastro padrão da V3 (SOL-F46), aplicado igual nos dois computadores, sem conflito.
-ok(leoP === '10490,11467,15,6703,7,8016', `primeira sincronização junta os prestadores dos dois sem conflito (${leoP})`);
+ok(leoP === '10490,11467,15,17771,6703,7,8016', `primeira sincronização junta os prestadores dos dois sem conflito (${leoP})`);
 await ana.evaluate(() => window.__RM.t.sincronizarCfg());
-ok((await ana.evaluate(() => window.__RM.S.cfg.prestadores.map(p => p.cod).sort().join(','))) === '10490,11467,15,6703,7,8016', 'Ana recebe o prestador cadastrado pelo Leo');
+ok((await ana.evaluate(() => window.__RM.S.cfg.prestadores.map(p => p.cod).sort().join(','))) === '10490,11467,15,17771,6703,7,8016', 'Ana recebe o prestador cadastrado pelo Leo');
 // Mudanças em prestadores diferentes: juntam sozinhas.
 const sincC = p => p.evaluate(() => window.__RM.t.sincronizarCfg());
 await ana.evaluate(() => { const { S } = window.__RM; S.cfg.prestadores.find(p => p.cod === '15').aliases.push({ nome: 'Medico Quinze da Silva', status: 'validado', responsavel: 'Ana Teste' }); window.__RM.t.salvarCfg(); });

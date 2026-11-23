@@ -322,7 +322,8 @@ function avisosConferenciaV3(res) {
  * - 10490 Ian: percentual por faixa de volume (65/68/70% do líquido, 9,15% de impostos) + densitometria 10% do bruto;
  * - 11467 Gilson: USG R$ 30,00 · ressonância R$ 45,00;
  * - 6703 Alexandre: USG R$ 33,00 · raio-X R$ 6,00 · ressonância R$ 45,00;
- * - 8016 Elen: mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO).
+ * - 8016 Elen: mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO);
+ * - 17771 Matheus: USG R$ 35,00 · mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO).
  * HM de USG Unimed = valor da USG; pacote de ressonância/mamografia pelo valor do MV (regras gerais da V3).
  * Aplicado uma vez por prestador (regras.v3padrao): não sobrescreve regra já cadastrada, e apagar a regra depois não a traz
  * de volta. Data e autor fixos, para os dois computadores gravarem o mesmo (configuração compartilhada). */
@@ -331,6 +332,7 @@ const CADASTRO_V3_PADRAO = [
   { cod: '10490', nome: 'IAN SARAIVA DE OLANDA BRAGA', regra: () => regraV3Padrao() },
   { cod: '11467', nome: 'GILSON YOITI OGASSAWARA', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 30 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
   { cod: '6703', nome: 'ALEXANDRE ROMANUS', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 33 }, { grupo: 'RADIOLOGIA DIAGNOSTICA', valorLaudo: 6 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
+  { cod: '17771', nome: 'MATHEUS LEITE RAMOS DE SOUZA', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 35 }, { grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL UNIVERSITARIO', valorLaudo: 10 }] }] }) },
   { cod: '8016', nome: 'ELEN AKIKO NAKANO', regra: () => ({ modo: 'fixo', grupos: [{ grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL UNIVERSITARIO', valorLaudo: 10 }] }] }) }
 ];
 function aplicarCadastroV3Padrao(c) {
