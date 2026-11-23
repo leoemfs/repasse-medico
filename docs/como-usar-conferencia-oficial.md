@@ -12,7 +12,7 @@ Toda linha do relatório do MV fica em uma classe. A classe vem da situação da
 | **Aceito** | sim | você aceitou para pagamento («Aceitar para pagamento…», antes «Considerar no repasse»), com justificativa. Fica registrado quem e quando |
 | **Pendente** | **não** | qualquer linha ainda sem decisão: ressalva (convênio, data), ambíguo, só no faturamento, sem equivalência, composição incompleta, pacote, desconhecido, e «Resolvido no MV» ainda não reconferido |
 | **Não conformidade** | **não** | NC registrada. Se a NC for marcada «não procede», a linha volta para a classe que tinha antes |
-| **Excluído** | **não** | taxa, material e medicamento, que nunca compõem repasse; e HM sem regra do prestador, que deve ser excluído do MV. Não precisa de decisão |
+| **Excluído** | **não** | taxa, material e medicamento, que nunca compõem repasse; e HM: **fora da V3 nenhum HM é pago**, de nenhum grupo (raio-X, mamografia, ressonância, PF, USG…); na V3, só o HM de USG Unimed. O HM excluído é notificado para exclusão do MV (marcador «HM a excluir do MV», aviso no Fechamento e aba no Excel). Não precisa de decisão |
 
 - **Valor para pagamento** = Devido + Aceito.
 - **Conferência da soma:** Devido + Aceito + Pendente + NC + Excluído = total do relatório do MV.
@@ -68,7 +68,7 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 - **Remover decisão** — desfaz o aceite, o resolvido ou a dispensa. Para NC, use «não procede» na aba Não conformidades.
 
 ## 5. Reconferência (depois de corrigir no MV)
-1. Corrija no MV: retire o procedimento da NC, exclua o HM sem regra, corrija o lançamento.
+1. Corrija no MV: retire o procedimento da NC, exclua o HM (fora da V3, todo HM), corrija o lançamento.
 2. Gere o PDF de novo, carregue e execute a conferência.
 3. Na aba **NCs e correções no MV**:
    - **Corrigida no MV / Confirmado pela reconferência:** a linha não está mais no relatório.

@@ -66,6 +66,7 @@ node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o 
 node test/quadro_fechamento.mjs # v3.0: SOL-F19 — quadro por prestador no Fechamento (colunas pelos dados, «Aguardando terceiros», aba no Excel de indicadores)
 node test/estrutura_pastas.mjs  # v3.0: estrutura padronizada (01 - Sistema, um ano por pasta, 12 competências), leitura da nova e da antiga, nada sobrescrito
 node test/planilha_unidade.mjs   # v3.0: Excel único da unidade × grupo (IMG/USG/Curitiba), gravado em «09 - Planilhas de repasse conferidos»
+node test/hm_fora_v3.mjs         # v3.0: HM fora da V3 nunca compõe o repasse e é notificado para exclusão (todos os grupos de HM)
 node test/f41_conferencia.mjs   # v3.0: SOL-F41 — filtros por título, médico, intervalo de datas e observação; lote de dispensa e observação; observação no Excel, aceite, NC e retenção
 node test/p3_regras_config.mjs # v3.0: modalidade por grupo e HM da V3 configuráveis em Bases e regras; texto de privacidade
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência

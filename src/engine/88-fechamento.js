@@ -115,6 +115,11 @@ function montarFechamento({ rodadas, cfg, chave, decisoes, fluxoComp, fech, ante
       x.classes = x.classes || Object.fromEntries([...ORDEM_CLASSES, 'total'].map(k => [k, 0]));
       for (const k of ORDEM_CLASSES) x.classes[k] = r2(x.classes[k] + t[k].valor); x.classes.total = r2(x.classes.total + t.total);
       if (t.pend.n) x.avisos.push(`${t.pend.n} linha(s) pendente(s) na unidade ${g.unidadeCod} (R$ ${fmtBR(t.pend.valor)}) fora do valor até decidir`);
+      // SOL-F48: fora da V3 nenhum HM é pago — avisa para pedir a exclusão no MV (na V3, os avisos da regra V3 já listam).
+      if (x.tipo !== 'curitiba') {
+        const hm = r.linhas.filter(l => l.tipoItem === 'hm' && classeDaLinhaRodada(l, decisoes) === 'excluido');
+        if (hm.length) { x.hmExcluir = { qtd: (x.hmExcluir?.qtd || 0) + hm.length, valor: r2((x.hmExcluir?.valor || 0) + hm.reduce((s2, l) => s2 + (+l.vlRepasse || 0), 0)) }; x.avisos.push(`unidade ${g.unidadeCod}: ${hm.length} HM a excluir do MV (R$ ${fmtBR(r2(hm.reduce((s2, l) => s2 + (+l.vlRepasse || 0), 0)))}), fora do valor: fora da V3 nenhum HM é pago`); }
+      }
     } else x.regraAntiga = true;
     // Na V3 o relatório de USG e o de IMG da mesma unidade somam.
     x.unidades[g.unidadeCod] = r2((x.tipo === 'curitiba' ? (x.unidades[g.unidadeCod] || 0) : 0) + somaLinhas(base, 'vlRepasse'));
