@@ -1,0 +1,134 @@
+<title>Roteiro da conferência</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="base/app.css">
+<style>
+/* Roteiro do relatório: seis passos em linha; o atual em destaque, com a ação que leva adiante. Cores só dos tokens do app. */
+.rot{padding:14px 16px}
+.rot-cab{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.rot-cab h2{margin:0;font-size:16px}
+.rot-passos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.rot-passo{position:relative;border:1px solid var(--line);border-radius:10px;padding:9px 10px 10px;background:var(--card);min-width:0}
+.rot-passo .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;background:var(--bg);color:var(--muted);border:1px solid var(--line);margin-bottom:6px}
+.rot-passo b{display:block;font-size:13px;line-height:1.25}
+.rot-passo small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px;line-height:1.3}
+.rot-passo.feito{background:var(--bg)}
+.rot-passo.feito .n{background:var(--okbg);color:var(--ok);border-color:transparent}
+.rot-passo.feito b{color:var(--muted);font-weight:600}
+.rot-passo.atual{border:2px solid var(--accent);background:var(--infobg)}
+.rot-passo.atual .n{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.rot-passo.alerta .n{background:var(--errbg);color:var(--err);border-color:transparent}
+.rot-agora{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.rot-agora p{margin:0;font-size:13px;max-width:70ch}
+.rot-agora .acoes{margin:0}
+.rot-rel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:12.5px}
+.rot-rel .marc{display:inline-flex;gap:6px;align-items:center}
+.rot-rel .marc i{font-style:normal;font-weight:700;font-size:11px;padding:0 6px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.rot-rel .marc.sel i{background:var(--card);color:var(--accent)}
+.res-topo{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.res-topo .tot-cl.pagar{min-width:230px}
+.res-cls{display:grid;grid-template-columns:repeat(5,minmax(96px,1fr));gap:6px;flex:2 1 480px}
+.res-cls .tot-cl{display:block;padding:8px 10px}.res-cls .tot-cl b{font-size:15px}
+.fin{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fin>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.fin h4{margin:0 0 4px;font-size:13px}.fin p{margin:0;font-size:12.5px;color:var(--muted)}
+@media (max-width:1100px){.rot-passos{grid-template-columns:repeat(3,minmax(0,1fr))}.res-cls{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.rot-passos{grid-template-columns:1fr 1fr}.fin{grid-template-columns:1fr}}
+</style>
+
+<template id="conteudo">
+<nav class="modo-pag" aria-label="Conferência"><a href="#" class="on">Conferência cruzada</a><a href="#">Correção de prestador</a><a href="#">Histórico de rodadas</a></nav>
+
+<div class="card cf-param"><h2>O que conferir</h2>
+  <div class="grid4">
+    <label class="campo">Relatório MV<select id="relSel"><option value="dr">15 - DR X · unidade 17 · USG · REPASSE USG 11/2026</option><option value="gb">7873 - Gabriel Bianchini · unidade 17 · USG</option><option value="hp">412 - Helena Prado · unidade 17 · USG</option></select></label>
+    <label class="campo">Unidade dos laudos<select><option>17 - ALPHASONIC LONDRINA (PALHANO)</option></select><span class="small muted">Pela pasta da unidade.</span></label>
+    <label class="campo">Tolerância de data (dias)<input type="number" value="7"></label>
+    <label class="campo">Médico do laudo («Só no laudo»)<select><option>DR X (do cadastro)</option></select></label>
+  </div>
+  <div class="rot-rel"><span class="small muted">Relatórios da unidade 17 · USG:</span>
+    <button type="button" class="marc sel" data-rel="dr">15 - DR X <i>passo 4 de 6</i></button>
+    <button type="button" class="marc" data-rel="gb">7873 - Gabriel Bianchini <i>passo 2 de 6</i></button>
+    <button type="button" class="marc" data-rel="hp">412 - Helena Prado <i>✓ enviado</i></button>
+    <button type="button" class="marc" data-rel="novo">88 - Ivo Campos <i>passo 1 de 6</i></button>
+  </div>
+</div>
+
+<section class="card rot" id="rot" aria-labelledby="rotTit">
+  <div class="rot-cab"><h2 id="rotTit">Roteiro deste relatório</h2><span class="small muted" id="rotSub"></span></div>
+  <ol class="rot-passos" id="rotPassos"></ol>
+  <div class="rot-agora" id="rotAgora"></div>
+</section>
+
+<div id="resultado"></div>
+</template>
+
+<script src="base/shell.js"></script>
+<script>
+montarPrevia({ ativo: 'conferencia', titulo: 'Conferência',
+  faixa: '<b>Prévia: roteiro da conferência.</b> Clique nos relatórios da unidade (abaixo de «O que conferir») para ver o roteiro em cada momento.',
+  nota: 'O roteiro aparece em cada relatório: em que passo ele está e o botão do próximo passo. Ele é calculado pelo que já existe: PDF lido, rodadas, decisões, «Resolvido no MV», aceite e e-mail marcado no Fechamento. Você não preenche nada a mais. O relatório que o médico recebe (versão final, sem o valor total) continua sendo tirado e enviado por você: o passo 6 só lembra de fazer isso e de marcar o envio.' });
+
+const PASSOS = [
+  ['Versão hospitalar no MV', 'PDF com valor total, na pasta ou carregado'],
+  ['Conferir e decidir', 'aceitar, registrar NC ou marcar «Resolvido no MV»'],
+  ['Corrigir no MV', 'o que você marcou para corrigir'],
+  ['Gerar de novo e reconferir', 'novo PDF na pasta · «Reler o PDF e conferir de novo»'],
+  ['Aceite do relatório', 'nada falta decidir'],
+  ['Versão final e envio', 'PDF sem valor total + prévia por e-mail']
+];
+// Cada relatório fictício num momento do roteiro.
+const ESTADOS = {
+  novo: { passo: 0, sub: '88 - Ivo Campos · nenhuma rodada nesta competência',
+    detalhe: ['PDF ainda não está na pasta', '', '', '', '', ''],
+    agora: '<b>Passo 1:</b> gere no MV a <b>versão hospitalar</b> (com o valor total) e salve em «Relatórios para conferência › USG › Unidade 17». A ferramenta lê o PDF sozinha quando você sincroniza a pasta.',
+    acoes: '<button class="sec">Sincronizar pasta</button><button class="sec">Carregar o PDF…</button>', res: '' },
+  gb: { passo: 1, sub: '7873 - Gabriel Bianchini · rodada 1, hoje 09:40',
+    detalhe: ['lido hoje 09:12 (mv_7873.pdf)', '6 decisões faltam', '', '', '', ''],
+    agora: '<b>Passo 2:</b> faltam <b>6 decisões</b>. Abra «O que falta decidir»: para cada caso, aceite para pagamento, registre NC ou marque «Resolvido no MV» se você vai corrigir lá.',
+    acoes: '<button>Começar pelas decisões</button>', res: 'pend' },
+  dr: { passo: 3, alerta: true, sub: '15 - DR X · rodada 2, hoje 10:42',
+    detalhe: ['lido hoje 09:12 (mv_15.pdf)', 'tudo decidido', '2 resolvidos no MV · 1 NC', 'falta reler o PDF novo', '', ''],
+    agora: '<b>Passo 4:</b> você marcou <b>2 linhas «Resolvido no MV»</b> e <b>1 NC</b> para corrigir. Depois de corrigir no MV, gere a versão hospitalar de novo, substitua o PDF na pasta e clique em <b>«Reler o PDF e conferir de novo»</b>. A ferramenta confere se as correções saíram; as decisões já tomadas continuam valendo.',
+    acoes: '<button>Reler o PDF e conferir de novo</button><button class="sec">Ver o que corrigir</button>', res: 'corr' },
+  pronto: { passo: 4, sub: '15 - DR X · rodada 3, hoje 15:05',
+    detalhe: ['lido hoje 15:02 (mv_15.pdf novo)', 'tudo decidido', 'corrigido no MV ✓', 'reconferido ✓', 'falta registrar', ''],
+    agora: '<b>Passo 5:</b> nada falta decidir e as correções foram confirmadas no PDF novo. Registre o aceite: o valor desta rodada passa a ser o do Fechamento.',
+    acoes: '<button>Registrar aceite</button>', res: 'ok' },
+  hp: { passo: 5, sub: '412 - Helena Prado · aceite de Leo em 22/11',
+    detalhe: ['lido 20/11', 'tudo decidido', 'nada a corrigir', 'não precisou', 'aceito 22/11 por Leo', 'falta marcar o e-mail'],
+    agora: '<b>Passo 6:</b> o relatório está aceito. Tire no MV a <b>versão final</b> (sem o valor total e sem a %), salve e envie por e-mail junto com a prévia de todas as unidades. Depois, marque <b>E-mail</b> na linha do prestador em Fechamento e envio.',
+    acoes: '<button>Copiar a prévia do e-mail</button><button class="sec">Marcar e-mail enviado</button><button class="sec">Abrir no Fechamento</button>', res: 'fim' }
+};
+
+function desenhar(k) {
+  const e = ESTADOS[k];
+  document.getElementById('rotSub').textContent = e.sub;
+  document.getElementById('rotPassos').innerHTML = PASSOS.map(([t, d], i) => {
+    const cls = i < e.passo ? 'feito' : i === e.passo ? 'atual' + (e.alerta ? ' alerta' : '') : '';
+    return `<li class="rot-passo ${cls}"${i === e.passo ? ' aria-current="step"' : ''}><span class="n">${i < e.passo ? '✓' : i + 1}</span><b>${t}</b><small>${e.detalhe[i] || d}</small></li>`;
+  }).join('');
+  document.getElementById('rotAgora').innerHTML = `<p>${e.agora}</p><div class="acoes">${e.acoes}</div>`;
+  document.getElementById('resultado').innerHTML = resultado(e.res);
+  document.querySelectorAll('[data-rel]').forEach(b => b.classList.toggle('sel', b.dataset.rel === k || (k === 'pronto' && b.dataset.rel === 'dr')));
+}
+function resultado(tipo) {
+  if (!tipo) return '';
+  if (tipo === 'fim') return `<div class="card"><h2>Antes de enviar</h2><div class="fin">
+    <div><h4>Versão final no MV</h4><p>Mesmo relatório, sem a coluna de valor total e sem a %. Ela não precisa ser lida pela ferramenta: o valor que vale é o da rodada aceita (R$ 1.915,50).</p></div>
+    <div><h4>Prévia do e-mail</h4><p>Valor de todas as unidades do prestador, pronta para copiar em Fechamento e envio.</p></div>
+    <div><h4>Marcar o envio</h4><p>«E-mail» na linha do prestador grava a data e fecha o passo 6. Depois vêm NF recebida e NF ao Financeiro.</p></div></div></div>`;
+  const v = { pend: ['R$ 30,00', 'R$ 30,00', 'R$ 0,00', 'R$ 120,00', 'R$ 0,00', '6 decisões faltam'], corr: ['R$ 110,00', 'R$ 80,00', 'R$ 30,00', 'R$ 0,00', 'R$ 40,00', '2 resolvidos no MV aguardam o PDF novo'], ok: ['R$ 140,00', 'R$ 110,00', 'R$ 30,00', 'R$ 0,00', 'R$ 0,00', 'correções confirmadas no PDF novo'] }[tipo];
+  return `<div class="card cf-frase"><div class="res-topo"><div><h2 style="margin:0 0 8px">Resultado da rodada <span class="muted small">${v[5]}</span></h2>
+    <div class="tot-cl pagar"><small>PARA PAGAMENTO (Devido + Aceito)</small><b>${v[0]}</b><small>de R$ 150,00 no relatório do MV</small></div></div>
+    <div class="res-cls"><div class="tot-cl"><span class="faixa cl-devido"></span><small>Devido</small><b>${v[1]}</b></div><div class="tot-cl"><span class="faixa cl-aceito"></span><small>Aceito</small><b>${v[2]}</b></div><div class="tot-cl"><span class="faixa cl-pend"></span><small>Pendente</small><b>${v[3]}</b></div><div class="tot-cl"><span class="faixa cl-nc"></span><small>Não conformidade</small><b>${v[4]}</b></div><div class="tot-cl"><span class="faixa cl-excluido"></span><small>Excluído</small><b>R$ 0,00</b></div></div></div>
+    <p class="small muted" style="margin:10px 0 0">Abaixo continuam as abas de hoje (Prévia de conferência, O que falta decidir, NCs e correções no MV, Aceite do relatório, Histórico e detalhes), sem mudança.</p></div>`;
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-rel]'); if (b) { ev.preventDefault(); desenhar(b.dataset.rel); document.getElementById('relSel').value = b.dataset.rel === 'novo' ? 'dr' : b.dataset.rel; return; }
+  const a = ev.target.closest('.rot-agora button');
+  if (a && /Reler o PDF/.test(a.textContent)) desenhar('pronto');
+  else if (a && /Registrar aceite/.test(a.textContent)) desenhar('hp');
+});
+document.getElementById('relSel').onchange = e => desenhar(e.target.value);
+desenhar('dr');
+</script>

@@ -22,8 +22,10 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
-## SOL-F51 — Roteiro da conferência por relatório (pedido de 23/11/2026) — **prévia em avaliação**
-Prévia: https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB (base reaproveitável das prévias: https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE).
+## SOL-F51 — Roteiro da conferência por relatório — **IMPLEMENTADA na v3.0.0-alpha.26** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/roteiro-conferencia/` e https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB; teste: `test/roteiro.mjs`)
+Base reaproveitável das prévias (CSS, menu e ícones do app): https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE.
+
+**Como ficou:** o passo vem do motor (`roteiroDoRelatorio`, em `src/engine/64-roteiro.js`). Na Conferência, o cartão «Roteiro deste relatório» fica entre «O que conferir» e o resultado, com o botão do próximo passo; abaixo dos parâmetros, cada relatório da lista mostra o passo em que está (clicar escolhe o relatório). Um PDF novo (outro arquivo) depois da última rodada leva ao passo 4. «Resolvido no MV» ou NC em linhas que continuam no PDF conferido mantêm o passo 3 (com alerta, se o PDF novo ainda traz as linhas). O aceite com pendências justificadas segue para o envio.
 
 O usuário se perde no ciclo «confiro na ferramenta, corrijo no MV, tiro o relatório de novo… e agora, rodo de novo?». Pedido: mostrar na Conferência o roteiro de cada relatório e o passo em que ele está.
 - Seis passos:

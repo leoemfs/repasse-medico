@@ -81,6 +81,20 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 
 **Reconferir em um clique** (desde a v3.0.0-alpha.10): no topo do resultado, «Reler o PDF da pasta e conferir de novo» (com a pasta raiz conectada) ou «Carregar o PDF novo e conferir de novo». A conferência roda de novo com a mesma unidade, o mesmo médico, a mesma tolerância e na mesma aba.
 
+## 5a. Roteiro deste relatório (desde a v3.0.0-alpha.26)
+Na Conferência, o cartão **«Roteiro deste relatório»** mostra em que passo o relatório escolhido está e o botão do próximo passo:
+
+1. **Versão hospitalar no MV:** gere o PDF com o valor total e salve na pasta (ou carregue no Início).
+2. **Conferir e decidir:** aceite para pagamento, registre NC ou marque «Resolvido no MV» o que vai corrigir lá.
+3. **Corrigir no MV:** o que você marcou como «Resolvido no MV» ou NC e ainda está no PDF conferido.
+4. **Gerar de novo e reconferir:** com um PDF novo deste relatório, confira de novo. As decisões continuam valendo.
+5. **Aceite do relatório.**
+6. **Versão final e envio:** tire no MV a versão sem o valor total e sem a %, envie com a prévia e marque **E-mail** na linha do prestador em Fechamento e envio.
+
+Você não preenche nada a mais: o passo é calculado pelo PDF lido, pelas rodadas, pelas decisões, pelo aceite e pelo e-mail marcado. Abaixo de «O que conferir», cada relatório da lista mostra o passo em que está («passo 4 de 6», «✓ enviado»).
+
+A versão final do MV não precisa ser carregada na ferramenta: o valor que vale é o da rodada aceita.
+
 ## 6. Fechamento
 - Cada prestador × unidade usa o **valor para pagamento** da rodada. Isso vale também para a produção de USG (classe A/B/C/D), a V3, a planilha de controle e o e-mail.
 - Embaixo do valor aparece o detalhe: para pagamento, pendente, NC, excluído e o total do MV.

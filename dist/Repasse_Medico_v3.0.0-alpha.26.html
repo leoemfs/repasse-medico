@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.25</title>
+<title>Repasse Médico v3.0.0-alpha.26</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -482,13 +482,29 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .v3-exc-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
 .v3-exc-form input[type=text]{width:190px}.v3-exc-form input[type=number]{width:100px}
 .v3-exc-nota{border-left:3px solid var(--info);padding-left:8px;margin:6px 0 0}
+/* SOL-F51 — Roteiro deste relatório (alpha.26) */
+.rot{padding:14px 16px}
+.rot-cab{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}.rot-cab h2{margin:0;font-size:16px}
+.rot-passos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.rot-passo{border:1px solid var(--line);border-radius:10px;padding:9px 10px 10px;background:var(--card);min-width:0}
+.rot-passo .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;background:var(--bg);color:var(--muted);border:1px solid var(--line);margin-bottom:6px}
+.rot-passo b{display:block;font-size:13px;line-height:1.25}.rot-passo small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px;line-height:1.3}
+.rot-passo.feito{background:var(--bg)}.rot-passo.feito .n{background:var(--okbg);color:var(--ok);border-color:transparent}.rot-passo.feito b{color:var(--muted);font-weight:600}
+.rot-passo.atual{border:2px solid var(--accent);background:var(--infobg)}.rot-passo.atual .n{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.rot-passo.alerta .n{background:var(--errbg);color:var(--err);border-color:transparent}
+.rot-agora{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
+.rot-agora p{margin:0;font-size:13px;max-width:72ch}.rot-agora .acoes{margin:0}
+.rot-rel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12.5px}.rot-rel:empty{display:none}
+.rot-rel .marc{display:inline-flex;gap:6px;align-items:center}.rot-rel .marc i{font-style:normal;font-weight:700;font-size:11px;padding:0 6px;border-radius:999px;background:var(--bg);color:var(--muted)}
+.rot-rel .marc.sel i{background:var(--card);color:var(--accent)}
+@media (max-width:1100px){.rot-passos{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.25 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.26 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -533,7 +549,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.25';
+const MOTOR_VERSAO = '3.0.0-alpha.26';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -3611,6 +3627,77 @@ function situacaoCorrecoesMV(res, ctx, ncs, decisoes, rodadas) {
   for (const x of res.linhas) if (x.r && x.tipo === 'hm' && classeDaLinhaConf(x) === 'excluido') out.hm.push({ linha: x, continua: kdsAntes.has(chaveMVDecisao(x.r)) });
   return out;
 }
+
+/* ---- src/engine/64-roteiro.js ---- */
+/* ============================================================
+ * SOL-F51 (v3.0.0-alpha.26) — Roteiro da conferência por relatório (prestador × unidade).
+ * Não é um registro novo: o passo é LIDO do que já existe — PDF lido, rodadas, decisões, «Resolvido no MV»,
+ * NCs nas linhas, aceite e e-mail marcado no Fechamento.
+ *   0 Versão hospitalar no MV      → falta o PDF (nenhum lido e nenhuma rodada)
+ *   1 Conferir e decidir           → PDF lido sem rodada, ou rodada com linhas pendentes sem decisão
+ *   2 Corrigir no MV               → tudo decidido, mas há «Resolvido no MV» ou NC em linhas que continuam no PDF conferido
+ *   3 Gerar de novo e reconferir   → há um PDF lido diferente do da última rodada (PDF novo: conferir de novo)
+ *   4 Aceite do relatório          → nada a decidir nem a corrigir; falta o aceite
+ *   5 Versão final e envio         → aceito; falta marcar o e-mail
+ *   6 Concluído                    → aceito e e-mail marcado
+ * ============================================================ */
+const PASSOS_ROTEIRO = [
+  { nome: 'Versão hospitalar no MV', dica: 'PDF com valor total, na pasta ou carregado' },
+  { nome: 'Conferir e decidir', dica: 'aceitar, registrar NC ou marcar «Resolvido no MV»' },
+  { nome: 'Corrigir no MV', dica: 'o que você marcou para corrigir' },
+  { nome: 'Gerar de novo e reconferir', dica: 'novo PDF · «Reler o PDF e conferir de novo»' },
+  { nome: 'Aceite do relatório', dica: 'nada falta decidir' },
+  { nome: 'Versão final e envio', dica: 'PDF sem valor total + prévia por e-mail' }
+];
+const hashMVDaRodada = r => (r?.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
+
+/* pdf: {nome, hash} do relatório lido nesta sessão (ou null); rodadas: as de conferência deste prestador × unidade na
+ * competência; idx: índice das decisões da competência; enviado: data do e-mail marcado (ou ''). */
+function roteiroDoRelatorio({ pdf = null, rodadas = [], idx = null, enviado = '' }) {
+  const ult = [...rodadas].filter(r => !r.resumida).sort((a, b) => b.em.localeCompare(a.em))[0] || null;
+  const det = PASSOS_ROTEIRO.map(() => '');
+  const out = { passo: 0, detalhes: det, alerta: false, rodada: ult, pendentes: 0, resolvidos: 0, ncs: 0, pdfNovo: false };
+  if (!pdf && !ult) { det[0] = 'nenhum PDF lido para este relatório'; return out; }
+  det[0] = pdf ? `lido: ${pdf.nome}` : `conferido: ${(ult.arquivos || []).find(a => a.papel === 'MV')?.nome || 'PDF'}`;
+  if (!ult) { out.passo = 1; det[1] = 'falta executar a conferência'; return out; }
+  // Linhas da última rodada com as decisões atuais da competência (mesma leitura das classes do fechamento, SOL-F43).
+  for (const l of ult.linhas || []) {
+    const d = idx ? decisaoDaLinhaRodada(idx, l)?.tipo || '' : (l.decisao || '');
+    if (d === 'resolvido') out.resolvidos++;
+    else if (d === 'nc') out.ncs++;
+    else if (classeDaLinhaRodada(l, idx) === 'pend') out.pendentes++;
+  }
+  out.pdfNovo = !!(pdf && pdf.hash && hashMVDaRodada(ult) && pdf.hash !== hashMVDaRodada(ult));
+  if (out.pdfNovo) {
+    out.passo = 3; det[1] = 'decisões guardadas'; det[2] = 'PDF novo lido'; det[3] = 'falta conferir o PDF novo'; return out;
+  }
+  const reconferido = rodadas.some(r => hashMVDaRodada(r) && hashMVDaRodada(r) !== hashMVDaRodada(ult));
+  // Aceite registrado (inclusive com pendências justificadas na observação): o relatório segue para o envio.
+  if (ult.aceite) {
+    det[1] = out.pendentes ? `${out.pendentes} pendente(s) no aceite, com observação` : 'tudo decidido';
+    det[2] = out.resolvidos || out.ncs ? [out.resolvidos && `${out.resolvidos} resolvido(s) no MV`, out.ncs && `${out.ncs} NC`].filter(Boolean).join(' · ') : 'nada a corrigir';
+    det[3] = reconferido ? 'reconferido ✓' : 'não precisou';
+    det[4] = `aceito ${new Date(ult.aceite.em).toLocaleDateString('pt-BR')} por ${ult.aceite.por || '—'}`;
+    if (!enviado) { out.passo = 5; det[5] = 'falta marcar o e-mail'; return out; }
+    out.passo = 6; det[5] = `e-mail ${String(enviado).split('-').reverse().join('/')}`;
+    return out;
+  }
+  if (out.pendentes) { out.passo = 1; det[1] = `${out.pendentes} decisão(ões) faltam`; return out; }
+  det[1] = 'tudo decidido';
+  if (out.resolvidos || out.ncs) {
+    // Já foi conferido um PDF novo e as linhas continuam lá: alerta (o MV ainda vai pagar).
+    const anteriores = rodadas.filter(r => r.id !== ult.id && r.em < ult.em && hashMVDaRodada(r) && hashMVDaRodada(r) !== hashMVDaRodada(ult));
+    out.alerta = anteriores.length > 0;
+    out.passo = 2;
+    det[2] = [out.resolvidos && `${out.resolvidos} resolvido(s) no MV`, out.ncs && `${out.ncs} NC`].filter(Boolean).join(' · ') + (out.alerta ? ' — continuam no PDF novo' : '');
+    det[3] = 'depois: gerar o PDF de novo';
+    return out;
+  }
+  det[2] = 'nada a corrigir'; det[3] = reconferido ? 'reconferido ✓' : 'não precisou';
+  out.passo = 4; det[4] = 'falta registrar';
+  return out;
+}
+const rotuloPassoRoteiro = r => r.passo >= 6 ? '✓ enviado' : `passo ${r.passo + 1} de 6`;
 
 /* ---- src/engine/70-correcao.js ---- */
 /* ============================================================
@@ -7093,7 +7180,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
       <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
-    <div id="${prefixo}Extra"></div></div>`;
+    <div id="${prefixo}Extra"></div></div>${prefixo === 'cf' ? '<div class="rot-rel" id="cfRotRels"></div>' : ''}`;
 }
 // Decisões da competência do topo: NCs registradas (pelas chaves da linha) e linhas consideradas no repasse.
 const indiceDecisoesComp = (chave = S.comp) => indiceDecisoes(S.nc.itens.filter(x => x.competencia === chave), estadoCompetencia(S.compReg, chave).decisoes);
@@ -7131,6 +7218,7 @@ function desenharPaginaConferencia() {
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card cf-param"><h2>O que conferir</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
     <div class="acoes"><button id="cfRodar">${S.conf && S.conf.ctx.chaveCompetencia === S.comp ? 'Conferir' : 'Executar conferência'}</button>${botaoSyncPasta('cf')}<span class="muted small" title="Cada execução vira uma rodada registrada, com versões das bases e parâmetros. O histórico fica na aba «Histórico e detalhes».">A unidade dos laudos vem do relatório (pasta ou nome do arquivo); o médico do laudo, do cadastro do prestador.</span></div></div>
+    <div id="cfRoteiro"></div>
     <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
@@ -7160,6 +7248,8 @@ function desenharPaginaConferencia() {
   };
   if (!$('cfRel')) { $('cfRodar').disabled = true; return; }
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
+  const relRot = $('cfRel'); if (relRot) { const f = relRot.onchange; relRot.onchange = e => { f(e); desenharRoteiroConf(); }; const fu = $('cfUn').onchange; $('cfUn').onchange = e => { fu(e); desenharRoteiroConf(); }; }
+  desenharRoteiroConf();
   $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
@@ -7392,6 +7482,7 @@ function desenharConferencia() {
       aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
+  desenharRoteiroConf();
 }
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
 function comparacaoMVLaudo(x) {
@@ -7735,6 +7826,67 @@ document.addEventListener('click', e => {
   const F = FILTRO_REL.cf; if (F.un === '*' || F.gr === '*') return avisar('Escolha a unidade e o grupo no filtro dos relatórios.', 'warn');
   gerarPlanilhaUnidade(bt, F.un, F.gr);
 });
+
+/* SOL-F51 (v3.0.0-alpha.26) — Roteiro deste relatório: em que passo ele está e o botão do próximo passo.
+ * O passo vem do motor (roteiroDoRelatorio, 64-roteiro.js), pelo que já existe; nada a preencher. */
+function rodadasDoRelatorio(cod, un) {
+  return (S.rodadas || []).filter(r => r.tipo === 'conferencia' && competenciaDaRodada(r) === S.comp && String(r.prestadorCod) === String(cod) && String(r.unidadeCod) === String(un));
+}
+function enviadoDoRelatorio(x) {
+  const g = grDoRel(x), d = S.fluxo?.competencias?.[S.comp]?.grupos?.[g]?.documental?.[x.rel.cab.prestadorCod];
+  return d?.relatorio || '';
+}
+function roteiroDe(x, un) {
+  const rods = rodadasDoRelatorio(x.rel.cab.prestadorCod, un);
+  return roteiroDoRelatorio({ pdf: { nome: x.nome, hash: x.hash }, rodadas: rods, idx: indiceDecisoesComp(), enviado: enviadoDoRelatorio(x) });
+}
+// Unidade do relatório para o roteiro: a escolhida (se for o selecionado), a da pasta/nome, ou a da última rodada.
+function unidadeParaRoteiro(x) {
+  if ($('cfRel') && $('cfRel').value === x.id && $('cfUn')?.value) return $('cfUn').value;
+  const u = unDoRel(x); if (u) return u;
+  const r = (S.rodadas || []).filter(y => y.tipo === 'conferencia' && competenciaDaRodada(y) === S.comp && String(y.prestadorCod) === String(x.rel.cab.prestadorCod)).sort((a, b) => b.em.localeCompare(a.em))[0];
+  return r?.unidadeCod || '';
+}
+function desenharRoteiroConf() {
+  const c = $('cfRoteiro'); if (!c) return;
+  const x = $('cfRel') ? relSelecionado('cf') : null, un = $('cfUn')?.value || '';
+  if (!x || !un) { c.innerHTML = ''; return; }
+  const rt = roteiroDe(x, un), mesmo = S.conf && S.conf.ctx.chaveCompetencia === S.comp && S.conf.ctx.relId === x.id && String(S.conf.ctx.unidadeCod) === String(un);
+  const ult = rt.rodada, sub = `${esc(x.rel.cab.prestadorCod)} - ${esc(x.rel.cab.prestadorNome)}${ult ? ` · ${rodadasDoRelatorio(x.rel.cab.prestadorCod, un).length} rodada(s), última ${new Date(ult.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : ' · nenhuma rodada nesta competência'}`;
+  const bt = (k, t, sec = false) => `<button type="button"${sec ? ' class="sec"' : ''} data-rot="${k}">${t}</button>`;
+  const rodar = mesmo ? '' : bt('rodar', ult ? 'Abrir a última conferência' : 'Executar conferência');
+  const texto = [
+    () => [`<b>Passo 1:</b> gere no MV a <b>versão hospitalar</b> (com o valor total) e salve na pasta da competência, em «Relatórios para conferência». ${pastaConectadaConf() ? 'Depois, sincronize a pasta.' : 'Ou carregue o PDF no Início.'}`, pastaConectadaConf() ? botaoSyncPasta('cf') : bt('inicio', 'Ir para o Início')],
+    () => [ult ? `<b>Passo 2:</b> faltam <b>${rt.pendentes} decisão(ões)</b>. Em «O que falta decidir», aceite para pagamento, registre NC ou marque «Resolvido no MV» o que você vai corrigir lá.` : '<b>Passo 2:</b> execute a conferência deste relatório e decida o que ficar pendente.', ult ? (mesmo ? bt('decidir', 'Começar pelas decisões') : rodar) : bt('rodar', 'Executar conferência')],
+    () => [`<b>Passo 3:</b> ${rt.alerta ? '<b style="color:var(--err)">o PDF novo ainda traz</b>' : 'você marcou'} ${[rt.resolvidos && `<b>${rt.resolvidos} linha(s) «Resolvido no MV»</b>`, rt.ncs && `<b>${rt.ncs} NC</b>`].filter(Boolean).join(' e ')} ${rt.alerta ? '— corrija no MV antes de seguir.' : 'para corrigir.'} Depois de corrigir no MV, gere a versão hospitalar de novo, substitua o PDF na pasta e confira de novo: as decisões já tomadas continuam valendo.`, mesmo ? `${bt('nc', 'Ver o que corrigir', true)}${botaoReconferir(S.conf.ctx)}` : rodar],
+    () => ['<b>Passo 4:</b> há um <b>PDF novo</b> deste relatório. Confira de novo: a ferramenta reaplica as decisões e mostra se as correções saíram do MV.', bt('rodar', 'Conferir o PDF novo')],
+    () => ['<b>Passo 5:</b> nada falta decidir nem corrigir. Registre o aceite: o valor desta rodada passa a ser o do Fechamento.', mesmo ? bt('aceite', 'Ir para o aceite') : rodar],
+    () => ['<b>Passo 6:</b> o relatório está aceito. Tire no MV a <b>versão final</b> (sem o valor total e sem a %), salve e envie por e-mail com a prévia de todas as unidades. Depois, marque <b>E-mail</b> na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento')],
+    () => ['<b>Concluído:</b> aceito e e-mail marcado. Depois vêm NF recebida e NF ao Financeiro, na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento', true)]
+  ][rt.passo]();
+  c.innerHTML = `<section class="card rot" aria-labelledby="cfRotTit"><div class="rot-cab"><h2 id="cfRotTit">Roteiro deste relatório</h2><span class="small muted">${sub}</span></div>
+    <ol class="rot-passos">${PASSOS_ROTEIRO.map((ps, i) => { const cls = i < rt.passo ? 'feito' : i === rt.passo ? `atual${rt.alerta ? ' alerta' : ''}` : '';
+      return `<li class="rot-passo ${cls}"${i === rt.passo ? ' aria-current="step"' : ''}><span class="n">${i < rt.passo ? '✓' : i + 1}</span><b>${esc(ps.nome)}</b><small>${esc(rt.detalhes[i] || ps.dica)}</small></li>`; }).join('')}</ol>
+    <div class="rot-agora"><p>${texto[0]}</p><div class="acoes">${texto[1]}</div></div></section>`;
+  c.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => {
+    const k = b.dataset.rot;
+    if (k === 'rodar') return $('cfRodar')?.click();
+    if (k === 'inicio') { location.hash = 'inicio'; return; }
+    if (k === 'fechamento') { FH.sub = ['usg', 'img', 'curitiba'].includes(grDoRel(x)) ? grDoRel(x) : 'usg'; FH.fSit = null; location.hash = 'fechamento'; return; }
+    irAbaConf(k);
+  });
+  if (mesmo) ligarReconferir(c);
+  desenharRoteiroRelatorios();
+}
+// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir»: clicar escolhe o relatório.
+function desenharRoteiroRelatorios() {
+  const alvo = $('cfRotRels'); if (!alvo || !$('cfRel')) return;
+  const ids = [...$('cfRel').options].map(o => o.value), lista = ids.map(id => S.relatorios.find(r => r.id === id)).filter(Boolean);
+  if (lista.length < 2) { alvo.innerHTML = ''; return; }
+  alvo.innerHTML = `<span class="small muted">Em que passo está cada relatório:</span>${lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
+    return `<button type="button" class="marc${x.id === $('cfRel').value ? ' sel' : ''}" data-rotrel="${esc(x.id)}">${esc(x.rel.cab.prestadorCod)} - ${esc(x.rel.cab.prestadorNome)}${un ? ` · un. ${esc(un)}` : ''} <i>${rt ? rotuloPassoRoteiro(rt) : 'sem unidade'}</i></button>`; }).join('')}`;
+  alvo.querySelectorAll('[data-rotrel]').forEach(b => b.onclick = () => { $('cfRel').value = b.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+}
 
 /* ---- src/ui/21-causas.js ---- */
 /* ============================================================
