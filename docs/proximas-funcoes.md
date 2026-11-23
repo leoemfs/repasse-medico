@@ -21,6 +21,24 @@
 
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
+
+## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **PRÉVIA, aguarda aprovação** (pedido de 23/11/2026)
+Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstein-agz3lv`, «SOL-F41» na numeração antiga). Ela nunca entrou na `main`: a 3.0 começou da alpha.19. Precisa ser refeita sobre a 3.0.
+
+**Prévia sem código:** `docs/prototipos/uso-equivalencias.html` (CSS, menu e ícones do app; dados fictícios).
+- **Equivalências TUSS → nova subaba «Uso nas conferências»:**
+  - quadros: em uso · paradas · nunca usadas · linhas confirmadas na competência;
+  - filtros: relações ou regras compostas, **grupo USG/IMG** (novo), janela de «em uso» e busca;
+  - tabela com linhas confirmadas, mini gráfico 08 → 11, última competência com uso, prestadores, Vl Repasse e quem validou; o detalhe mostra a conta por competência, os prestadores e as unidades.
+- **Tirar a validação com o impacto à vista:** «Voltar a pendente» e «Desativar» mostram quantas linhas a equivalência confirmou (no total e na competência). Com uso, a justificativa é obrigatória e vai para o histórico.
+- **Base de equivalências:** coluna «Uso nas conferências».
+- **Motor:** cada linha da rodada guarda o id da equivalência. Nas rodadas antigas, ela é achada pelo par código × título. A conferência e o fechamento não mudam.
+
+**A decidir antes de implementar:**
+1. As rodadas ficam no navegador de quem conferiu. Para os dois verem o mesmo uso, gravar na pasta da rede um resumo de uso por competência, sem paciente (recomendado).
+2. As rodadas resumidas pela retenção (alpha.10) devem guardar a contagem por equivalência.
+3. Janela padrão de «em uso»: 3 competências.
+
 ## SOL-F45 — Estrutura padronizada das pastas na rede — **IMPLEMENTADA na v3.0.0-alpha.14** (pedido de 17/11/2026; guia em `como-usar-pastas.md`; teste: `test/estrutura_pastas.mjs`)
 
 **Pedido do usuário:** padronizar a pasta raiz `App repasse médico`:
