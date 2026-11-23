@@ -299,6 +299,7 @@ async function sincronizarEq({ interativo = false } = {}) {
       } else { SYQ.lm = lm; SYQ.meta = remoto ? { atualizadoEm: remoto.atualizadoEm, atualizadoPor: remoto.atualizadoPor } : SYQ.meta; }
       gravarLocal(CHAVE_SYNC_EQ, S.eq);
       SYQ.status = 'ok'; SYQ.erro = ''; SYQ.conflitos = 0; SYQ.conferidoEm = Date.now();
+      sincronizarUsoEq();   // SOL-F50: resumos de uso das equivalências (arquivo próprio, sem conflito)
       return;
     }
     SYQ.status = 'erro'; SYQ.erro = 'o arquivo da pasta mudou durante a gravação; tente de novo';

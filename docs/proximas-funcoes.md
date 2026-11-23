@@ -22,7 +22,7 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
-## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **PRÉVIA, aguarda aprovação** (pedido de 23/11/2026)
+## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **IMPLEMENTADA na v3.0.0-alpha.24** (pedido de 23/11/2026; prévia e os 3 pontos aprovados; teste: `test/eq_uso.mjs`)
 Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstein-agz3lv`, «SOL-F41» na numeração antiga). Ela nunca entrou na `main`: a 3.0 começou da alpha.19. Precisa ser refeita sobre a 3.0.
 
 **Prévia sem código:** `docs/prototipos/uso-equivalencias.html` (CSS, menu e ícones do app; dados fictícios).
@@ -34,10 +34,22 @@ Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstei
 - **Base de equivalências:** coluna «Uso nas conferências».
 - **Motor:** cada linha da rodada guarda o id da equivalência. Nas rodadas antigas, ela é achada pelo par código × título. A conferência e o fechamento não mudam.
 
-**A decidir antes de implementar:**
-1. As rodadas ficam no navegador de quem conferiu. Para os dois verem o mesmo uso, gravar na pasta da rede um resumo de uso por competência, sem paciente (recomendado).
-2. As rodadas resumidas pela retenção (alpha.10) devem guardar a contagem por equivalência.
-3. Janela padrão de «em uso»: 3 competências.
+**Decisões aprovadas (23/11/2026) e como ficou:**
+1. **Os dois computadores veem o mesmo uso.** Cada conferência registrada vira um **resumo por relatório** (competência × prestador × unidade × repasse), sem paciente, com as contagens por relação (chave código × título × escopo, igual nos dois navegadores) e por regra composta.
+   - O resumo fica no navegador (`rm2.usoEquivalencias`) e na pasta da rede, em `01 - Sistema › Equivalências TUSS › uso_equivalencias.json`.
+   - A junção é por relatório e vale o resumo mais recente, então não há conflito para escolher.
+   - A sincronização roda depois de cada conferência e junto com a das equivalências.
+2. **A retenção não apaga o histórico.** O resumo é guardado à parte. Ao abrir a ferramenta, o uso é tirado de todas as rodadas **antes** de a retenção resumir as antigas.
+3. **«Em uso»** = usada nas últimas 3 competências (padrão; muda no filtro).
+
+**Na tela:** Equivalências TUSS → **«Uso nas conferências»**:
+- quadros clicáveis (em uso · paradas · nunca usadas · linhas confirmadas no mês, com o valor);
+- filtros: relações ou regras compostas, **grupo USG/IMG** (relatórios de Curitiba entram nos dois), janela e busca;
+- tabela com mini gráfico das últimas competências e detalhe por competência, prestadores e unidades;
+- «Voltar a pendente» e «Desativar» com o impacto à vista; com uso, a justificativa é obrigatória e o histórico guarda «uso: N linha(s) nas conferências»;
+- **Exportar uso (.xlsx)**: Leia-me, Relações (com a coluna Grupo) e Regras compostas.
+
+Na **Base de equivalências** entram a coluna «Uso nas conferências», o uso no detalhe e o mesmo quadro de impacto. Cada linha de rodada nova guarda o id da relação (`eqId`); nas rodadas antigas, a relação é achada pelo par código × título.
 
 ## SOL-F45 — Estrutura padronizada das pastas na rede — **IMPLEMENTADA na v3.0.0-alpha.14** (pedido de 17/11/2026; guia em `como-usar-pastas.md`; teste: `test/estrutura_pastas.mjs`)
 
