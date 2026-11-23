@@ -16,6 +16,7 @@ const CAUSAS = {
   'sl-nc': { acao: 'Registrar NC (natureza sugerida pelo Power BI)', titulo: c => `Só no laudo — ${SITUACAO_PBI[c.sit]?.nome || c.sit}` },
   'sl-outro-relatorio': { acao: 'Conferir no relatório do médico do laudo; NC só se não estiver lá', titulo: () => 'Lançados no relatório do médico do laudo (outro relatório)' },
   hm: { acao: 'Cadastrar a regra de HM em Bases', titulo: () => 'Itens HM — regra pendente' },
+  'hm-sem-base': { acao: 'Achar o exame de USG no MV (outro relatório ou lançamento errado) ou aceitar para pagamento com justificativa', titulo: () => 'HM de USG Unimed (V3) sem o exame base no relatório' },
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
   repetida: { acao: 'Decidir qual lançamento vale; o outro vira NC (ou as duas estão certas)', titulo: () => 'Linha repetida no MV' },
   'nome-semelhante': { acao: 'Confirmar se é o mesmo paciente', titulo: () => 'Nome apenas semelhante' },
@@ -43,6 +44,7 @@ function causasDaConferencia(res, compostas = []) {
       return add('so-laudo', { tipo: 'so-laudo' }, i);
     }
     if (x.status === 'hm-pendente') return add('hm', { tipo: 'hm' }, i);
+    if (x.status === 'hm-sem-base') return add('hm-sem-base', { tipo: 'hm-sem-base' }, i);
     if (x.status === 'classificacao-pendente') return add('classificacao', { tipo: 'classificacao' }, i);
     if (x.status === 'so-faturamento') return uma.push({ k: 'sf|' + i, tipo: 'so-faturamento', linhas: [i] });
     // Ambígua sem equivalência (ou com título validado para outro código): o par é um palpite entre laudos do mesmo

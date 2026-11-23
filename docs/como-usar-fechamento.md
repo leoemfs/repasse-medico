@@ -69,7 +69,7 @@ O Doppler sempre conta como USG: entra no volume de exames e no faturamento de U
 3. Para mudar só neste mês, digite o valor (fica «manual» e registrado). Apague o valor para voltar ao automático.
 4. Leia os alertas no cartão «Descontos do mês». Quando o prestador estiver sem valores, use **Levar para o próximo mês**.
 
-### Descontos que mudam todo mês (desde a v3.0.0-alpha.21)
+### Descontos que mudam todo mês (desde a v3.0.0-alpha.22)
 Para adiantamento da Unimed, plano de saúde e outros descontos cujo valor é conferido no portal a cada mês.
 1. No cadastro do desconto, escolha **Valor → Muda todo mês** e informe **Onde conferir** (ex.: «Portal da Unimed»). Em «Aplica em», escolha o repasse em que o desconto é feito (ex.: **IMG**, pago no último dia útil).
 2. Todo mês, o desconto aparece **a conferir**:
@@ -80,7 +80,7 @@ Para adiantamento da Unimed, plano de saúde e outros descontos cujo valor é co
 3. Confira o valor no portal e, no cartão, digite o valor e clique em **Lançar**. Se não houver desconto no mês, clique em **Sem desconto este mês**. Fica registrado quem lançou e quando; **✎ Corrigir** desfaz o lançamento.
 4. Desconto de valor fixo (ex.: pensão) continua entrando sozinho, na mesma tabela.
 
-### Reajuste anual (desde a v3.0.0-alpha.21)
+### Reajuste anual (desde a v3.0.0-alpha.22)
 Em **Bases → Prestadores e regras → Reajuste anual**, escolha o mês do lembrete (padrão: janeiro; o primeiro lembrete é em janeiro de 2027). A partir desse mês, o Início mostra «Reajuste anual de AAAA» até alguém clicar em **Reajuste de AAAA feito**. O cartão lista o que revisar: percentuais de USG, BOARD, valores do IMG, descontos fixos e regras da V3.
 
 ## Novidades da v2.0.0-alpha.11

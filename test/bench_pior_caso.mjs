@@ -28,7 +28,7 @@ const r = await page.evaluate(() => { const H = window.H, x = window.__pior, t =
   return { ms: Math.round(ms), assinatura: fnv(c.linhas.map(y => `${y.r?.seq || ''}:${y.status}:${y.l?.i ?? ''}:${[...y.marcadores].sort().join(',')}`).join('|')), conferidos: c.porStatus.conferido.n }; });
 console.log(JSON.stringify(r));
 // Assinatura do resultado: qualquer otimização tem de mantê-la. Era '41a7085c' na v3.0.0-alpha.10 (antes das otimizações do P2).
-// v3.0.0-alpha.21 (SOL-F46, mudança de regra, não de desempenho): o título do laudo desempata exames do mesmo paciente. Neste caso,
+// v3.0.0-alpha.22 (SOL-F47, mudança de regra, não de desempenho): o título do laudo desempata exames do mesmo paciente. Neste caso,
 // linhas com laudo do próprio código 2.936 → 2.977 de 3.000, «ambíguo» 2.936 → 2.925, mesmas contagens por situação.
 const ASSINATURA = '6eb626c3';
 console.log((r.assinatura === ASSINATURA ? '✔ ' : '✘ ') + `resultado idêntico ao de antes das otimizações (assinatura ${r.assinatura})`); if (r.assinatura !== ASSINATURA) process.exitCode = 1;

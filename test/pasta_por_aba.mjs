@@ -72,6 +72,8 @@ await p.waitForFunction(() => window.__RM.S.relatorios.some(x => x.rel.cab.prest
 const r1 = await p.evaluate(() => window.__RM.S.relatorios.map(x => `${x.rel.cab.prestadorCod}:${x.finalidade}:${x.unidadePasta}`));
 // Desde a alpha.19, conectar a pasta já lê os PDFs da conferência; a Correção traz o dela, uma vez só.
 ok(r1.filter(x => x.startsWith('2:')).length === 1 && r1.includes('2:correcao:17'), `«Sincronizar pasta» da Correção traz o PDF dela (${r1.join(' · ')}), com a unidade 17 tirada do nome do arquivo`);
+// O aviso da sincronização da configuração pode passar na frente por um instante: espera o da leitura da pasta.
+await p.waitForFunction(() => /Correção de prestador/.test(document.getElementById('aviso').textContent), null, { timeout: 5000 }).catch(() => {});
 ok(/Correção de prestador/.test(await p.textContent('#aviso')), `aviso diz que leu só a Correção de prestador (${(await p.textContent('#aviso')).slice(0, 80)})`);
 // Conferência: lê só «Relatórios para conferência».
 await p.goto(html + '#conferencia'); await p.waitForTimeout(300);

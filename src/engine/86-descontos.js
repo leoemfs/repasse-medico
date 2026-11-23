@@ -5,7 +5,7 @@
  *    (competência da 1ª parcela), tipo 'usg'|'img'|'curitiba' (em qual fechamento entra),
  *    adiadas ['AAAA-MM'] (meses em que a parcela não foi descontada e passou para o seguinte),
  *    encerradoEm 'AAAA-MM' (opcional), obs, por, em,
- *    variavel (SOL-F47: o valor muda todo mês e é conferido em «onde», ex.: portal da Unimed),
+ *    variavel (SOL-F48: o valor muda todo mês e é conferido em «onde», ex.: portal da Unimed),
  *    lancamentos {'AAAA-MM': {valor, semDesconto, por, em}} (valor do mês lançado por alguém; só nos variáveis)}
  * No Fechamento, a parcela do mês entra sozinha em DESCONTOS com a observação «parcela 7/10».
  * ============================================================ */
@@ -21,11 +21,11 @@ function parcelaDoMes(d, chave) {
   const total = +d.parcelas || 0;
   if (total && n > total) return null;
   if (!d.variavel) return { n, total, recorrente: !total, ultima: !!total && n === total, valor: r2(+d.valorParcela || 0) };
-  // SOL-F47: valor do mês conferido no portal. Até alguém lançar, fica «a conferir» e entra como zero.
+  // SOL-F48: valor do mês conferido no portal. Até alguém lançar, fica «a conferir» e entra como zero.
   const l = (d.lancamentos || {})[chave];
   return { n, total, recorrente: !total, ultima: !!total && n === total, valor: l ? r2(+l.valor || 0) : 0, variavel: true, conferir: !l, semDesconto: !!l?.semDesconto, lancamento: l || null };
 }
-/* SOL-F47 — lança o valor do mês de um desconto variável (valor null = «sem desconto este mês»); valor undefined desfaz. */
+/* SOL-F48 — lança o valor do mês de um desconto variável (valor null = «sem desconto este mês»); valor undefined desfaz. */
 function lancarDescontoMes(d, chave, valor, por) {
   d.lancamentos = d.lancamentos || {};
   if (valor === undefined) { delete d.lancamentos[chave]; return null; }
@@ -36,7 +36,7 @@ function lancarDescontoMes(d, chave, valor, por) {
 const descontosAConferir = (cfg, chave) => (cfg.descontos || []).filter(d => d.variavel && parcelaDoMes(d, chave)?.conferir);
 const textoValorDesconto = d => d.variavel ? `muda todo mês${d.onde ? ` · conferir em ${d.onde}` : ''}` : `R$ ${fmtBR(d.valorParcela)}`;
 
-/* SOL-F47 — Reajuste anual do cadastro: no mês escolhido (e depois, até alguém marcar como feito), o Início lembra.
+/* SOL-F48 — Reajuste anual do cadastro: no mês escolhido (e depois, até alguém marcar como feito), o Início lembra.
  * cfg.reajusteAnual = {mes 1–12, desde AAAA (1º ano com lembrete), feitos {AAAA: {por, em}}} */
 const ITENS_REAJUSTE = ['Percentuais de USG das unidades e das faixas (geral, +2%, residentes, fixos)', 'BOARD fixo mensal de cada médico', 'Valores do IMG por classe (A/B/C/D, SUS e convênio) e cortes de produção', 'Descontos de valor fixo (ex.: pensão)', 'Regras da V3 (Curitiba)'];
 const reajustePadrao = (hoje = new Date()) => ({ mes: 1, desde: hoje.getFullYear() + 1, feitos: {} });

@@ -120,7 +120,7 @@ Cada relatório é conferido de novo na hora, com os parâmetros da última roda
 - **Rodadas resumidas:** as outras guardam só o resumo (arquivos, versões, contagens). Aparecem como «resumida» e não recebem aceite.
 - O backup leva as rodadas da competência aberta.
 
-## Vários exames do paciente no mesmo dia (v3.0.0-alpha.21)
+## Vários exames do paciente no mesmo dia (v3.0.0-alpha.22)
 Quando o paciente fez mais de um USG no mesmo atendimento (ex.: abdome total, transvaginal e tireoide) e as equivalências desses títulos ainda não estão validadas, a ferramenta usa o **título do laudo** para saber qual laudo é de qual linha do MV.
 
 - No detalhe da linha, cada laudo candidato mostra **«título N%»**: quanto do título aparece na descrição do procedimento no MV.

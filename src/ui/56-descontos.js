@@ -16,7 +16,7 @@ function cardDescontos() {
         <td style="white-space:nowrap"><button class="sec mini" data-desc-ed="${esc(d.id)}" aria-label="Editar">✎</button> <button class="perigo mini" data-desc-rm="${esc(d.id)}" aria-label="Excluir">✕</button></td></tr>`; }).join('') || '<tr><td colspan="8" class="muted">Nenhum desconto cadastrado.</td></tr>'}</tbody></table></div>
     <div class="acoes"><button class="sec" data-desc-novo="">+ Desconto</button></div></div>${cardReajuste()}`;
 }
-/* SOL-F47 — Reajuste anual: mês do lembrete e o que revisar. */
+/* SOL-F48 — Reajuste anual: mês do lembrete e o que revisar. */
 function cardReajuste() {
   const r = S.cfg.reajusteAnual || reajustePadrao(), feitos = Object.entries(r.feitos || {}).sort((a, b) => b[0] - a[0]), lemb = lembreteReajuste(S.cfg);
   const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -43,7 +43,7 @@ function ligarDescontos(raiz, depois) {
     salvarCfg(`Desconto de ${d.cod} - ${d.nome} (${d.motivo}): parcela de ${rotuloCompetencia(S.comp)} levada para o próximo mês.`, 'prestadores');
     avisar('Parcela levada para o próximo mês: as seguintes andam um mês.', 'ok'); depois();
   });
-  // SOL-F47: valor do mês dos descontos que mudam todo mês.
+  // SOL-F48: valor do mês dos descontos que mudam todo mês.
   const lancar = async (id, valor, texto) => {
     if (!exigirAberta(S.comp, 'lançar o desconto do mês')) return;
     const op = await exigirOperador(); if (!op) return;
@@ -119,7 +119,7 @@ function cartaoDescontosFech(f, tipo) {
   const lista = listaFech(f, tipo), naLista = new Map(lista.map(x => [x.cod, x])), alertas = (f.alertasDescontos || []).filter(a => a.tipo === tipo && a.k !== 'conferir');
   const adiadas = (S.cfg.descontos || []).filter(d => d.tipo === tipo && (d.adiadas || []).includes(S.comp));
   const cls = { ultima: 'warn', 'sem-valores': 'err', 'sem-linha': 'err', maior: 'err' }, fechada = compFechada();
-  // Uma linha por desconto do mês (SOL-F47): o fixo entra sozinho; o que muda todo mês fica «a conferir» até ser lançado.
+  // Uma linha por desconto do mês (SOL-F48): o fixo entra sozinho; o que muda todo mês fica «a conferir» até ser lançado.
   const linhas = (S.cfg.descontos || []).filter(d => d.tipo === tipo && naLista.has(String(d.cod))).map(d => ({ d, p: parcelaDoMes(d, S.comp), x: naLista.get(String(d.cod)) })).filter(o => o.p)
     .sort((a, b) => a.x.nome.localeCompare(b.x.nome) || a.d.motivo.localeCompare(b.d.motivo));
   const conferir = linhas.filter(o => o.p.conferir && o.x.temValores), manuais = lista.filter(x => x.descontosManual);
@@ -137,7 +137,7 @@ function cartaoDescontosFech(f, tipo) {
     ${adiadas.length ? `<p class="small muted">Adiadas neste mês: ${adiadas.map(d => `${esc(d.nome)} · ${esc(d.motivo)} <button class="sec mini" data-desc-volta="${esc(d.id)}">desfazer</button>`).join(' · ')}</p>` : ''}
     <div class="acoes"><button class="sec" data-desc-novo="${tipo}">+ Desconto</button><span class="small muted">Cadastro completo em Bases → Prestadores e regras → Descontos do prestador.</span></div></div>`;
 }
-/* SOL-F47 — contagem de descontos a conferir no item «Fechamento e envio» do menu. */
+/* SOL-F48 — contagem de descontos a conferir no item «Fechamento e envio» do menu. */
 function atualizarPillMenu() {
   const a = document.querySelector('.nav a[data-pag="fechamento"]'); if (!a) return;
   a.querySelector('.pill-desc')?.remove();

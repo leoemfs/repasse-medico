@@ -1,4 +1,4 @@
-// v3.0.0-alpha.21 — SOL-F47: descontos que mudam todo mês (lembrete com o valor conferido no portal) e lembrete do
+// v3.0.0-alpha.22 — SOL-F48: descontos que mudam todo mês (lembrete com o valor conferido no portal) e lembrete do
 // reajuste anual. Cadastro pela tela, «a conferir» no Fechamento até lançar (prestador em «Verificar»), Início e menu,
 // «Sem desconto este mês», corrigir, e o reajuste anual no mês escolhido. Dados fictícios.
 import { createRequire } from 'module';
