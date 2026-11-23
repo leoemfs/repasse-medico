@@ -12,7 +12,7 @@ function registroRodada(res, ctx) {
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
     // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
-      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
+      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '', ...(x.baseConvenio !== undefined ? { baseConvenio: x.baseConvenio } : {}),
       kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
     regraValor: res.tipo === 'conferencia' ? REGRA_VALOR_F43 : undefined,
     chavesV: 2,   // v3.0.0-alpha.9: kd com a ordem da linha repetida (ver normalizarChavesRodada)   // SOL-F43: só Devido + Aceito compõem o fechamento

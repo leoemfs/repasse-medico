@@ -130,7 +130,7 @@ async function memoriaV3(x) {
   const exc = [...c.hmExcluir.itens].sort((a, b) => b[1] - a[1]);
   const pacV3 = c.pacotes?.qtd ? `<li><b>Pacotes de ressonância/mamografia:</b> ${c.pacotes.qtd} pelo valor de repasse do MV (R$ ${fmtBR(c.pacotes.valor)}); o exame base Bradesco a 100% que cada um substitui ficou fora.</li>` : '';
   const origem = c.modo === 'fixo' ? `<li><b>Regra:</b> valor fixo por laudo, por grupo do MV.</li>
-      ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${esc(i.conta)}${i.hmQtd ? ` · HM Unimed ${i.hmQtd} × R$ ${fmtBR(i.valorHM)} = R$ ${fmtBR(i.hmValor)}` : ''}.</li>`).join('')}
+      ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${esc(i.conta)}${i.hmQtd ? ` · HM Unimed ${esc(i.contaHM)} (mesmo valor do exame base)` : ''}.</li>`).join('')}
       <li>Exames de USG e Doppler no mês: ${c.exames} (USG bruto no MV: R$ ${fmtBR(c.brutoUSG)}, só referência).</li>
       ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor do laudo de USG na regra: não pagos.</li>` : ''}
       ${pacV3}

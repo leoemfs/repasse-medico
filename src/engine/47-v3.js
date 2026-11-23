@@ -205,7 +205,7 @@ function calcularV3(regra, linhas) {
 /* Valor fixo por laudo, por grupo do MV. HM de USG/Doppler Unimed paga o valor de HM do grupo de USG. */
 function calcularV3Fixo(regra, linhas) {
   const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
-    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0, porValor: new Map() })) };
+    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0, porValor: new Map(), hmPorValor: new Map() })) };
   // HM de USG/Doppler Unimed vale o mesmo que o laudo de USG do médico (regra de 23/11/2026, para qualquer médico da V3).
   const gsR = regra.grupos || [], gUSG = gsR.find(x => x.grupo === GRUPO_USG_V3) || gsR.find(x => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(x.grupo)));
   for (const it of r.itens) it.valorHM = it.grupo === gUSG?.grupo ? (+gUSG.valorLaudo || 0) : 0;
@@ -214,10 +214,12 @@ function calcularV3Fixo(regra, linhas) {
     const q = +l.quant || 1, v = +l.vlTotal || 0;
     r.valorMV += +l.vlRepasse || 0;
     if (ehLinhaHM(l)) {
-      // HM de USG/Doppler Unimed paga o valor do laudo de USG da regra.
+      // HM de USG/Doppler Unimed (regra para todos na V3, 23/11/2026): vale SEMPRE o mesmo que o exame base correspondente —
+      // o valor da USG do médico para o convênio do exame base (com a exceção por convênio, se houver).
       const g = gUSG;
       if (hmV3Devido(l.grupo, l.desc, l.convenio)) {
-        if (g && +g.valorLaudo > 0) { const it = itemDe(g); it.hmQtd += q; it.hmValor += q * +g.valorLaudo; r.hm.qtd += q; r.hm.valor += q * +g.valorLaudo; }
+        const vh = g ? valorFixoV3(g, l.baseConvenio || l.convenio).valor : 0;
+        if (vh > 0) { const it = itemDe(g); it.hmQtd += q; it.hmValor += q * vh; r.hm.qtd += q; r.hm.valor += q * vh; it.hmPorValor.set(vh, (it.hmPorValor.get(vh) || 0) + q); }
         else r.hm.semValor += q;
       } else { r.hmExcluir.qtd += q; r.hmExcluir.valor += v; const k = `${l.desc || l.grupo} · ${l.convenio || 'sem convênio'}`; r.hmExcluir.itens.set(k, (r.hmExcluir.itens.get(k) || 0) + q); }
       continue;
@@ -239,6 +241,10 @@ function calcularV3Fixo(regra, linhas) {
   }
   for (const it of r.itens) {
     it.valor = r2(it.valor); it.hmValor = r2(it.hmValor);
+    // HM: «9 × R$ 35,00 = R$ 315,00» (ou a soma por valor, quando o exame base tem valor de exceção).
+    const hv = [...it.hmPorValor].sort((a, b) => b[1] - a[1]);
+    if (hv.length === 1) it.valorHM = hv[0][0];
+    it.contaHM = hv.length > 1 ? `${hv.map(([v, n]) => `${n} × R$ ${fmtBR(v)}`).join(' + ')} = R$ ${fmtBR(it.hmValor)}` : `${it.hmQtd} × R$ ${fmtBR(it.valorHM)} = R$ ${fmtBR(it.hmValor)}`;
     // Conta do grupo para o e-mail e a memória: «276 laudo(s) = 220 × R$ 15,00 + 56 × R$ 10,00 (HOSPITAL UNIVERSITARIO) = R$ 3.860,00».
     const pv = [...it.porValor.values()].sort((a, b) => b.qtd - a.qtd);
     it.conta = pv.length > 1 || pv[0]?.convenio ? `${it.qtd} laudo(s) = ${pv.map(x => `${x.qtd} × R$ ${fmtBR(x.valor)}${x.convenio ? ` (${x.convenio})` : ''}`).join(' + ')} = R$ ${fmtBR(it.valor)}`
@@ -269,7 +275,7 @@ function textoEmailV3(c) {
     const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', ''];
     for (const i of c.itens) {
       L.push(i.qtd ? `${i.rotulo}: ${i.conta}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
-      if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.hmQtd} × ${R(i.valorHM)} = ${R(i.hmValor)}`);
+      if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.contaHM}`);
     }
     if (c.pacotes?.qtd) L.push(`Pacotes (ressonância/mamografia): ${c.pacotes.qtd} = ${R(c.pacotes.valor)}`);
     L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
