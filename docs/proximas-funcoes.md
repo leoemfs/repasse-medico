@@ -81,6 +81,42 @@ Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «c
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
+## SOL-F47 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **PRÉVIA ENVIADA, aguardando aprovação** (pedido de 23/11/2026; prévia: `docs/prototipos/descontos-do-mes.html`)
+
+**Pedido do usuário:**
+- Lembrete de descontos para três prestadores:
+  - dois recebem **adiantamento direto da Unimed**;
+  - um tem **plano de saúde** a descontar;
+  - um deles também tem a pensão alimentícia (valor fixo).
+- O valor muda todo mês e é conferido no **portal do convênio**. Por isso não dá para deixar fixo.
+- Todos esses descontos são feitos no **repasse do fim do mês (dia 30)**, o pagamento do último dia útil.
+- «A partir de agora e no ano que vem vou realizar reajuste anual.»
+
+**Hoje:**
+- O desconto parcelado (SOL-F31) exige valor fixo da parcela.
+- Não há lembrete para conferir valores no mês nem para o reajuste anual.
+
+**Proposta da prévia:**
+1. **Bases → Descontos do prestador:** cada desconto tem o valor **Fixo** (como hoje; ex.: pensão) ou **Muda todo mês**. Nesse segundo caso:
+   - não tem valor cadastrado;
+   - tem o campo «onde conferir» (ex.: portal da Unimed);
+   - o padrão de «Aplica em» é o **Repasse IMG (último dia útil)**.
+2. **Fechamento e envio → Repasse IMG**, no cartão «Descontos do mês»:
+   - o desconto que muda fica **a conferir**, com um campo para o valor visto no portal;
+   - os botões são «Lançar» e «Sem desconto este mês», e fica registrado quem lançou e quando;
+   - até ser lançado, o prestador fica com a pendência «desconto» e não aparece como pronto para enviar;
+   - o valor lançado entra na coluna DESCONTOS;
+   - o valor fixo continua automático.
+3. **Início → O que pede atenção:** «Descontos a conferir no portal: N», com o prazo do pagamento, até todos serem lançados. O menu também mostra a contagem em «Fechamento e envio».
+4. **Reajuste anual (Bases):**
+   - mês do lembrete (sugestão: janeiro) e lista do que revisar: percentuais de USG, BOARD, valores do IMG, descontos fixos e regras da V3;
+   - no mês, o Início mostra «Reajuste anual de AAAA» até alguém marcar «Reajuste de AAAA feito».
+
+**Perguntas em aberto:**
+- O que entra no reajuste anual e em que mês?
+- Os três prestadores aparecem no Repasse IMG? Se não, o desconto não teria em qual linha entrar no dia 30.
+- A pensão continua com valor fixo?
+
 ## Cadastro de USG pela planilha de controle: faixa «Repasse 42%» e residente que muda de faixa (23/11/2026, v3.0.0-alpha.21; teste: `test/cadastro_usg.mjs`)
 
 Pedido: atualizar o cadastro de USG com a lista atual de prestadores por faixa (geral, acréscimo de 2%, residentes, 40%, 42%, 50%, 55% e 70%), quem recebe BOARD e um desconto mensal recorrente. A lista com os nomes **não** fica no repositório: vai como planilha no formato da planilha de controle, para importar em Bases → Prestadores → «Importar regras da planilha de controle».
