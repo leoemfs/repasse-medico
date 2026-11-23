@@ -69,6 +69,7 @@ node test/p3_regras_config.mjs # v3.0: modalidade por grupo e HM da V3 configur�
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
 node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios
 node test/pasta_por_aba.mjs    # v3.0: «Sincronizar pasta» por aba, Correção de prestador sem subpastas (unidade pelo nome) e avisos do Fechamento recolhíveis
+node test/retrospectiva.mjs    # v3.0: SOL-F20 — Retrospectiva (PDCA) no Fluxo mensal: lead time, rodadas até o aceite, terceiros, NCs com reincidência, antecedência, comparação entre meses, melhorias e backlog
 node test/bench_pior_caso.mjs  # desempenho: 3.000 linhas × 30 mil laudos com homônimos; resultado idêntico (assinatura) e limite de tempo (precisa do --harness)
 ```
 

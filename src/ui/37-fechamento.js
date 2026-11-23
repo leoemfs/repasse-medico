@@ -325,7 +325,10 @@ async function acaoSituacao(ac, modo, x) {
     salvarFech(fe => { fe.aguardando = fe.aguardando || {}; fe.aguardando[tipo] = { ...(fe.aguardando[tipo] || {}), [x.cod]: { quem: r.campos.quem, motivo: r.campos.motivo.trim(), por: op, em: agoraISO() } }; });
     avisar(`${x.nome}: aguardando terceiros.`, 'ok');
   } else if (ac === 'tirarAguardando') {
-    salvarFech(fe => { if (fe.aguardando?.[tipo]) delete fe.aguardando[tipo][x.cod]; if (tipo === 'curitiba' && fe.aguardando?.img) delete fe.aguardando.img[x.cod]; });
+    salvarFech(fe => {
+      // SOL-F20: a marca retirada fica no histórico (tempo de espera por terceiros na Retrospectiva).
+      for (const t of tipo === 'curitiba' ? ['curitiba', 'img'] : [tipo]) { const a = fe.aguardando?.[t]?.[x.cod]; if (!a) continue; (fe.aguardandoHist ||= []).push({ ...a, tipo, cod: x.cod, ate: agoraISO(), retiradaPor: op }); delete fe.aguardando[t][x.cod]; }
+    });
     avisar(`Marca «Aguardando terceiros» retirada de ${x.nome}.`, 'ok');
   } else if (ac === 'verificar') {
     const r = await dialogo(`Marcar «${x.nome}» para verificar`, `<p class="small muted">A marca fica por cima da situação calculada até você tirar. Aparece na tela e na planilha (cor «Verificar»).</p><label class="campo">Motivo (obrigatório)<input type="text" name="motivo"></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Marcar']]);

@@ -6,8 +6,8 @@
  * ============================================================ */
 const SCHEMA_FLUXO_SYNC = 'repasse-medico/fluxo-sync';
 const SUBMAPAS_GRUPO = ['tarefas', 'documental', 'classificacao', 'matriz'];   // cada entrada é uma unidade da mescla
-const MAPAS_COMP = ['marcosManuais', 'divisao'];
-const LISTAS_COMP = ['anotacoes'];   // listas com id: une por id
+const MAPAS_COMP = ['marcosManuais', 'divisao', 'backlog'];   // backlog: situação das melhorias herdadas (SOL-F20)
+const LISTAS_COMP = ['anotacoes', 'melhorias'];   // listas com id: une por id (melhorias: SOL-F20)
 const json = v => v === undefined ? undefined : JSON.stringify(v);
 
 // Achata a competência em unidades da mescla: caminho → valor.
@@ -55,6 +55,8 @@ function rotuloUnidadeFluxo(comp, p) {
   }
   if (ps[0] === 'divisao') { const [un, gr] = ps[1].split(':'); return `Divisão: unidade ${un} · ${GRUPOS_CONTROLE?.[gr] || gr}`; }
   if (ps[0] === 'anotacoes') return 'Anotação';
+  if (ps[0] === 'melhorias') return 'Melhoria para o próximo mês';
+  if (ps[0] === 'backlog') return 'Item do backlog de melhorias';
   if (ps[0] === 'marcosManuais') return `Marco ${ps[1]}`;
   return p;
 }
@@ -64,6 +66,7 @@ function resumoValorFluxo(v) {
   if (v && typeof v === 'object') {
     if ('status' in v && STATUS_TAREFA?.[v.status]) return `${STATUS_TAREFA[v.status]}${v.obs ? ` · «${v.obs}»` : ''}${v.historico?.length ? ` (${v.historico.at(-1).por || '—'}, ${String(v.historico.at(-1).em || '').slice(11, 16)})` : ''}`;
     if ('relatorio' in v || 'nfRecebida' in v) return [v.relatorio && `e-mail ${v.relatorio}`, v.nfRecebida && `NF recebida ${v.nfRecebida}`, v.nfFinanceiro && `NF ao Financeiro ${v.nfFinanceiro}`, v.pendencia && `pendência «${v.pendencia}»`].filter(Boolean).join(' · ') || 'sem marcações';
+    if ('texto' in v && 'por' in v && !('status' in v)) return `«${String(v.texto).slice(0, 100)}» (${v.por || '—'})`;
     if ('status' in v && 'por' in v) return `${v.status} · ${v.por || '—'}`;
   }
   const t = typeof v === 'string' ? v : JSON.stringify(v); return t.length > 120 ? t.slice(0, 117) + '…' : t;
