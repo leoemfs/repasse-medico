@@ -22,6 +22,22 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+## SOL-F51 — Roteiro da conferência por relatório (pedido de 23/11/2026) — **prévia em avaliação**
+Prévia: https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB (base reaproveitável das prévias: https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE).
+
+O usuário se perde no ciclo «confiro na ferramenta, corrijo no MV, tiro o relatório de novo… e agora, rodo de novo?». Pedido: mostrar na Conferência o roteiro de cada relatório e o passo em que ele está.
+- Seis passos:
+  1. versão hospitalar no MV (PDF com valor total);
+  2. conferir e decidir;
+  3. corrigir no MV;
+  4. gerar de novo e reconferir («Reler o PDF e conferir de novo»);
+  5. aceite do relatório;
+  6. versão final e envio.
+- O passo é **calculado pelo que já existe**: PDF lido, rodadas, decisões, «Resolvido no MV» e NCs a corrigir, aceite, e-mail marcado no Fechamento. Nada a preencher a mais.
+- Cada relatório da unidade mostra o passo («passo 4 de 6», «✓ enviado») em «O que conferir».
+- **Versão final do MV** (sem a coluna de valor total e sem a %): o usuário tira, salva e envia por e-mail com a prévia de todas as unidades. A ferramenta **não precisa ler** esse PDF; o passo 6 só lembra de enviar e de marcar o e-mail. (Ainda não há exemplo do PDF final; se um dia for preciso lê-lo, pedir um exemplo.)
+- Regras de negócio que mudam: nenhuma.
+
 ## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **IMPLEMENTADA na v3.0.0-alpha.24** (pedido de 23/11/2026; prévia e os 3 pontos aprovados; teste: `test/eq_uso.mjs`)
 Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstein-agz3lv`, «SOL-F41» na numeração antiga). Ela nunca entrou na `main`: a 3.0 começou da alpha.19. Precisa ser refeita sobre a 3.0.
 
