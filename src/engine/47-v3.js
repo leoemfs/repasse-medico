@@ -109,6 +109,13 @@ function grupoFixoV3(regra, l) {
     || gs.find(g => g.grupo !== GRUPO_USG_V3 && casaGrupoV3(g.grupo, l)) || null;
 }
 
+// Valor por laudo de um grupo da regra fixa para um convênio: a exceção do convênio (trecho do nome) ou o valor do grupo.
+function valorFixoV3(g, convenio) {
+  const ex = (g.excecoes || []).find(x => x.convenio && casaTrechos(trechosPadrao(x.convenio), convenio || ''));
+  return ex ? { valor: +ex.valorLaudo || 0, convenio: ex.convenio } : { valor: +g.valorLaudo || 0, convenio: '' };
+}
+const textoExcecoesV3 = g => (g.excecoes || []).filter(x => x.convenio).map(x => `${x.convenio} R$ ${fmtBR(x.valorLaudo)}`).join(', ');
+
 function faixaV3(faixas, exames) {
   const l = [...(faixas || [])].filter(f => f.pct !== '' && f.pct !== null && f.pct !== undefined).sort((a, b) => (+a.de || 0) - (+b.de || 0));
   let r = null; for (const f of l) if (exames >= (+f.de || 0)) r = f;
@@ -119,7 +126,7 @@ function faixaV3(faixas, exames) {
 const rotuloFaixaV3 = f => !f ? '' : f.ate === null ? `${f.de}+ exames` : f.de ? `${f.de}–${f.ate}` : `até ${f.ate}`;
 function resumoRegraV3(regra) {
   if (!regra) return '';
-  if (regra.modo === 'fixo') return 'Valor fixo por laudo — ' + (regra.grupos || []).map(g => `${rotuloGrupoV3(g.grupo)}: R$ ${fmtBR(g.valorLaudo)}${g.grupo === GRUPO_USG_V3 ? ' (HM Unimed pelo mesmo valor)' : ''}`).join(' · ');
+  if (regra.modo === 'fixo') return 'Valor fixo por laudo — ' + (regra.grupos || []).map(g => `${rotuloGrupoV3(g.grupo)}: R$ ${fmtBR(g.valorLaudo)}${textoExcecoesV3(g) ? ` (${textoExcecoesV3(g)})` : ''}${g.grupo === GRUPO_USG_V3 ? ' (HM Unimed pelo mesmo valor)' : ''}`).join(' · ');
   const u = regra.usg || {}, p = [];
   const usg = u.forma === 'faixa-liquido' ? `${(u.faixas || []).map(f => +f.pct).join(' / ')}% do líquido por volume`
     : u.forma === 'pct-liquido' ? `${u.pct}% do líquido` : u.forma === 'pct-bruto' ? `${u.pct}% do bruto` : u.forma === 'por-laudo' ? `R$ ${fmtBR(u.valor)} por laudo` : 'não paga';
@@ -137,6 +144,7 @@ function validarRegraV3(regra) {
     const gs = regra.grupos || [];
     if (!gs.length) e.push('cadastre ao menos um grupo com valor por laudo');
     if (gs.some(g => !(+g.valorLaudo > 0))) e.push('cada grupo precisa de valor por laudo');
+    if (gs.some(g => (g.excecoes || []).some(x => !String(x.convenio || '').trim() || !(+x.valorLaudo >= 0)))) e.push('cada exceção por convênio precisa do convênio e do valor');
     const vistos = new Set(); for (const g of gs) { const k = norm(g.grupo); if (vistos.has(k)) e.push(`grupo repetido: ${rotuloGrupoV3(g.grupo)}`); vistos.add(k); }
     return e;
   }
@@ -197,7 +205,7 @@ function calcularV3(regra, linhas) {
 /* Valor fixo por laudo, por grupo do MV. HM de USG/Doppler Unimed paga o valor de HM do grupo de USG. */
 function calcularV3Fixo(regra, linhas) {
   const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
-    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0 })) };
+    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0, porValor: new Map() })) };
   // HM de USG/Doppler Unimed vale o mesmo que o laudo de USG do médico (regra de 23/11/2026, para qualquer médico da V3).
   const gsR = regra.grupos || [], gUSG = gsR.find(x => x.grupo === GRUPO_USG_V3) || gsR.find(x => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(x.grupo)));
   for (const it of r.itens) it.valorHM = it.grupo === gUSG?.grupo ? (+gUSG.valorLaudo || 0) : 0;
@@ -219,11 +227,23 @@ function calcularV3Fixo(regra, linhas) {
     const usg = ehUSGouDoppler(l.grupo, l.desc);
     if (usg) { r.exames += q; r.brutoUSG += v; }
     const g = grupoFixoV3(regra, l);
-    if (g) { const it = itemDe(g); it.qtd += q; it.valor += q * (+g.valorLaudo || 0); continue; }
+    if (g) {
+      // Exceção por convênio (ex.: Dra. Elen, mamografia R$ 15,00 e R$ 10,00 no HOSPITAL UNIVERSITARIO).
+      const ex = valorFixoV3(g, l.convenio), it = itemDe(g);
+      it.qtd += q; it.valor += q * ex.valor;
+      const kv = `${ex.valor}|${ex.convenio}`, pv = it.porValor.get(kv) || it.porValor.set(kv, { valor: ex.valor, convenio: ex.convenio, qtd: 0 }).get(kv); pv.qtd += q;
+      continue;
+    }
     const k = l.grupo || l.desc || 'sem grupo', e = r.semRegra.get(k) || { qtd: 0, valor: 0 };
     e.qtd += q; e.valor += v; r.semRegra.set(k, e);
   }
-  for (const it of r.itens) { it.valor = r2(it.valor); it.hmValor = r2(it.hmValor); }
+  for (const it of r.itens) {
+    it.valor = r2(it.valor); it.hmValor = r2(it.hmValor);
+    // Conta do grupo para o e-mail e a memória: «276 laudo(s) = 220 × R$ 15,00 + 56 × R$ 10,00 (HOSPITAL UNIVERSITARIO) = R$ 3.860,00».
+    const pv = [...it.porValor.values()].sort((a, b) => b.qtd - a.qtd);
+    it.conta = pv.length > 1 || pv[0]?.convenio ? `${it.qtd} laudo(s) = ${pv.map(x => `${x.qtd} × R$ ${fmtBR(x.valor)}${x.convenio ? ` (${x.convenio})` : ''}`).join(' + ')} = R$ ${fmtBR(it.valor)}`
+      : `${it.qtd} laudo(s) × R$ ${fmtBR(it.valorLaudo)} = R$ ${fmtBR(it.valor)}`;
+  }
   r.valorUSG = r2(r.itens.filter(i => i.grupo === GRUPO_USG_V3 || /ULTRASS/.test(norm(i.grupo))).reduce((s, i) => s + i.valor, 0));
   r.outrosValor = r2(r.itens.filter(i => !(i.grupo === GRUPO_USG_V3 || /ULTRASS/.test(norm(i.grupo)))).reduce((s, i) => s + i.valor, 0));
   r.pacotes.valor = r2(r.pacotes.valor);
@@ -248,7 +268,7 @@ function textoEmailV3(c) {
   if (c.modo === 'fixo') {
     const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', ''];
     for (const i of c.itens) {
-      L.push(i.qtd ? `${i.rotulo}: ${i.qtd} laudo(s) × ${R(i.valorLaudo)} = ${R(i.valor)}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
+      L.push(i.qtd ? `${i.rotulo}: ${i.conta}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
       if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.hmQtd} × ${R(i.valorHM)} = ${R(i.hmValor)}`);
     }
     if (c.pacotes?.qtd) L.push(`Pacotes (ressonância/mamografia): ${c.pacotes.qtd} = ${R(c.pacotes.valor)}`);
@@ -295,4 +315,35 @@ function avisosConferenciaV3(res) {
   out.hmExcluir.usgUnimed = { n: usgNoGrupo.length, valor: soma(usgNoGrupo) };
   out.total = out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
   return out;
+}
+
+
+/* Cadastro padrão dos médicos V3 (23/11/2026), com as regras lidas dos relatórios do MV de 11/2026 (produção 10/2026):
+ * - 10490 Ian: percentual por faixa de volume (65/68/70% do líquido, 9,15% de impostos) + densitometria 10% do bruto;
+ * - 11467 Gilson: USG R$ 30,00 · ressonância R$ 45,00;
+ * - 6703 Alexandre: USG R$ 33,00 · raio-X R$ 6,00 · ressonância R$ 45,00;
+ * - 8016 Elen: mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO).
+ * HM de USG Unimed = valor da USG; pacote de ressonância/mamografia pelo valor do MV (regras gerais da V3).
+ * Aplicado uma vez por prestador (regras.v3padrao): não sobrescreve regra já cadastrada, e apagar a regra depois não a traz
+ * de volta. Data e autor fixos, para os dois computadores gravarem o mesmo (configuração compartilhada). */
+const V3_PADRAO_VERSAO = '2026-11-23';
+const CADASTRO_V3_PADRAO = [
+  { cod: '10490', nome: 'IAN SARAIVA DE OLANDA BRAGA', regra: () => regraV3Padrao() },
+  { cod: '11467', nome: 'GILSON YOITI OGASSAWARA', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 30 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
+  { cod: '6703', nome: 'ALEXANDRE ROMANUS', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 33 }, { grupo: 'RADIOLOGIA DIAGNOSTICA', valorLaudo: 6 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
+  { cod: '8016', nome: 'ELEN AKIKO NAKANO', regra: () => ({ modo: 'fixo', grupos: [{ grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL UNIVERSITARIO', valorLaudo: 10 }] }] }) }
+];
+function aplicarCadastroV3Padrao(c) {
+  if (!Array.isArray(c.prestadores)) return false;
+  let mudou = false;
+  for (const x of CADASTRO_V3_PADRAO) {
+    let p = c.prestadores.find(y => String(y.cod) === x.cod);
+    if (!p) { p = { cod: x.cod, nomeMV: x.nome, aliases: [], naoRealizaRepasse: false, origem: 'cadastro padrão da V3', em: V3_PADRAO_VERSAO + 'T00:00:00.000Z', regras: regrasPrestadorVazias() }; c.prestadores.push(p); mudou = true; }
+    const r = p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}) };
+    if (r.v3padrao) continue;
+    r.v3padrao = V3_PADRAO_VERSAO;
+    if (!r.v3regra) { r.v3 = true; r.v3regra = x.regra(); r.alteradoPor = 'Cadastro padrão da V3 (relatórios de 11/2026)'; r.alteradoEm = V3_PADRAO_VERSAO + 'T00:00:00.000Z'; }
+    mudou = true;
+  }
+  return mudou;
 }

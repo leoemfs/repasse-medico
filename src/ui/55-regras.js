@@ -298,7 +298,9 @@ async function editarRegraV3(p) {
   if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
   else if (c.modo === 'fixo') {
     const lerGrupo = t => { const v = String(t || '').trim(); return norm(v) === norm(rotuloGrupoV3(GRUPO_USG_V3)) ? GRUPO_USG_V3 : v; };
-    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => ({ grupo: lerGrupo(c['fxGrupo' + k]), valorLaudo: +c['fxLaudo' + k] || 0 })).filter(g => g.grupo) };
+    // Exceções por convênio (cadastro padrão da V3) ficam com o grupo de mesmo nome; a tela ainda não as edita (prévia).
+    const excDe = g => (atual?.modo === 'fixo' ? atual.grupos || [] : []).find(x => norm(x.grupo) === norm(g))?.excecoes;
+    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => { const grupo = lerGrupo(c['fxGrupo' + k]), ex = excDe(grupo); return { grupo, valorLaudo: +c['fxLaudo' + k] || 0, ...(ex?.length ? { excecoes: ex } : {}) }; }).filter(g => g.grupo) };
   } else {
     regra = {
       modo: 'percentual', impostos: +c.impostos || 0,

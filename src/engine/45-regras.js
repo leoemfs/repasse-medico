@@ -73,6 +73,7 @@ function migrarRegras(c) {
   if (!c.fechamento) { c.fechamento = clone(FECHAMENTO_PADRAO); mudou = true; }
   if (!Array.isArray(c.fechamento.categoriasNF)) { c.fechamento.categoriasNF = clone(CATEGORIAS_NF_PADRAO); mudou = true; }
   for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
+  if (aplicarCadastroV3Padrao(c)) mudou = true;   // médicos V3 com as regras de 11/2026 (SOL-F46)
   return mudou;
 }
 const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, v3regra: null, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });

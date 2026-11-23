@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR" style="--accent: #1f5f99; --accent2: #2b74b8; --info: #1f5f99; --nav-ativo: #1f5f99;"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Prévia — exceção por convênio na regra da V3</title>
+<link href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" rel="icon" type="image/svg+xml"/>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
+  --ok:#17663a;--okbg:#e3f3e8;--warn:#8a5300;--warnbg:#fff3dc;--err:#a8251c;--errbg:#fdecea;--info:#1f5f99;--infobg:#e7f0fa;
+  --s-conferido:#c6efce;--s-ressalva:#ffeb9c;--s-pendente:#fce4d6;--s-fat:#ffc7ce;--s-laudo:#f8cbad;--s-hm:#d9e1f2;--s-np:#e2efda;--s-cls:#e4e4e4;--s-t:#1d2939;--on-accent:#fff;
+  color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --s-conferido:#1d4a2b;--s-ressalva:#4d3d10;--s-pendente:#4a2f20;--s-fat:#4d2126;--s-laudo:#4c2c1a;--s-hm:#243049;--s-np:#25381f;--s-cls:#333b46;--s-t:#eef2f7;--on-accent:#0b1520;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --s-conferido:#1d4a2b;--s-ressalva:#4d3d10;--s-pendente:#4a2f20;--s-fat:#4d2126;--s-laudo:#4c2c1a;--s-hm:#243049;--s-np:#25381f;--s-cls:#333b46;--s-t:#eef2f7;--on-accent:#0b1520;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.shell{--menu:232px;display:grid;grid-template-columns:var(--menu) minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--side) var(--menu),var(--bg) var(--menu))}
+.shell.recolhido{--menu:64px}
+.sidebar{background:var(--side);color:var(--side-t);padding:16px 10px;display:flex;flex-direction:column;gap:16px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:4}
+.brand{display:flex;gap:8px;align-items:center;padding:0 2px 14px 4px;border-bottom:1px solid #2c3b4e;white-space:nowrap}
+.brand-mark{width:36px;height:36px;border-radius:10px;display:block;flex:none}
+.brand-nome{min-width:0;flex:1;overflow:hidden}.brand strong{display:block;color:#fff;font-size:14px}.brand small{color:#93a4b9;font-size:11px}
+.hamb{margin-left:auto;flex:none;width:32px;height:32px;padding:0;display:grid;place-items:center;background:none;border:0;border-radius:8px;color:var(--side-t);cursor:pointer}
+.hamb:hover{background:#223349;color:#fff;border:0}.hamb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{position:relative;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
+.nav a svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a:hover{background:#223349;color:#fff}.nav a.ativo{background:var(--nav-ativo,#2a5d8c);color:#fff}
+.nav .curto,.nav .dica{display:none}
+.pill{margin-left:auto;flex:none;background:#d97b29;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
+.side-note{margin-top:auto;background:#1f2f42;border:1px solid #2f4258;border-radius:10px;padding:10px 12px;font-size:11.5px}.side-note strong{color:#fff}.side-note p{margin:4px 0 0}
+/* Menu recolhido: só ícones, como atalhos; nome em dica ao passar o mouse; pendências como ponto */
+.recolhido .sidebar{overflow:visible}
+.recolhido .brand{justify-content:center;padding:2px 0 14px}.recolhido .brand-mark,.recolhido .brand-nome,.recolhido .rot,.recolhido .side-note{display:none}
+.recolhido .hamb{margin:0}
+.recolhido .nav a{justify-content:center;padding:10px 0}
+.recolhido .pill{position:absolute;top:6px;left:calc(50% + 6px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box}
+.recolhido .nav a:hover .dica,.recolhido .nav a:focus-visible .dica{display:block;position:absolute;left:56px;top:50%;transform:translateY(-50%);background:#0d131b;color:#fff;font-size:12px;padding:5px 9px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:10;pointer-events:none}
+.main{padding:22px clamp(16px,2.6vw,36px) 40px;min-width:0}
+.topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.topo h1{margin:2px 0 0;font-size:24px}.eyebrow{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--muted)}
+.topo-dir{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.ok{background:var(--okbg);color:var(--ok)}.warn{background:var(--warnbg);color:var(--warn)}.err{background:var(--errbg);color:var(--err)}.info{background:var(--infobg);color:var(--info)}
+.aviso{border-radius:10px;padding:10px 14px;margin:0 0 14px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 8px}.card h3{font-size:14px;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 12px;max-width:900px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dz{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--accent);font-weight:600;transition:.15s}
+.dz:hover,.dz.over{border-color:var(--accent);background:var(--infobg)}
+.dz small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.fonte .estado{margin-top:10px;font-size:13px}
+button,.btn{font:inherit;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+button:hover{background:var(--accent2);border-color:var(--accent2)}
+button.sec{background:transparent;color:var(--accent)}button.sec:hover{background:var(--infobg)}
+button.perigo{background:transparent;color:var(--err);border-color:var(--err)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+label.campo{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+input[type=text],input[type=number],input[type=search],select,textarea{font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;width:100%}
+textarea{min-height:90px;font-family:Consolas,monospace;font-size:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tile{display:block;border-radius:10px;padding:10px 12px;cursor:pointer;border:2px solid transparent;color:var(--s-t);text-align:left;background:var(--s-cls);font:inherit}
+.tile b{display:block;font-size:22px}.tile small{font-size:12px;font-weight:600}
+.tile.sel{border-color:var(--text)}.tile.vazio{opacity:.45}
+.st-conferido,.st-identificado{background:var(--s-conferido)}.st-ressalva,.st-conflito{background:var(--s-ressalva)}.st-pendente{background:var(--s-pendente)}
+.st-so-faturamento,.st-nao-identificado{background:var(--s-fat)}.st-so-laudo{background:var(--s-laudo)}.st-hm-pendente{background:var(--s-hm)}
+.st-nao-procedimental{background:var(--s-np)}.st-classificacao-pendente,.st-insuficiente{background:var(--s-cls)}
+.marcadores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.marc{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--card);cursor:pointer;color:var(--text)}
+.marc.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:62vh;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:var(--accent);color:var(--on-accent);z-index:1;white-space:nowrap}
+td.n,th.n{text-align:right;white-space:nowrap}
+tbody tr.clicavel{cursor:pointer}tbody tr.clicavel:hover td{filter:brightness(.97)}
+td .st,td .badge{white-space:nowrap}td .st{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;color:var(--s-t);white-space:nowrap}
+tr.detalhe td{background:var(--bg)}
+.det{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;font-size:12.5px}.det h4{margin:0 0 4px;font-size:12px;color:var(--muted)}
+.det ul{margin:0;padding-left:18px}
+.paginacao{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:12px}
+.filtros{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:end}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+details.card>summary{cursor:pointer;font-weight:700;color:var(--accent)}
+ul.avisos{margin:6px 0;padding-left:18px;color:var(--warn);font-size:12.5px}
+.passos{counter-reset:p;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.passos li{counter-increment:p;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.passos li::before{content:counter(p);width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:12px}
+.passos li.feito::before{content:"✓";background:var(--ok)}
+.barra{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.barra i{display:block;height:100%;background:var(--accent);width:0}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);max-width:560px;width:calc(100% - 32px);padding:18px}
+dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-botoes{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.rodape{margin-top:28px;font-size:12px;color:var(--muted)}
+code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
+@media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
+/* Janela estreita no computador (v3.0.0-alpha.12: sem modo celular): o menu continua o mesmo, recolhível com ☰ ou Ctrl+B;
+ * só as grades viram uma coluna. */
+@media (max-width:760px){.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}.main{padding:16px}}
+/* ===== Fluxo mensal ===== */
+.txt-err{color:var(--err);font-weight:700}.txt-warn{color:var(--warn);font-weight:700}.txt-ok{color:var(--ok);font-weight:700}
+button.ic{padding:5px 10px}
+.subabas{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:14px}
+.subabas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;margin-bottom:-2px}
+.subabas button.on{color:var(--accent);border-bottom-color:var(--accent)}.subabas button:hover{background:var(--infobg);color:var(--accent)}
+.fx-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.comp-nav{display:flex;align-items:center;gap:8px}.comp-nav b{font-size:15px;min-width:160px;text-align:center}
+.fx-kpis .card{margin-bottom:0}.fx-kpis{margin-bottom:14px}
+.kpi h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.kpi dl{margin:0}.kpi dl div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:13px}.kpi dt{color:var(--muted)}.kpi dd{margin:0;font-weight:700;white-space:nowrap}
+.marcos-linha{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.marco,.mi{flex:none;min-width:132px;max-width:190px;display:block;text-align:left;font-weight:400;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.marco:hover,.mi:hover{background:var(--infobg);border-color:var(--accent)}.marco b,.mi b{display:block;font-size:13px}.marco small,.mi small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.marco.passado,.mi.passado{opacity:.7}.marco.hoje,.mi.hoje{border:2px solid var(--err);background:var(--errbg)}.marco.prox,.mi.prox{border-color:var(--warn);background:var(--warnbg)}
+.fx-filtros{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:6px 0 12px}.fx-filtros input{max-width:320px}
+.grupo-fx{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.gcab{width:100%;display:grid;grid-template-columns:18px minmax(200px,1.3fr) 150px minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;border-radius:0;color:var(--text);font-weight:400;text-align:left;padding:12px 14px}
+.gcab:hover{background:var(--bg)}.seta{color:var(--muted);transition:transform .15s;font-size:11px}.grupo-fx.aberto .seta{transform:rotate(90deg)}
+.gnome b{display:block}.gnome small,.gprog small{color:var(--muted);font-size:12px}.gprazo{font-size:12.5px;min-width:0}.gprazo small{display:block}
+.gprog .barra{display:block;margin:0 0 3px}
+.dep{display:block;color:#6b3fa0;font-size:11.5px}
+.gcorpo{display:none;border-top:1px solid var(--line);padding:12px 14px 14px}.grupo-fx.aberto .gcorpo{display:block}
+.stt{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.s-ni{background:#eceff3;color:#55606e}.s-and{background:var(--infobg);color:var(--info)}.s-ter{background:#efe7fa;color:#6b3fa0}.s-cor{background:var(--errbg);color:var(--err)}.s-ok{background:var(--okbg);color:var(--ok)}.s-na{background:#f1f1f1;color:#8a8a8a}
+.tab-fx td{vertical-align:middle}.tab-fx th{position:static}.tab-fx input,.tab-fx select{padding:4px 6px;font-size:12.5px}
+.tab-fx input[type=date]{min-width:128px}.tab-fx .t-nome{min-width:240px}.tab-fx .t-nome small{display:block}
+.nw{white-space:nowrap}.lnk{background:none;border:0;color:var(--accent);padding:2px 0;font-weight:600;text-decoration:underline dotted}.lnk:hover{background:none}
+.regra-fixa{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:6px 10px;font-size:12.5px;margin:0 0 10px}
+.sub-fx{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.obs-sec{margin-top:12px}.obs-sec textarea{font-family:inherit;font-size:13px;min-height:54px}
+.nota-nova{display:grid;grid-template-columns:1fr 220px auto;gap:8px;align-items:start}.nota-nova textarea{font-family:inherit;font-size:13px;min-height:44px}
+.notas{list-style:none;padding:0;margin:12px 0 0}.notas li{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0}.notas p{margin:2px 0 0;white-space:pre-wrap}
+.opt-rod{display:block;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.regra-ed{display:flex;gap:6px;flex-wrap:wrap}.regra-ed select,.regra-ed input{width:auto}
+@media (max-width:760px){.gcab{grid-template-columns:18px 1fr}.gcab>:nth-child(n+3){grid-column:2}.nota-nova{grid-template-columns:1fr}.comp-nav b{min-width:0}}
+.tab-fx select[data-c="status"]{min-width:168px;font-weight:600;border-radius:999px}
+.tab-fx input[data-c="responsavel"]{min-width:150px}.tab-fx input[data-c="obs"]{min-width:200px}
+.tab-fx select.sel-ok{background:var(--okbg);color:var(--ok)}.tab-fx select.sel-and{background:var(--infobg);color:var(--info)}.tab-fx select.sel-ter{background:#efe7fa;color:#6b3fa0}
+.tab-fx select.sel-cor{background:var(--errbg);color:var(--err)}.tab-fx select.sel-na{color:#8a8a8a}
+.gcab>.stt{justify-self:start}
+/* ---------- Não conformidades ---------- */
+.nc-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.nc-kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}.nc-kpi b{display:block;font-size:24px}.nc-kpi small{color:var(--muted);font-size:12px}
+.nc-kpi.err b{color:var(--err)}.nc-kpi.warn b{color:var(--warn)}.nc-kpi.ok b{color:var(--ok)}
+.nc-duas{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+.nc-duas h3,.legenda h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.barras .l{display:grid;grid-template-columns:minmax(0,230px) 1fr 34px;gap:8px;align-items:center;font-size:12.5px;margin:4px 0}
+.barras .l span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.barras i{display:block;height:12px;border-radius:3px;background:var(--accent)}.barras .l b{text-align:right}
+.nc-cand .l{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}.nc-cand h3+.l,.nc-cand p+.l{border-top:0}
+.nc-cand small{display:block;color:var(--muted);font-size:12px}.nc-cand .l b{white-space:nowrap}
+button.mini{padding:4px 10px;font-size:12px}
+.nc-abas{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:10px;overflow-x:auto}
+.nc-abas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;margin-bottom:-2px;white-space:nowrap}
+.nc-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}.nc-abas button:hover{background:var(--infobg);color:var(--accent)}
+.nc-abas em{font-style:normal;background:var(--infobg);color:var(--info);border-radius:999px;font-size:11px;padding:1px 7px;margin-left:5px}
+.nc-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.nc-filtros select,.nc-filtros input{width:auto;min-width:0;max-width:100%;font-size:12.5px}.nc-filtros input{flex:1 1 220px}
+.nc-sit{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.s-ab{background:var(--errbg);color:var(--err)}.s-env{background:var(--infobg);color:var(--info)}.s-tra{background:#efe7fa;color:#6b3fa0}.s-reg{background:var(--okbg);color:var(--ok)}.s-np{background:#eceff3;color:#55606e}
+.nc-nat{display:block;font-weight:600}.nc-det{display:block;color:var(--muted);font-size:12px}
+.nc-orig{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--infobg);color:var(--muted);white-space:nowrap}
+.nc-lote{margin-top:10px}.legenda{border-style:dashed}.legenda ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--muted)}.legenda li{margin:3px 0}
+.aviso-fixo{border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+@media (max-width:1000px){.nc-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-duas{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.nc-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.barras .l{grid-template-columns:minmax(0,1fr) 70px 30px}.nc-cand small{overflow-wrap:anywhere}}
+.nc-motivo{display:block;min-width:260px}
+/* ---------- Competência no topo ---------- */
+.comp-global{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:5px 8px}
+.comp-global .ic{width:30px;height:30px;padding:0;display:grid;place-items:center}
+.comp-rot{text-align:center;min-width:170px}.comp-rot b{display:block;font-size:14.5px;white-space:nowrap}.comp-rot small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.comp-st{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;vertical-align:middle;margin-left:2px}
+.comp-st.aberta{background:var(--okbg);color:var(--ok)}.comp-st.fechada{background:var(--errbg);color:var(--err)}
+.comp-aviso{background:var(--errbg);color:var(--err);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;font-weight:600}
+.fx-titulo{font-size:15px;margin:0}
+.painel-comp .l{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}.painel-comp h3+.l{border-top:0}
+.painel-comp .l small{display:block;color:var(--muted);font-size:12px}.painel-comp .v{font-weight:700;white-space:nowrap}
+.painel-comp h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.barra{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}.barra i{display:block;height:100%;background:var(--accent)}
+.fechamento{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.fechamento p{margin:4px 0 0}
+.nota-global{margin:0 0 10px}
+@media (max-width:760px){.topo-dir{width:100%}.comp-global{flex:1 1 100%;justify-content:space-between}.comp-rot{min-width:0}.comp-rot small{white-space:normal}}
+.comp-global[hidden]{display:none}
+.conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
+.st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
+.st.dec-dispensado,.marc.dec-dispensado{background:var(--line);color:var(--muted)}
+td .st.dec-nc,td .st.dec-considerar,td .st.dec-dispensado{margin-left:4px}
+.card[hidden]{display:none}
+/* ---------- Fechamento ---------- */
+.fs{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.fs-verificar{background:var(--errbg);color:var(--err)}.fs-sem{background:#fff0d6;color:#9a5b00}.fs-conferido{background:#eceff3;color:#55606e}.fs-enviado{background:var(--infobg);color:var(--info)}.fs-concluido{background:var(--okbg);color:var(--ok)}
+.fh-tab td,.fh-tab th{white-space:nowrap}.fh-tab td input{font-size:12px;padding:2px 5px}
+.fh-faixa td{background:var(--infobg);color:var(--accent);font-weight:700}.fh-cnpj td{font-size:10.5px;color:var(--muted)}.fh-total td{font-weight:800;border-top:2px solid var(--line)}
+.fh-aviso{display:inline-block;max-width:320px;white-space:normal;color:var(--warn);font-size:11.5px;font-weight:600}
+.fh-sub{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.fh-ind{width:100%;font-size:13px}.fh-ind td{padding:4px 0;border-bottom:1px solid var(--line)}
+.aviso-fixo.ok{background:var(--okbg);color:var(--ok)}
+small.evid{display:block;color:var(--info)}
+.subabas button em{font-style:normal;font-size:11px;color:var(--muted);font-weight:400;margin-left:4px}
+.subabas{overflow-x:auto}.subabas button{white-space:nowrap}
+.nc-kpi .fs{white-space:normal}
+.fh-tab th.fh-un{white-space:normal;min-width:84px;max-width:120px;line-height:1.2}.fh-tab th.fh-un small{display:block;font-weight:400;font-size:10px;opacity:.85}
+.fh-tab .fh-nome{position:sticky;left:0;z-index:1;background:var(--card);box-shadow:1px 0 0 var(--line)}
+.fh-tab th.fh-nome{background:var(--accent)}
+/* Cabeçalho acima das linhas ao rolar para baixo; o título da coluna do prestador acima de tudo (fixo nos dois sentidos). */
+.fh-tab th{z-index:2}.fh-tab th.fh-nome{z-index:3}
+.fh-faixa td.fh-pct{font-size:12.5px;white-space:nowrap}
+.fontes .card{margin-bottom:0}.grid3.fontes{margin-bottom:14px}
+/* ---------- Campo de busca no cadastro ---------- */
+.campo-busca{position:relative}
+.busca-lista{position:absolute;left:0;right:0;top:100%;margin-top:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.16);z-index:60;max-height:280px;overflow-y:auto}
+.busca-lista[hidden]{display:none}
+.busca-lista .op{display:flex;gap:10px;align-items:baseline;padding:7px 10px;font-size:13px;color:var(--text);cursor:pointer}
+.busca-lista .op.on,.busca-lista .op:hover{background:var(--infobg)}
+.busca-lista .op b{min-width:48px;color:var(--accent)}.busca-lista .op small{margin-left:auto;color:var(--muted);font-size:11px;text-align:right}
+.busca-lista .op.novo{border-top:1px solid var(--line);color:var(--accent);font-weight:600}.busca-lista .op.vazio{color:var(--muted);cursor:default}
+#dlgCorpo{overflow:visible}
+/* Menu da situação do prestador (Fechamento) */
+button.fs{border:0;cursor:pointer;font:inherit;font-size:11px;font-weight:700}
+.fs-manual{display:block;font-size:11px;color:var(--err);white-space:normal;max-width:240px;margin-top:2px}
+.menu-sit{position:fixed;z-index:80;width:320px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:6px}
+.menu-sit .cab{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:6px 10px 4px;font-weight:700}
+.menu-sit button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500}
+.menu-sit button:hover{background:var(--infobg)}.menu-sit small{color:var(--muted);font-size:11px;white-space:nowrap}
+.menu-sit hr{border:0;border-top:1px solid var(--line);margin:4px 0}.menu-sit .rodape{font-size:12px;color:var(--muted);padding:6px 10px}
+.memoria-v3{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;max-height:52vh;overflow:auto}
+dialog:has(.dlg-largo){max-width:900px}
+.alerta-desc{border-radius:8px;padding:7px 10px;margin:4px 0;font-size:13px;background:var(--bg);border:1px solid var(--line)}
+button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--warnbg);color:var(--warn);border:1px solid transparent;white-space:nowrap;cursor:pointer}
+.fh-avisos-bt .seta{display:inline-block;transition:transform .15s}.fh-avisos-bt.aberto .seta{transform:rotate(90deg)}button.fh-avisos-bt:hover{border-color:var(--warn)}
+.fh-det .fh-det-corpo{position:sticky;left:0;max-width:min(900px,calc(100vw - 80px));white-space:normal;font-size:12.5px}.fh-det ul{margin:4px 0 2px;padding-left:18px}.fh-det li{margin:2px 0}
+.lista-semvinc{columns:2 340px;padding-left:18px}.lista-semvinc li{break-inside:avoid;margin:3px 0}.lista-semvinc li button{margin-left:6px;padding:1px 8px;font-size:11.5px}
+.opcoes-check{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:4px 0}
+.opcoes-check label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
+.opcoes-check label:has(input:checked){border-color:var(--accent);background:var(--infobg)}
+.opcoes-check input{margin-top:3px;width:16px;height:16px;flex:none}.opcoes-check b{display:block;font-size:13.5px}.opcoes-check small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.35}
+.aceite-box{border:2px solid var(--accent);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--infobg)}
+.aceite-box.feito{border-color:var(--ok);background:var(--okbg)}.aceite-box .campo{margin-top:4px}
+.hist-cob{display:flex;align-items:flex-end;gap:8px;margin-top:6px}.hist-cob div{flex:1;text-align:center;font-size:11px;color:var(--muted)}.hist-cob small{display:block;font-size:10px}
+.hist-cob span{display:block;width:60%;margin:0 auto 3px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.7}.hist-cob span.atual{background:var(--ok);opacity:1}
+.lote-dv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--infobg);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.lote-dv.vazio{opacity:.8}
+.sug-fx{display:block;margin-top:3px;font-size:11.5px;color:var(--info)}.sug-fx button{margin-left:4px;padding:1px 8px;font-size:11px}
+.pbi-resumo{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.pbi-resumo .marc{cursor:default}
+.guardada{margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.tag-cp{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:1px;background:var(--bg)}
+.item-cp{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
+.item-cp .alt-cp{width:100%;margin-top:-4px}.sim-cp{background:var(--okbg);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
+@media (max-width:700px){.item-cp{grid-template-columns:1fr}}
+/* SOL-F35 — Prestadores por unidade */
+.aviso-fixo.err{background:var(--errbg);color:var(--err)}
+.cu-un{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.cu-un button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600}
+.cu-un button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cu-un .q{margin-left:6px;font-weight:800}
+.cu-res{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.cu-k{border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px;min-width:90px}
+.cu-k b{display:block;font-size:17px}
+.cu-tab tr.cu-falta td{background:var(--warnbg)}
+.cu-outros{border:1px dashed var(--line);border-radius:10px;padding:6px 10px;margin-top:10px}
+.cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
+.cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
+.fh-ctl{margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 12px}
+.fh-ctl>summary{cursor:pointer;padding:10px 0;list-style:revert}
+.fh-ctl[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+.fh-ctl .aviso-fixo{margin:6px 0}
+.bolinha{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--err);font-size:12px;font-weight:700;vertical-align:middle;color:var(--card)}
+.bolinha.warn{background:var(--warn)}
+.fh-ctl[open] .bolinha{opacity:.55}
+/* SOL-F36 — Fluxo sincronizado e divisão do trabalho */
+.sy-barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;border:1px solid var(--line)}
+.sy-barra.ok{background:var(--okbg);border-color:var(--ok)}.sy-barra.warn{background:var(--warnbg);border-color:var(--warn)}.sy-barra.off{background:var(--card)}
+.sy-barra code{font-size:12px;word-break:break-all}.sy-esp{flex:1}
+.sy-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}.sy-barra.ok .sy-dot{background:var(--ok)}.sy-barra.warn .sy-dot{background:var(--warn)}
+.sy-conf{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-direction:column;gap:4px}
+.dv-fichas .marc.sel .muted{color:inherit;opacity:.8}.dv-bloco{margin-top:14px}.dv-bloco h3{margin:0 0 4px;font-size:14px}
+.dv-quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+.dv-cel{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.dv-cel small{color:var(--muted)}.dv-cel .acoes{margin-top:6px}
+.dv-cel.eu{border-color:var(--accent);background:var(--infobg)}.dv-cel.outro{border-color:#b89be0;background:#f4eefb}.dv-cel.ok{border-color:var(--ok);background:var(--okbg)}
+.dv-quem{font-weight:700}.dv-cel.outro .dv-quem{color:#5b3d99}
+.dv-feed{margin-top:10px;font-size:12.5px}.dv-feed summary{cursor:pointer;color:var(--muted);font-weight:600}.dv-feed div{padding:4px 0;border-bottom:1px solid var(--line)}
+.dv-aviso{border:1px solid #b89be0;background:#f4eefb;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:8px 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-cel.outro,:root:not([data-theme="light"]) .dv-aviso{background:#2a2140;border-color:#6b4fa0}:root:not([data-theme="light"]) .dv-cel.outro .dv-quem{color:#cdb6f2}}
+:root[data-theme="dark"] .dv-cel.outro,:root[data-theme="dark"] .dv-aviso{background:#2a2140;border-color:#6b4fa0}
+/* Equivalências: agrupar por título (compostas na lista de pendentes) */
+.cp-bt{background:#5b3d99;border-color:#5b3d99;color:#fff}.cp-bt:disabled{opacity:.5}
+.eq-grupos td{vertical-align:top}.tag-cod{display:flex;gap:6px;align-items:baseline;font-size:12.5px;padding:2px 0}
+/* Pasta raiz no Início */
+.pr-card.ok{border-left:4px solid var(--ok)}.pr-card.warn{border-left:4px solid var(--warn)}.pr-card.off{border-left:4px solid var(--accent)}
+.pr-st{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+/* Início: filtros da lista de relatórios do MV */
+.lm-filtros{margin-bottom:4px}.lm-tab{max-height:560px;overflow:auto}
+.cf-fil{margin-bottom:6px}.cf-fil .campo{min-width:180px}
+/* SOL-F40 — Conferência por causa */
+.cf-barra{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:8px 0}
+.cf-barra span{display:block;height:100%}
+.cf-det{margin-top:10px}.cf-det summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.cz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.cz small{color:var(--muted);display:block;font-size:12px;margin-top:2px}.cz.cz-sl{background:var(--infobg)}
+.cz-n{font-size:22px;font-weight:800;text-align:right;line-height:1}.cz-n small{font-size:11px;font-weight:600}
+.cz-sep{border-top:1px dashed var(--line);margin:12px 0 4px;padding-top:8px;font-size:12.5px;color:var(--muted);font-weight:600}
+.cf-fl{background:var(--infobg);border-radius:8px;padding:6px 10px;margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){.cz{grid-template-columns:minmax(0,1fr)}.cz-n{text-align:left}}
+.cp-leitura{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:4px;max-width:420px;line-height:1.35}
+.modo-cp{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:13px}
+/* Cadastro de regra composta em 4 perguntas */
+.cp-passo{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;margin:12px 0}
+.cp-n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px}
+.cp-passo h4{margin:3px 0 6px;font-size:14px;text-transform:none;letter-spacing:0;color:var(--text)}
+.cp-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.cp-chip{background:var(--infobg);color:var(--info);border-radius:999px;padding:3px 4px 3px 10px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.cp-chip button{background:none;border:0;color:inherit;padding:0 6px;font-weight:800;cursor:pointer}
+.cp-modo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.cp-modo button{text-align:left;background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:400}
+.cp-modo button.on{border-color:var(--accent);background:var(--infobg)}.cp-modo small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.cp-proc{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:4px 0;font-size:13px}
+.cp-qtd{display:inline-flex;align-items:center;gap:4px;font-size:12.5px}.cp-qtd button{padding:0 8px;min-height:24px}
+.cp-x{background:none;border:0;color:var(--err);font-weight:800;cursor:pointer;padding:0 6px}
+.cp-ou{text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
+.cp-exc{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;border:1px dashed var(--line);border-radius:8px;padding:6px 10px;margin-bottom:6px}
+.cp-exc input[type=text]{width:140px}.cp-exc select{max-width:260px}
+.cp-como{background:var(--okbg);border:1px solid var(--ok);border-radius:10px;padding:8px 12px;font-size:13px;margin-top:6px}
+.cp-mais{margin-top:6px}.cp-mais summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:12.5px}
+@media (max-width:700px){.cp-modo{grid-template-columns:1fr}}
+/* v3.0 — Configurações em categorias, cor de destaque, modelos de exportação e aviso de versão */
+.cfg-abas{margin:0 0 14px}
+.acentos{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.acento{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:var(--card)}
+.acento input{position:absolute;opacity:0;pointer-events:none}
+.acento i{width:18px;height:18px;border-radius:50%;display:block}
+.acento.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.acento:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.ex-cols{columns:3 260px;padding-left:22px;margin:8px 0}
+.ex-cols li{break-inside:avoid;display:flex;align-items:center;gap:6px;justify-content:space-between;padding:2px 0}
+.ex-cols li.off{color:var(--muted)}
+.ex-mov{display:inline-flex;gap:2px}.ex-mov .mini{padding:0 7px;min-width:0}
+.aviso-versao{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--warnbg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.aviso-versao span{color:var(--text)}.aviso-versao button{margin-left:auto}
+.tt-lista{max-height:62vh;overflow:auto}
+.tt-titulo{cursor:pointer}.tt-titulo.on td{background:var(--infobg)}
+.tt-painel{position:sticky;top:12px}
+.tt-sug{list-style:none;padding:0;margin:6px 0}
+.tt-sug li{display:flex;gap:8px;align-items:baseline;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.tt-sug li:last-child{border-bottom:0}
+.tt-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){.tt-grid{grid-template-columns:minmax(0,1fr)}.tt-painel{position:static}}
+/* SOL-F43 — conferência oficial: classes de fechamento, totais, abas, filtros e correções no MV */
+:root{--cl-devido:#c6efce;--cl-aceito:#e4dcf5;--cl-pend:#ffeb9c;--cl-nc:#ffc7ce;--cl-excluido:#e4e4e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}}
+:root[data-theme="dark"]{--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}
+.cl-devido{background:var(--cl-devido)}.cl-aceito{background:var(--cl-aceito)}.cl-pend{background:var(--cl-pend)}.cl-nc{background:var(--cl-nc)}.cl-excluido{background:var(--cl-excluido)}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{color:var(--s-t)}
+.cf-barra-cl{display:flex}.cf-barra-cl span{display:block;height:100%}
+.cf-abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin:4px 0 12px;padding-top:4px}
+.cf-abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;margin-bottom:-2px;white-space:nowrap;font-weight:600}
+.cf-abas button:hover{color:var(--text);background:transparent}
+.cf-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.cf-abas .n{display:inline-block;vertical-align:1px;line-height:16px;margin-left:6px;border-radius:999px;padding:0 7px;font-size:11px;background:var(--line);color:var(--text)}
+.cf-abas .n.alerta{background:var(--err);color:#fff}
+.totais-cl{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(5,minmax(120px,1fr));gap:8px}
+.tot-cl{border-radius:10px;padding:10px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-align:left;color:var(--text);font-weight:400}
+.tot-cl:hover{background:var(--card);border-color:var(--accent)}
+.tot-cl b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.tot-cl small{display:block;color:var(--muted);font-size:11.5px}
+.tot-cl .faixa{display:block;height:5px;border-radius:3px;margin-bottom:6px}
+.tot-cl.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.tot-cl.pagar{background:var(--accent);border-color:var(--accent);color:var(--on-accent);cursor:default}
+.tot-cl.pagar b{font-size:24px}.tot-cl.pagar small{color:var(--on-accent);opacity:.88}
+.cf-filtros{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;align-items:end;margin-top:10px}.cf-filtros>label:first-child{grid-column:span 2}
+.cf-filtros .campo{margin:0;min-width:0}.cf-filtros select{max-width:100%}
+.cf-fchk{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
+.cf-selinfo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--infobg)}
+.aviso-mv{border:1px solid var(--err);background:var(--errbg);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+.aviso-mv b{color:var(--err)}
+.v3-avisos{border:1px solid var(--warn);background:var(--warnbg);border-radius:10px;padding:8px 12px;margin:8px 0 0}
+.v3-avisos ul{margin:4px 0 0;padding-left:18px}
+.v3-avisos li{margin:3px 0}
+.v3-avisos .v3-exc{color:var(--err)}
+.obs-i{color:var(--accent);font-weight:700}
+.cf-obs{width:100%;min-height:52px}
+.st.dec-resolvido,.marc.dec-resolvido{background:var(--warnbg);color:var(--warn)}
+.fh-classes{margin-bottom:2px;white-space:normal}
+@media (max-width:1100px){.totais-cl{grid-template-columns:repeat(3,minmax(0,1fr))}.tot-cl.pagar{grid-column:1/-1}}
+@media (max-width:760px){.totais-cl{grid-template-columns:1fr 1fr}}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;white-space:nowrap}
+.arvore{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;line-height:1.5;margin:8px 0}
+/* SOL-F19 — Quadro por prestador (Fechamento) */
+.quadro{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto;padding-bottom:4px}
+.qd-col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:120px}
+.qd-col h3{font-size:13px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.qd-n{background:var(--line);border-radius:10px;padding:0 8px;font-size:12px}
+.qd-card{display:flex;flex-direction:column;align-items:stretch;gap:3px;width:100%;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:7px 8px;margin:0 0 6px;font-weight:400;cursor:pointer}
+.qd-card:hover{background:var(--card);border-color:var(--accent)}
+.qd-card.qd-verif{border-left-color:var(--err)}
+.qd-nome{font-weight:600;font-size:13px}.qd-meta,.qd-data{font-size:11.5px;color:var(--muted)}
+.qd-tag{font-size:11px;border-radius:6px;padding:1px 6px;align-self:flex-start}
+.qd-tag.warn{background:var(--warnbg);color:var(--warn)}.qd-tag.err{background:var(--errbg);color:var(--err)}.qd-tag.info{background:var(--infobg);color:var(--info)}
+.qd-concluido .qd-card{border-left-color:var(--ok)}.qd-terceiros .qd-card{border-left-color:var(--warn)}
+/* SOL-F20 — Retrospectiva (Fluxo mensal) */
+.rt-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.rt-kpi{margin:0;padding:12px 14px}.rt-kpi h3{margin:0 0 4px;font-size:12px;color:var(--muted);font-weight:700}.rt-kpi b{display:block;font-size:22px}.rt-kpi small{display:block;font-size:12px;margin-top:2px}
+.rt-tend{font-size:11px;font-weight:700}.rt-tend.melhor{color:var(--ok)}.rt-tend.pior{color:var(--err)}
+.rt-comp td.rt-atual{background:var(--infobg);font-weight:600}.rt-comp th.rt-atual{text-decoration:underline;text-underline-offset:3px}
+.rt-barra{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 70px;gap:4px 10px;align-items:center;margin:6px 0}
+.rt-barra>div{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.rt-barra i{display:block;height:100%;background:var(--accent2)}
+.rt-barra.gargalo i{background:var(--err)}.rt-barra b{text-align:right;font-size:13px}.rt-barra small{grid-column:2/4;margin-top:-4px}
+.rt-lista{list-style:none;padding:0;margin:8px 0 0}.rt-lista li{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-top:1px solid var(--line);padding:8px 0}.rt-lista p{margin:0 0 2px;white-space:pre-wrap}
+.rt-lista select{max-width:150px}
+.rt-nova{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:8px;align-items:start}.rt-nova textarea{width:100%}
+@media (max-width:760px){.rt-nova{grid-template-columns:minmax(0,1fr)}.rt-barra{grid-template-columns:minmax(0,1fr) 60px}.rt-barra>div{grid-column:1/3;grid-row:2}.rt-barra small{grid-column:1/3}.rt-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* v3.0.0-alpha.20 — simplificação: grupos do menu e modo da página (Conferência / Correção / Histórico; Etapas / Repasses) */
+.grupo-nav{margin:14px 10px 4px;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--side-t);opacity:.6;font-weight:700}
+.nav .grupo-nav:first-child{margin-top:2px}
+.recolhido .grupo-nav{height:1px;margin:8px 12px;overflow:hidden;color:transparent;background:var(--side-t);opacity:.25}
+.modo-pag{display:inline-flex;gap:0;margin:0 0 14px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.modo-pag[hidden]{display:none}
+.modo-pag a{padding:8px 16px;font-weight:600;font-size:13.5px;color:var(--muted);text-decoration:none;border-right:1px solid var(--line)}
+.modo-pag a:last-child{border-right:0}.modo-pag a:hover{background:var(--bg)}
+.modo-pag a.on{background:var(--accent);color:var(--on-accent)}
+/* Conferência simplificada (alpha.20): topo do resultado, filtros recolhidos, lote por marcação, MV × laudo */
+.cf-res-topo{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}.cf-res-tit{flex:1 1 300px;min-width:0}.cf-res-tit h2{margin-bottom:8px}
+.cf-res-tit .tot-cl.pagar{display:inline-block;min-width:240px}
+.cf-cls{display:grid;grid-template-columns:repeat(5,minmax(104px,1fr));gap:6px;flex:2 1 520px}
+.cf-cls .tot-cl{display:block;padding:8px 10px}.cf-cls .tot-cl b{font-size:15px}
+.cf-rapido{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}.cf-rapido input[type=search]{flex:0 1 340px;min-width:220px}
+.cf-sofalta{white-space:nowrap}
+.cf-etqs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.cf-etq{font-size:12px;font-weight:600;background:var(--infobg);color:var(--info);border:0;border-radius:999px;padding:3px 10px;cursor:pointer}
+.cf-gaveta{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}.cf-gaveta[hidden]{display:none}
+.cf-filtros.cf-gaveta>label:first-child{grid-column:auto}
+.cf-selinfo.cf-selbar{background:var(--accent);color:var(--on-accent)}.cf-selinfo.cf-selbar .muted{color:inherit}
+.cf-sit{margin-top:3px}
+.cf-cmp{margin:0 0 10px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cf-cmp>div{display:grid;grid-template-columns:110px minmax(0,1fr) minmax(0,1fr);gap:8px;padding:5px 10px;border-bottom:1px solid var(--line);font-size:12.5px}
+.cf-cmp>div:last-child{border-bottom:0}.cf-cmp>div>span:first-child{color:var(--muted)}.cf-cmp .cf-cmp-cab{background:var(--bg)}
+.cf-cmp .dif{background:var(--warnbg)}
+.cf-hist-atual td{background:var(--infobg)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:1100px){.cf-cls{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* Início como painel do dia (alpha.20) */
+.ini-dia-topo{display:flex;gap:10px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}.ini-link{font-weight:600;font-size:13px}
+.marcos-linha a.mi{text-decoration:none}
+.ini-grid{align-items:start;margin-bottom:16px}.ini-grid>.card{margin:0}
+.ini-grid .l{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.ini-grid .l small{display:block;color:var(--muted);font-size:11.5px}.ini-grid .estado:empty{display:none}.ini-grid .estado{padding:2px 0 6px}
+.ini-manual{margin-top:10px}.ini-manual summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--accent)}.ini-manual .dz{margin-top:8px;padding:14px}
+.ini-pede{list-style:none;margin:0;padding:0}.ini-pede li{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}
+.ini-pede li:last-child{border-bottom:0}.ini-pede small{display:block;color:var(--muted);font-size:11.5px}
+.ini-fech.fechamento{border-top:0;margin-top:0;padding-top:16px}.ini-fech{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+/* Fechamento e envio (alpha.20): subabas no topo, situações como filtro, envio na linha */
+.modo-pag.modo-abas{display:flex;flex-wrap:wrap;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;overflow:visible}
+.modo-pag.modo-abas a{border:0;border-bottom:3px solid transparent;padding:9px 14px;color:var(--muted)}
+.modo-pag.modo-abas a.on{background:none;color:var(--accent);border-bottom-color:var(--accent)}
+.modo-pag.modo-abas a em{font-style:normal;font-size:11px;font-weight:500;margin-left:4px;opacity:.8}
+.modo-pag.modo-abas .pill{position:static;display:inline-block;font-size:10.5px;padding:0 6px;margin-left:4px;border-radius:999px;background:var(--warnbg);color:var(--warn)}
+.fh-exp{flex-wrap:wrap;align-items:center}
+.fh-sits{align-items:stretch;grid-template-columns:repeat(5,minmax(0,1fr)) auto}.fh-sits .nc-kpi{cursor:pointer;font:inherit;text-align:left;color:var(--text)}.fh-sits .nc-kpi.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.fh-sits .fh-quadro{align-self:center}
+.fh-envio{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.fh-env{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);white-space:nowrap}
+.fh-env:hover{background:var(--bg);color:var(--text)}.fh-env.on{background:var(--okbg);color:var(--ok);border-color:transparent}.fh-env small{font-weight:400}
+.fx-mais{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;justify-content:flex-end;margin:-4px 0 10px;font-size:13px}
+.fx-mais .lnk{font-weight:600}.fx-mais .lnk.on{text-decoration:none;color:var(--text)}
+.fx-doc{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.fx-doc>summary{cursor:pointer}
+/* Bases e regras (alpha.20): grupos «Usados no mês» e «Avançado» */
+.bs-abas{align-items:center}.bs-grupo{white-space:nowrap;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 0 2px}
+.bs-grupo.bs-av{margin-left:14px;padding-left:14px;border-left:1px solid var(--line)}.bs-abas .bs-avb{font-weight:500}
+
+</style>
+<style>
+.pv-faixa{position:fixed;left:50%;transform:translateX(-50%);top:8px;z-index:100;background:var(--infobg);color:var(--info);border:1px solid var(--info);border-radius:10px;padding:8px 14px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.15);max-width:calc(100vw - 32px)}
+.pv-fundo{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:40}
+#dlg[open]{position:fixed;inset:56px 0 0 0;margin:0 auto auto;z-index:50;max-height:calc(100vh - 72px);overflow:auto}
+.pv-exc{min-width:260px}
+.pv-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--infobg);color:var(--text);border-radius:999px;padding:2px 4px 2px 10px;margin:2px 4px 2px 0;font-size:12px}
+.pv-chip b{font-weight:600}
+.pv-chip button{border:0;background:transparent;color:var(--err);cursor:pointer;font-size:13px;padding:0 6px}
+.pv-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.pv-form input[type=text]{width:190px}.pv-form input[type=number]{width:90px}
+.pv-novo{border-left:3px solid var(--info);padding-left:8px}
+.pv-toast{position:fixed;top:64px;right:16px;z-index:120;background:var(--okbg);color:var(--ok);border:1px solid var(--ok);border-radius:10px;padding:10px 14px;max-width:460px;font-size:13px}
+</style></head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand"><img alt="" class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo="/><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.21 · alpha</small></div>
+<button aria-expanded="true" aria-label="Recolher menu" class="hamb" id="btnMenu" title="Recolher/expandir menu (Ctrl+B)" type="button"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button></div>
+<nav aria-label="Navegação principal" class="nav" id="navPrincipal">
+<h4 class="grupo-nav">Trabalho do mês</h4>
+<a aria-label="Início" class="" data-pag="inicio" href="#inicio"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg><span class="rot">Início</span><span aria-hidden="true" class="curto">Início</span><span aria-hidden="true" class="dica">Início</span></a>
+<a aria-label="Conferência" data-pag="conferencia" href="#conferencia"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 8h13"></path><path d="M14 4l4 4-4 4"></path><path d="M20 16H7"></path><path d="M10 12l-4 4 4 4"></path></svg><span class="rot">Conferência</span><span aria-hidden="true" class="curto">Conferir</span><span aria-hidden="true" class="dica">Conferência</span></a>
+<a aria-label="Equivalências TUSS" data-pag="equivalencias" href="#equivalencias"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="6" rx="1.5" width="7" x="3" y="4"></rect><rect height="6" rx="1.5" width="7" x="14" y="14"></rect><path d="M10 7h4a3 3 0 0 1 3 3v4"></path><path d="M15 12l2 2 2-2"></path></svg><span class="rot">Equivalências TUSS</span><span aria-hidden="true" class="curto">TUSS</span><b class="pill" hidden="" id="navPend" title="0 equivalências pendentes de validação">0</b><span aria-hidden="true" class="dica">Equivalências TUSS</span></a>
+<a aria-label="Não conformidades" data-pag="nc" href="#nc"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3.5L2.8 19.5h18.4z"></path><path d="M12 10v4.5"></path><path d="M12 17.2v.1"></path></svg><span class="rot">Não conformidades</span><span aria-hidden="true" class="curto">NCs</span><b class="pill" hidden="" id="navNC">0</b><span aria-hidden="true" class="dica">Não conformidades</span></a>
+<a aria-label="Fechamento e envio" data-pag="fechamento" href="#fluxo"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="18" rx="2" width="16" x="4" y="3"></rect><path d="M8 8h8M8 12h8"></path><path d="M8.5 16.5l1.8 1.8 3.7-3.7"></path></svg><span class="rot">Fechamento e envio</span><span aria-hidden="true" class="curto">Fechar</span><b class="pill" hidden="" id="navFluxo">0</b><span aria-hidden="true" class="dica">Fechamento e envio</span></a>
+<h4 class="grupo-nav">Configurações</h4>
+<a aria-label="Bases e regras" class="ativo" data-pag="bases" href="#bases"><svg aria-hidden="true" viewbox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path></svg><span class="rot">Bases e regras</span><span aria-hidden="true" class="curto">Bases</span><span aria-hidden="true" class="dica">Bases e regras</span></a>
+<a aria-label="Configurações" data-pag="configuracoes" href="#configuracoes"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg><span class="rot">Configurações</span><span aria-hidden="true" class="curto">Ajustes</span><span aria-hidden="true" class="dica">Configurações</span></a>
+</nav>
+<div class="side-note"><strong>Processamento local</strong><p>PDFs e planilhas são lidos só neste navegador e não vão para a internet. O que é compartilhado fica na pasta da rede.</p></div>
+</aside>
+<main class="main">
+<header class="topo">
+<div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Bases e regras</h1></div>
+<div class="topo-dir"><div class="comp-global" hidden="" id="compGlobal"><button aria-label="Competência anterior" class="sec ic" id="compAnt" title="Competência anterior" type="button">‹</button>
+<div class="comp-rot"><b>Competência 11/2026 <span class="comp-st aberta">aberta</span></b>
+<small>produção 10/2026</small></div>
+<button aria-label="Próxima competência" class="sec ic" id="compProx" title="Próxima competência" type="button">›</button></div><span class="chip" id="operadorTopo" style="cursor: pointer;" title="Clique para trocar o operador">Operador: Operador Exemplo</span><span class="badge ok" id="stInit">Pronto · processamento local</span></div>
+</header>
+<div class="aviso" hidden="" id="aviso" role="status"></div>
+<div class="comp-aviso" hidden="" id="compAviso"></div>
+<nav aria-label="" class="modo-pag" hidden="" id="subnav"></nav>
+<section class="pag" hidden="" id="pag-inicio"><div class="card ini-dia"><div class="ini-dia-topo"><div><span class="eyebrow">HOJE</span><h2 style="margin:2px 0 0">Segunda-feira, 23/11 <span class="muted small">· competência 11/2026 aberta · produção 10/2026</span></h2></div>
+<a class="ini-link" href="#fluxo">Todos os marcos e etapas →</a></div>
+<div class="marcos-linha" style="margin-top:10px"><a class="mi passado" href="#fluxo" title="Ver nas Etapas do mês"><b>13/11</b>Pagamento USG<small>há 10 dia(s)</small></a><a class="mi passado" href="#fluxo" title="Ver nas Etapas do mês"><b>13/11</b>Ecodoppler Dr. Eudes<small>há 10 dia(s)</small></a><a class="mi prox" href="#fluxo" title="Ver nas Etapas do mês"><b>24/11</b>NCs de USG<small>em 1 dia(s)</small></a><a class="mi prox" href="#fluxo" title="Ver nas Etapas do mês"><b>24/11</b>Início da classificação / IMG<small>em 1 dia(s)</small></a><a class="mi prox" href="#fluxo" title="Ver nas Etapas do mês"><b>25/11</b>Envio de relatórios IMG<small>em 2 dia(s)</small></a><a class="mi prox" href="#fluxo" title="Ver nas Etapas do mês"><b>25/11</b>Envio de relatórios Curitiba<small>em 2 dia(s)</small></a><a class="mi prox" href="#fluxo" title="Ver nas Etapas do mês"><b>25/11</b>Envio de relatórios Sedação<small>em 2 dia(s)</small></a></div></div><div class="card pr-card off"><div class="fx-topo"><h2 style="margin:0">Pasta raiz do aplicativo</h2><button id="prConectar">Conectar a pasta raiz…</button></div>
+<p class="small"><b>Lembrete:</b> conecte a pasta raiz na rede (a que contém Fluxo mensal, Equivalência TUSS, Bases de dados…). Com ela, a ferramenta lê os PDFs do MV e as planilhas do mês com um clique, sincroniza o Fluxo e as equivalências com a outra pessoa e cria as pastas com os nomes certos.</p></div><div class="grid3 painel-comp ini-grid">
+<div class="card" id="iniArquivos"><h3>Arquivos do mês</h3>
+<div class="l"><div>Relatórios do MV<small>nenhum carregado</small></div><span class="v muted">—</span></div>
+<div class="estado small" id="stMV"><span class="muted">Nenhum PDF carregado.</span></div>
+<div class="l"><div>Laudos do Apolo<small>não carregado</small></div><span class="v muted">—</span></div>
+<div class="estado small" id="stApolo"></div>
+<div class="l"><div>Power BI <span class="muted small">(opcional)</span><small>não carregado</small></div><span class="v muted">—</span></div>
+<div class="estado small" id="stPBI"></div>
+<details class="ini-manual" open=""><summary>Carregar manualmente…</summary>
+<div class="dz" id="dzMV">Relatório(s) do MV (PDF)<small>um ou vários · Relatório de Repasse de Prestadores do SOULMV</small><input accept=".pdf,application/pdf" hidden="" id="inMV" multiple="" type="file"/></div>
+<div class="dz" id="dzApolo">Laudos do Apolo (.xlsx)<small>produção 10/2026 · formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input accept=".xlsx" hidden="" id="inApolo" type="file"/></div>
+<div class="dz" id="dzPBI">Power BI (.xlsx)<small>opcional, só consulta</small><input accept=".xlsx" hidden="" id="inPBI" type="file"/></div></details>
+<p class="small muted" style="margin:6px 0 0">Esperado: produção 10/2026.</p></div>
+<div class="card"><h3>Andamento</h3>
+<div class="l"><div>Etapas do mês<small>checklist não iniciado · <a href="#fluxo">iniciar</a></small></div><span class="v">—</span></div>
+<div class="l"><div>Conferências<small>0 prestador(es) · 0 sem aceite</small></div><span class="v">0</span></div>
+<div class="l"><div>Não conformidades<small>0 abertas · 0 enviadas ao Qualiex</small></div><span class="v">0</span></div>
+<div class="l" id="cobInicio"><div>Cobertura automática<small>sem rodadas de conferência · <a data-destrava="" href="#equivalencias">o que mais destrava</a></small></div><span class="v">—</span></div>
+<div class="hist-cob" title="Cobertura das últimas competências"><div><span style="height:2px"></span>—<small>08/2026</small></div><div><span style="height:2px"></span>—<small>09/2026</small></div><div><span style="height:2px"></span>—<small>10/2026</small></div><div><span class="atual" style="height:2px"></span>—<small>11/2026</small></div></div>
+</div>
+<div class="card"><h3>Pede você</h3>
+<ul class="ini-pede"><li><span><b>Carregar os relatórios do MV (PDF)</b><small>pasta raiz ou «Carregar manualmente»</small></span></li><li><span><b>Carregar a planilha de laudos do Apolo</b><small>produção 10/2026</small></span></li></ul></div>
+</div>
+<div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do mês</h2></div><div id="listaMV"><p class="muted">Nenhum relatório carregado.</p></div></div>
+<div class="card fechamento ini-fech"><div><strong>Fechar a competência 11/2026</strong>
+<p class="small muted">Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.</p>
+<details class="small" id="iniBases"><summary>Bases alteradas nesta competência (0)</summary>
+<div class="painel-comp"><div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">0</span></div>
+<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p></div></details>
+</div>
+<div class="acoes" style="margin:0"><button class="sec" id="compPacote" title="Pasta Comp_MM-AAAA (.zip): correção de prestador, NCs, planilhas usadas, relatórios por modalidade e unidade, conferências e planilha de controle">Exportar competência (pasta)</button><button class="sec" id="compFechar">Fechar 11/2026…</button></div></div></section>
+<section class="pag" hidden="" id="pag-fluxo"></section>
+<section class="pag" hidden="" id="pag-conferencia"></section>
+<section class="pag" hidden="" id="pag-correcao"></section>
+<section class="pag" hidden="" id="pag-nc"></section>
+<section class="pag" hidden="" id="pag-fechamento"></section>
+<section class="pag" hidden="" id="pag-equivalencias"></section>
+<section class="pag" id="pag-bases"><div class="sy-barra off" id="cfgSync"><span class="sy-dot"></span><b>Configuração só neste navegador.</b><span class="muted">Conecte a pasta raiz (Configurações → Pastas e sincronização) para dividir unidades, prestadores, aliases e regras com a outra pessoa.</span></div><p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (11/2026) e aparece no painel do Início.</p>
+<div class="subabas bs-abas" role="tablist"><span class="bs-grupo">Usados no mês</span><button aria-selected="true" class="on" data-bsub="prestadores" role="tab">Prestadores e regras</button><button aria-selected="false" class="" data-bsub="unidades" role="tab">Unidades e faixas</button><button aria-selected="false" class="" data-bsub="convenios" role="tab">Convênios</button><button aria-selected="false" class="" data-bsub="faturistas" role="tab">Faturistas</button><span class="bs-grupo bs-av">Avançado</span><button aria-selected="false" class="bs-avb" data-bsub="classes" role="tab">Classes e valores IMG</button><button aria-selected="false" class="bs-avb" data-bsub="itens" role="tab">Tipo de item</button><button aria-selected="false" class="bs-avb" data-bsub="modalidades" role="tab">Modalidades e HM V3</button><button aria-selected="false" class="bs-avb" data-bsub="pbi" role="tab">Power BI</button></div>
+<div class="card" data-sub="unidades" hidden=""><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
+<div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th>CNPJ para a NF</th><th>% USG médicos</th><th>% USG residentes</th><th></th></tr></thead><tbody><tr>
+<td><input data-c="cod" data-u="0" style="width:60px" type="text" value="1"/></td><td><input data-c="nome" data-u="0" type="text" value="ULTRAMED APUCARANA (HPA)"/></td>
+<td><input data-c="apolo" data-u="0" type="text" value="GrupoSRA HPA"/></td><td><input data-c="pbi" data-u="0" type="text" value="1 - ULTRAMED APUCARANA"/></td>
+<td><input data-c="empresa" data-u="0" style="width:80px" type="text" value="SRA"/></td><td><input data-c="cnpj" data-u="0" style="width:150px" type="text" value="10.304.593/0001-33"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="0" step="0.01" style="width:70px" type="number" value="44"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="0" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="0">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="1" style="width:60px" type="text" value="2"/></td><td><input data-c="nome" data-u="1" type="text" value="ALPHASONIC JACAREZINHO"/></td>
+<td><input data-c="apolo" data-u="1" type="text" value="GrupoSRA Jacarezinho"/></td><td><input data-c="pbi" data-u="1" type="text" value="2 - ALPHASONIC - JACAREZINHO"/></td>
+<td><input data-c="empresa" data-u="1" style="width:80px" type="text" value="SRA"/></td><td><input data-c="cnpj" data-u="1" style="width:150px" type="text" value="10.304.593/0004-86"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="1" step="0.01" style="width:70px" type="number" value="49"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="1" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="1">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="2" style="width:60px" type="text" value="4"/></td><td><input data-c="nome" data-u="2" type="text" value="ULTRAMED CAMBÉ"/></td>
+<td><input data-c="apolo" data-u="2" type="text" value="Ultramed Cambe"/></td><td><input data-c="pbi" data-u="2" type="text" value="4 - ULTRAMED CAMBE"/></td>
+<td><input data-c="empresa" data-u="2" style="width:80px" type="text" value="STA"/></td><td><input data-c="cnpj" data-u="2" style="width:150px" type="text" value="09.346.898/0002-00"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="2" step="0.01" style="width:70px" type="number" value="40"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="2" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="2">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="3" style="width:60px" type="text" value="5"/></td><td><input data-c="nome" data-u="3" type="text" value="ALPHASONIC CURITIBA"/></td>
+<td><input data-c="apolo" data-u="3" type="text" value="AlphaSonic Curitiba"/></td><td><input data-c="pbi" data-u="3" type="text" value="5 - ALPHASONIC CURITIBA"/></td>
+<td><input data-c="empresa" data-u="3" style="width:80px" type="text" value="V3"/></td><td><input data-c="cnpj" data-u="3" style="width:150px" type="text" value="10.563.835/0001-03"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="3" step="0.01" style="width:70px" type="number" value=""/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="3" step="0.01" style="width:70px" type="number" value=""/></td><td><button class="perigo" data-urm="3">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="4" style="width:60px" type="text" value="7"/></td><td><input data-c="nome" data-u="4" type="text" value="ULTRAMED ARAPONGAS"/></td>
+<td><input data-c="apolo" data-u="4" type="text" value="Ultramed Arapongas Filial"/></td><td><input data-c="pbi" data-u="4" type="text" value="7 - ULTRAMED ARAPONGAS FILIAL"/></td>
+<td><input data-c="empresa" data-u="4" style="width:80px" type="text" value="SI2M"/></td><td><input data-c="cnpj" data-u="4" style="width:150px" type="text" value="02.978.370/0002-04"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="4" step="0.01" style="width:70px" type="number" value="40"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="4" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="4">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="5" style="width:60px" type="text" value="10"/></td><td><input data-c="nome" data-u="5" type="text" value="ALPHASONIC APUCARANA"/></td>
+<td><input data-c="apolo" data-u="5" type="text" value="AlphaSonic Apucarana"/></td><td><input data-c="pbi" data-u="5" type="text" value="10 - ALPHASONIC APUCARANA"/></td>
+<td><input data-c="empresa" data-u="5" style="width:80px" type="text" value="SRA"/></td><td><input data-c="cnpj" data-u="5" style="width:150px" type="text" value="10.304.593/0005-67"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="5" step="0.01" style="width:70px" type="number" value="44"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="5" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="5">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="6" style="width:60px" type="text" value="11"/></td><td><input data-c="nome" data-u="6" type="text" value="ULTRASONIC LONDRINA"/></td>
+<td><input data-c="apolo" data-u="6" type="text" value=""/></td><td><input data-c="pbi" data-u="6" type="text" value="11 - ULTRASONIC LONDRI PR"/></td>
+<td><input data-c="empresa" data-u="6" style="width:80px" type="text" value=""/></td><td><input data-c="cnpj" data-u="6" style="width:150px" type="text" value=""/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="6" step="0.01" style="width:70px" type="number" value=""/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="6" step="0.01" style="width:70px" type="number" value=""/></td><td><button class="perigo" data-urm="6">✕</button></td></tr><tr>
+<td><input data-c="cod" data-u="7" style="width:60px" type="text" value="17"/></td><td><input data-c="nome" data-u="7" type="text" value="ALPHASONIC LONDRINA (PALHANO)"/></td>
+<td><input data-c="apolo" data-u="7" type="text" value="AlphaSonic Palhano | MedicalShare"/></td><td><input data-c="pbi" data-u="7" type="text" value="17 - ALPHASONIC LONDRINA"/></td>
+<td><input data-c="empresa" data-u="7" style="width:80px" type="text" value=""/></td><td><input data-c="cnpj" data-u="7" style="width:150px" type="text" value="10.304.593/0007-29"/></td>
+<td><input aria-label="% USG médicos" data-c="pctMed" data-u="7" step="0.01" style="width:70px" type="number" value="42"/></td><td><input aria-label="% USG residentes" data-c="pctRes" data-u="7" step="0.01" style="width:70px" type="number" value="35"/></td><td><button class="perigo" data-urm="7">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button id="unSalvar">Salvar unidades</button><button class="sec" id="unAdd">+ Unidade</button><button class="sec" id="unPad">Restaurar padrão</button></div></div>
+<div class="card" data-sub="unidades" hidden=""><h2>Faixas de repasse de USG</h2>
+<p class="lead">«Unidade» usa o percentual de médicos da unidade (mais o acréscimo); «Residente», o percentual de residentes da unidade; «Fixo», o mesmo percentual em todas. O prestador escolhe a faixa em «Prestadores e regras» e pode ter percentual diferenciado por unidade.</p>
+<div class="tw"><table><thead><tr><th>Nome</th><th>Base</th><th>Acréscimo (p.p.)</th><th>% fixo</th><th class="n">Prestadores</th><th></th></tr></thead><tbody><tr>
+<td><input data-c="nome" data-fx="0" type="text" value="Repasse médicos geral"/></td>
+<td><select data-c="base" data-fx="0"><option selected="" value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="0" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="0">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="1" type="text" value="Repasse com acréscimo de 2%"/></td>
+<td><select data-c="base" data-fx="1"><option selected="" value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="1" step="0.01" style="width:80px" type="number" value="2"/></td>
+<td><input data-c="pct" data-fx="1" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="1">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="2" type="text" value="Repasse residentes 35%"/></td>
+<td><select data-c="base" data-fx="2"><option value="unidade">Unidade (médicos)</option><option selected="" value="residente">Unidade (residentes)</option><option value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="2" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="2" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="2">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="3" type="text" value="Repasse 40%"/></td>
+<td><select data-c="base" data-fx="3"><option value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option selected="" value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="3" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="3" step="0.01" style="width:80px" type="number" value="40"/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="3">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="4" type="text" value="Repasse 49%"/></td>
+<td><select data-c="base" data-fx="4"><option value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option selected="" value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="4" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="4" step="0.01" style="width:80px" type="number" value="49"/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="4">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="5" type="text" value="Repasse 50%"/></td>
+<td><select data-c="base" data-fx="5"><option value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option selected="" value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="5" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="5" step="0.01" style="width:80px" type="number" value="50"/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="5">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="6" type="text" value="Repasse 55%"/></td>
+<td><select data-c="base" data-fx="6"><option value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option selected="" value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="6" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="6" step="0.01" style="width:80px" type="number" value="55"/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="6">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fx="7" type="text" value="Repasse 70%"/></td>
+<td><select data-c="base" data-fx="7"><option value="unidade">Unidade (médicos)</option><option value="residente">Unidade (residentes)</option><option selected="" value="fixo">Fixo</option></select></td>
+<td><input data-c="acrescimo" data-fx="7" disabled="" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><input data-c="pct" data-fx="7" step="0.01" style="width:80px" type="number" value="70"/></td>
+<td class="n"></td><td><button aria-label="Remover" class="perigo mini" data-fxrm="7">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button id="fxSalvar">Salvar faixas</button><button class="sec" id="fxAdd">+ Faixa</button></div></div><div class="card" data-sub="unidades" hidden=""><h2>Parâmetros do fechamento</h2>
+<div class="grid4"><label class="campo">CNPJ da NF do BOARD<input id="pfBoard" type="text" value="10.304.593/0007-29"/></label>
+<label class="campo">CNPJ da NF do PLANTÃO<input id="pfPlantao" type="text" value="10.304.593/0001-33"/></label>
+<label class="campo">Avisar variação acima de (%)<input id="pfVar" min="0" type="number" value="30"/><span class="small muted">contra a competência anterior</span></label>
+<label class="campo">Tolerância do % de USG (p.p.)<input id="pfTolPct" min="0" step="0.1" type="number" value="0.5"/><span class="small muted">e R$ 0,05 por laudo do IMG</span></label></div>
+<div class="acoes"><button id="pfSalvar">Salvar parâmetros</button></div></div>
+<div class="card" data-sub="prestadores"><h2>Prestadores</h2><p class="lead">O par código ↔ nome vem do cabeçalho de cada relatório do MV carregado. O médico do Apolo só é ligado a um código por nome idêntico (após normalizar caixa e acentos) ou por <strong>alias validado</strong> com responsável (RN-208).</p>
+<div class="tw"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases do Apolo</th><th>Regras de repasse</th><th>Não realiza repasse</th><th>Origem</th><th></th></tr></thead><tbody></tbody></table></div>
+<p class="small muted">3 médico(s) só da V3 ficam em «Médicos V3 (Curitiba)», mais abaixo. Quem atua também nas outras unidades continua nesta lista.</p>
+<div class="acoes"><button class="sec" id="prAdd">+ Prestador manual</button><button class="sec" id="prCtrl">Importar regras da planilha de controle (.xlsx)</button><input accept=".xlsx" hidden="" id="prCtrlArq" type="file"/></div>
+<p class="small muted">A planilha de controle do repasse (abas «REPASSE USG …» e «REPASSE IMG …») preenche faixa de USG, BOARD, participação no IMG, classe fixa e V3 de cada prestador. Exceções (ex.: mamografia fixa) ficam em «Regras…».</p>
+</div>
+<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">3 médico(s)</span></h2>
+<p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago, pelo mesmo valor da USG do médico, sem precisar de laudo (basta o exame base no relatório); HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e aparece como «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Na V3 a modalidade do laudo vem da coluna TITLE do Apolo.</p>
+<div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Aliases do Apolo</th><th>Atua em</th><th>Regra</th><th></th></tr></thead><tbody>
+<tr><td>9001</td><td>MÉDICO EXEMPLO PERCENTUAL</td>
+<td><span class="muted small">—</span></td>
+<td class="small">só V3</td>
+<td class="small">USG + HM Unimed: 65 / 68 / 70% do líquido por volume · densitometria 10% do bruto · impostos 9,15%</td>
+<td style="white-space:nowrap"><button class="sec mini" data-v3regra="0">Regra da V3…</button> <button class="sec mini" data-alias="0">+ Alias</button> <button aria-label="Tirar da V3" class="perigo mini" data-v3rm="0" title="Tirar da V3">✕</button></td></tr><tr><td>9002</td><td>MÉDICO EXEMPLO USG E RESSONÂNCIA</td>
+<td><span class="muted small">—</span></td>
+<td class="small">só V3</td>
+<td class="small">Valor fixo por laudo — USG (inclui Doppler): R$ 30,00 (HM Unimed pelo mesmo valor) · RESSONANCIA MAGNETICA DIAGNOSTICA: R$ 45,00</td>
+<td style="white-space:nowrap"><button class="sec mini" data-v3regra="1">Regra da V3…</button> <button class="sec mini" data-alias="1">+ Alias</button> <button aria-label="Tirar da V3" class="perigo mini" data-v3rm="1" title="Tirar da V3">✕</button></td></tr><tr><td>9003</td><td>MÉDICA EXEMPLO MAMOGRAFIA</td>
+<td><span class="muted small">—</span></td>
+<td class="small">só V3</td>
+<td class="small">Valor fixo por laudo — MAMOGRAFIA DIAGNOSTICA: R$ 15,00 (HOSPITAL EXEMPLO R$ 10,00)</td>
+<td style="white-space:nowrap"><button class="sec mini" data-v3regra="2">Regra da V3…</button> <button class="sec mini" data-alias="2">+ Alias</button> <button aria-label="Tirar da V3" class="perigo mini" data-v3rm="2" title="Tirar da V3">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div>
+<h3 style="margin-top:18px">Médicos de Londrina que laudam na V3 por produção <span class="muted small">16 médico(s)</span></h3>
+<p class="small muted" style="margin-top:0">Laudos que não são de USG feitos para a unidade de Curitiba, pagos pelo relatório do MV (Fechamento do IMG, coluna da unidade 5). Contam em Conferência → Prestadores por unidade, no grupo Curitiba. A lista padrão raramente muda; tire ou inclua só quando mudar.</p>
+<div class="tw"><table><thead><tr><th>Cód.</th><th>Médico</th><th>Situação</th><th></th></tr></thead><tbody>
+<tr><td>9101</td><td>MÉDICO EXEMPLO 01</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9102</td><td>MÉDICO EXEMPLO 02</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9103</td><td>MÉDICO EXEMPLO 03</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9104</td><td>MÉDICO EXEMPLO 04</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9105</td><td>MÉDICO EXEMPLO 05</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9106</td><td>MÉDICO EXEMPLO 06</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9107</td><td>MÉDICO EXEMPLO 07</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9108</td><td>MÉDICO EXEMPLO 08</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9109</td><td>MÉDICO EXEMPLO 09</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9110</td><td>MÉDICO EXEMPLO 10</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9111</td><td>MÉDICO EXEMPLO 11</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9112</td><td>MÉDICO EXEMPLO 12</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9113</td><td>MÉDICO EXEMPLO 13</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9114</td><td>MÉDICO EXEMPLO 14</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9115</td><td>MÉDICO EXEMPLO 15</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr><tr><td>9116</td><td>MÉDICO EXEMPLO 16</td>
+<td class="small"><span class="badge warn">sem cadastro com este código</span></td>
+<td></td></tr></tbody></table></div>
+<div class="acoes"><button class="sec" id="v3ProdAdd">+ Médico por produção</button></div></div><div class="card" data-sub="prestadores" id="cardDesc"><h2>Descontos parcelados <span class="muted small">0 cadastrado(s) · situação em 11/2026</span></h2>
+<p class="lead">Adiantamentos, pensão alimentícia e outros descontos combinados. A parcela de cada mês entra sozinha em DESCONTOS no Fechamento, com a observação «parcela 7/10». Dá para mudar à mão no mês, e a mudança fica registrada.</p>
+<div class="tw"><table><thead><tr><th>Prestador</th><th>Motivo</th><th class="n">Parcela (R$)</th><th>Parcelas</th><th>Aplica em</th><th>Situação</th><th>Histórico</th><th></th></tr></thead><tbody>
+<tr><td class="muted" colspan="8">Nenhum desconto cadastrado.</td></tr></tbody></table></div>
+<div class="acoes"><button class="sec" data-desc-novo="">+ Desconto</button></div></div><div class="card" data-sub="classes" hidden=""><h2>Classes por produção de USG e valores por laudo do IMG <span class="muted small">vigência 2026</span></h2>
+<p class="lead">A classe sai da produção bruta de USG do prestador (Vl Total dos relatórios de USG, todas as unidades) na produção da competência. Classe fixa no cadastro do prestador vale por cima. A ferramenta usa a tabela só para conferir o valor de cada laudo do relatório do IMG e avisar quando não bate.</p>
+<div class="grid4"><label class="campo">Classe A: produção acima de (R$)<input data-corte="0" step="0.01" type="number" value="26524.38"/></label><label class="campo">Classe B: produção acima de (R$)<input data-corte="1" step="0.01" type="number" value="19679.38"/></label><label class="campo">Classe C: produção acima de (R$)<input data-corte="2" step="0.01" type="number" value="9411.88"/></label><div class="campo">Classe D<span class="small">até o último corte ou sem produção</span></div></div>
+<div class="grid2" style="margin-top:8px"><div><h3>Convênios e particulares</h3><div class="tw"><table><thead><tr><th>Exame</th><th>Residentes</th><th>Classe D</th><th>Classe C</th><th>Classe B</th><th>Classe A</th></tr></thead><tbody><tr><td>Raio-X</td><td><input data-val="convenio|RX|residente" step="0.01" style="width:72px" type="number" value="3"/></td><td><input data-val="convenio|RX|D" step="0.01" style="width:72px" type="number" value="4.1"/></td><td><input data-val="convenio|RX|C" step="0.01" style="width:72px" type="number" value="4.5"/></td><td><input data-val="convenio|RX|B" step="0.01" style="width:72px" type="number" value="4.9"/></td><td><input data-val="convenio|RX|A" step="0.01" style="width:72px" type="number" value="5.5"/></td></tr><tr><td>Mamografia</td><td><input data-val="convenio|MAMO|residente" step="0.01" style="width:72px" type="number" value="8"/></td><td><input data-val="convenio|MAMO|D" step="0.01" style="width:72px" type="number" value="15.3"/></td><td><input data-val="convenio|MAMO|C" step="0.01" style="width:72px" type="number" value="16.83"/></td><td><input data-val="convenio|MAMO|B" step="0.01" style="width:72px" type="number" value="18.36"/></td><td><input data-val="convenio|MAMO|A" step="0.01" style="width:72px" type="number" value="20.66"/></td></tr><tr><td>Densitometria</td><td><input data-val="convenio|DENSITO|residente" step="0.01" style="width:72px" type="number" value="5"/></td><td><input data-val="convenio|DENSITO|D" step="0.01" style="width:72px" type="number" value="7.14"/></td><td><input data-val="convenio|DENSITO|C" step="0.01" style="width:72px" type="number" value="7.14"/></td><td><input data-val="convenio|DENSITO|B" step="0.01" style="width:72px" type="number" value="8.16"/></td><td><input data-val="convenio|DENSITO|A" step="0.01" style="width:72px" type="number" value="9.18"/></td></tr><tr><td>Tomografia</td><td><input data-val="convenio|TOMO|residente" step="0.01" style="width:72px" type="number" value="18"/></td><td><input data-val="convenio|TOMO|D" step="0.01" style="width:72px" type="number" value="20.4"/></td><td><input data-val="convenio|TOMO|C" step="0.01" style="width:72px" type="number" value="24.48"/></td><td><input data-val="convenio|TOMO|B" step="0.01" style="width:72px" type="number" value="26.52"/></td><td><input data-val="convenio|TOMO|A" step="0.01" style="width:72px" type="number" value="29.58"/></td></tr><tr><td>Ressonância</td><td><input data-val="convenio|RESSO|residente" step="0.01" style="width:72px" type="number" value="22"/></td><td><input data-val="convenio|RESSO|D" step="0.01" style="width:72px" type="number" value="32.65"/></td><td><input data-val="convenio|RESSO|C" step="0.01" style="width:72px" type="number" value="35.7"/></td><td><input data-val="convenio|RESSO|B" step="0.01" style="width:72px" type="number" value="40.8"/></td><td><input data-val="convenio|RESSO|A" step="0.01" style="width:72px" type="number" value="44.88"/></td></tr></tbody></table></div></div><div><h3>SUS</h3><div class="tw"><table><thead><tr><th>Exame</th><th>Residentes</th><th>Classe D</th><th>Classe C</th><th>Classe B</th><th>Classe A</th></tr></thead><tbody><tr><td>Raio-X</td><td><input data-val="sus|RX|residente" step="0.01" style="width:72px" type="number" value="3"/></td><td><input data-val="sus|RX|D" step="0.01" style="width:72px" type="number" value="3.2"/></td><td><input data-val="sus|RX|C" step="0.01" style="width:72px" type="number" value="3.5"/></td><td><input data-val="sus|RX|B" step="0.01" style="width:72px" type="number" value="3.8"/></td><td><input data-val="sus|RX|A" step="0.01" style="width:72px" type="number" value="4.3"/></td></tr><tr><td>Mamografia</td><td><input data-val="sus|MAMO|residente" step="0.01" style="width:72px" type="number" value="8"/></td><td><input data-val="sus|MAMO|D" step="0.01" style="width:72px" type="number" value="11"/></td><td><input data-val="sus|MAMO|C" step="0.01" style="width:72px" type="number" value="12"/></td><td><input data-val="sus|MAMO|B" step="0.01" style="width:72px" type="number" value="13.2"/></td><td><input data-val="sus|MAMO|A" step="0.01" style="width:72px" type="number" value="14.85"/></td></tr><tr><td>Densitometria</td><td><input data-val="sus|DENSITO|residente" step="0.01" style="width:72px" type="number" value="5"/></td><td><input data-val="sus|DENSITO|D" step="0.01" style="width:72px" type="number" value="6"/></td><td><input data-val="sus|DENSITO|C" step="0.01" style="width:72px" type="number" value="6.5"/></td><td><input data-val="sus|DENSITO|B" step="0.01" style="width:72px" type="number" value="7"/></td><td><input data-val="sus|DENSITO|A" step="0.01" style="width:72px" type="number" value="8"/></td></tr><tr><td>Tomografia</td><td><input data-val="sus|TOMO|residente" step="0.01" style="width:72px" type="number" value="15"/></td><td><input data-val="sus|TOMO|D" step="0.01" style="width:72px" type="number" value="20"/></td><td><input data-val="sus|TOMO|C" step="0.01" style="width:72px" type="number" value="22"/></td><td><input data-val="sus|TOMO|B" step="0.01" style="width:72px" type="number" value="24"/></td><td><input data-val="sus|TOMO|A" step="0.01" style="width:72px" type="number" value="27"/></td></tr><tr><td>Ressonância</td><td><input data-val="sus|RESSO|residente" step="0.01" style="width:72px" type="number" value="17"/></td><td><input data-val="sus|RESSO|D" step="0.01" style="width:72px" type="number" value="26"/></td><td><input data-val="sus|RESSO|C" step="0.01" style="width:72px" type="number" value="28"/></td><td><input data-val="sus|RESSO|B" step="0.01" style="width:72px" type="number" value="31"/></td><td><input data-val="sus|RESSO|A" step="0.01" style="width:72px" type="number" value="40"/></td></tr></tbody></table></div></div></div>
+<h3 style="margin-top:12px">Procedimentos equivalentes <span class="muted small">paga por nº de exames da tabela, por valor fixo ou por % do valor faturado da linha (vale o primeiro preenchido: % da unidade → % fixo → valor fixo → nº de exames)</span></h3>
+<div class="tw"><table><thead><tr><th>Nome</th><th>Padrão na descrição do MV</th><th>Equivale a (exame)</th><th>Nº de exames</th><th>Ou valor fixo (R$)</th><th>Ou % do valor faturado</th><th>Ou % da unidade</th><th></th></tr></thead><tbody><tr>
+<td><input data-c="nome" data-eqv="0" type="text" value="Angiotomografia"/></td><td><input data-c="padrao" data-eqv="0" type="text" value="ANGIO ?TOMO|ANGIO ?TC|ANGIOTC"/></td>
+<td><select data-c="exame" data-eqv="0"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option selected="" value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="0" step="0.5" style="width:70px" type="number" value="2"/></td><td><input data-c="valor" data-eqv="0" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="0" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="0" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="0">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="1" type="text" value="Angiorressonância"/></td><td><input data-c="padrao" data-eqv="1" type="text" value="ANGIO ?R+ESSO|ANGIO ?RM|ANGIORM"/></td>
+<td><select data-c="exame" data-eqv="1"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option value="TOMO">Tomografia</option><option selected="" value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="1" step="0.5" style="width:70px" type="number" value="1.5"/></td><td><input data-c="valor" data-eqv="1" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="1" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="1" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="1">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="2" type="text" value="Artrorressonância"/></td><td><input data-c="padrao" data-eqv="2" type="text" value="ARTRO ?R+ESSO|ARTRO ?RM"/></td>
+<td><select data-c="exame" data-eqv="2"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option value="TOMO">Tomografia</option><option selected="" value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="2" step="0.5" style="width:70px" type="number" value="2"/></td><td><input data-c="valor" data-eqv="2" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="2" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="2" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="2">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="3" type="text" value="Artrotomografia"/></td><td><input data-c="padrao" data-eqv="3" type="text" value="ARTRO ?TOMO|ARTRO ?TC"/></td>
+<td><select data-c="exame" data-eqv="3"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option selected="" value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="3" step="0.5" style="width:70px" type="number" value="2"/></td><td><input data-c="valor" data-eqv="3" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="3" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="3" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="3">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="4" type="text" value="Dacriotomografia"/></td><td><input data-c="padrao" data-eqv="4" type="text" value="DACRIO"/></td>
+<td><select data-c="exame" data-eqv="4"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option selected="" value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="4" step="0.5" style="width:70px" type="number" value="2"/></td><td><input data-c="valor" data-eqv="4" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="4" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="4" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="4">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="5" type="text" value="Infiltração tomografia"/></td><td><input data-c="padrao" data-eqv="5" type="text" value="INFILTRA.*(TOMO|TC)"/></td>
+<td><select data-c="exame" data-eqv="5"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option selected="" value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="5" step="0.5" style="width:70px" type="number" value="1.5"/></td><td><input data-c="valor" data-eqv="5" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="5" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="5" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="5">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="6" type="text" value="Infiltração ressonância"/></td><td><input data-c="padrao" data-eqv="6" type="text" value="INFILTRA.*(R+ESSO|RM)"/></td>
+<td><select data-c="exame" data-eqv="6"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option value="TOMO">Tomografia</option><option selected="" value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="6" step="0.5" style="width:70px" type="number" value="1.5"/></td><td><input data-c="valor" data-eqv="6" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="6" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="6" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="6">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="7" type="text" value="Perfusão"/></td><td><input data-c="padrao" data-eqv="7" type="text" value="PERFUSAO"/></td>
+<td><select data-c="exame" data-eqv="7"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="7" step="0.5" style="width:70px" type="number" value=""/></td><td><input data-c="valor" data-eqv="7" step="0.01" style="width:90px" type="number" value="250"/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="7" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input data-c="pctUnidade" data-eqv="7" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="7">✕</button></td></tr><tr>
+<td><input data-c="nome" data-eqv="8" type="text" value="Fusão de imagem"/></td><td><input data-c="padrao" data-eqv="8" type="text" value="FUSAO"/></td>
+<td><select data-c="exame" data-eqv="8"><option value="">—</option><option value="RX">Raio-X</option><option value="MAMO">Mamografia</option><option value="DENSITO">Densitometria</option><option value="TOMO">Tomografia</option><option value="RESSO">Ressonância</option></select></td>
+<td><input data-c="fator" data-eqv="8" step="0.5" style="width:70px" type="number" value=""/></td><td><input data-c="valor" data-eqv="8" step="0.01" style="width:90px" type="number" value=""/></td><td><input aria-label="Percentual do valor faturado" data-c="pct" data-eqv="8" max="100" min="0" step="0.01" style="width:80px" type="number" value=""/></td>
+<td><label class="small" title="O percentual geral de repasse da unidade onde o exame foi feito (Bases → Unidades)"><input checked="" data-c="pctUnidade" data-eqv="8" type="checkbox"/> da unidade</label></td>
+<td><button aria-label="Remover" class="perigo mini" data-eqvrm="8">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button id="clsSalvar">Salvar classes e valores</button><button class="sec" id="clsEqvAdd">+ Equivalente</button><button class="sec" id="clsPad">Restaurar tabela 2026</button></div></div><div class="card" data-sub="convenios" hidden=""><h2>Convênios <span class="muted small">0 cadastrados · 0 sem tipo</span></h2>
+<p class="lead">O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
+<div class="acoes"><span class="small muted">Carregue o Power BI no Início para importar a lista com os tipos.</span>
+<button class="sec" id="cvAdd">+ Convênio</button>
+<label class="small"><input id="cvSoSem" type="checkbox"/> só os sem tipo</label><input id="cvBusca" placeholder="Buscar convênio…" style="max-width:260px" type="search"/></div>
+<div id="cvTab" style="margin-top:8px"><div class="tw"><table><thead><tr><th class="">Convênio</th><th class="">Tipo</th><th class="">Origem</th></tr></thead><tbody><tr><td class="muted" colspan="3">Nenhum convênio. Importe do Power BI ou dos relatórios do MV.</td></tr></tbody></table></div><div class="paginacao"><span>0 registro(s)</span></div></div></div>
+<div class="card" data-sub="faturistas" hidden="" id="cardFat"><h2>Faturistas — responsáveis pelo fechamento da conta</h2><p class="lead">Lista usada nas não conformidades e nos indicadores por responsável. Cadastre à mão, importe de uma planilha (escolhendo a coluna) ou do Power BI, quando a exportação trouxer a coluna de quem fechou a conta. Os genéricos («FATURISTA DA UNIDADE», «PARTICULAR - EQUIPE UNIDADE») valem para qualquer unidade.</p>
+<div class="tw"><table><thead><tr><th>Nome</th><th>Unidade(s)</th><th>Genérico</th><th>Ativo</th><th class="n">NCs</th><th>Origem</th><th></th></tr></thead><tbody><tr>
+<td><input data-c="nome" data-fat="0" type="text" value="FATURISTA DA UNIDADE"/></td><td><input data-c="unidades" data-fat="0" placeholder="ex.: 17, 5" type="text" value=""/></td>
+<td><input aria-label="Genérico" checked="" data-c="generico" data-fat="0" type="checkbox"/></td><td><input aria-label="Ativo" checked="" data-c="ativo" data-fat="0" type="checkbox"/></td>
+<td class="n"></td><td class="small muted">padrão</td><td><button aria-label="Remover" class="perigo" data-fatrm="0">✕</button></td></tr><tr>
+<td><input data-c="nome" data-fat="1" type="text" value="PARTICULAR - EQUIPE UNIDADE"/></td><td><input data-c="unidades" data-fat="1" placeholder="ex.: 17, 5" type="text" value=""/></td>
+<td><input aria-label="Genérico" checked="" data-c="generico" data-fat="1" type="checkbox"/></td><td><input aria-label="Ativo" checked="" data-c="ativo" data-fat="1" type="checkbox"/></td>
+<td class="n"></td><td class="small muted">padrão</td><td><button aria-label="Remover" class="perigo" data-fatrm="1">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button class="sec" id="fatAdd">+ Faturista</button><button class="sec" id="fatImp">Importar de planilha (escolher coluna)</button><input accept=".xlsx" hidden="" id="fatArq" type="file"/>
+</div></div>
+<div class="card" data-sub="itens" hidden=""><h2>Classificação do tipo de item</h2><p class="lead">Aplicada antes de qualquer equivalência (RN-199). A primeira regra ativa que casar define o tipo; sem regra, o item fica «Desconhecido — pendente». Padrões são expressões regulares sobre o texto normalizado (maiúsculas, sem acento).</p>
+<div class="tw"><table><thead><tr><th>Ativa</th><th>Campo</th><th>Padrão</th><th>Tipo</th><th>Nota</th><th></th></tr></thead><tbody><tr>
+<td><input checked="" data-c="ativa" data-cl="0" type="checkbox"/></td><td><select data-c="campo" data-cl="0"><option value="grupo">Grupo de procedimento</option><option selected="" value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="0" type="text" value="(^|\s)-\s*HM\s*$"/></td><td><select data-c="tipo" data-cl="0"><option value="procedimento">Procedimento / exame</option><option selected="" value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="0" type="text" value="Descrição termina em «- HM»"/></td><td><button class="perigo" data-clrm="0">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="1" type="checkbox"/></td><td><select data-c="campo" data-cl="1"><option selected="" value="grupo">Grupo de procedimento</option><option value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="1" type="text" value="HONORARIO"/></td><td><select data-c="tipo" data-cl="1"><option value="procedimento">Procedimento / exame</option><option selected="" value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="1" type="text" value="Grupo de honorários médicos (ex.: LAUDO URGENTE, 2ª via)"/></td><td><button class="perigo" data-clrm="1">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="2" type="checkbox"/></td><td><select data-c="campo" data-cl="2"><option selected="" value="grupo">Grupo de procedimento</option><option value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="2" type="text" value="MEDICAMENTO"/></td><td><select data-c="tipo" data-cl="2"><option value="procedimento">Procedimento / exame</option><option value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option selected="" value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="2" type="text" value=""/></td><td><button class="perigo" data-clrm="2">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="3" type="checkbox"/></td><td><select data-c="campo" data-cl="3"><option selected="" value="grupo">Grupo de procedimento</option><option value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="3" type="text" value="MATERIA"/></td><td><select data-c="tipo" data-cl="3"><option value="procedimento">Procedimento / exame</option><option value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option selected="" value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="3" type="text" value="Materiais descartáveis e kits"/></td><td><button class="perigo" data-clrm="3">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="4" type="checkbox"/></td><td><select data-c="campo" data-cl="4"><option selected="" value="grupo">Grupo de procedimento</option><option value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="4" type="text" value="PACOTE"/></td><td><select data-c="tipo" data-cl="4"><option value="procedimento">Procedimento / exame</option><option value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option selected="" value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="4" type="text" value=""/></td><td><button class="perigo" data-clrm="4">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="5" type="checkbox"/></td><td><select data-c="campo" data-cl="5"><option value="grupo">Grupo de procedimento</option><option selected="" value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="5" type="text" value="\bTAXA\b|SEDACAO"/></td><td><select data-c="tipo" data-cl="5"><option value="procedimento">Procedimento / exame</option><option value="hm">HM / honorário médico</option><option selected="" value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="5" type="text" value="Taxas e sedação cobradas à parte"/></td><td><button class="perigo" data-clrm="5">✕</button></td></tr><tr>
+<td><input checked="" data-c="ativa" data-cl="6" type="checkbox"/></td><td><select data-c="campo" data-cl="6"><option selected="" value="grupo">Grupo de procedimento</option><option value="descricao">Descrição do procedimento</option><option value="codigo">Código</option></select></td>
+<td><input data-c="padrao" data-cl="6" type="text" value="ULTRASSONOGRAFIA|TOMOGRAFIA|RESSONANCIA|RADIOLOGIA|MAMOGRAFIA|DENSITOMETRIA|ECOCARDIOGRAMA"/></td><td><select data-c="tipo" data-cl="6"><option selected="" value="procedimento">Procedimento / exame</option><option value="hm">HM / honorário médico</option><option value="taxa">Taxa</option><option value="medicamento">Medicamento</option><option value="material">Material / insumo</option><option value="pacote">Pacote / agrupador</option><option value="outro">Serviço administrativo / outro</option><option value="desconhecido">Desconhecido — pendente de classificação</option></select></td>
+<td><input data-c="nota" data-cl="6" type="text" value="Grupos de diagnóstico por imagem"/></td><td><button class="perigo" data-clrm="6">✕</button></td></tr></tbody></table></div>
+<div class="acoes"><button id="clSalvar">Salvar regras</button><button class="sec" id="clAdd">+ Regra</button><button class="sec" id="clPad">Restaurar padrão</button></div></div>
+<div class="card" data-sub="modalidades" hidden="" id="cardModHM"><h2>Modalidade do Apolo por grupo do MV</h2>
+<p class="small muted">Na unidade de Curitiba (V3), a modalidade do laudo vem da coluna TITLE do Apolo (ex.: «ULTRASSONOGRAFIA…» → US, «MAMOGRAFIA…» → MG), na conferência, na correção de prestador e em Prestadores por unidade.</p>
+<p class="lead">A conferência só procura laudos da modalidade do grupo de procedimento (ex.: ULTRASSONOGRAFIA → US). Em cada linha, os trechos do nome do grupo separados por «|» e as modalidades do Apolo separadas por vírgula. A primeira linha que casar vale; grupo sem linha não restringe a modalidade.</p>
+<div class="tw"><table><thead><tr><th>Trechos do grupo do MV</th><th>Modalidades do Apolo</th><th></th></tr></thead><tbody><tr>
+<td><input data-c="padrao" data-mg="0" style="width:100%" type="text" value="ULTRASSONOGRAFIA|DOPPLER|ECOCARDIOGRAMA"/></td><td><input data-c="modalidades" data-mg="0" style="width:110px" type="text" value="US"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="0">✕</button></td></tr><tr>
+<td><input data-c="padrao" data-mg="1" style="width:100%" type="text" value="TOMOGRAFIA"/></td><td><input data-c="modalidades" data-mg="1" style="width:110px" type="text" value="CT"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="1">✕</button></td></tr><tr>
+<td><input data-c="padrao" data-mg="2" style="width:100%" type="text" value="RESSONANCIA"/></td><td><input data-c="modalidades" data-mg="2" style="width:110px" type="text" value="MR"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="2">✕</button></td></tr><tr>
+<td><input data-c="padrao" data-mg="3" style="width:100%" type="text" value="RADIOLOGIA"/></td><td><input data-c="modalidades" data-mg="3" style="width:110px" type="text" value="CR, DX"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="3">✕</button></td></tr><tr>
+<td><input data-c="padrao" data-mg="4" style="width:100%" type="text" value="MAMOGRAFIA"/></td><td><input data-c="modalidades" data-mg="4" style="width:110px" type="text" value="MG"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="4">✕</button></td></tr><tr>
+<td><input data-c="padrao" data-mg="5" style="width:100%" type="text" value="DENSITOMETRIA"/></td><td><input data-c="modalidades" data-mg="5" style="width:110px" type="text" value="OT"/></td>
+<td><button aria-label="Remover" class="perigo mini" data-mgrm="5">✕</button></td></tr></tbody></table></div>
+<h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
+<p class="lead">Os grupos de HM que nunca são pagos valem antes de tudo. Fora deles, o HM é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio, e o exame base está no relatório (não precisa de laudo). O valor é o mesmo da USG do médico. Os demais HM não compõem o repasse e aparecem em «HM a excluir do MV».</p>
+<label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input id="hmExc" type="text" value="HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA"/><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA». Não inclua o «78 - HONORARIOS MEDICOS PF»: é nele que o MV lança o HM de USG Unimed.</span></label>
+<div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input id="hmProc" type="text" value="ULTRASS|DOPPLER|USG"/></label>
+<label class="campo">Trechos do convênio<input id="hmConv" type="text" value="UNIMED"/></label></div>
+<h2 style="margin-top:18px">Pacotes na V3</h2>
+<p class="lead">Pacote da V3 com um destes trechos é considerado pelo valor de repasse do MV e notificado. O exame base do mesmo paciente e dia, do convênio indicado e lançado a 100% (erro do MV), sai do fechamento, substituído pelo pacote.</p>
+<div class="grid2"><label class="campo">Trechos do pacote (grupo ou descrição)<input id="hmPac" type="text" value="RESSON|MAMOG"/></label>
+<label class="campo">Convênio do exame base substituído<input id="hmPacConv" type="text" value="BRADESCO"/></label></div>
+<div class="acoes"><button id="mhSalvar">Salvar</button><button class="sec" id="mgAdd">+ Grupo</button><button class="sec" id="mhPad">Restaurar padrão</button></div>
+<p class="small muted">Valem a partir da próxima conferência. Rodadas já feitas não mudam: execute a conferência de novo.</p></div>
+<div class="card" data-sub="pbi" hidden=""><h2>Power BI (consulta)</h2><p class="lead">Base auxiliar: cataloga o que existe no faturamento. Não participa da conferência nem da identificação de prestador.</p>
+<p class="muted">Carregue a planilha do Power BI no Início para consultar.</p></div></section>
+<section class="pag" hidden="" id="pag-rodadas"></section>
+<section class="pag" hidden="" id="pag-configuracoes"></section>
+<footer class="rodape">Ferramenta de apoio à conferência: não altera o MV nem substitui o aceite do responsável. Os arquivos contêm dados de pacientes (LGPD).</footer>
+</main>
+</div>
+<dialog data-aberto="1" id="dlg" open=""><form id="dlgForm" method="dialog"><h3 id="dlgTitulo">Regra da V3 — 9003 - MÉDICA EXEMPLO MAMOGRAFIA</h3><div id="dlgCorpo"><span class="dlg-largo" hidden=""></span>
+<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option><option value="9001">9001 - MÉDICO EXEMPLO PERCENTUAL (percentual)</option><option value="9002">9002 - MÉDICO EXEMPLO USG E RESSONÂNCIA (valor fixo)</option></select></label>
+<div aria-label="Como o médico recebe na V3" class="opcoes-check" role="radiogroup">
+<label><input checked="" name="modo" type="radio" value="fixo"/><span><b>Valor fixo por laudo</b><small>Valor por grupo de procedimento do MV, como está no MV. Ex.: USG R$ 33,00 o laudo (o HM Unimed paga o mesmo); ressonância R$ 45,00.</small></span></label>
+<label><input name="modo" type="radio" value="percentual"/><span><b>Percentual do faturamento (como o Dr. Ian)</b><small>USG + HM Unimed menos impostos, com % por faixa de volume; outros grupos por % ou valor.</small></span></label></div>
+<div data-modo="fixo">
+<h4 style="margin:10px 0 4px">Valor por grupo de procedimento <span class="muted small">(escolha o grupo na lista; «USG (inclui Doppler)» pega todos os procedimentos de ultrassom)</span></h4>
+<div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th><th>Exceções por convênio</th></tr></thead><tbody><tr>
+<td><input list="dlGruposV3" name="fxGrupo0" placeholder="USG (inclui Doppler)" style="min-width:300px" type="text" value="MAMOGRAFIA DIAGNOSTICA"/></td>
+<td><input min="0" name="fxLaudo0" step="0.01" style="width:110px" type="number" value="15"/></td><td class="pv-exc" data-k="0"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo1" placeholder="ex.: RESSONANCIA MAGNETICA" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo1" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="1"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo2" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo2" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="2"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo3" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo3" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="3"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo4" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo4" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="4"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo5" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo5" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="5"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo6" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo6" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="6"></td></tr><tr>
+<td><input list="dlGruposV3" name="fxGrupo7" placeholder="" style="min-width:300px" type="text" value=""/></td>
+<td><input min="0" name="fxLaudo7" step="0.01" style="width:110px" type="number" value=""/></td><td class="pv-exc" data-k="7"></td></tr></tbody></table></div>
+<p class="small muted pv-novo" style="margin:6px 0 0"><b>Novo:</b> um grupo pode ter valor diferente em um convênio (ex.: mamografia R$ 15,00, mas R$ 10,00 no HOSPITAL EXEMPLO). O convênio é procurado pelo trecho do nome, como no MV. A conta aparece separada no e-mail e na memória de cálculo.</p><p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, <b>pelo mesmo valor do laudo de USG</b> deste médico, sem precisar de laudo (basta o exame base no relatório). HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e fica no aviso «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
+<div data-modo="percentual" hidden="">
+<div class="grid4" style="margin-top:8px"><label class="campo">Impostos sobre o faturamento (%)<input min="0" name="impostos" step="0.01" type="number" value="9.15"/><span class="small muted">líquido = bruto − impostos</span></label>
+<label class="campo">USG (inclui Doppler)<select name="usgForma"><option selected="" value="faixa-liquido">% do líquido por faixa de volume</option><option value="pct-liquido">% do líquido</option><option value="pct-bruto">% do bruto</option><option value="por-laudo">valor por laudo</option><option value="nao-paga">não paga</option></select></label>
+<label class="campo">% da USG<input min="0" name="usgPct" step="0.01" type="number" value=""/><span class="small muted">para «% do líquido» ou «% do bruto»</span></label>
+<label class="campo">Valor por laudo de USG (R$)<input min="0" name="usgValor" step="0.01" type="number" value=""/></label></div>
+<h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(volume = quantidade de exames de USG e Doppler no mês)</span></h4>
+<div class="grid4"><label class="campo">A partir de (exames)<input min="0" name="fxDe0" step="1" type="number" value="0"/></label><label class="campo">% do líquido<input min="0" name="fxPct0" step="0.01" type="number" value="65"/></label><label class="campo">A partir de (exames)<input min="0" name="fxDe1" step="1" type="number" value="800"/></label><label class="campo">% do líquido<input min="0" name="fxPct1" step="0.01" type="number" value="68"/></label><label class="campo">A partir de (exames)<input min="0" name="fxDe2" step="1" type="number" value="1000"/></label><label class="campo">% do líquido<input min="0" name="fxPct2" step="0.01" type="number" value="70"/></label><label class="campo">A partir de (exames)<input min="0" name="fxDe3" step="1" type="number" value=""/></label><label class="campo">% do líquido<input min="0" name="fxPct3" step="0.01" type="number" value=""/></label><label class="campo">A partir de (exames)<input min="0" name="fxDe4" step="1" type="number" value=""/></label><label class="campo">% do líquido<input min="0" name="fxPct4" step="0.01" type="number" value=""/></label></div>
+<label class="campo">HM de USG/Doppler Unimed<select name="hm"><option selected="" value="faturamento">entra no faturamento da USG</option><option value="valor-laudo">igual a um laudo de USG</option><option value="nao-paga">não paga</option></select><span class="small muted">Os outros HM (raio-X, mamografia, ressonância e o que não é USG no 78 PF, outros convênios) nunca são pagos na V3 e ficam no aviso «HM a excluir do MV».</span></label>
+<h4 style="margin:8px 0 4px">Outros grupos <span class="muted small">(escolha o grupo do procedimento na lista)</span></h4>
+<div class="tw"><table><thead><tr><th>Nome</th><th>Grupo do procedimento (MV)</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody><tr>
+<td><input name="oNome0" type="text" value="Densitometria"/></td><td><input list="dlGruposV3" name="oPad0" style="min-width:200px" type="text" value="DENSITOM"/></td>
+<td><select name="oForma0"><option selected="" value="pct-bruto">% do bruto</option><option value="pct-liquido">% do líquido</option><option value="por-laudo">valor por laudo</option><option value="nao-paga">não paga</option></select></td>
+<td><input min="0" name="oPct0" step="0.01" style="width:70px" type="number" value="10"/></td><td><input min="0" name="oVal0" step="0.01" style="width:90px" type="number" value=""/></td></tr><tr>
+<td><input name="oNome1" type="text" value=""/></td><td><input list="dlGruposV3" name="oPad1" style="min-width:200px" type="text" value=""/></td>
+<td><select name="oForma1"><option selected="" value="pct-bruto">% do bruto</option><option value="pct-liquido">% do líquido</option><option value="por-laudo">valor por laudo</option><option value="nao-paga">não paga</option></select></td>
+<td><input min="0" name="oPct1" step="0.01" style="width:70px" type="number" value=""/></td><td><input min="0" name="oVal1" step="0.01" style="width:90px" type="number" value=""/></td></tr><tr>
+<td><input name="oNome2" type="text" value=""/></td><td><input list="dlGruposV3" name="oPad2" style="min-width:200px" type="text" value=""/></td>
+<td><select name="oForma2"><option selected="" value="pct-bruto">% do bruto</option><option value="pct-liquido">% do líquido</option><option value="por-laudo">valor por laudo</option><option value="nao-paga">não paga</option></select></td>
+<td><input min="0" name="oPct2" step="0.01" style="width:70px" type="number" value=""/></td><td><input min="0" name="oVal2" step="0.01" style="width:90px" type="number" value=""/></td></tr><tr>
+<td><input name="oNome3" type="text" value=""/></td><td><input list="dlGruposV3" name="oPad3" style="min-width:200px" type="text" value=""/></td>
+<td><select name="oForma3"><option selected="" value="pct-bruto">% do bruto</option><option value="pct-liquido">% do líquido</option><option value="por-laudo">valor por laudo</option><option value="nao-paga">não paga</option></select></td>
+<td><input min="0" name="oPct3" step="0.01" style="width:70px" type="number" value=""/></td><td><input min="0" name="oVal3" step="0.01" style="width:90px" type="number" value=""/></td></tr></tbody></table></div></div>
+<datalist id="dlGruposV3"><option value="USG (inclui Doppler)"></option></datalist>
+<p class="small muted">A lista de grupos vem dos relatórios do MV, das rodadas e do Power BI carregados. Sem eles, digite o nome do grupo como aparece no MV.</p></div><div class="dlg-botoes" id="dlgBotoes"><button class="sec" value="">Cancelar</button><button class="perigo" value="limpar">Apagar regra</button><button class="" value="ok">Salvar regra</button></div></form></dialog>
+<div class="pv-fundo" id="pvFundo"></div><div class="pv-faixa" role="note"><b>Prévia</b> (dados fictícios, sem código da ferramenta): inclua ou tire exceções por convênio, salve a regra e reabra pelo botão «Regra da V3…» do cartão.</div><datalist id="pvConv"><option value="HOSPITAL EXEMPLO"></option><option value="CONVÊNIO EXEMPLO A"></option><option value="CONVÊNIO EXEMPLO B"></option></datalist><script>
+const R = v => 'R$ ' + (+v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const exc = { 0: [{ convenio: 'HOSPITAL EXEMPLO', valor: 10 }] };   // estado da prévia (grupo 0 = MAMOGRAFIA DIAGNOSTICA)
+const dlg = document.getElementById('dlg'), fundo = document.getElementById('pvFundo');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function desenhar() {
+  document.querySelectorAll('.pv-exc').forEach(td => {
+    const k = td.dataset.k, grupo = document.querySelector(`[name="fxGrupo${k}"]`).value.trim(), l = exc[k] || [];
+    if (!grupo) { td.innerHTML = '<span class="small muted">—</span>'; return; }
+    td.innerHTML = l.map((e, i) => `<span class="pv-chip"><b>${esc(e.convenio)}</b> ${R(e.valor)} por laudo<button type="button" title="Tirar a exceção" aria-label="Tirar a exceção de ${esc(e.convenio)}" data-rm="${k}:${i}">✕</button></span>`).join('')
+      + (td.dataset.form ? `<div class="pv-form"><input type="text" list="pvConv" placeholder="Convênio (trecho do nome)" data-conv="${k}"><input type="number" step="0.01" min="0" placeholder="R$ por laudo" data-val="${k}"><button type="button" class="mini" data-ok="${k}">Incluir</button><button type="button" class="sec mini" data-cancela="${k}">Cancelar</button></div>`
+        : `<button type="button" class="sec mini" data-add="${k}">+ Convênio</button>`);
+  });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const td = k => document.querySelector(`.pv-exc[data-k="${k}"]`);
+  if (b.dataset.add !== undefined) { td(b.dataset.add).dataset.form = '1'; desenhar(); td(b.dataset.add).querySelector('[data-conv]').focus(); }
+  else if (b.dataset.cancela !== undefined) { delete td(b.dataset.cancela).dataset.form; desenhar(); }
+  else if (b.dataset.ok !== undefined) {
+    const k = b.dataset.ok, c = document.querySelector(`[data-conv="${k}"]`).value.trim().toUpperCase(), v = document.querySelector(`[data-val="${k}"]`).value;
+    if (!c || v === '') { alert('Informe o convênio e o valor por laudo.'); return; }
+    (exc[k] = exc[k] || []).push({ convenio: c, valor: +v }); delete td(k).dataset.form; desenhar();
+  }
+  else if (b.dataset.rm) { const [k, i] = b.dataset.rm.split(':'); exc[k].splice(+i, 1); desenhar(); }
+  else if (b.closest('#dlgBotoes')) { e.preventDefault(); fechar(b.value === 'ok'); }
+  else if (b.dataset.v3regra !== undefined) { e.preventDefault(); abrir(); }
+});
+function resumo() {
+  const gs = [...document.querySelectorAll('[name^="fxGrupo"]')].map(i => ({ k: i.name.slice(7), g: i.value.trim() })).filter(x => x.g);
+  return 'Valor fixo por laudo — ' + gs.map(({ k, g }) => { const v = document.querySelector(`[name="fxLaudo${k}"]`).value, l = exc[k] || [];
+    return `${g}: ${R(v)}${l.length ? ` (${l.map(e => `${e.convenio} ${R(e.valor)}`).join(', ')})` : ''}`; }).join(' · ');
+}
+function fechar(salvar) {
+  dlg.removeAttribute('open'); fundo.hidden = true;
+  if (!salvar) return;
+  const r = resumo(), linha = [...document.querySelectorAll('#cardV3 tbody tr')].find(tr => /9003/.test(tr.textContent));
+  if (linha) linha.children[4].textContent = r;
+  const t = document.createElement('div'); t.className = 'pv-toast'; t.textContent = 'Regra da V3 de 9003 - MÉDICA EXEMPLO MAMOGRAFIA atualizada: ' + r + '.'; document.body.append(t); setTimeout(() => t.remove(), 6000);
+}
+function abrir() { dlg.setAttribute('open', ''); fundo.hidden = false; desenhar(); }
+document.querySelectorAll('[name^="fxGrupo"]').forEach(i => i.addEventListener('input', desenhar));
+document.querySelectorAll('[name="modo"]').forEach(r => r.addEventListener('change', () => document.querySelectorAll('[data-modo]').forEach(d => { d.hidden = d.dataset.modo !== r.value; })));
+desenhar();
+</script></body></html>
