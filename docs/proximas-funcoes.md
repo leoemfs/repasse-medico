@@ -1,5 +1,7 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F20 implementada na v3.0.0-alpha.18** (23/11/2026): Retrospectiva mensal (PDCA) como subaba do Fluxo mensal. Detalhes na seção da SOL-F20.
+
 **SOL-F45 implementada na v3.0.0-alpha.17** (19/11/2026): Excel único da unidade × grupo, gravado em `09 - Planilhas de repasse conferidos`. Detalhes abaixo.
 
 **Atualização de 17/11/2026 — v3.0.0-alpha.9 a alpha.12.** A auditoria técnica de 16/11/2026 (`auditoria-tecnica-2026-11-16.md`) foi feita inteira, do P0 ao P3, e entraram os pedidos de 17/11 (SOL-F44, abaixo). Resumo:
@@ -529,7 +531,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 | 3 | SOL-F15 Cobertura de equivalências e validação em lote dos títulos mais frequentes | baixo | planejado |
 | 4 | SOL-F16 Status sugerido nas etapas do Fluxo · SOL-F17 Candidatos a NC guardados na competência | médio | planejado |
 | 5 | SOL-F10 Pasta da competência · SOL-F18 Base compartilhada para a equipe | médio/alto | planejado |
-| 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | planejado |
+| 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | **implementado** (F19 na v3.0.0-alpha.15, F20 na v3.0.0-alpha.18) |
 | 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
 | 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | **implementado na v2.0.0-alpha.6** |
 
@@ -627,7 +629,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - Também: limite configurável de prestadores «em correção» (WIP), com aviso quando passar.
 - **Definição de Pronto por prestador** = situação «Concluído»: aceite, divergências tratadas, prévia enviada, NF encaminhada.
 
-## SOL-F20 — Indicadores de fluxo para a retrospectiva mensal (PDCA) — PLANEJADO
+## SOL-F20 — Indicadores de fluxo para a retrospectiva mensal (PDCA) — **IMPLEMENTADA na v3.0.0-alpha.18** (teste: `test/retrospectiva.mjs`; guia em `como-usar-fluxo-mensal.md`)
 - **Indicadores:**
   - lead time por prestador (geração no MV → aceite → envio → NF);
   - nº de rodadas até o aceite;
@@ -636,6 +638,18 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - NCs por natureza e faturista (reincidência);
   - dias de antecedência na entrega ao Financeiro.
 - **Proposta:** uma aba «Retrospectiva» na competência, com comparação entre meses e um campo de «o que melhorar no próximo mês» (vira item do backlog).
+
+### SOL-F20 — implementação (v3.0.0-alpha.18, 23/11/2026)
+- **Onde:** Fluxo mensal → subaba **Retrospectiva**, da competência escolhida no topo. Nada é digitado de novo: tudo sai do Fluxo, das rodadas e aceites, do Fechamento e das NCs. Prazos em **dias úteis**, com os feriados do calendário do Fluxo.
+- **Lead time por prestador:** geração no MV → 1ª conferência → aceite → e-mail enviado → NF recebida → NF ao Financeiro, por etapa e no total. A geração é a data em que a etapa «Gerar» do grupo foi concluída no Fluxo; sem ela, vale o marco do modelo (5º dia útil no USG, início do IMG). O aceite conta quando todas as unidades do prestador têm aceite na última rodada. O quadro «Onde o tempo foi gasto» mostra a média de cada etapa e destaca o **gargalo do mês**.
+- **Rodadas até o aceite:** por relatório (prestador × unidade), incluindo as rodadas resumidas pela retenção. Mostra a média, o máximo, o % de aceites na 1ª rodada e a distribuição.
+- **Espera por terceiros:** tempo das etapas do Fluxo em «Aguardando terceiros» (pelo histórico de status) e das marcas «Aguardando terceiros» do Fechamento (SOL-F19). Ao tirar a marca, ela passa a ficar guardada num histórico (`fechamento.aguardandoHist`); antes ela era apagada. Soma por responsável.
+- **Cobertura de equivalências:** a da SOL-F15.
+- **NCs:** por natureza e por faturista, contando só as registradas na competência (sem as trazidas de outro mês e sem as «não procede»). **Reincidência** = o mesmo faturista com a mesma natureza em 2 ou mais dos últimos 3 meses.
+- **Dias de antecedência na entrega ao Financeiro:** por repasse (USG, IMG, Curitiba e Sedação), em dias úteis, da última NF encaminhada (controle documental) ou da etapa de NF concluída até o pagamento. Compara com a meta do modelo (`antecedenciaDias`, padrão 5).
+- **Comparação entre meses:** os indicadores da competência e dos 3 meses anteriores, com ▲▼ verde ou vermelho conforme melhorou ou piorou.
+- **PDCA:** «O que melhorar no próximo mês» registra itens no Fluxo da competência (lista `melhorias`), que **sincronizam pela pasta da rede** com o restante do Fluxo. Eles viram o **backlog** da competência seguinte, onde cada item é marcado como Em aberto, Em andamento, Feita ou Descartada (`backlog`, com observação). O que não for feito nem descartado segue sozinho para os meses seguintes (até 12).
+- **Excel da retrospectiva** com as abas Resumo (comparação), Lead time, Terceiros, NCs, Antecedência e Melhorias.
 
 ## SOL-F21 — Atualizar bases com o Power BI — IMPLEMENTADA na v2.0.0-alpha.11 (faturistas com unidades, convênios com tipo, procedimentos TUSS; o restante da SOL-F9 continua planejado)
 - **Hoje:** carregar no Início e depois importar faturistas e convênios em botões separados.

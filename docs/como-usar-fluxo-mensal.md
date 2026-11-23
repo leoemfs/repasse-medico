@@ -23,6 +23,14 @@
 9. **Observações da seção** e **Anotações da competência**: o lugar do bloco de notas e das anotações no e-mail.
 10. **Filtros** (Vencidas, Vencem em 3 dias, Aguardando terceiros…) e **Exportar situação (.xlsx)** para enviar o andamento a alguém.
 
+## Fim do mês: Retrospectiva (PDCA)
+Na subaba **Retrospectiva** do Fluxo mensal ficam os indicadores da competência escolhida no topo. Todos são calculados com o que já foi registrado:
+- **Lead time** (em dias úteis): geração no MV → 1ª conferência → aceite → e-mail → NF → Financeiro, por prestador e por etapa. A etapa mais demorada aparece como **gargalo do mês**. Para a geração ter a data certa, conclua a etapa «Gerar» do grupo no checklist. Sem ela, a ferramenta usa o marco do modelo.
+- **Rodadas até o aceite**, **espera por terceiros** (etapas e prestadores marcados como «Aguardando terceiros»), **cobertura de equivalências**, **NCs por natureza e faturista** (com reincidência nos últimos 3 meses) e **antecedência da entrega ao Financeiro** contra a meta de dias úteis.
+- **Comparação entre meses:** a competência e os 3 meses anteriores; ▲▼ em verde quando melhorou e em vermelho quando piorou.
+- **O que melhorar no próximo mês:** escreva cada combinado da reunião e, se quiser, ligue-o a um indicador. Esses itens viram o **backlog** do mês seguinte, onde são marcados como Em andamento, Feita ou Descartada. O que ficar em aberto segue para os próximos meses. Os itens vão para a pasta da rede junto com o Fluxo.
+- **Exportar retrospectiva (.xlsx)** gera uma planilha com tudo isso, para levar à reunião.
+
 ## Onde ficam os dados
 
 No armazenamento deste navegador, sem dados de pacientes. Faça **Configurações → Exportar backup** regularmente; o backup inclui o fluxo mensal. Para trabalhar junto com outra pessoa, use a pasta da rede (abaixo).
