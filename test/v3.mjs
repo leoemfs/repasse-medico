@@ -23,7 +23,7 @@ const okDlg = async (botao = 'ok') => { await p.waitForSelector('#dlg[open]'); a
 const LINHAS_IAN = [
   { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG ABDOME TOTAL', convenio: 'UNIMED CURITIBA', quant: 1500, vlTotal: 90000, vlRepasse: 0, tipoItem: 'procedimento' },
   { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'DOPPLER COLORIDO VENOSO DE MEMBRO INFERIOR - UNILAT', convenio: 'PARTICULAR', quant: 39, vlTotal: 3838.16, vlRepasse: 0, tipoItem: 'procedimento' },
-  { grupo: '79 - HONORARIO MEDICO ULTRASSOM', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 300, vlTotal: 21907.88, vlRepasse: 0, tipoItem: 'hm' },
+  { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 300, vlTotal: 21907.88, vlRepasse: 0, tipoItem: 'hm' },
   { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - 2 INCIDENCIAS-HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 50, vlRepasse: 0, tipoItem: 'hm' },
   { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'PARTICULAR', quant: 1, vlTotal: 80, vlRepasse: 0, tipoItem: 'hm' }
 ];
@@ -39,7 +39,7 @@ const m = await S(([L]) => {
   const densito = calcularV3(regraV3Padrao(), [...L, { grupo: 'DENSITOMETRIA', desc: 'DENSITOMETRIA OSSEA - ROTINA', quant: 40, vlTotal: 12000, tipoItem: 'procedimento' }]);
   const alex = calcularV3({ impostos: 9.15, usg: { forma: 'por-laudo', valor: 20, faixas: [] }, hm: 'valor-laudo', outros: [{ nome: 'Raio-X', padrao: 'RX|RADIOLOG', forma: 'por-laudo', valor: 8 }] }, [
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG TIREOIDE', quant: 100, vlTotal: 9000, tipoItem: 'procedimento' },
-    { grupo: '79 - HONORARIO MEDICO ULTRASSOM', desc: 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
     { grupo: 'RADIOLOGIA', desc: 'RX TORAX', quant: 5, vlTotal: 300, tipoItem: 'procedimento' },
     { grupo: 'MAMOGRAFIA', desc: 'MAMOGRAFIA DIGITAL', quant: 2, vlTotal: 400, tipoItem: 'procedimento' }]);
   return { c: { total: c.total, exames: c.exames, base: c.base, liquido: c.liquido, pct: c.pct, hm: c.hm.valor, exc: c.hmExcluir.qtd }, texto: textoEmailV3(c),
@@ -59,7 +59,7 @@ const fx = await S(() => {
   const c = calcularV3(regra, [
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG TIREOIDE', quant: 90, vlTotal: 9000, tipoItem: 'procedimento' },
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'DOPPLER COLORIDO VENOSO', quant: 10, vlTotal: 2000, tipoItem: 'procedimento' },
-    { grupo: '79 - HONORARIO MEDICO ULTRASSOM', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
     { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 40, tipoItem: 'hm' },
     { grupo: 'RESSONANCIA MAGNETICA', desc: 'RMN JOELHO', quant: 3, vlTotal: 1500, tipoItem: 'procedimento' },
     { grupo: 'MAMOGRAFIA', desc: 'MAMOGRAFIA DIGITAL', quant: 2, vlTotal: 400, tipoItem: 'procedimento' }]);
@@ -148,7 +148,7 @@ const conf = await S(() => {
   const { S: E, t } = window.__RM;
   const reg = (seq, desc, grupo, conv) => ({ seq, chave: 'c' + seq, codigo: '1' + seq, procDesc: desc, grupoNome: grupo, convenio: conv, paciente: 'PACIENTE FICTICIO', data: new Date(Date.UTC(2026, 8, 10)), vlTotal: 70, vlRepasse: 0, quant: 1 });
   // O HM de USG Unimed é pago com o exame base (USG do mesmo paciente e dia) no relatório (regra de 23/11/2026).
-  const rel = { regs: [reg(0, 'USG MAMAS', 'ULTRASSONOGRAFIA', 'UNIMED CURITIBA'), reg(1, 'USG MAMAS - HM', '79 - HONORARIO MEDICO ULTRASSOM', 'UNIMED CURITIBA'), reg(2, 'RX TORAX - 2 INCIDENCIAS-HM', 'HONORARIO MEDICO RAIO X', 'UNIMED CURITIBA'), reg(3, 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', 'HONORARIOS MEDICOS PF', 'PARTICULAR')], cab: {} };
+  const rel = { regs: [reg(0, 'USG MAMAS', 'ULTRASSONOGRAFIA', 'UNIMED CURITIBA'), reg(1, 'USG MAMAS - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA'), reg(2, 'RX TORAX - 2 INCIDENCIAS-HM', 'HONORARIO MEDICO RAIO X', 'UNIMED CURITIBA'), reg(3, 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', 'HONORARIOS MEDICOS PF', 'PARTICULAR')], cab: {} };
   const eq = { itens: [], revisao: 1 }, apolo = { laudos: [] };
   const em = un => t.conferirCruzado(rel, apolo, E.cfg, eq, { tol: 0, unidadeCod: un, medicos: [] }).linhas.filter(x => x.tipo === 'hm').map(x => `${x.status}:${[...x.marcadores].join('+')}`);
   return { v3: em('5'), sra: em('1') };

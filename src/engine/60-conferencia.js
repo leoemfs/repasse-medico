@@ -166,7 +166,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
-    // HM de raio-X, PF e mamografia (e qualquer outro) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
+    // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (b.tipo === 'hm' && unidadeV3) {
       const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
       if (sit.devido) {

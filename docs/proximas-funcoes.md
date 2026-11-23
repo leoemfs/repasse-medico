@@ -1292,7 +1292,8 @@ Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc c
 ### Como ficou (conferência da unidade V3)
 | Linha do MV | Situação | Classe | Aviso |
 |---|---|---|---|
-| HM dos grupos 77 RX, 77 PF ou 81 Mamografia (inclusive HM de USG Unimed lançado no PF) | HM — regra pendente · «HM V3 a excluir» | Excluído | «Curitiba (V3) — avisos para o MV» e «HM a excluir do MV» |
+| HM dos grupos 77 Raio X ou 81 Mamografia (inclusive HM de USG Unimed lançado lá, com destaque) | HM — regra pendente · «HM V3 a excluir» | Excluído | «Curitiba (V3) — avisos para o MV» e «HM a excluir do MV» |
+| HM do grupo 78 HONORARIOS MEDICOS PF que não é de USG Unimed (ressonância, particular…) | HM — regra pendente · «HM V3 a excluir» | Excluído | idem |
 | HM de outro grupo que não é de USG/Doppler, ou não é Unimed | HM — regra pendente · «HM V3 a excluir» | Excluído | idem |
 | HM de USG/Doppler Unimed **com** o exame de USG do mesmo atendimento (ou do mesmo paciente e dia) no relatório | Conferido · «HM V3 devido» | Devido | — |
 | HM de USG/Doppler Unimed **sem** o exame base no relatório | **HM sem exame base** | Pendente (pode ser aceito com justificativa) | causa própria em «O que falta decidir» |
@@ -1309,7 +1310,7 @@ Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc c
   - Na regra percentual (Dr. Ian), o HM já entrava no faturamento junto com a USG.
 - **Pacotes no Fechamento → Repasse Curitiba:** somados ao total pelo Vl Repasse do MV, nos dois modos de regra, com linha própria no e-mail e na memória de cálculo.
 - **Configurável:** Bases e regras → «Modalidades e HM V3», nos campos «Grupos de HM que nunca são pagos», «Trechos do pacote» e «Convênio do exame base substituído».
-  - Padrão dos grupos: `HONORARIO MEDICO RAIO X|HONORARIO MEDICO PF|HONORARIO MEDICO MAMOGRAFIA`.
+  - Padrão dos grupos: `HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA`. O «78 - HONORARIOS MEDICOS PF» **não** entra em bloco (ver «Teste com os arquivos reais»).
   - Cada palavra do padrão precisa começar uma palavra do grupo do MV, sem diferença de plural nem do número do grupo.
 - **Médicos por produção:** em Bases → Médicos V3, nova lista «Médicos de Londrina que laudam na V3 por produção», já com os 16 médicos.
   - Botões «Tirar», «Voltar à lista» e «+ Médico por produção»; a escolha fica em `regras.v3producao` do prestador.
@@ -1320,17 +1321,36 @@ Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc c
   - Cada item tem o botão «Ver linhas», que filtra a tabela.
 
 ### Critérios de aceite (em `test/v3_curitiba.mjs`, com dados fictícios)
-1. HM dos grupos 77 Raio X, 77 PF e 81 Mamografia = Excluído e listado para exclusão, mesmo quando é de USG Unimed.
+1. HM dos grupos 77 Raio X e 81 Mamografia = Excluído e listado para exclusão, mesmo quando é de USG Unimed. No 78 PF, só o HM de USG Unimed é devido.
 2. HM de USG Unimed com o exame base no relatório = Devido, sem laudo; sem o exame base = Pendente, com causa própria.
 3. Laudo com MODALITY errada e TITLE de ultrassom pareia com a linha de USG.
 4. Pacote de ressonância = Devido; o exame base Bradesco a 100% do mesmo paciente e dia = Excluído («Substituído pelo pacote»).
 5. Valor fixo: HM Unimed × valor do laudo de USG; pacote somado pelo valor do MV.
 6. Lista padrão com os 16 médicos por produção; na unidade 5, contam só os laudos que não são de USG.
 
+### Teste com os arquivos reais (competência 11/2026, produção 10/2026) — `test/curitiba_real_11-2026.mjs`
+Material de 23/11/2026, na pasta `dados/comp_11-2026_curitiba/` (fora do Git): relatórios do MV de 10490 (Ian), 11467 (Gilson), 7 e 14 e a planilha de laudos. Sem a base de equivalências, os procedimentos ficam «pendente»; o teste mede o que é próprio da V3.
+
+- **O HM de USG Unimed vem no grupo «78 - HONORARIOS MEDICOS PF»**, e não em «77».
+  - É lá que estão os 544 HM do Ian (R$ 27.890,68) e os 21 do Gilson.
+  - O mesmo grupo traz HM que não são pagos: 3 do Ian, particulares; 3 do Gilson e 5 do Marcelo (7), de ressonância.
+  - Por isso, o PF saiu da exclusão em bloco: dentro dele, vale a regra geral (só USG/Doppler Unimed é devido).
+  - Grupos de HM que apareceram: 78 PF, 80 HONORARIO MEDICO RESSONANCIA, 81 HONORARIO MEDICO MAMOGRAFIA e 83 HONORARIO MEDICO DENSITOMETRIA.
+- **Exame base:** os 544 HM do Ian e os 18 HM de USG do Gilson acharam o exame de USG no relatório. Nenhum ficou «sem exame base».
+- **HM a excluir:**
+  - Ian: 6, R$ 287,40 (3 particulares no PF, 2 de mamografia e 1 de densitometria);
+  - Gilson: 3 de RMN no PF, R$ 90,00 (o MV pagou R$ 30 cada);
+  - Marcelo (7): 8 de ressonância, R$ 779,52.
+- **Cálculo, simulando tudo aceito:**
+  - Ian: 1.741 USG; R$ 100.962,16 + HM R$ 27.890,68 = R$ 128.852,84; menos 9,15% = R$ 117.062,81; × 70% = **R$ 81.943,96**.
+  - Gilson (valor fixo lido do relatório: USG R$ 30, ressonância R$ 45, HM = USG): **R$ 7.635,00**, contra R$ 7.725,00 do MV. A diferença são os R$ 90,00 de HM de RMN.
+- **TITLE:** dos 4.118 laudos de Curitiba, o TITLE e a MODALITY concordam.
+  - Títulos com erro de digitação («ULTRASONOGRAFIA», «RESSNONÂNCIA») passaram a ser reconhecidos.
+  - O pareamento ficou em 1.728 de 1.741 (Ian), 169 de 170 (Gilson), 226 de 227 (7) e 26 de 26 (14).
+- **Achado:** o MV lançou uma USG para o Dr. Paulo (14), que só tem laudos de ressonância; o laudo dessa USG é de outro médico. A ferramenta marca «Laudo de outro médico», candidato a correção de prestador.
+- **Prestadores por unidade (5):** o 7 conta 236 laudos por produção e o 14 conta 26.
+- **Pacotes:** não houve nenhum nestes relatórios, então a regra do pacote ainda não foi vista em dado real.
+
 ### A confirmar com o usuário
-- **Importante:** nos dados fictícios das versões anteriores, o HM de USG Unimed do Dr. Ian (R$ 21.907,88 em 10/2026) aparecia no grupo «HONORARIOS MEDICOS PF». Se no MV real for assim, a regra «PF nunca é pago» tira esse HM da NF.
-  - Para não passar despercebido, o HM de USG/Doppler Unimed lançado num grupo excluído aparece com destaque («Atenção: … confira se o grupo do MV está certo»).
-  - Rodar `test/competencia10.mjs` com os PDFs reais mostra o efeito.
-- Nome do grupo do HM de USG no MV de Curitiba. Hoje vale qualquer grupo de HM fora dos três excluídos, com «ULTRASS|DOPPLER|USG» no grupo ou na descrição e convênio Unimed.
-- Se o «Honorario Medico PF» nunca traz HM de USG Unimed que deva ser pago. Pela regra, ele nunca é pago.
+- O «Honorario Medico PF» pedido como «nunca pago» é o 78 PF dos relatórios? Nele está o HM de USG Unimed. Por isso a ferramenta paga só o de USG Unimed dele e exclui o resto. Se existir outro grupo «77 … PF», basta acrescentá-lo em «Modalidades e HM V3».
 - Se o exame base do HM pode estar em outro relatório (de outro médico). Hoje é procurado só no mesmo relatório; sem ele, o HM fica pendente para decisão.

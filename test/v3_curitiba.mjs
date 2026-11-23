@@ -1,5 +1,5 @@
 // v3.0.0-alpha.21 — Regras de Curitiba (V3) de 23/11/2026, com dados fictícios:
-// HM de raio-X, PF e mamografia nunca pago (aviso para excluir do MV) · HM de USG Unimed pelo valor da USG do médico, sem laudo,
+// HM de raio-X e mamografia nunca pago (o 78 PF segue a regra geral) (aviso para excluir do MV) · HM de USG Unimed pelo valor da USG do médico, sem laudo,
 // com o exame base no relatório · modalidade pelo TITLE na V3 · pacote de ressonância/mamografia considerado e notificado,
 // substituindo o exame base Bradesco a 100% · V3 sem tomografia · médicos de Londrina que laudam na V3 por produção.
 import { createRequire } from 'module';
@@ -18,10 +18,10 @@ await p.goto(html + '#inicio'); await p.waitForFunction(() => document.getElemen
 
 // 1) HM: grupos que nunca são pagos valem antes de tudo.
 const hm = await p.evaluate(() => { const t = window.__RM.t; return [
-  ['77 - HONORARIO MEDICO RAIO X', 'RX TORAX - HM', 'UNIMED CURITIBA'], ['77 - HONORARIOS MEDICOS PF', 'US ABDOME TOTAL - HM', 'UNIMED CURITIBA'],
-  ['81 - HONORARIO MEDICO MAMOGRAFIA', 'MAMOGRAFIA DIGITAL - HM', 'UNIMED'], ['79 - HONORARIO MEDICO ULTRASSOM', 'US MAMAS - HM', 'UNIMED CURITIBA'],
-  ['79 - HONORARIO MEDICO ULTRASSOM', 'US MAMAS - HM', 'BRADESCO SAUDE']].map(a => { const s = t.hmV3Situacao(...a); return s.devido ? 'devido' : s.motivo; }).join(' '); });
-ok(hm === 'grupo grupo grupo devido convenio', `HM: raio-X, PF e mamografia nunca pagos (mesmo USG Unimed no PF); USG Unimed devido; USG Bradesco não (${hm})`);
+  ['77 - HONORARIO MEDICO RAIO X', 'RX TORAX - HM', 'UNIMED CURITIBA'], ['78 - HONORARIOS MEDICOS PF', 'RMN ARTICULAR (POR ARTICULACAO) - HM', 'UNIMED CURITIBA'],
+  ['81 - HONORARIO MEDICO MAMOGRAFIA', 'MAMOGRAFIA DIGITAL BILATERAL - HM', 'UNIMED'], ['78 - HONORARIOS MEDICOS PF', 'USG MAMAS - HM', 'UNIMED CURITIBA -'],
+  ['78 - HONORARIOS MEDICOS PF', 'USG MAMAS - HM', 'PARTICULAR - GRUPO SRA'], ['81 - HONORARIO MEDICO MAMOGRAFIA', 'USG MAMAS - HM', 'UNIMED CURITIBA']].map(a => { const s = t.hmV3Situacao(...a); return s.devido ? 'devido' : s.motivo; }).join(' '); });
+ok(hm === 'grupo procedimento grupo devido convenio grupo', `HM: raio-X e mamografia nunca pagos (nem USG Unimed lançado lá); no 78 PF só USG Unimed é devido (RMN e particular não) (${hm})`);
 
 // 2) Modalidade pelo TITLE.
 const mt = await p.evaluate(() => { const t = window.__RM.t; return ['ULTRASSONOGRAFIA MAMÁRIA BILATERAL', 'DOPPLER COLORIDO DE CARÓTIDAS', 'MAMOGRAFIA DIGITAL BILATERAL', 'RESSONÂNCIA MAGNÉTICA DO CRÂNIO', 'DENSITOMETRIA ÓSSEA', 'RX DE TÓRAX PA E PERFIL', 'TÍTULO SEM MODALIDADE'].map(x => t.modalidadeDoTituloV3(x) || '-').join(' '); });
@@ -34,11 +34,12 @@ const conf = await p.evaluate(() => {
   const R = (paciente, dia, codigo, procDesc, grupoNome, convenio, vlRepasse, vlTotal, atendimento) => ({ seq: ++seq, pagina: 1, codigo, procDesc, grupoNome, conta: 'C' + seq, atendimento: atendimento || 'A' + seq, paciente, convenio, data: d(dia), vlRepasse, vlTotal, pct: vlTotal ? vlRepasse / vlTotal : 0, quant: 1, prestadorCod: '6703', prestadorNome: 'DR ALEXANDRE' });
   const regs = [
     R('ANA LIMA SOUZA', 3, '40901114', 'US MAMAS', 'ULTRASSONOGRAFIA', 'UNIMED CURITIBA', 33, 120, 'AT1'),
-    R('ANA LIMA SOUZA', 3, '40901114', 'US MAMAS - HM', '79 - HONORARIO MEDICO ULTRASSOM', 'UNIMED CURITIBA', 33, 60, 'AT1'),
-    R('BEATRIZ COSTA', 4, '40901114', 'US MAMAS - HM', '79 - HONORARIO MEDICO ULTRASSOM', 'UNIMED CURITIBA', 33, 60),
+    R('ANA LIMA SOUZA', 3, '40901114', 'USG MAMAS - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA -', 33, 60, 'AT1'),
+    R('BEATRIZ COSTA', 4, '40901114', 'USG MAMAS - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA -', 33, 60),
     R('CAIO REIS', 5, '40805026', 'RX TORAX - HM', '77 - HONORARIO MEDICO RAIO X', 'UNIMED CURITIBA', 10, 20),
-    R('CAIO REIS', 5, '40901122', 'USG ABDOME TOTAL - HM', '77 - HONORARIO MEDICO PF', 'UNIMED CURITIBA', 33, 60),
+    R('CAIO REIS', 5, '41101318', 'RMN ARTICULAR (POR ARTICULACAO) - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA -', 30, 60),
     R('DORA NUNES', 6, '40808041', 'MAMOGRAFIA DIGITAL - HM', '81 - HONORARIO MEDICO MAMOGRAFIA', 'UNIMED CURITIBA', 12, 25),
+    R('DORA NUNES', 6, '40901114', 'USG MAMAS - HM', '81 - HONORARIO MEDICO MAMOGRAFIA', 'UNIMED CURITIBA', 12, 25),
     R('ELIS PRADO', 7, '99000001', 'PACOTE RESSONANCIA DO CRANIO', 'PACOTE', 'BRADESCO SAUDE', 45, 450),
     R('ELIS PRADO', 7, '41101014', 'RM CRANIO', 'RESSONANCIA MAGNETICA', 'BRADESCO SAUDE', 300, 300),
     R('FABIO RAMOS', 8, '41001010', 'TC CRANIO', 'TOMOGRAFIA COMPUTADORIZADA', 'UNIMED CURITIBA', 30, 300)
@@ -57,18 +58,18 @@ const L = Object.fromEntries(conf.linhas.map(x => { const [s, st, cl] = x.split(
 ok(conf.parAna === 'US/OT', `laudo com MODALITY «OT» e TITLE de ultrassom pareia com a USG pela modalidade do TITLE (${conf.parAna})`);
 ok(L[2] === 'conferido:devido', `HM de USG Unimed com o exame base no relatório = Devido, sem laudo próprio (${L[2]})`);
 ok(L[3] === 'hm-sem-base:pend' && conf.causaSemBase, `HM de USG Unimed sem exame base = Pendente, com causa própria para decidir (${L[3]})`);
-ok(L[4] === 'hm-pendente:excluido' && L[5] === 'hm-pendente:excluido' && L[6] === 'hm-pendente:excluido', `HM raio-X, PF e mamografia = Excluído (${L[4]} ${L[5]} ${L[6]})`);
-ok(L[7] === 'conferido:devido', `pacote de ressonância = Devido pelo valor do MV (${L[7]})`);
-ok(L[8] === 'substituido-pacote:excluido', `ressonância Bradesco a 100% do mesmo paciente e dia = substituída pelo pacote, fora do fechamento (${L[8]})`);
-ok(conf.av.usgNoPF === 1, `HM de USG Unimed lançado no grupo PF: excluído, mas com destaque no aviso (${conf.av.usgNoPF})`);
-ok(conf.av.exc === 3 && conf.av.semBase === 1 && conf.av.pac === 1 && conf.av.sub === 1 && conf.av.fora === 1, `avisos de Curitiba: 3 HM a excluir, 1 sem base, 1 pacote, 1 base substituída, 1 tomografia (${JSON.stringify(conf.av)})`);
+ok(L[4] === 'hm-pendente:excluido' && L[5] === 'hm-pendente:excluido' && L[6] === 'hm-pendente:excluido' && L[7] === 'hm-pendente:excluido', `HM raio-X, RMN no 78 PF, mamografia e USG lançado no grupo de mamografia = Excluído (${L[4]} ${L[5]} ${L[6]} ${L[7]})`);
+ok(L[8] === 'conferido:devido', `pacote de ressonância = Devido pelo valor do MV (${L[8]})`);
+ok(L[9] === 'substituido-pacote:excluido', `ressonância Bradesco a 100% do mesmo paciente e dia = substituída pelo pacote, fora do fechamento (${L[9]})`);
+ok(conf.av.usgNoPF === 1, `HM de USG Unimed lançado no grupo de mamografia: excluído, mas com destaque no aviso (${conf.av.usgNoPF})`);
+ok(conf.av.exc === 4 && conf.av.semBase === 1 && conf.av.pac === 1 && conf.av.sub === 1 && conf.av.fora === 1, `avisos de Curitiba: 4 HM a excluir, 1 sem base, 1 pacote, 1 base substituída, 1 tomografia (${JSON.stringify(conf.av)})`);
 
 // 4) Cálculo da V3 (valor fixo): HM Unimed vale o mesmo do laudo de USG; pacote entra pelo valor do MV.
 const fx = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.__RM.t;
   const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, valorHM: 10 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45 }] };
   const c = calcularV3(regra, [
     { grupo: 'ULTRASSONOGRAFIA', desc: 'US MAMAS', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 1200, vlRepasse: 330, tipoItem: 'procedimento' },
-    { grupo: '79 - HONORARIO MEDICO ULTRASSOM', desc: 'US MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 4, vlTotal: 240, vlRepasse: 132, tipoItem: 'hm' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 4, vlTotal: 240, vlRepasse: 132, tipoItem: 'hm' },
     { grupo: 'RESSONANCIA MAGNETICA', desc: 'RM JOELHO', convenio: 'UNIMED', quant: 2, vlTotal: 900, vlRepasse: 90, tipoItem: 'procedimento' },
     { grupo: 'PACOTE', desc: 'PACOTE RESSONANCIA DO CRANIO', convenio: 'BRADESCO SAUDE', quant: 1, vlTotal: 450, vlRepasse: 45, tipoItem: 'pacote' }]);
   return { total: c.total, hm: c.hm.valor, pac: c.pacotes.valor, texto: textoEmailV3(c) }; });
@@ -95,6 +96,6 @@ ok(prod.outros === '777', `médico fora da lista e sem regra V3 continua em «n�
 await p.goto(html + '#bases'); await p.waitForTimeout(400);
 const tela = await p.evaluate(() => ({ prod: !!document.getElementById('v3ProdAdd'), exc: document.getElementById('hmExc')?.value || '' }));
 ok(tela.prod, 'Bases → Médicos V3 mostra a lista dos médicos por produção');
-ok(/HONORARIO MEDICO PF/.test(tela.exc), `Bases → Modalidades e HM V3 mostra os grupos que nunca são pagos (${tela.exc})`);
+ok(/HONORARIO MEDICO MAMOGRAFIA/.test(tela.exc) && !/ PF/.test(tela.exc), `Bases → Modalidades e HM V3 mostra os grupos que nunca são pagos (${tela.exc})`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.slice(0, 3).join(' | ') : ''));
 await b.close();

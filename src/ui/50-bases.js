@@ -214,7 +214,7 @@ function cardModalidadesHM() {
     ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
     <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
     <p class="lead">Os grupos de HM que nunca são pagos valem antes de tudo. Fora deles, o HM é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio, e o exame base está no relatório (não precisa de laudo). O valor é o mesmo da USG do médico. Os demais HM não compõem o repasse e aparecem em «HM a excluir do MV».</p>
-    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO PF» casa «77 - HONORARIOS MEDICOS PF».</span></label>
+    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA». Não inclua o «78 - HONORARIOS MEDICOS PF»: é nele que o MV lança o HM de USG Unimed.</span></label>
     <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
       <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
     <h2 style="margin-top:18px">Pacotes na V3</h2>

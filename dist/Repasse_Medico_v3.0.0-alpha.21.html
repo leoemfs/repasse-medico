@@ -1639,7 +1639,7 @@ function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, 
  * mostra a memória de cálculo e gera o texto do e-mail no formato usado hoje.
  * - Doppler é sempre parte do grupo de USG (conta no volume e no faturamento de USG).
  * - HM: só se paga HM de USG/Doppler do convênio Unimed, sem laudo próprio: basta o exame base no relatório, e o valor é o
- *   mesmo da USG do médico. Os demais HM (raio-X, PF, mamografia…) não são pagos a ninguém e ficam sinalizados para exclusão.
+ *   mesmo da USG do médico. Os demais HM (raio-X, mamografia, ressonância, e o que não é USG no 78 PF) não são pagos a ninguém e ficam sinalizados para exclusão.
  * - Pacote de ressonância e mamografia: considerado pelo valor do MV e notificado (substitui o base Bradesco a 100%).
  * - Arredonda só no final (assim o exemplo do Dr. Ian dá R$ 73.608,69).
  * ============================================================ */
@@ -1667,12 +1667,14 @@ const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm
 /* HM de uma linha da unidade V3: devido ou a excluir. P3 (v3.0.0-alpha.12): configurável em Bases e regras →
  * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed.
  * v3.0.0-alpha.21 (regras de Curitiba de 23/11/2026):
- * - gruposExcluir: grupos de HM que NUNCA são pagos a ninguém (77 - Honorario Medico Raio X, 77 - Honorario Medico PF,
- *   81 - Honorario Medico Mamografia). Valem antes de tudo e entram no aviso «HM a excluir do MV».
+ * - gruposExcluir: grupos de HM que NUNCA são pagos a ninguém (77 - Honorario Medico Raio X, 81 - Honorario Medico Mamografia).
+ *   Valem antes de tudo e entram no aviso «HM a excluir do MV». O «78 - HONORARIOS MEDICOS PF» NÃO entra em bloco: nos PDFs
+ *   reais de 11/2026 é nele que o MV lança o HM de USG Unimed (pago) junto com HM de ressonância etc. (não pagos); dentro
+ *   dele vale a regra geral (só USG/Doppler Unimed é devido).
  * - pacotes / pacoteConvenios: pacote de ressonância e mamografia é considerado (valor do MV) e notificado; o exame base do
  *   mesmo paciente e dia, do convênio Bradesco e lançado a 100% (erro do MV), é substituído pelo pacote. */
-const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO PF|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
-// Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO PF» casa «77 - HONORARIOS MEDICOS PF»).
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
+// Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA»).
 const compilarGruposHM = p => String(p || '').split('|').map(x => norm(x).split(/[^A-Z0-9]+/).filter(Boolean)).filter(x => x.length);
 const casaGrupoHM = (padroes, grupo) => { const ws = norm(grupo || '').split(/[^A-Z0-9]+/).filter(Boolean); return padroes.some(pd => pd.every(w => ws.some(g => g.startsWith(w)))); };
 const compilarHMV3 = hm => ({ proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios), gruposExcluir: compilarGruposHM(hm.gruposExcluir), pacotes: trechosPadrao(hm.pacotes), pacoteConv: trechosPadrao(hm.pacoteConvenios) });
@@ -1704,9 +1706,9 @@ function aplicarRegrasConfig(cfg) {
  * consideração a coluna title»). A V3 só faz mamografia, ultrassonografia (com Doppler), raio-X, densitometria e ressonância;
  * ainda não faz tomografia. Título que aponta uma só modalidade vale no lugar da MODALITY; senão fica a MODALITY. */
 const MODALIDADES_TITULO_V3 = [
-  { mod: 'US', re: /ULTRASS|ECOGRAF|DOPPLER|\bUSG?\b/ },
+  { mod: 'US', re: /ULTRAS+ONOGRAF|ULTRASS|ECOGRAF|DOPPLER|\bUSG?\b/ },
   { mod: 'MG', re: /MAMOGRAF|\bMAMO\b|TOMOSSINTESE/ },
-  { mod: 'MR', re: /RESSONANCIA|\bRM\b|\bRNM\b/ },
+  { mod: 'MR', re: /RES+N?ONANCIA|\bRMN?\b|\bRNM\b/ },
   { mod: 'OT', re: /DENSITOMETRIA|\bDMO\b/ },
   { mod: 'CR', re: /\bRX\b|RAIO[ -]?X|RADIOGRAF/ },
   { mod: 'CT', re: /TOMOGRAFIA|\bTC\b/ }
@@ -1923,7 +1925,7 @@ function avisosConferenciaV3(res) {
   const grupos = [...porGrupo.values()].map(g => ({ ...g, n: g.linhas.length, valor: soma(g.linhas), rotuloMotivo: MOTIVO_HM_V3[g.motivo] || '' })).sort((a, b) => b.n - a.n);
   const pega = m => { const l = mv.filter(x => x.marcadores.has(m)); return { n: l.length, valor: soma(l), linhas: l }; };
   const out = { hmExcluir: { n: hmExcluir.length, valor: soma(hmExcluir), grupos }, hmSemBase: pega('hm-v3-sem-base'), pacotes: pega('pacote-v3'), substituidos: pega('base-pacote-v3'), foraEscopo: pega('fora-escopo-v3') };
-  // HM de USG Unimed que caiu num grupo excluído (ex.: PF): conferir se o grupo está certo no MV.
+  // HM de USG Unimed que caiu num grupo excluído (ex.: mamografia): conferir se o grupo está certo no MV.
   const usgNoGrupo = hmExcluir.filter(x => x.hmV3SeriaDevido);
   out.hmExcluir.usgUnimed = { n: usgNoGrupo.length, valor: soma(usgNoGrupo) };
   out.total = out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
@@ -2999,7 +3001,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
-    // HM de raio-X, PF e mamografia (e qualquer outro) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
+    // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (b.tipo === 'hm' && unidadeV3) {
       const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
       if (sit.devido) {
@@ -7164,7 +7166,7 @@ function cartaoCorrecoesMV(corr) {
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
     <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
     <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
-    <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">${corr.hm.some(x => x.linha.marcadores?.has('hm-v3-excluir')) ? 'Curitiba (V3): HM de raio-X, PF, mamografia e qualquer HM que não seja de USG Unimed não é pago a ninguém.' : 'O prestador não tem regra que inclua HM'}: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.linha.r.grupoNome ? ` · <span class="muted">${esc(x.linha.r.grupoNome)} · ${esc(x.linha.r.convenio || '')}</span>` : ''}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
+    <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">${corr.hm.some(x => x.linha.marcadores?.has('hm-v3-excluir')) ? 'Curitiba (V3): HM de raio-X, de mamografia e qualquer HM que não seja de USG Unimed (inclusive no 78 PF) não é pago a ninguém.' : 'O prestador não tem regra que inclua HM'}: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.linha.r.grupoNome ? ` · <span class="muted">${esc(x.linha.r.grupoNome)} · ${esc(x.linha.r.convenio || '')}</span>` : ''}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
 
 function resumoComparacao({ ant, grupos }) {
@@ -10864,7 +10866,7 @@ function cardModalidadesHM() {
     ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
     <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
     <p class="lead">Os grupos de HM que nunca são pagos valem antes de tudo. Fora deles, o HM é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio, e o exame base está no relatório (não precisa de laudo). O valor é o mesmo da USG do médico. Os demais HM não compõem o repasse e aparecem em «HM a excluir do MV».</p>
-    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO PF» casa «77 - HONORARIOS MEDICOS PF».</span></label>
+    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA». Não inclua o «78 - HONORARIOS MEDICOS PF»: é nele que o MV lança o HM de USG Unimed.</span></label>
     <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
       <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
     <h2 style="margin-top:18px">Pacotes na V3</h2>
@@ -11094,7 +11096,7 @@ function gruposMVConhecidos() {
 function cardMedicosV3() {
   const v3 = S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => p.regras?.v3);
   return `<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">${v3.length} médico(s)</span></h2>
-    <p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago, pelo mesmo valor da USG do médico, sem precisar de laudo (basta o exame base no relatório); HM de raio-X, PF e mamografia nunca é pago e aparece como «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Na V3 a modalidade do laudo vem da coluna TITLE do Apolo.</p>
+    <p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago, pelo mesmo valor da USG do médico, sem precisar de laudo (basta o exame base no relatório); HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e aparece como «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Na V3 a modalidade do laudo vem da coluna TITLE do Apolo.</p>
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Aliases do Apolo</th><th>Atua em</th><th>Regra</th><th></th></tr></thead><tbody>
     ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td>
       <td>${(p.aliases || []).map(a => `<span class="badge ${a.status === 'validado' ? 'ok' : 'warn'}">${esc(a.nome)}</span>`).join(' ') || '<span class="muted small">—</span>'}</td>
@@ -11164,7 +11166,7 @@ async function editarRegraV3(p) {
       <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
         <td><input type="text" name="fxGrupo${k}" list="dlGruposV3" value="${esc(valGrupo(g.grupo))}" placeholder="${k === 0 ? 'USG (inclui Doppler)' : k === 1 ? 'ex.: RESSONANCIA MAGNETICA' : ''}" style="min-width:300px"></td>
         <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td></tr>`).join('')}</tbody></table></div>
-      <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, <b>pelo mesmo valor do laudo de USG</b> deste médico, sem precisar de laudo (basta o exame base no relatório). HM de raio-X, PF e mamografia nunca é pago e fica no aviso «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
+      <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, <b>pelo mesmo valor do laudo de USG</b> deste médico, sem precisar de laudo (basta o exame base no relatório). HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e fica no aviso «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
 
     <div data-modo="percentual"${modo === 'percentual' ? '' : ' hidden'}>
       <div class="grid4" style="margin-top:8px"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${gPerc.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
@@ -11173,7 +11175,7 @@ async function editarRegraV3(p) {
         <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${gPerc.usg.valor || ''}"></label></div>
       <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(volume = quantidade de exames de USG e Doppler no mês)</span></h4>
       <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
-      <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), gPerc.hm)}</select><span class="small muted">Os outros HM (raio-X, PF, mamografia, outros convênios) nunca são pagos na V3 e ficam no aviso «HM a excluir do MV».</span></label>
+      <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), gPerc.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, ressonância e o que não é USG no 78 PF, outros convênios) nunca são pagos na V3 e ficam no aviso «HM a excluir do MV».</span></label>
       <h4 style="margin:8px 0 4px">Outros grupos <span class="muted small">(escolha o grupo do procedimento na lista)</span></h4>
       <div class="tw"><table><thead><tr><th>Nome</th><th>Grupo do procedimento (MV)</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
         <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" list="dlGruposV3" value="${esc(o.padrao)}" style="min-width:200px"></td>

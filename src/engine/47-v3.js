@@ -4,7 +4,7 @@
  * mostra a memória de cálculo e gera o texto do e-mail no formato usado hoje.
  * - Doppler é sempre parte do grupo de USG (conta no volume e no faturamento de USG).
  * - HM: só se paga HM de USG/Doppler do convênio Unimed, sem laudo próprio: basta o exame base no relatório, e o valor é o
- *   mesmo da USG do médico. Os demais HM (raio-X, PF, mamografia…) não são pagos a ninguém e ficam sinalizados para exclusão.
+ *   mesmo da USG do médico. Os demais HM (raio-X, mamografia, ressonância, e o que não é USG no 78 PF) não são pagos a ninguém e ficam sinalizados para exclusão.
  * - Pacote de ressonância e mamografia: considerado pelo valor do MV e notificado (substitui o base Bradesco a 100%).
  * - Arredonda só no final (assim o exemplo do Dr. Ian dá R$ 73.608,69).
  * ============================================================ */
@@ -32,12 +32,14 @@ const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm
 /* HM de uma linha da unidade V3: devido ou a excluir. P3 (v3.0.0-alpha.12): configurável em Bases e regras →
  * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed.
  * v3.0.0-alpha.21 (regras de Curitiba de 23/11/2026):
- * - gruposExcluir: grupos de HM que NUNCA são pagos a ninguém (77 - Honorario Medico Raio X, 77 - Honorario Medico PF,
- *   81 - Honorario Medico Mamografia). Valem antes de tudo e entram no aviso «HM a excluir do MV».
+ * - gruposExcluir: grupos de HM que NUNCA são pagos a ninguém (77 - Honorario Medico Raio X, 81 - Honorario Medico Mamografia).
+ *   Valem antes de tudo e entram no aviso «HM a excluir do MV». O «78 - HONORARIOS MEDICOS PF» NÃO entra em bloco: nos PDFs
+ *   reais de 11/2026 é nele que o MV lança o HM de USG Unimed (pago) junto com HM de ressonância etc. (não pagos); dentro
+ *   dele vale a regra geral (só USG/Doppler Unimed é devido).
  * - pacotes / pacoteConvenios: pacote de ressonância e mamografia é considerado (valor do MV) e notificado; o exame base do
  *   mesmo paciente e dia, do convênio Bradesco e lançado a 100% (erro do MV), é substituído pelo pacote. */
-const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO PF|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
-// Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO PF» casa «77 - HONORARIOS MEDICOS PF»).
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
+// Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA»).
 const compilarGruposHM = p => String(p || '').split('|').map(x => norm(x).split(/[^A-Z0-9]+/).filter(Boolean)).filter(x => x.length);
 const casaGrupoHM = (padroes, grupo) => { const ws = norm(grupo || '').split(/[^A-Z0-9]+/).filter(Boolean); return padroes.some(pd => pd.every(w => ws.some(g => g.startsWith(w)))); };
 const compilarHMV3 = hm => ({ proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios), gruposExcluir: compilarGruposHM(hm.gruposExcluir), pacotes: trechosPadrao(hm.pacotes), pacoteConv: trechosPadrao(hm.pacoteConvenios) });
@@ -69,9 +71,9 @@ function aplicarRegrasConfig(cfg) {
  * consideração a coluna title»). A V3 só faz mamografia, ultrassonografia (com Doppler), raio-X, densitometria e ressonância;
  * ainda não faz tomografia. Título que aponta uma só modalidade vale no lugar da MODALITY; senão fica a MODALITY. */
 const MODALIDADES_TITULO_V3 = [
-  { mod: 'US', re: /ULTRASS|ECOGRAF|DOPPLER|\bUSG?\b/ },
+  { mod: 'US', re: /ULTRAS+ONOGRAF|ULTRASS|ECOGRAF|DOPPLER|\bUSG?\b/ },
   { mod: 'MG', re: /MAMOGRAF|\bMAMO\b|TOMOSSINTESE/ },
-  { mod: 'MR', re: /RESSONANCIA|\bRM\b|\bRNM\b/ },
+  { mod: 'MR', re: /RES+N?ONANCIA|\bRMN?\b|\bRNM\b/ },
   { mod: 'OT', re: /DENSITOMETRIA|\bDMO\b/ },
   { mod: 'CR', re: /\bRX\b|RAIO[ -]?X|RADIOGRAF/ },
   { mod: 'CT', re: /TOMOGRAFIA|\bTC\b/ }
@@ -288,7 +290,7 @@ function avisosConferenciaV3(res) {
   const grupos = [...porGrupo.values()].map(g => ({ ...g, n: g.linhas.length, valor: soma(g.linhas), rotuloMotivo: MOTIVO_HM_V3[g.motivo] || '' })).sort((a, b) => b.n - a.n);
   const pega = m => { const l = mv.filter(x => x.marcadores.has(m)); return { n: l.length, valor: soma(l), linhas: l }; };
   const out = { hmExcluir: { n: hmExcluir.length, valor: soma(hmExcluir), grupos }, hmSemBase: pega('hm-v3-sem-base'), pacotes: pega('pacote-v3'), substituidos: pega('base-pacote-v3'), foraEscopo: pega('fora-escopo-v3') };
-  // HM de USG Unimed que caiu num grupo excluído (ex.: PF): conferir se o grupo está certo no MV.
+  // HM de USG Unimed que caiu num grupo excluído (ex.: mamografia): conferir se o grupo está certo no MV.
   const usgNoGrupo = hmExcluir.filter(x => x.hmV3SeriaDevido);
   out.hmExcluir.usgUnimed = { n: usgNoGrupo.length, valor: soma(usgNoGrupo) };
   out.total = out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
