@@ -1,4 +1,4 @@
-// v3.0.0-alpha.22 (SOL-F47) — Vários USG do mesmo paciente no mesmo dia: quando a equivalência não decide, o título do laudo
+// v3.0.0-alpha.23 (SOL-F47) — Vários USG do mesmo paciente no mesmo dia: quando a equivalência não decide, o título do laudo
 // desempata pela descrição do MV (afinidade), e um par que continua sendo palpite não entra na validação em lote.
 // Dados fictícios; códigos TUSS de USG (40901122 abdome total, 40901300 transvaginal, 40901173 tireoide).
 import { createRequire } from 'module';

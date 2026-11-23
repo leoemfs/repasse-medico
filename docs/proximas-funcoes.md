@@ -1,6 +1,8 @@
 # Próximas funções — requisitos registrados
 
-**SOL-F48 implementada na v3.0.0-alpha.22** (descontos que mudam todo mês e lembrete do reajuste anual). **SOL-F47 implementada na v3.0.0-alpha.22** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes nas seções da SOL-F47 e da SOL-F48.
+**SOL-F49 implementada na v3.0.0-alpha.23** (descontos que mudam todo mês e lembrete do reajuste anual). **SOL-F47 implementada na v3.0.0-alpha.23** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes nas seções da SOL-F47 e da SOL-F49.
+
+**SOL-F48 implementada na v3.0.0-alpha.22** (23/11/2026): HM fora da V3 nunca compõe o repasse e é notificado para exclusão do MV, em todos os grupos de HM. Detalhes na seção da SOL-F48.
 
 **SOL-F46 implementada na v3.0.0-alpha.21** (23/11/2026): regras de Curitiba (V3) na conferência cruzada e na correção de prestador. Detalhes na seção da SOL-F46.
 
@@ -83,7 +85,7 @@ Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «c
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
-## SOL-F48 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **IMPLEMENTADA na v3.0.0-alpha.22** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/descontos-do-mes.html`; guia em `como-usar-fechamento.md`; teste: `test/descontos_variaveis.mjs`)
+## SOL-F49 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **IMPLEMENTADA na v3.0.0-alpha.23** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/descontos-do-mes.html`; guia em `como-usar-fechamento.md`; teste: `test/descontos_variaveis.mjs`)
 
 **Implementação (prévia aprovada em 23/11/2026, sem resposta às perguntas em aberto; adotados os padrões abaixo, todos editáveis na tela):**
 - **Motor (`86-descontos.js`):** o desconto tem `variavel` e `onde`, e os valores do mês ficam em `lancamentos` (`{AAAA-MM: {valor, semDesconto, por, em}}`).
@@ -131,7 +133,7 @@ Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada 
 - Os três prestadores aparecem no Repasse IMG? Se não, o desconto não teria em qual linha entrar no dia 30.
 - A pensão continua com valor fixo?
 
-## Cadastro de USG pela planilha de controle: faixa «Repasse 42%» e residente que muda de faixa (23/11/2026, v3.0.0-alpha.22; teste: `test/cadastro_usg.mjs`)
+## Cadastro de USG pela planilha de controle: faixa «Repasse 42%» e residente que muda de faixa (23/11/2026, v3.0.0-alpha.23; teste: `test/cadastro_usg.mjs`)
 
 Pedido: atualizar o cadastro de USG com a lista atual de prestadores por faixa (geral, acréscimo de 2%, residentes, 40%, 42%, 50%, 55% e 70%), quem recebe BOARD e um desconto mensal recorrente. A lista com os nomes **não** fica no repositório: vai como planilha no formato da planilha de controle, para importar em Bases → Prestadores → «Importar regras da planilha de controle».
 
@@ -153,7 +155,7 @@ Limites da importação, mantidos:
 - **Prestador fora da planilha:** continua com a faixa que tinha.
 - **Descontos parcelados** (pensão, por exemplo) não vêm da planilha. São cadastrados em Bases → Prestadores e regras → Descontos parcelados, com o nº de parcelas vazio para recorrente.
 
-## SOL-F47 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.22** (pedido de 17/11/2026, entregue em 23/11/2026)
+## SOL-F47 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.23** (pedido de 17/11/2026, entregue em 23/11/2026)
 
 **Problema (reproduzido com dados fictícios):** paciente com USG de abdome total, transvaginal e tireoide no mesmo atendimento, sem equivalência validada para esses títulos. O pareamento escolhia o laudo pela ordem da planilha:
 - o código do abdome total (40901122) ficava com o laudo de **tireoide**, e assim por diante;
@@ -1367,6 +1369,30 @@ Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 
 
 ## Correção de prestador com regra composta (09/11/2026, v2.1.0-alpha.19)
 Causa do erro «Cannot read properties of undefined (reading 'responsavel')» na Correção de prestador: quando o laudo compatível é confirmado por uma **regra composta** (e não por uma relação simples código × título), não existe «relação» com responsável, e o texto do detalhe tentava ler esse campo. Agora o detalhe diz «validado para 41001109 (regra composta «TC abdome total», responsável)». Teste novo em `test/compostas.mjs` (Correção de prestador com laudo de regra composta).
+
+## SOL-F48 — HM fora da V3: nunca compõe o repasse e é notificado para exclusão — **IMPLEMENTADA na v3.0.0-alpha.22** (pedido de 23/11/2026; teste: `test/hm_fora_v3.mjs`)
+Pedido: «Enquanto na unidade da V3 nós pagamos HM de USG, nas demais unidades o HM deve ser notificado para exclusão e não compõe valor para o repasse — todos os grupos de HM em todas as unidades (exceto V3).»
+
+**O que já valia (SOL-F43):** fora da V3, o HM ficava na classe Excluído (fora do valor), não podia ser aceito para pagamento e aparecia em «NCs e correções no MV › HM a excluir do MV», com alerta quando continuava no MV depois da reconferência.
+
+**Achado e corrigido:** a regra de classificação «descrição termina em «- HM»» nunca casava. A descrição é comparada sem hífen e sem acento, e o padrão exigia o hífen. Um HM lançado no grupo do exame (ex.: «US TIREOIDE - HM» no grupo ULTRASSONOGRAFIA) era tratado como exame: podia parear com o laudo e **ser pago**.
+- Padrão novo da descrição: começa com «HM» ou termina em «HM» (`^HM |(^| )HM$`).
+- Padrão novo do grupo: `HONORARIO|HONOR MED|(^| )HM( |$)`, que cobre 77 Raio X, 78 PF, 80 Ressonância, 81 Mamografia, 83 Densitometria e grupos abreviados («HONOR. MEDICO», «77 - HM RAIO X»).
+- As configurações antigas são migradas sozinhas quando a regra ainda tem o padrão de fábrica. A regra que o usuário editou fica como está.
+
+**O que mudou na notificação:**
+- **Conferência:** todo HM fora da V3 ganha o marcador **«HM a excluir do MV (fora da V3)»**, que dá para filtrar. O motivo diz o grupo e o convênio: «HM a excluir do MV: fora da V3 nenhum HM é pago…». Os textos que falavam em «HM sem regra do prestador» passaram a dizer a regra.
+- **Fechamento (USG e IMG):** aviso por prestador e unidade, por exemplo «unidade 17: 4 HM a excluir do MV (R$ 31,00), fora do valor: fora da V3 nenhum HM é pago».
+- **Excel do prestador:** aba nova **«HM a excluir do MV»**, com atendimento, conta, remessa, paciente, data, código, descrição, grupo, convênio, valores e motivo. Pronta para pedir a exclusão.
+- **Excel único da unidade (SOL-F45):** a mesma aba, com o prestador nas duas primeiras colunas.
+- **V3 (unidade 5):** nada muda. O HM de USG Unimed continua pago (com o exame base, SOL-F46), e os outros HM seguem «HM V3 a excluir».
+
+**Critérios de aceite** (`test/hm_fora_v3.mjs`, dados fictícios):
+1. Na unidade 17, os HM dos grupos 78 PF (inclusive o de USG Unimed), 81 Mamografia, 77 Raio X e o «- HM» no grupo de USG ficam Excluídos, com o marcador. Para pagamento: só as USG.
+2. «Aceito para pagamento» não muda a classe do HM.
+3. Fechamento com o aviso e o valor sem HM; Excel do prestador e Excel único com a aba «HM a excluir do MV».
+4. A configuração antiga com o padrão de fábrica é migrada.
+5. Na V3, o HM de USG Unimed continua Devido, e o de mamografia, Excluído pela regra da V3.
 
 ## SOL-F46 — Regras de Curitiba (V3) na conferência cruzada — **IMPLEMENTADA na v3.0.0-alpha.21** (pedido de 23/11/2026; teste: `test/v3_curitiba.mjs`)
 Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc consegue adicionar essas informações à ferramenta ou terei de fazer manualmente?»

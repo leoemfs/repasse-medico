@@ -1,4 +1,4 @@
-// v3.0.0-alpha.22 — Cadastro de USG pela planilha de controle (pedido de 23/11/2026): faixa «Repasse 42%» nova, migração
+// v3.0.0-alpha.23 — Cadastro de USG pela planilha de controle (pedido de 23/11/2026): faixa «Repasse 42%» nova, migração
 // das faixas sem mexer nas editadas, residente que muda de faixa volta a médico, e o % esperado por unidade de cada faixa.
 // Importa pela tela (Bases → Prestadores → «Importar regras da planilha de controle»). Nomes e códigos fictícios.
 import { createRequire } from 'module';

@@ -51,7 +51,7 @@ function pedidosDoDia(R) {
   if (R.semAceite) out.push([`${R.semAceite} rodada(s) sem aceite`, 'conferência feita, falta o aceite', 'conferencia', 'Continuar']);
   if (eqp) out.push([`${eqp} equivalência(s) TUSS pendente(s)`, 'sem validação, nada é confirmado automaticamente', 'equivalencias', 'Validar']);
   if (R.indNC.porSituacao.aberta) out.push([`${R.indNC.porSituacao.aberta} NC(s) aberta(s)`, 'ainda não enviadas ao Qualiex', 'nc', 'Ver NCs']);
-  // SOL-F48: descontos que mudam todo mês e o reajuste anual.
+  // SOL-F49: descontos que mudam todo mês e o reajuste anual.
   const dc = descontosAConferir(S.cfg, S.comp);
   if (dc.length && !compFechada()) { let pag = ''; try { const mk = marcosFech(S.comp)[{ usg: 'pagUSG', img: 'pagIMG', curitiba: 'pagCuritiba' }[dc[0].tipo]]; if (mk) pag = `, pagamento ${fmtData(mk)}`; } catch (e) { }
     out.push([`Descontos a conferir no portal: ${dc.length}`, esc(dc.map(d => `${d.cod} · ${d.motivo}`).join(' · ')) + ` — ${esc([...new Set(dc.map(d => TIPOS_DESCONTO[d.tipo]))].join(', '))}${pag}`, 'fechamento', 'Conferir', dc[0].tipo]); }

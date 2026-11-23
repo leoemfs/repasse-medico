@@ -2,7 +2,7 @@
  * SOL-F43 (v3.0.0-alpha.6) — Classes de fechamento: o que a conferência autoriza a pagar.
  * Não é um motor novo: é a leitura da situação da linha (conferência) + as decisões já registradas.
  *   Devido      → «Conferido» (par único, nome seguro, mesma data, equivalência validada / regra composta / exame).
- *                 HM só quando a regra do prestador o inclui (hoje: V3, HM de USG/Doppler Unimed → conferido).
+ *                 HM só na V3 (HM de USG/Doppler Unimed → conferido). Fora da V3 nenhum HM é pago (SOL-F48).
  *   Aceito      → decisão «Aceito para pagamento» (antes «Considerado no repasse»), com justificativa, quem e quando.
  *   NC          → NC registrada (menos «não procede»). Fora do fechamento.
  *   Excluído    → taxa, material e medicamento (nunca compõem repasse), HM sem regra do prestador (excluir do MV) e,
