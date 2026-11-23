@@ -1,5 +1,7 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F49 implementada na v3.0.0-alpha.23** (descontos que mudam todo mês e lembrete do reajuste anual). **SOL-F47 implementada na v3.0.0-alpha.23** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes nas seções da SOL-F47 e da SOL-F49.
+
 **SOL-F48 implementada na v3.0.0-alpha.22** (23/11/2026): HM fora da V3 nunca compõe o repasse e é notificado para exclusão do MV, em todos os grupos de HM. Detalhes na seção da SOL-F48.
 
 **SOL-F46 implementada na v3.0.0-alpha.21** (23/11/2026): regras de Curitiba (V3) na conferência cruzada e na correção de prestador. Detalhes na seção da SOL-F46.
@@ -82,6 +84,106 @@ Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «c
 **SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
+
+## SOL-F49 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **IMPLEMENTADA na v3.0.0-alpha.23** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/descontos-do-mes.html`; guia em `como-usar-fechamento.md`; teste: `test/descontos_variaveis.mjs`)
+
+**Implementação (prévia aprovada em 23/11/2026, sem resposta às perguntas em aberto; adotados os padrões abaixo, todos editáveis na tela):**
+- **Motor (`86-descontos.js`):** o desconto tem `variavel` e `onde`, e os valores do mês ficam em `lancamentos` (`{AAAA-MM: {valor, semDesconto, por, em}}`).
+  - Sem lançamento, a parcela do mês é «a conferir» e entra como zero.
+  - No Fechamento (`88-fechamento.js`), o prestador com desconto a conferir fica em **Verificar**, com aviso, até alguém lançar.
+- **Reajuste anual:** `cfg.reajusteAnual = {mes, desde, feitos}`. O padrão é janeiro, a partir de 2027, porque o reajuste de 2026 é o cadastro de USG atualizado em 23/11/2026. A configuração compartilhada mescla esse campo item a item (mês, ano inicial, feitos).
+- **Telas:**
+  - Bases: «Descontos do prestador» com o valor «Fixo» ou «Muda todo mês», e o cartão «Reajuste anual».
+  - Fechamento: cartão «Descontos do mês», com Lançar, «Sem desconto este mês» e Corrigir.
+  - Início: «Pede você».
+  - Menu: contagem em «Fechamento e envio».
+- **Padrões adotados:** «Aplica em» começa em IMG (último dia útil); a pensão continua com valor fixo.
+
+**Pedido do usuário:**
+- Lembrete de descontos para três prestadores:
+  - dois recebem **adiantamento direto da Unimed**;
+  - um tem **plano de saúde** a descontar;
+  - um deles também tem a pensão alimentícia (valor fixo).
+- O valor muda todo mês e é conferido no **portal do convênio**. Por isso não dá para deixar fixo.
+- Todos esses descontos são feitos no **repasse do fim do mês (dia 30)**, o pagamento do último dia útil.
+- «A partir de agora e no ano que vem vou realizar reajuste anual.»
+
+**Hoje:**
+- O desconto parcelado (SOL-F31) exige valor fixo da parcela.
+- Não há lembrete para conferir valores no mês nem para o reajuste anual.
+
+**Proposta da prévia:**
+1. **Bases → Descontos do prestador:** cada desconto tem o valor **Fixo** (como hoje; ex.: pensão) ou **Muda todo mês**. Nesse segundo caso:
+   - não tem valor cadastrado;
+   - tem o campo «onde conferir» (ex.: portal da Unimed);
+   - o padrão de «Aplica em» é o **Repasse IMG (último dia útil)**.
+2. **Fechamento e envio → Repasse IMG**, no cartão «Descontos do mês»:
+   - o desconto que muda fica **a conferir**, com um campo para o valor visto no portal;
+   - os botões são «Lançar» e «Sem desconto este mês», e fica registrado quem lançou e quando;
+   - até ser lançado, o prestador fica com a pendência «desconto» e não aparece como pronto para enviar;
+   - o valor lançado entra na coluna DESCONTOS;
+   - o valor fixo continua automático.
+3. **Início → O que pede atenção:** «Descontos a conferir no portal: N», com o prazo do pagamento, até todos serem lançados. O menu também mostra a contagem em «Fechamento e envio».
+4. **Reajuste anual (Bases):**
+   - mês do lembrete (sugestão: janeiro) e lista do que revisar: percentuais de USG, BOARD, valores do IMG, descontos fixos e regras da V3;
+   - no mês, o Início mostra «Reajuste anual de AAAA» até alguém marcar «Reajuste de AAAA feito».
+
+**Perguntas em aberto:**
+- O que entra no reajuste anual e em que mês?
+- Os três prestadores aparecem no Repasse IMG? Se não, o desconto não teria em qual linha entrar no dia 30.
+- A pensão continua com valor fixo?
+
+## Cadastro de USG pela planilha de controle: faixa «Repasse 42%» e residente que muda de faixa (23/11/2026, v3.0.0-alpha.23; teste: `test/cadastro_usg.mjs`)
+
+Pedido: atualizar o cadastro de USG com a lista atual de prestadores por faixa (geral, acréscimo de 2%, residentes, 40%, 42%, 50%, 55% e 70%), quem recebe BOARD e um desconto mensal recorrente. A lista com os nomes **não** fica no repositório: vai como planilha no formato da planilha de controle, para importar em Bases → Prestadores → «Importar regras da planilha de controle».
+
+Percentuais conferidos (já eram os do cadastro das unidades):
+
+| Faixa | Unid. 1 | 2 | 4 | 7 | 10 | 17 |
+|---|---|---|---|---|---|---|
+| Médicos geral | 44% | 49% | 40% | 40% | 44% | 42% |
+| Acréscimo de 2% | 46% | 51% | 42% | 42% | 46% | 44% |
+| Residentes | 35% | 35% | 35% | 35% | 35% | 35% |
+| 40%, 42%, 50%, 55%, 70% | fixo, independente da unidade (70%: só atuam na 17) |
+
+O que mudou no motor (`45-regras.js`):
+- **Faixa nova «Repasse 42%»** (fixa). Antes não existia: o bloco «REPASSE 42%» da planilha virava uma faixa sem cadastro, e o prestador ficava sem percentual esperado. Configurações antigas recebem as faixas padrão que faltam na posição do padrão, sem mexer nas que o usuário editou.
+- **Residente que muda de faixa volta a médico** na importação. Antes continuava «residente» e o IMG usava a tabela de residente.
+
+Limites da importação, mantidos:
+- **BOARD:** é um valor fixo mensal em R$, lido da coluna BOARD. Célula vazia mantém o valor já cadastrado, e a importação nunca zera um BOARD.
+- **Prestador fora da planilha:** continua com a faixa que tinha.
+- **Descontos parcelados** (pensão, por exemplo) não vêm da planilha. São cadastrados em Bases → Prestadores e regras → Descontos parcelados, com o nº de parcelas vazio para recorrente.
+
+## SOL-F47 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.23** (pedido de 17/11/2026, entregue em 23/11/2026)
+
+**Problema (reproduzido com dados fictícios):** paciente com USG de abdome total, transvaginal e tireoide no mesmo atendimento, sem equivalência validada para esses títulos. O pareamento escolhia o laudo pela ordem da planilha:
+- o código do abdome total (40901122) ficava com o laudo de **tireoide**, e assim por diante;
+- as três linhas viravam «Mais de um laudo plausível»;
+- «O que falta decidir» propunha **validar pares errados** («Sem equivalência: «USG de tireoide» × 40901122»);
+- faltando um dos laudos, a linha **que tinha laudo** podia ficar «Só no faturamento», gerando um **candidato a NC errado**.
+
+**O que mudou** (motor `60-conferencia.js`, `54-titulos.js` e `61-causas.js`; as faixas e as regras de bloqueio não mudaram):
+1. **Afinidade título × descrição do MV** (0 a 100%):
+   - mede quanto do título do laudo aparece na descrição do procedimento no MV;
+   - o nome do procedimento (antes do parêntese) pesa mais do que a lista de estruturas da descrição TUSS: «USG de abdome superior» fica mais perto de «US - ABDOME SUPERIOR» do que de «US - ABDOME TOTAL (ABDOME SUPERIOR, RINS…)»;
+   - a palavra da modalidade (ultrassonografia, tomografia…) não conta, e sinônimos como mamária = mamas, renal = rins e pelve = pélvica são reconhecidos.
+2. **Pareamento:** dentro da mesma faixa, o par de maior afinidade escolhe primeiro. Laudo com título validado para **outro** código fica atrás dos laudos sem cadastro. A ordem das linhas e da planilha deixa de importar.
+3. **Ambiguidade:** quando o laudo escolhido tem afinidade de pelo menos **40%** e fica **25 pontos acima** de cada alternativa, a linha não é mais «ambígua». Ela ganha o marcador **«Laudo escolhido pelo título»**, com os percentuais no motivo.
+   - A situação não muda: sem equivalência validada, a linha segue Pendente até validar a equivalência.
+   - O desempate só vale onde a equivalência não decide (pendente, sem cadastro, título validado para outro código). Com equivalência validada, quem decide é a base, como antes. Par por **regra composta** também fica fora: o título da regra descreve vários procedimentos (ex.: «bolsa escrotal com Doppler» × a página só do Doppler de outro médico continua ambíguo, para você decidir quem laudou).
+4. **«O que falta decidir»:** linha que **continua** ambígua e não tem equivalência (ou o título está validado para outro código) vai para a decisão linha a linha («Mais de um laudo plausível»), e não para «Cadastrar e validar a equivalência» em lote. Assim um par que é palpite não vira equivalência validada.
+5. **Detalhe da linha:** cada laudo candidato mostra «título N%».
+
+**Critérios de aceite** (`test/usg_mesmo_dia.mjs`, dados fictícios):
+- 3 USG no mesmo dia sem equivalência → cada linha com o laudo do seu exame, sem «ambíguo», em qualquer ordem;
+- falta o laudo de um exame → é a linha desse exame que fica «Só no faturamento»;
+- abdome total × aparelho urinário (o abdome também cita os rins) → cada um com o seu laudo;
+- títulos que não dizem o exame («Exame de imagem») → continuam ambíguos e vão para a decisão linha a linha;
+- equivalências validadas ou pendentes já cadastradas → resultado igual ao de antes;
+- duas linhas do mesmo código e um laudo → a 2ª continua «Só no faturamento» (bilateral fica para a próxima melhoria).
+
+**A conferir com os relatórios reais:** os testes com a pasta `dados/` (`motor`, `e2e`, `competencia10`, `conferencia_causas`…) não rodaram no ambiente desta entrega. Vale rodá-los e comparar a quantidade de «Mais de um laudo plausível» antes e depois.
 
 ## SOL-F43 — Prévia de conferência vira a conferência oficial: só o Devido e o Aceito compõem o fechamento — **IMPLEMENTADA na v3.0.0-alpha.6** (pedido de 13/11/2026; guia em `como-usar-conferencia-oficial.md`)
 

@@ -310,6 +310,7 @@ function irPara(pag) {
   document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === ativo));
   $('titulo').textContent = PAGINAS[pag];
   desenharSubnav(pag);
+  try { atualizarPillMenu(); } catch (e) { }
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
 }

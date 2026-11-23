@@ -38,6 +38,7 @@ const MARCADORES = {
   'laudo-sem-data': 'Laudo sem data válida',
   'composta': 'Regra composta',
   'composta-falta': 'Composição incompleta',
+  'escolhido-titulo': 'Laudo escolhido pelo título (vários exames no mesmo dia)',
   'hm-v3-devido': 'HM V3 devido',
   'hm-v3-excluir': 'HM V3 a excluir',
   'hm-v3-sem-base': 'HM V3 sem exame base',
@@ -45,6 +46,13 @@ const MARCADORES = {
   'base-pacote-v3': 'Base substituída pelo pacote',
   'fora-escopo-v3': 'Modalidade que a V3 não faz'
 };
+
+/* Vários exames do mesmo paciente no mesmo dia (ex.: USG de abdome, transvaginal e tireoide no mesmo atendimento):
+ * quando a equivalência não decide (sem cadastro, pendente), o título do laudo desempata pela descrição do MV.
+ * O laudo escolhido precisa ter afinidade de pelo menos AF_MIN e ficar AF_MARGEM acima de cada alternativa;
+ * senão a linha continua «Mais de um laudo plausível» para a pessoa decidir. */
+const AF_MIN = 0.4, AF_MARGEM = 0.25;
+const pct = v => `${Math.round(v * 100)}%`;
 
 // Período de produção coberto pelo relatório: do 1º dia do mês da menor data ao último dia do mês da maior.
 function periodoDoRelatorio(regs) {
@@ -103,6 +111,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
       const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });
       const dd = Math.abs(b.dia - l.dia);
+      // Título validado para OUTRO código é evidência contra o par: fica atrás dos pares sem cadastro na mesma faixa.
+      const contra = proc.estado === 'divergente' && !proc.composta && (proc.outrosCodigos || []).length > 0;
       const tier = (proc.estado === 'validada' && nm >= 2 && dd === 0) ? 1 : (proc.estado === 'validada' && nm >= 2) ? 2
         : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2 && dd === 0) ? 3
           : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2) ? 4
@@ -112,9 +122,12 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
                 // em vez de duas linhas soltas («Só no faturamento» + «Só no laudo»).
                 : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio) !== false) ? 7 : 0;
       if (!tier) continue;
-      b.cands.push({ l, nm, dd, proc, tier, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio) });
+      // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 6 e 7). Com equivalência validada, quem
+      // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
+      const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 5 && !proc.composta ? af : 0;
+      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio) });
     }
-    const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || y.nm - x.nm || x.dd - y.dd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
+    const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
     b.cands.sort(ordem);
   }
 
@@ -127,7 +140,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
-    fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || y.c.nm - x.c.nm || x.c.dd - y.c.dd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
+    // Dentro da faixa, a maior afinidade título × descrição escolhe primeiro: com vários exames do paciente no mesmo dia,
+    // cada linha fica com o laudo do seu exame (e não com o primeiro da planilha).
+    fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || x.c.contra - y.c.contra || y.c.nm - x.c.nm || x.c.dd - y.c.dd || y.c.afd - x.c.afd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);
     for (const { b, c } of fila) {
       if (b.par) continue;
       if (usado.has(c.l.i)) { if (!cabeNoComposto(b, c)) continue; const u = compostoUsos.get(c.l.i); b.par = c; u.usos[c.proc.itemIdx] = (u.usos[c.proc.itemIdx] || 0) + 1; u.bs.push(b); continue; }
@@ -219,9 +234,13 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (p.l.idDuplo) marc.add('id-duplo');
       // Ambiguidade: outro laudo da mesma faixa, materialmente diferente, que não está com uma linha do mesmo código.
       const mesmoExame = c => secundarioDe.get(c.l.i) === p.l.i || secundarioDe.get(p.l.i) === c.l.i;
-      const alt = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l) && !mesmoExame(c)
+      const alt0 = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l) && !mesmoExame(c)
         && !(usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && usado.get(c.l.i) !== b));
-      if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'})`).join('; ')}`); }
+      // Alternativa claramente de outro exame pelo título (afinidade bem menor) não deixa a linha ambígua.
+      const peloTitulo = c => p.afd >= AF_MIN && p.afd - c.afd >= AF_MARGEM;
+      const alt = alt0.filter(c => !peloTitulo(c)), descartadas = alt0.filter(peloTitulo);
+      if (alt.length) { marc.add('ambiguo'); motivos.push(`${alt.length + 1} laudos plausíveis na mesma faixa: ${[p, ...alt].map(c => `«${c.l.titulo}» (${c.l.medico || 'sem médico'}, título ${pct(c.af)})`).join('; ')}`); }
+      else if (descartadas.length) { marc.add('escolhido-titulo'); out.peloTitulo = true; motivos.push(`Laudo escolhido pelo título entre ${descartadas.length + 1} exames do paciente no mesmo período: «${p.l.titulo}» corresponde a ${pct(p.af)} da descrição do MV «${r.procDesc || r.codigo}»; ${descartadas.map(c => `«${c.l.titulo}» ${pct(c.af)}`).join('; ')}.`); }
       if (p.proc.composta) {
         marc.add('composta');
         const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(e => e.qtd > (u.usos[e.i] || 0)) : [];

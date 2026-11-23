@@ -11,7 +11,7 @@ const LISTAS_CFG = {
   unidades: u => String(u.cod), prestadores: p => String(p.cod), faturistas: f => norm(f.nome), convenios: c => norm(c.nome || ''),
   classificacao: r => r.id, descontos: d => d.id, faixasUSG: f => f.id, modelosExportacao: m => m.id
 };
-const MAPAS_CFG = ['parametros', 'fechamento', 'pastas'];   // cada chave é um item da mescla
+const MAPAS_CFG = ['parametros', 'fechamento', 'pastas', 'reajusteAnual'];   // cada chave é um item da mescla
 const FORA_DA_MESCLA_CFG = new Set(['schema', 'versaoSchema', 'revisao', 'atualizadoEm']);
 
 function unidadesCfg(cfg) {

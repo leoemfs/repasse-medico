@@ -27,8 +27,10 @@ const r = await page.evaluate(() => { const H = window.H, x = window.__pior, t =
   const fnv = s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); };
   return { ms: Math.round(ms), assinatura: fnv(c.linhas.map(y => `${y.r?.seq || ''}:${y.status}:${y.l?.i ?? ''}:${[...y.marcadores].sort().join(',')}`).join('|')), conferidos: c.porStatus.conferido.n }; });
 console.log(JSON.stringify(r));
-// Assinatura do resultado na v3.0.0-alpha.10 (antes das otimizações do P2): qualquer otimização tem de mantê-la.
-const ASSINATURA = '41a7085c';
+// Assinatura do resultado: qualquer otimização tem de mantê-la. Era '41a7085c' na v3.0.0-alpha.10 (antes das otimizações do P2).
+// v3.0.0-alpha.23 (SOL-F47, mudança de regra, não de desempenho): o título do laudo desempata exames do mesmo paciente. Neste caso,
+// linhas com laudo do próprio código 2.936 → 2.977 de 3.000, «ambíguo» 2.936 → 2.925, mesmas contagens por situação.
+const ASSINATURA = '6eb626c3';
 console.log((r.assinatura === ASSINATURA ? '✔ ' : '✘ ') + `resultado idêntico ao de antes das otimizações (assinatura ${r.assinatura})`); if (r.assinatura !== ASSINATURA) process.exitCode = 1;
 console.log((r.ms < 8000 ? '✔ ' : '✘ ') + `pior caso em ${(r.ms / 1000).toFixed(1)} s (era 6,8 s na auditoria e 14,9 s nesta máquina antes do P2; limite do teste 8 s)`); if (r.ms >= 8000) process.exitCode = 1;
 if (perfil) { const { profile } = await cdp.send('Profiler.stop'); const self = new Map(), dt = profile.timeDeltas; const byId = new Map(profile.nodes.map(n => [n.id, n]));

@@ -14,7 +14,7 @@ function desenharInicio() {
   zonaArquivo($('dzMV'), $('inMV'), carregarPDFs);
   zonaArquivo($('dzApolo'), $('inApolo'), fs => carregarApolo(fs[0]));
   zonaArquivo($('dzPBI'), $('inPBI'), fs => carregarPBI(fs[0]));
-  document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { location.hash = b.dataset.ir; });
+  document.querySelectorAll('#pag-inicio [data-ir]').forEach(b => b.onclick = () => { if (b.dataset.fsub) FH.sub = b.dataset.fsub; location.hash = b.dataset.ir; });
   ligarPainelCompetencia();
   if ($('btLimpar')) $('btLimpar').onclick = limparArquivosSessao;
   ligarPlanilhasGuardadas($('pag-inicio'));
@@ -51,6 +51,12 @@ function pedidosDoDia(R) {
   if (R.semAceite) out.push([`${R.semAceite} rodada(s) sem aceite`, 'conferência feita, falta o aceite', 'conferencia', 'Continuar']);
   if (eqp) out.push([`${eqp} equivalência(s) TUSS pendente(s)`, 'sem validação, nada é confirmado automaticamente', 'equivalencias', 'Validar']);
   if (R.indNC.porSituacao.aberta) out.push([`${R.indNC.porSituacao.aberta} NC(s) aberta(s)`, 'ainda não enviadas ao Qualiex', 'nc', 'Ver NCs']);
+  // SOL-F49: descontos que mudam todo mês e o reajuste anual.
+  const dc = descontosAConferir(S.cfg, S.comp);
+  if (dc.length && !compFechada()) { let pag = ''; try { const mk = marcosFech(S.comp)[{ usg: 'pagUSG', img: 'pagIMG', curitiba: 'pagCuritiba' }[dc[0].tipo]]; if (mk) pag = `, pagamento ${fmtData(mk)}`; } catch (e) { }
+    out.push([`Descontos a conferir no portal: ${dc.length}`, esc(dc.map(d => `${d.cod} · ${d.motivo}`).join(' · ')) + ` — ${esc([...new Set(dc.map(d => TIPOS_DESCONTO[d.tipo]))].join(', '))}${pag}`, 'fechamento', 'Conferir', dc[0].tipo]); }
+  const rj = lembreteReajuste(S.cfg);
+  if (rj) out.push([`Reajuste anual de ${rj.ano}`, 'revisar percentuais de USG, BOARD, valores do IMG e descontos fixos (Bases e regras → Reajuste anual)', 'bases', 'Abrir']);
   if (R.indFx?.vencidas.length) out.push([`${R.indFx.vencidas.length} etapa(s) com prazo vencido`, esc(R.indFx.vencidas[0].nome || ''), 'fluxo', 'Ver etapas']);
   if (R.indFx?.proximas.length) out.push([`${R.indFx.proximas.length} etapa(s) vencem em até 3 dias`, esc(R.indFx.proximas[0].nome || ''), 'fluxo', 'Ver etapas']);
   return out;
@@ -110,7 +116,7 @@ function painelCompetencia() {
         <div class="hist-cob" title="Cobertura das últimas competências">${h.map(x => `<div><span style="height:${Math.max(2, Math.round(x.pct * 0.4))}px"${x.chave === ch ? ' class="atual"' : ''}></span>${x.total ? f(x.pct) + '%' : '—'}<small>${rotuloCompetencia(x.chave)}</small></div>`).join('')}</div>`; })()}
       ${R.indFx ? `<p class="small muted" style="margin:6px 0 0">${R.indFx.ok} de ${R.indFx.total} etapas do mês concluídas (${pct}%).</p>` : ''}</div>
     <div class="card"><h3>Pede você</h3>
-      ${pedidos.length ? `<ul class="ini-pede">${pedidos.map(([t, sub, ir, bt]) => `<li><span><b>${t}</b><small>${sub}</small></span>${ir ? `<button class="sec mini" data-ir="${ir}">${bt}</button>` : ''}</li>`).join('')}</ul>` : '<p class="txt-ok">Nada esperando por você agora ✓</p>'}</div>
+      ${pedidos.length ? `<ul class="ini-pede">${pedidos.map(([t, sub, ir, bt, fsub]) => `<li><span><b>${t}</b><small>${sub}</small></span>${ir ? `<button class="sec mini" data-ir="${ir}"${fsub ? ` data-fsub="${fsub}"` : ''}>${bt}</button>` : ''}</li>`).join('')}</ul>` : '<p class="txt-ok">Nada esperando por você agora ✓</p>'}</div>
   </div>`;
 }
 function ligarPainelCompetencia() {

@@ -47,6 +47,9 @@ function causasDaConferencia(res, compostas = []) {
     if (x.status === 'hm-sem-base') return add('hm-sem-base', { tipo: 'hm-sem-base' }, i);
     if (x.status === 'classificacao-pendente') return add('classificacao', { tipo: 'classificacao' }, i);
     if (x.status === 'so-faturamento') return uma.push({ k: 'sf|' + i, tipo: 'so-faturamento', linhas: [i] });
+    // Ambígua sem equivalência (ou com título validado para outro código): o par é um palpite entre laudos do mesmo
+    // paciente e dia. Não entra no grupo de validação em lote, para não validar o título do exame errado.
+    if (p && m.has('ambiguo') && (m.has('eq-sem-cadastro') || m.has('eq-divergente'))) return uma.push({ k: 'amb|' + i, tipo: 'ambiguo', linhas: [i] });
     if (p && m.has('eq-pendente')) return add(`eq|${r.codigo}|${chaveTitulo(l.titulo)}`, { tipo: 'eq-pendente', ...base, ambigua: !!p.proc.relacao?.ambiguo, relacaoId: p.proc.relacao?.id || '' }, i);
     if (p && m.has('eq-sem-cadastro')) return add(`eqn|${r.codigo}|${chaveTitulo(l.titulo)}`, { tipo: 'eq-sem-cadastro', ...base }, i);
     if (p && m.has('eq-divergente')) return add(`div|${r.codigo}|${chaveTitulo(l.titulo)}`, { tipo: 'eq-divergente', ...base, outros: p.proc.outrosCodigos || [] }, i);
