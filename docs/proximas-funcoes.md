@@ -1,5 +1,7 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F48 implementada na v3.0.0-alpha.22** (23/11/2026): HM fora da V3 nunca compõe o repasse e é notificado para exclusão do MV, em todos os grupos de HM. Detalhes na seção da SOL-F48.
+
 **SOL-F46 implementada na v3.0.0-alpha.21** (23/11/2026): regras de Curitiba (V3) na conferência cruzada e na correção de prestador. Detalhes na seção da SOL-F46.
 
 **SOL-F20 implementada na v3.0.0-alpha.18** (23/11/2026): Retrospectiva mensal (PDCA) como subaba do Fluxo mensal. Detalhes na seção da SOL-F20.
@@ -1265,6 +1267,30 @@ Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 
 
 ## Correção de prestador com regra composta (09/11/2026, v2.1.0-alpha.19)
 Causa do erro «Cannot read properties of undefined (reading 'responsavel')» na Correção de prestador: quando o laudo compatível é confirmado por uma **regra composta** (e não por uma relação simples código × título), não existe «relação» com responsável, e o texto do detalhe tentava ler esse campo. Agora o detalhe diz «validado para 41001109 (regra composta «TC abdome total», responsável)». Teste novo em `test/compostas.mjs` (Correção de prestador com laudo de regra composta).
+
+## SOL-F48 — HM fora da V3: nunca compõe o repasse e é notificado para exclusão — **IMPLEMENTADA na v3.0.0-alpha.22** (pedido de 23/11/2026; teste: `test/hm_fora_v3.mjs`)
+Pedido: «Enquanto na unidade da V3 nós pagamos HM de USG, nas demais unidades o HM deve ser notificado para exclusão e não compõe valor para o repasse — todos os grupos de HM em todas as unidades (exceto V3).»
+
+**O que já valia (SOL-F43):** fora da V3, o HM ficava na classe Excluído (fora do valor), não podia ser aceito para pagamento e aparecia em «NCs e correções no MV › HM a excluir do MV», com alerta quando continuava no MV depois da reconferência.
+
+**Achado e corrigido:** a regra de classificação «descrição termina em «- HM»» nunca casava. A descrição é comparada sem hífen e sem acento, e o padrão exigia o hífen. Um HM lançado no grupo do exame (ex.: «US TIREOIDE - HM» no grupo ULTRASSONOGRAFIA) era tratado como exame: podia parear com o laudo e **ser pago**.
+- Padrão novo da descrição: começa com «HM» ou termina em «HM» (`^HM |(^| )HM$`).
+- Padrão novo do grupo: `HONORARIO|HONOR MED|(^| )HM( |$)`, que cobre 77 Raio X, 78 PF, 80 Ressonância, 81 Mamografia, 83 Densitometria e grupos abreviados («HONOR. MEDICO», «77 - HM RAIO X»).
+- As configurações antigas são migradas sozinhas quando a regra ainda tem o padrão de fábrica. A regra que o usuário editou fica como está.
+
+**O que mudou na notificação:**
+- **Conferência:** todo HM fora da V3 ganha o marcador **«HM a excluir do MV (fora da V3)»**, que dá para filtrar. O motivo diz o grupo e o convênio: «HM a excluir do MV: fora da V3 nenhum HM é pago…». Os textos que falavam em «HM sem regra do prestador» passaram a dizer a regra.
+- **Fechamento (USG e IMG):** aviso por prestador e unidade, por exemplo «unidade 17: 4 HM a excluir do MV (R$ 31,00), fora do valor: fora da V3 nenhum HM é pago».
+- **Excel do prestador:** aba nova **«HM a excluir do MV»**, com atendimento, conta, remessa, paciente, data, código, descrição, grupo, convênio, valores e motivo. Pronta para pedir a exclusão.
+- **Excel único da unidade (SOL-F45):** a mesma aba, com o prestador nas duas primeiras colunas.
+- **V3 (unidade 5):** nada muda. O HM de USG Unimed continua pago (com o exame base, SOL-F46), e os outros HM seguem «HM V3 a excluir».
+
+**Critérios de aceite** (`test/hm_fora_v3.mjs`, dados fictícios):
+1. Na unidade 17, os HM dos grupos 78 PF (inclusive o de USG Unimed), 81 Mamografia, 77 Raio X e o «- HM» no grupo de USG ficam Excluídos, com o marcador. Para pagamento: só as USG.
+2. «Aceito para pagamento» não muda a classe do HM.
+3. Fechamento com o aviso e o valor sem HM; Excel do prestador e Excel único com a aba «HM a excluir do MV».
+4. A configuração antiga com o padrão de fábrica é migrada.
+5. Na V3, o HM de USG Unimed continua Devido, e o de mamografia, Excluído pela regra da V3.
 
 ## SOL-F46 — Regras de Curitiba (V3) na conferência cruzada — **IMPLEMENTADA na v3.0.0-alpha.21** (pedido de 23/11/2026; teste: `test/v3_curitiba.mjs`)
 Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc consegue adicionar essas informações à ferramenta ou terei de fazer manualmente?»

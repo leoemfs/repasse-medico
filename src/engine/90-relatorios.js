@@ -31,6 +31,13 @@ function xlsxExtracao(rel) {
   ]);
 }
 
+/* SOL-F48: HM que não compõe o repasse (fora da V3, todo HM; na V3, o que não é de USG Unimed) — lista para pedir a exclusão no MV. */
+const CAB_HM_EXCLUIR = ['Atendimento', 'Conta', 'Remessa', 'Paciente', 'Data', 'Cód. procedimento', 'Descrição MV', 'Grupo de procedimento', 'Convênio', 'Vl Repasse', 'Vl Total', 'Motivo'];
+const hmAExcluir = res => res.linhas.filter(x => x.r && x.tipo === 'hm' && classeDaLinhaConf(x) === 'excluido');
+const linhaHMExcluir = x => [{ v: x.r.atendimento, st: T }, { v: x.r.conta, st: T }, { v: x.r.remessa, st: T }, x.r.paciente, x.r.data, { v: x.r.codigo, st: T }, x.r.procDesc, x.r.grupoNome, x.r.convenio,
+  { v: x.r.vlRepasse, st: { fmt: 'money' } }, { v: x.r.vlTotal, st: { fmt: 'money' } }, { v: x.motivos.find(m => /^HM/.test(m)) || x.motivos[0] || '', st: { wrap: true } }];
+const LARG_HM_EXCLUIR = [12, 11, 10, 32, 11, 14, 44, 30, 24, 12, 12, 70];
+
 /* Excel da conferência cruzada (SOL-F23). Aba principal com o MV lado a lado com o Apolo e a
  * decisão da competência; o técnico (faixa, equivalência, chaves, candidatos) fica em abas à parte.
  * As decisões (NC, aceitar para pagamento) são tomadas na ferramenta; aqui só aparecem. */
@@ -112,7 +119,8 @@ function xlsxConferencia(res, ctx) {
     { nome: 'Por procedimento', larguras: [12, 50, 12, 12, 12, 22], linhas: [cabecalho(['Código TUSS', 'Descrição MV', 'Linhas no MV', 'Conferidas', 'Com ressalva', 'Laudos do escopo com título validado']), ...res.porCodigo.map(e => [{ v: e.codigo, st: T }, e.desc, e.mv, e.conferido, e.ressalva, e.laudosValidados])], filtro: true },
     { nome: 'Títulos sem validação', larguras: [70, 12], linhas: [cabecalho(['TITLE do Apolo no escopo sem nenhuma equivalência validada', 'Laudos']), ...res.titulosSemValidacao.map(([t, n]) => [t, n])], filtro: true },
     { nome: 'Candidatos', larguras: [8, 12, 30, 11, 24, 7, 50, 30, 11, 12, 10, 14, 10], linhas: C, filtro: true },
-    { nome: 'MV original', larguras: [8, 30, 7, 12, 50, 28, 9, 10, 11, 32, 28, 11, 7, 11, 9, 11, 22], linhas: [cabecalho(colunasMV), ...res.linhas.filter(x => x.r).sort((a, b) => a.r.seq - b.r.seq).map(x => celulasMV(x.r, x.tipo))], filtro: true }
+    { nome: 'MV original', larguras: [8, 30, 7, 12, 50, 28, 9, 10, 11, 32, 28, 11, 7, 11, 9, 11, 22], linhas: [cabecalho(colunasMV), ...res.linhas.filter(x => x.r).sort((a, b) => a.r.seq - b.r.seq).map(x => celulasMV(x.r, x.tipo))], filtro: true },
+    ...(hmAExcluir(res).length ? [{ nome: 'HM a excluir do MV', larguras: LARG_HM_EXCLUIR, linhas: [cabecalho(CAB_HM_EXCLUIR), ...hmAExcluir(res).map(linhaHMExcluir)], filtro: true }] : [])
   ]);
 }
 
@@ -187,6 +195,8 @@ function xlsxConferenciaUnidade(itens, controle, meta) {
     ['Decisões', 'NC, «aceito para pagamento», dispensas e observações são registradas na ferramenta; aqui só aparecem. Use os filtros desta planilha para controle.'],
     ...itens.map(it => ['Relatório', `${it.ctx.relatorio.cab.prestadorCod} - ${it.ctx.relatorio.cab.prestadorNome} · ${it.ctx.relatorio.arquivo || ''}${it.rodada ? ` · rodada ${it.rodada.id}` : ' · sem conferência'}`]),
     ['Privacidade', AVISO_LGPD]])];
+  const HMX = [[...cabecalho(['Cód. prestador', 'Prestador'], PR), ...cabecalho(CAB_HM_EXCLUIR)]];
+  for (const it of comConf) for (const x of hmAExcluir(it.res)) HMX.push([...prest(it), ...linhaHMExcluir(x)]);
   const PC = [cabecalho(['Código TUSS', 'Descrição MV', 'Linhas no MV', 'Conferidas', 'Com ressalva', 'Prestadores'])];
   for (const e of [...porCodigo.values()].sort((a, b) => b.mv - a.mv)) PC.push([{ v: e.codigo, st: T }, e.desc, e.mv, e.conferido, e.ressalva, [...e.prestadores].join(', ')]);
   return criarXlsx([
@@ -194,6 +204,7 @@ function xlsxConferenciaUnidade(itens, controle, meta) {
     { nome: 'Conferência', larguras: [12, 30, ...cols.map(c => c.larg)], linhas: P, filtro: true },
     { nome: 'O que falta decidir', larguras: [12, 30, 60, 44, 10, 32, 11, 12, 40, 40, 22, 22, 12, 80], linhas: F, filtro: F.length > 2 },
     { nome: 'Por procedimento', larguras: [12, 50, 12, 12, 12, 40], linhas: PC, filtro: true },
+    ...(HMX.length > 1 ? [{ nome: 'HM a excluir do MV', larguras: [12, 30, ...LARG_HM_EXCLUIR], linhas: HMX, filtro: true }] : []),
     { nome: 'Informações', larguras: [34, 110], linhas: I, filtro: false, congelar: false }
   ]);
 }

@@ -33,6 +33,7 @@ const MARCADORES = {
   'mesmo-estudo-possivel': 'Pode ser o mesmo estudo (regra composta)',
   'valor-simbolico': 'Valor simbólico',
   'possivel-bilateral': 'Laudo já usado por linha do mesmo código',
+  'hm-excluir': 'HM a excluir do MV (fora da V3)',
   'modalidade-desconhecida': 'Modalidade do grupo não mapeada',
   'laudo-sem-data': 'Laudo sem data válida',
   'composta': 'Regra composta',
@@ -194,7 +195,10 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     }
     if (b.tipo !== 'procedimento') {
       out.status = b.tipo === 'hm' ? 'hm-pendente' : b.tipo === 'desconhecido' ? 'classificacao-pendente' : 'nao-procedimental';
-      motivos.push(b.tipo === 'hm' ? 'Item HM: preservado e fora do cruzamento de procedimentos até existir regra validada (RN-201).'
+      // SOL-F48 (23/11/2026): fora da V3 nenhum HM é pago, de nenhum grupo (raio-X, mamografia, ressonância, PF, USG…).
+      // Não compõe o repasse (classe Excluído) e é notificado para exclusão do MV; não é NC por si só.
+      if (b.tipo === 'hm') marc.add('hm-excluir');
+      motivos.push(b.tipo === 'hm' ? `HM a excluir do MV: fora da V3 nenhum HM é pago (grupo «${r.grupoNome || '—'}», convênio «${r.convenio || '—'}»). Não compõe o repasse; não é NC por si só.`
         : b.tipo === 'desconhecido' ? 'Tipo de item não reconhecido pelas regras de classificação: revisar e cadastrar regra.'
           : `${TIPOS_ITEM[b.tipo]}: sem correspondência esperada na planilha de laudos (RN-202).`);
       linhas.push(out); continue;

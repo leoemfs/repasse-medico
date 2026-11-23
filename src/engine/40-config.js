@@ -18,10 +18,13 @@ const TIPOS_ITEM = {
   desconhecido: 'Desconhecido — pendente de classificação'
 };
 
+const HM_DESCRICAO_PADRAO = '^HM |(^| )HM$', HM_GRUPO_PADRAO = 'HONORARIO|HONOR MED|(^| )HM( |$)';
 // Padrões adotados (editáveis). A ordem importa: a primeira regra que casar define o tipo.
 const CLASSIFICACAO_PADRAO = [
-  { id: 'hm-sufixo', campo: 'descricao', padrao: '(^|\\s)-\\s*HM\\s*$', tipo: 'hm', nota: 'Descrição termina em «- HM»' },
-  { id: 'hm-grupo', campo: 'grupo', padrao: 'HONORARIO', tipo: 'hm', nota: 'Grupo de honorários médicos (ex.: LAUDO URGENTE, 2ª via)' },
+  // SOL-F48: o padrão é testado na descrição NORMALIZADA (sem hífen nem acento): «US TIREOIDE - HM» vira «US TIREOIDE HM».
+  // O padrão antigo exigia o hífen e nunca casava — o HM lançado num grupo de exame era tratado como exame.
+  { id: 'hm-sufixo', campo: 'descricao', padrao: HM_DESCRICAO_PADRAO, tipo: 'hm', nota: 'Descrição começa com «HM» ou termina em «- HM»' },
+  { id: 'hm-grupo', campo: 'grupo', padrao: HM_GRUPO_PADRAO, tipo: 'hm', nota: 'Grupo de honorários médicos (77 Raio X, 78 PF, 80 Ressonância, 81 Mamografia, 83 Densitometria…)' },
   { id: 'medicamento', campo: 'grupo', padrao: 'MEDICAMENTO', tipo: 'medicamento', nota: '' },
   { id: 'material', campo: 'grupo', padrao: 'MATERIA', tipo: 'material', nota: 'Materiais descartáveis e kits' },
   { id: 'pacote', campo: 'grupo', padrao: 'PACOTE', tipo: 'pacote', nota: '' },
@@ -92,6 +95,12 @@ function migrarConfig(c) {
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
+  // SOL-F48: regras de HM antigas (padrão do sufixo que nunca casava; grupo só com «HONORARIO») passam ao padrão novo.
+  // Regra que o usuário editou fica como está.
+  for (const r of c.classificacao || []) {
+    if (r.id === 'hm-sufixo' && r.padrao === '(^|\\s)-\\s*HM\\s*$') { r.padrao = HM_DESCRICAO_PADRAO; r.nota = 'Descrição começa com «HM» ou termina em «- HM»'; mudou = true; }
+    if (r.id === 'hm-grupo' && r.padrao === 'HONORARIO') { r.padrao = HM_GRUPO_PADRAO; mudou = true; }
+  }
   if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
   // v3.0: nomes das pastas e modelos de exportação da equipe (vão com a configuração compartilhada).
   if (!c.pastas || typeof c.pastas !== 'object' || Array.isArray(c.pastas)) { c.pastas = {}; mudou = true; }
