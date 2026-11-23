@@ -206,22 +206,28 @@ function cardModalidadesHM() {
   const mod = S.cfg.modalidadesGrupo?.length ? S.cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(S.cfg.hmV3 || {}) };
   const grupos = [...new Set((S.relatorios || []).flatMap(x => x.rel.regs.map(r => r.grupoNome)).filter(Boolean))].sort();
   return `<div class="card" data-sub="modalidades" id="cardModHM"><h2>Modalidade do Apolo por grupo do MV</h2>
+    <p class="small muted">Na unidade de Curitiba (V3), a modalidade do laudo vem da coluna TITLE do Apolo (ex.: «ULTRASSONOGRAFIA…» → US, «MAMOGRAFIA…» → MG), na conferência, na correção de prestador e em Prestadores por unidade.</p>
     <p class="lead">A conferência só procura laudos da modalidade do grupo de procedimento (ex.: ULTRASSONOGRAFIA → US). Em cada linha, os trechos do nome do grupo separados por «|» e as modalidades do Apolo separadas por vírgula. A primeira linha que casar vale; grupo sem linha não restringe a modalidade.</p>
     <div class="tw"><table><thead><tr><th>Trechos do grupo do MV</th><th>Modalidades do Apolo</th><th></th></tr></thead><tbody>${mod.map((x, i) => `<tr>
       <td><input type="text" data-mg="${i}" data-c="padrao" value="${esc(x.padrao)}" style="width:100%"></td><td><input type="text" data-mg="${i}" data-c="modalidades" value="${esc(x.modalidades)}" style="width:110px"></td>
       <td><button class="perigo mini" data-mgrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
     ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
     <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
-    <p class="lead">O HM de uma linha da V3 é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio. Os demais HM não compõem o repasse (excluir do MV).</p>
+    <p class="lead">Os grupos de HM que nunca são pagos valem antes de tudo. Fora deles, o HM é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio, e o exame base está no relatório (não precisa de laudo). O valor é o mesmo da USG do médico. Os demais HM não compõem o repasse e aparecem em «HM a excluir do MV».</p>
+    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO PF» casa «77 - HONORARIOS MEDICOS PF».</span></label>
     <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
       <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
+    <h2 style="margin-top:18px">Pacotes na V3</h2>
+    <p class="lead">Pacote da V3 com um destes trechos é considerado pelo valor de repasse do MV e notificado. O exame base do mesmo paciente e dia, do convênio indicado e lançado a 100% (erro do MV), sai do fechamento, substituído pelo pacote.</p>
+    <div class="grid2"><label class="campo">Trechos do pacote (grupo ou descrição)<input type="text" id="hmPac" value="${esc(hm.pacotes)}"></label>
+      <label class="campo">Convênio do exame base substituído<input type="text" id="hmPacConv" value="${esc(hm.pacoteConvenios)}"></label></div>
     <div class="acoes"><button id="mhSalvar">Salvar</button><button id="mgAdd" class="sec">+ Grupo</button><button id="mhPad" class="sec">Restaurar padrão</button></div>
     <p class="small muted">Valem a partir da próxima conferência. Rodadas já feitas não mudam: execute a conferência de novo.</p></div>`;
 }
 function lerModalidadesHM() {
   const linhas = [], pg = $('cardModHM');
   pg.querySelectorAll('[data-mg][data-c="padrao"]').forEach(inp => { const i = inp.dataset.mg, m = pg.querySelector(`[data-mg="${i}"][data-c="modalidades"]`).value.trim(); if (inp.value.trim() || m) linhas.push({ padrao: inp.value.trim(), modalidades: m.toUpperCase() }); });
-  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim() } };
+  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim(), gruposExcluir: $('hmExc').value.trim(), pacotes: $('hmPac').value.trim(), pacoteConvenios: $('hmPacConv').value.trim() } };
 }
 document.addEventListener('click', async e => {
   const c = $('cardModHM'); if (!c || !c.contains(e.target)) return;

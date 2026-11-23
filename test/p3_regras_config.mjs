@@ -33,8 +33,9 @@ ok(await hm() === 'true true true false', 'HM da V3 com SULAMERICA passa a ser d
 // Efeito na conferência da V3 (unidade 5): HM SulAmérica de USG fica Devido.
 const cls = await p.evaluate(() => { const { S, t } = window.__RM, d = new Date(Date.UTC(2026, 9, 3));
   const r = { seq: 1, pagina: 1, codigo: '40901173', procDesc: 'USG TIREOIDE - HM', grupoNome: 'HONORARIOS MEDICOS', conta: '1', atendimento: '2', paciente: 'ANA', convenio: 'SULAMERICA', data: d, vlRepasse: 7, vlTotal: 14, pct: .5, quant: 1, prestadorCod: '15', prestadorNome: 'DR X' };
-  const res = t.conferirCruzado({ regs: [r], cab: { prestadorCod: '15', prestadorNome: 'DR X' } }, { laudos: [] }, S.cfg, S.eq, { unidadeCod: '5', tol: 0 });
-  return res.linhas.filter(x => x.r).map(x => `${x.status}:${t.classeDaLinhaConf(x)}`).join(' '); });
+  const base = { ...r, seq: 2, procDesc: 'USG TIREOIDE', grupoNome: 'ULTRASSONOGRAFIA' };   // exame base do HM (regra de 23/11/2026)
+  const res = t.conferirCruzado({ regs: [base, r], cab: { prestadorCod: '15', prestadorNome: 'DR X' } }, { laudos: [] }, S.cfg, S.eq, { unidadeCod: '5', tol: 0 });
+  return res.linhas.filter(x => x.r && x.tipo === 'hm').map(x => `${x.status}:${t.classeDaLinhaConf(x)}`).join(' '); });
 ok(cls === 'conferido:devido', `conferência da V3: HM de USG SulAmérica = Devido pela regra configurada (${cls})`);
 await p.screenshot({ path: out + 'p3_modalidades.png' });
 // Recarregar: a regra continua valendo.

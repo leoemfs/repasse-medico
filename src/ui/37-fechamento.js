@@ -128,10 +128,12 @@ function desenharCuritiba(corpo, f, mk) {
 async function memoriaV3(x) {
   const c = x.v3, texto = textoEmailV3(c);
   const exc = [...c.hmExcluir.itens].sort((a, b) => b[1] - a[1]);
+  const pacV3 = c.pacotes?.qtd ? `<li><b>Pacotes de ressonância/mamografia:</b> ${c.pacotes.qtd} pelo valor de repasse do MV (R$ ${fmtBR(c.pacotes.valor)}); o exame base Bradesco a 100% que cada um substitui ficou fora.</li>` : '';
   const origem = c.modo === 'fixo' ? `<li><b>Regra:</b> valor fixo por laudo, por grupo do MV.</li>
       ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${i.qtd} laudo(s) × R$ ${fmtBR(i.valorLaudo)} = R$ ${fmtBR(i.valor)}${i.hmQtd ? ` · HM Unimed ${i.hmQtd} × R$ ${fmtBR(i.valorHM)} = R$ ${fmtBR(i.hmValor)}` : ''}.</li>`).join('')}
       <li>Exames de USG e Doppler no mês: ${c.exames} (USG bruto no MV: R$ ${fmtBR(c.brutoUSG)}, só referência).</li>
-      ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor de HM na regra: não pagos.</li>` : ''}
+      ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor do laudo de USG na regra: não pagos.</li>` : ''}
+      ${pacV3}
       <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>` : null;
   const r = await dialogo(`Memória de cálculo — ${x.cod} - ${x.nome}`, `<span class="dlg-largo" hidden></span><div class="grid2"><div><h4 style="margin:0 0 4px">Texto do e-mail</h4><pre class="memoria-v3">${esc(texto)}</pre></div>
     <div><h4 style="margin:0 0 4px">De onde vem cada número</h4><ul class="small">${origem || `
@@ -140,6 +142,7 @@ async function memoriaV3(x) {
       <li><b>HM Unimed:</b> ${c.hm.qtd} HM de USG/Doppler do convênio Unimed (R$ ${fmtBR(c.hm.valor)})${c.hmNaBase ? ', somados ao faturamento da USG' : c.forma === 'por-laudo' && x.p?.regras?.v3regra?.hm === 'valor-laudo' ? ', pagos como laudo de USG' : ', não pagos pela regra'}.</li>
       ${c.forma === 'faixa-liquido' ? `<li><b>Faixa:</b> ${c.exames} exames → ${c.faixa ? `${fmtBR(c.pct).replace(',00', '')}% (${esc(rotuloFaixaV3(c.faixa))})` : 'abaixo da primeira faixa'}.</li>` : ''}
       ${c.outros.map(o => `<li><b>${esc(o.nome)}:</b> ${o.qtd} exame(s), R$ ${fmtBR(o.bruto)} bruto → R$ ${fmtBR(o.valor)}.</li>`).join('')}
+      ${pacV3}
       <li>Calculado sem arredondar no meio; arredonda só no final.</li>
       <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>`}</ul>
       ${exc.length ? `<h4 style="margin:8px 0 4px">HM a excluir (${c.hmExcluir.qtd} · R$ ${fmtBR(c.hmExcluir.valor)})</h4><ul class="small">${exc.slice(0, 12).map(([k, n]) => `<li>${esc(k)} — ${n}</li>`).join('')}${exc.length > 12 ? `<li>… e mais ${exc.length - 12}</li>` : ''}</ul>` : ''}

@@ -1,5 +1,7 @@
 # Próximas funções — requisitos registrados
 
+**SOL-F46 implementada na v3.0.0-alpha.21** (23/11/2026): regras de Curitiba (V3) na conferência cruzada e na correção de prestador. Detalhes na seção da SOL-F46.
+
 **SOL-F20 implementada na v3.0.0-alpha.18** (23/11/2026): Retrospectiva mensal (PDCA) como subaba do Fluxo mensal. Detalhes na seção da SOL-F20.
 
 **SOL-F45 implementada na v3.0.0-alpha.17** (19/11/2026): Excel único da unidade × grupo, gravado em `09 - Planilhas de repasse conferidos`. Detalhes abaixo.
@@ -1263,3 +1265,72 @@ Relato: «Correção de prestador não está funcionando» (Gilberto · unidade 
 
 ## Correção de prestador com regra composta (09/11/2026, v2.1.0-alpha.19)
 Causa do erro «Cannot read properties of undefined (reading 'responsavel')» na Correção de prestador: quando o laudo compatível é confirmado por uma **regra composta** (e não por uma relação simples código × título), não existe «relação» com responsável, e o texto do detalhe tentava ler esse campo. Agora o detalhe diz «validado para 41001109 (regra composta «TC abdome total», responsável)». Teste novo em `test/compostas.mjs` (Correção de prestador com laudo de regra composta).
+
+## SOL-F46 — Regras de Curitiba (V3) na conferência cruzada — **IMPLEMENTADA na v3.0.0-alpha.21** (pedido de 23/11/2026; teste: `test/v3_curitiba.mjs`)
+Pedido: «Regra para HM V3 […] Regras para qualquer prestador da V3 […] vc consegue adicionar essas informações à ferramenta ou terei de fazer manualmente?»
+
+### O que o usuário definiu
+- **HM que nunca é pago a ninguém, e a ferramenta precisa avisar para excluir:**
+  - grupo de procedimento **77 - Honorario Medico Raio X**;
+  - grupo **77 - Honorario Medico PF**;
+  - grupo **81 - Honorario Medico Mamografia**.
+- **HM pago, para qualquer prestador da V3:** só o HM de **USG** do convênio **Unimed**.
+  - O valor é o mesmo da USG do prestador.
+  - Entra no repasse sem precisar de laudo; basta o **exame base**.
+- **Em Curitiba**, a conferência e a correção de prestador sempre levam em conta a coluna **TITLE** do Apolo.
+- **Pacote de ressonância e de mamografia:** considerar e notificar.
+  - Em alguns casos o pacote substitui o exame base do convênio **Bradesco**, que o MV lança a 100% por um erro que não dá para ajustar.
+  - Vale o pacote, que traz o valor certo de repasse.
+- **Modalidades da V3:** mamografia, ultrassonografia, raio-X, densitometria e ressonância. A V3 ainda não faz tomografia; quando fizer, entram as regras dos prestadores para ela.
+- **Quem recebe:** são 5 prestadores da unidade (os médicos V3, cada um com a sua regra).
+- **Médicos de Londrina que laudam na V3:** fazem os laudos que não são de USG e recebem **por produção**. A lista raramente muda:
+  - 7873 Amanda Souza de Assis · 5 Gustavo Andrade De Margalho · 8049 Heloisa Martins Cardoso · 10175 Henrique Pini Sonomiya;
+  - 11718 Lucas Franklin Amarante · 9033 Lucas Yamada · 8873 Lucca Maricato de Las Villas Rodrigues · 7 Marcelo Garcia Marini;
+  - 15 Marcelo Miyazaki Yoshida · 10264 Melanie Eiko · 12 Nilton Paccola Lovato · 14 Paulo Asshaias Felipe;
+  - 3 Rafael Ogasawara Ferreira · 9 Roberto Brazao Farinha · 13 Thales Cavallini Rossi · 10285 Wesley Americo Bergamin.
+
+### Como ficou (conferência da unidade V3)
+| Linha do MV | Situação | Classe | Aviso |
+|---|---|---|---|
+| HM dos grupos 77 RX, 77 PF ou 81 Mamografia (inclusive HM de USG Unimed lançado no PF) | HM — regra pendente · «HM V3 a excluir» | Excluído | «Curitiba (V3) — avisos para o MV» e «HM a excluir do MV» |
+| HM de outro grupo que não é de USG/Doppler, ou não é Unimed | HM — regra pendente · «HM V3 a excluir» | Excluído | idem |
+| HM de USG/Doppler Unimed **com** o exame de USG do mesmo atendimento (ou do mesmo paciente e dia) no relatório | Conferido · «HM V3 devido» | Devido | — |
+| HM de USG/Doppler Unimed **sem** o exame base no relatório | **HM sem exame base** | Pendente (pode ser aceito com justificativa) | causa própria em «O que falta decidir» |
+| Pacote de ressonância/mamografia (grupo PACOTE, ou descrição «PACOTE …» na V3) | Conferido · «Pacote V3 considerado» | Devido pelo Vl Repasse do MV | aviso com o exame que ele substitui |
+| Exame base do mesmo paciente e dia do pacote, do convênio Bradesco e lançado a 100% | **Substituído pelo pacote** | Excluído | aviso |
+| Linha de tomografia (ou outra modalidade que a V3 não faz) | segue a conferência | segue a conferência | «Modalidade que a V3 não faz» |
+
+- **Modalidade pelo TITLE:** na unidade V3, a modalidade do laudo vem do título quando ele aponta uma só (ultrassom/Doppler → US, mamografia → MG, ressonância → MR, densitometria → OT, raio-X → CR, tomografia → CT); senão fica a MODALITY.
+  - Vale para a conferência, a correção de prestador e Prestadores por unidade.
+  - A MODALITY original fica guardada no laudo (`modalidadeApolo`).
+- **Valor do HM (regra por valor fixo):** o HM Unimed paga o mesmo valor do laudo de USG do médico.
+  - O campo separado «R$ por HM Unimed» saiu da tela.
+  - Uma regra antiga com valor diferente passa a usar o valor do laudo de USG.
+  - Na regra percentual (Dr. Ian), o HM já entrava no faturamento junto com a USG.
+- **Pacotes no Fechamento → Repasse Curitiba:** somados ao total pelo Vl Repasse do MV, nos dois modos de regra, com linha própria no e-mail e na memória de cálculo.
+- **Configurável:** Bases e regras → «Modalidades e HM V3», nos campos «Grupos de HM que nunca são pagos», «Trechos do pacote» e «Convênio do exame base substituído».
+  - Padrão dos grupos: `HONORARIO MEDICO RAIO X|HONORARIO MEDICO PF|HONORARIO MEDICO MAMOGRAFIA`.
+  - Cada palavra do padrão precisa começar uma palavra do grupo do MV, sem diferença de plural nem do número do grupo.
+- **Médicos por produção:** em Bases → Médicos V3, nova lista «Médicos de Londrina que laudam na V3 por produção», já com os 16 médicos.
+  - Botões «Tirar», «Voltar à lista» e «+ Médico por produção»; a escolha fica em `regras.v3producao` do prestador.
+  - Em Conferência → Prestadores por unidade, no grupo Curitiba, eles contam os laudos que não são de USG. Os de USG aparecem como «fora da regra».
+  - O pagamento continua pelo relatório do MV, no Fechamento do IMG, na coluna da unidade 5.
+- **Aviso na conferência:** quadro «Curitiba (V3) — avisos para o MV» logo abaixo dos totais.
+  - Mostra os HM a excluir por grupo (com o valor), os HM sem exame base, os pacotes, as bases substituídas e as modalidades fora da V3.
+  - Cada item tem o botão «Ver linhas», que filtra a tabela.
+
+### Critérios de aceite (em `test/v3_curitiba.mjs`, com dados fictícios)
+1. HM dos grupos 77 Raio X, 77 PF e 81 Mamografia = Excluído e listado para exclusão, mesmo quando é de USG Unimed.
+2. HM de USG Unimed com o exame base no relatório = Devido, sem laudo; sem o exame base = Pendente, com causa própria.
+3. Laudo com MODALITY errada e TITLE de ultrassom pareia com a linha de USG.
+4. Pacote de ressonância = Devido; o exame base Bradesco a 100% do mesmo paciente e dia = Excluído («Substituído pelo pacote»).
+5. Valor fixo: HM Unimed × valor do laudo de USG; pacote somado pelo valor do MV.
+6. Lista padrão com os 16 médicos por produção; na unidade 5, contam só os laudos que não são de USG.
+
+### A confirmar com o usuário
+- **Importante:** nos dados fictícios das versões anteriores, o HM de USG Unimed do Dr. Ian (R$ 21.907,88 em 10/2026) aparecia no grupo «HONORARIOS MEDICOS PF». Se no MV real for assim, a regra «PF nunca é pago» tira esse HM da NF.
+  - Para não passar despercebido, o HM de USG/Doppler Unimed lançado num grupo excluído aparece com destaque («Atenção: … confira se o grupo do MV está certo»).
+  - Rodar `test/competencia10.mjs` com os PDFs reais mostra o efeito.
+- Nome do grupo do HM de USG no MV de Curitiba. Hoje vale qualquer grupo de HM fora dos três excluídos, com «ULTRASS|DOPPLER|USG» no grupo ou na descrição e convênio Unimed.
+- Se o «Honorario Medico PF» nunca traz HM de USG Unimed que deva ser pago. Pela regra, ele nunca é pago.
+- Se o exame base do HM pode estar em outro relatório (de outro médico). Hoje é procurado só no mesmo relatório; sem ele, o HM fica pendente para decisão.

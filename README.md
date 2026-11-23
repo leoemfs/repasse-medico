@@ -59,6 +59,7 @@ node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com
 node test/exames.mjs             # v3.0: exame (USG com Doppler em uma ou duas páginas) e «Dispensar laudo»
 node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (complementar e manual)
 node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, lote, observação, resolvido no MV, reconferência e fechamento
+node test/v3_curitiba.mjs        # v3.0: regras de Curitiba (HM que nunca é pago, HM Unimed com exame base, TITLE, pacote, médicos por produção)
 node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
 node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
 node test/quadro_fechamento.mjs # v3.0: SOL-F19 — quadro por prestador no Fechamento (colunas pelos dados, «Aguardando terceiros», aba no Excel de indicadores)

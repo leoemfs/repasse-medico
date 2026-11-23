@@ -5,7 +5,8 @@
  *                 HM só quando a regra do prestador o inclui (hoje: V3, HM de USG/Doppler Unimed → conferido).
  *   Aceito      → decisão «Aceito para pagamento» (antes «Considerado no repasse»), com justificativa, quem e quando.
  *   NC          → NC registrada (menos «não procede»). Fora do fechamento.
- *   Excluído    → taxa, material e medicamento (nunca compõem repasse) e HM sem regra do prestador (excluir do MV).
+ *   Excluído    → taxa, material e medicamento (nunca compõem repasse), HM sem regra do prestador (excluir do MV) e,
+ *                 na V3, o exame base Bradesco a 100% substituído pelo pacote de ressonância/mamografia.
  *   Pendente    → todo o resto: ressalva sem aceite, ambíguo, só no faturamento, equivalência não validada,
  *                 composição incompleta, pacote, desconhecido e «Resolvido no MV» ainda não reconferido.
  * Valor para pagamento = Devido + Aceito. Devido + Aceito + Pendente + NC + Excluído = total do relatório do MV.
@@ -27,8 +28,15 @@ const REGRA_VALOR_F43 = 'f43';
 function classeDaLinha(tipo, estado, decisao) {
   if (TIPOS_NUNCA_REPASSE.has(tipo)) return 'excluido';
   if (decisao === 'nc') return 'nc';
-  if (tipo === 'hm') return estado === 'conferido' ? 'devido' : 'excluido';
+  if (tipo === 'hm') {
+    if (estado === 'conferido') return 'devido';
+    // V3: HM de USG Unimed sem o exame base no relatório espera decisão (pode ser aceito); os demais HM são excluídos.
+    if (estado === 'hm-sem-base') return decisao === 'considerar' ? 'aceito' : 'pend';
+    return 'excluido';
+  }
   if (decisao === 'considerar') return 'aceito';
+  // V3: exame base Bradesco a 100% substituído pelo pacote de ressonância/mamografia não compõe repasse.
+  if (estado === 'substituido-pacote') return 'excluido';
   if (decisao === 'resolvido') return 'pend';
   return estado === 'conferido' ? 'devido' : 'pend';
 }
