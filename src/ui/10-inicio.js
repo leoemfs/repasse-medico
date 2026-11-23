@@ -4,34 +4,13 @@
 // Complementos explícitos (P2, v3.0.0-alpha.11): o cartão da pasta raiz entra aqui, não por redefinição em outro arquivo.
 RENDER.inicio = () => { desenharInicio(); complementoInicioPastaRaiz(); };
 function desenharInicio() {
-  const r = S.relatorios, a = S.apolo, eqv = S.eq.itens.filter(e => e.status === 'validada').length, eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
-  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${painelCompetencia()}${painelControleUnidade()}
-  <div class="card">
-    <h2>Preparar o repasse</h2>
-    <p class="lead">Carregue os arquivos uma vez; depois abra a análise. Nenhuma análise altera o MV: as correções são feitas lá, e a nova extração é conferida aqui em outra rodada.</p>
-    <ol class="passos">
-      <li class="${r.length ? 'feito' : ''}"><div><strong>Relatório(s) de repasse do MV</strong> <span class="muted">— PDF, um ou vários.</span></div></li>
-      <li class="${a ? 'feito' : ''}"><div><strong>Planilha de laudos do Apolo</strong> <span class="muted">— competência de produção (ex.: 09/2026 para o repasse 10/2026).</span></div></li>
-      <li class="${eqv ? 'feito' : ''}"><div><strong>Equivalências TUSS validadas</strong> <span class="muted">— ${eqv} validadas · ${eqp} pendentes. Sem validação, nada é confirmado automaticamente.</span> <a href="#equivalencias">Abrir Equivalências TUSS →</a></div></li>
-      <li class="${S.pbi ? 'feito' : ''}"><div><strong>Power BI</strong> <span class="muted">— opcional, só consulta; não interfere nos motores.</span></div></li>
-    </ol>
-  </div>
-  <div class="grid3 fontes">
-    <div class="card fonte"><h3>Relatório de repasse MV (PDF)</h3>
-      <div class="dz" id="dzMV">Clique ou arraste o(s) PDF(s)<small>Relatório de Repasse de Prestadores do SOULMV</small><input id="inMV" type="file" accept=".pdf,application/pdf" multiple hidden></div>
-      <div class="estado" id="stMV">${r.length ? `${r.length} relatório(s) carregado(s).` : '<span class="muted">Nenhum PDF carregado.</span>'}</div></div>
-    <div class="card fonte"><h3>Laudos do Apolo (.xlsx)</h3>
-      <div class="dz" id="dzApolo">Clique ou arraste a planilha<small>Formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input id="inApolo" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stApolo">${a ? resumoApolo(a) + estadoGuardada('apolo', a) : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Nenhuma planilha carregada.</span>'}</div></div>
-    <div class="card fonte"><h3>Power BI (.xlsx) — opcional</h3>
-      <div class="dz" id="dzPBI">Clique ou arraste a planilha do Power BI<small>Catálogo de unidades, grupos, procedimentos e códigos de prestador</small><input id="inPBI" type="file" accept=".xlsx" hidden></div>
-      <div class="estado" id="stPBI">${S.pbi ? `<span class="badge ok">${S.pbi.linhas.length} linhas</span> <span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:8px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>${estadoGuardada('pbi', S.pbi)}` : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : '<span class="muted">Não carregado.</span>'}</div></div>
-  </div>
-  <div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do MV carregados</h2>${S.relatorios.length || S.apolo || S.pbi ? '<button class="sec" id="btLimpar">Limpar arquivos…</button>' : ''}</div><div id="listaMV"></div></div>
-  <div class="grid2">
-    <div class="card"><h3>Conferência cruzada MV × Apolo</h3><p class="muted">Confirma se cada linha do repasse tem laudo e lista os laudos sem lançamento. Mostra pendências por categoria e marcadores.</p><div class="acoes"><button data-ir="conferencia">Abrir conferência →</button></div></div>
-    <div class="card"><h3>Correção de prestador</h3><p class="muted">Identifica o médico do laudo de cada linha, separando identificados, não identificados, conflitos e dados insuficientes. Não sugere prestador.</p><div class="acoes"><button data-ir="correcao">Abrir correção →</button></div></div>
-  </div>`;
+  /* v3.0.0-alpha.20 (simplificação): o Início é o painel do dia — marcos, arquivos do mês, andamento, o que pede você
+   * e os relatórios do mês. Os quadros de upload ficam em «Carregar manualmente»; os atalhos para Conferência e Correção
+   * saíram (o menu já leva lá); os marcos completos e as etapas ficam em Fechamento e envio › Etapas do mês. */
+  const r = S.relatorios, a = S.apolo;
+  $('pag-inicio').innerHTML = `${cartaoAvisoProducao()}${cabecalhoDoDia()}${painelCompetencia()}${painelControleUnidade()}
+  <div class="card"><div class="fx-topo" style="margin-bottom:6px"><h2 style="margin:0">Relatórios do mês</h2>${S.relatorios.length || S.apolo || S.pbi ? '<button class="sec" id="btLimpar">Limpar arquivos…</button>' : ''}</div><div id="listaMV"></div></div>
+  ${cartaoFecharCompetencia()}`;
   zonaArquivo($('dzMV'), $('inMV'), carregarPDFs);
   zonaArquivo($('dzApolo'), $('inApolo'), fs => carregarApolo(fs[0]));
   zonaArquivo($('dzPBI'), $('inPBI'), fs => carregarPBI(fs[0]));
@@ -41,7 +20,52 @@ function desenharInicio() {
   ligarPlanilhasGuardadas($('pag-inicio'));
   if ($('btPbiBase')) $('btPbiBase').onclick = atualizarBasePowerBI;
   desenharListaMV();
-};
+}
+// Marcos da competência para o Início: os dois últimos que passaram, o de hoje e os próximos (a linha completa fica nas Etapas do mês).
+function marcosParaInicio(chave) {
+  const comp = S.fluxo?.competencias[chave];
+  let ms;
+  if (comp) ms = indicadoresFluxo(comp).marcos;
+  else { const [an, me] = chave.split('-').map(Number), d = calcularMarcos(S.fluxo.modelo, an, me, S.fluxo.modelo.calendario, {}).datas; ms = S.fluxo.modelo.marcos.filter(m => !m.oculto).map(m => ({ ...m, data: d[m.id] })); }
+  const hoje = diaSerial(paraData(new Date()));
+  ms = ms.filter(m => m.data).map(m => ({ ...m, d: diaSerial(m.data) - hoje })).sort((x, y) => x.d - y.d);
+  const passados = ms.filter(m => m.d < 0).slice(-2), futuros = ms.filter(m => m.d >= 0).slice(0, 5);
+  return [...passados, ...futuros];
+}
+function cabecalhoDoDia() {
+  const ch = S.comp, fechada = compFechada(ch), hoje = new Date();
+  const dia = hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+  const ms = S.fluxo ? marcosParaInicio(ch) : [];
+  return `<div class="card ini-dia"><div class="ini-dia-topo"><div><span class="eyebrow">HOJE</span><h2 style="margin:2px 0 0">${esc(dia.charAt(0).toUpperCase() + dia.slice(1))} <span class="muted small">· competência ${rotuloCompetencia(ch)} ${fechada ? 'fechada' : 'aberta'} · produção ${rotuloMes(producaoEsperada(ch))}</span></h2></div>
+    <a href="#fluxo" class="ini-link">Todos os marcos e etapas →</a></div>
+    ${ms.length ? `<div class="marcos-linha" style="margin-top:10px">${ms.map(m => `<a href="#fluxo" class="mi ${m.d === 0 ? 'hoje' : m.d < 0 ? 'passado' : m.d <= 3 ? 'prox' : ''}" title="Ver nas Etapas do mês"><b>${fmtData(m.data).slice(0, 5)}${m.d === 0 ? ' · HOJE' : ''}${m.manual ? ' ✎' : ''}</b>${esc(m.nome)}<small>${m.d === 0 ? 'hoje' : m.d < 0 ? `há ${-m.d} dia(s)` : `em ${m.d} dia(s)`}</small></a>`).join('')}</div>` : ''}</div>`;
+}
+// «Pede você»: o que está parado esperando alguém, com o botão que leva até lá.
+function pedidosDoDia(R) {
+  const out = [], eqp = S.eq.itens.filter(e => e.status === 'pendente').length;
+  const conf = relatoriosPara('cf'), comRodada = new Set(R.conf.map(x => String(x.prestadorCod)));
+  const semConf = conf.filter(x => !comRodada.has(String(x.rel.cab.prestadorCod))).length;
+  if (!S.relatorios.length) out.push(['Carregar os relatórios do MV (PDF)', 'pasta raiz ou «Carregar manualmente»', '', '']);
+  if (!S.apolo) out.push(['Carregar a planilha de laudos do Apolo', `produção ${rotuloMes(producaoEsperada(S.comp))}`, '', '']);
+  if (semConf) out.push([`${semConf} relatório(s) sem conferência`, 'nesta competência', 'conferencia', 'Conferir']);
+  if (R.semAceite) out.push([`${R.semAceite} rodada(s) sem aceite`, 'conferência feita, falta o aceite', 'conferencia', 'Continuar']);
+  if (eqp) out.push([`${eqp} equivalência(s) TUSS pendente(s)`, 'sem validação, nada é confirmado automaticamente', 'equivalencias', 'Validar']);
+  if (R.indNC.porSituacao.aberta) out.push([`${R.indNC.porSituacao.aberta} NC(s) aberta(s)`, 'ainda não enviadas ao Qualiex', 'nc', 'Ver NCs']);
+  if (R.indFx?.vencidas.length) out.push([`${R.indFx.vencidas.length} etapa(s) com prazo vencido`, esc(R.indFx.vencidas[0].nome || ''), 'fluxo', 'Ver etapas']);
+  if (R.indFx?.proximas.length) out.push([`${R.indFx.proximas.length} etapa(s) vencem em até 3 dias`, esc(R.indFx.proximas[0].nome || ''), 'fluxo', 'Ver etapas']);
+  return out;
+}
+function cartaoFecharCompetencia() {
+  const ch = S.comp, R = resumoCompetencia(ch), est = estadoCompetencia(S.compReg, ch), fechada = est.status === 'fechada';
+  const porTipo = [...R.alt.reduce((m, a) => m.set(a.tipo, [...(m.get(a.tipo) || []), a]), new Map())];
+  return `<div class="card fechamento ini-fech"><div><strong>${fechada ? `Competência fechada em ${new Date(est.fechadaEm).toLocaleString('pt-BR')} por ${esc(est.fechadaPor || '—')}` : `Fechar a competência ${rotuloCompetencia(ch)}`}</strong>
+      <p class="small muted">${fechada ? 'Somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. Pendências podem ser levadas para a competência seguinte.' : 'Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.'}</p>
+      <details class="small" id="iniBases"><summary>Bases alteradas nesta competência (${R.eqVal + R.alt.length})</summary>
+        <div class="painel-comp"><div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
+        ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div></details>
+      ${est.historico?.length ? `<details class="small"><summary>Histórico (${est.historico.length})</summary><ul>${est.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${h.obs ? ` — ${esc(h.obs)}` : ''}</li>`).join('')}</ul></details>` : ''}</div>
+    <div class="acoes" style="margin:0"><button class="sec" id="compPacote" title="Pasta Comp_MM-AAAA (.zip): correção de prestador, NCs, planilhas usadas, relatórios por modalidade e unidade, conferências e planilha de controle">Exportar competência (pasta)</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button class="sec" id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div>`;
+}
 
 /* ---------- Painel da competência: arquivos, o que foi feito, bases alteradas e fechamento ---------- */
 function resumoCompetencia(chave) {
@@ -54,40 +78,40 @@ function resumoCompetencia(chave) {
   return { rods, conf, corr, semAceite: rods.filter(r => !r.aceite).length, ncs, indNC, fx, indFx, eqVal, alt };
 }
 function painelCompetencia() {
-  const ch = S.comp, R = resumoCompetencia(ch), est = estadoCompetencia(S.compReg, ch), fechada = est.status === 'fechada', esp = producaoEsperada(ch);
+  const ch = S.comp, R = resumoCompetencia(ch), esp = producaoEsperada(ch), r = S.relatorios, a = S.apolo;
   const arq = (nome, sub, dom) => `<div class="l"><div>${nome}<small>${sub}</small></div><span class="v ${!dom ? 'muted' : dom.mes === esp ? 'txt-ok' : 'txt-warn'}">${!dom ? '—' : dom.mes === esp ? 'ok' : 'outro mês'}</span></div>`;
   const domMV = S.relatorios.map(x => producaoDoArquivo(x, () => x.rel.regs.map(r => r.data))).filter(Boolean);
   const mvDom = domMV.length ? (domMV.every(d => d.mes === esp) ? { mes: esp } : domMV.find(d => d.mes !== esp)) : null;
   const domAp = S.apolo ? producaoDoArquivo(S.apolo, () => S.apolo.laudos.map(l => l.data)) : null;
   const domPb = S.pbi ? producaoDoArquivo(S.pbi, () => S.pbi.linhas.map(l => l.data)) : null;
-  const prestConf = new Set(R.conf.map(r => r.prestadorCod)).size, unCorr = [...new Set(R.corr.map(r => r.unidadeCod))].join(', ');
-  const porTipo = [...R.alt.reduce((m, a) => m.set(a.tipo, [...(m.get(a.tipo) || []), a]), new Map())];
   const pct = R.indFx && R.indFx.total ? Math.round(R.indFx.ok / R.indFx.total * 100) : 0;
-  return `<div class="card painel-comp"><h2>Painel da competência ${rotuloCompetencia(ch)} <span class="comp-st ${fechada ? 'fechada' : 'aberta'}">${fechada ? 'fechada' : 'aberta'}</span></h2>
-    <div class="grid3">
-      <div><h3>Arquivos desta sessão</h3>
-        ${arq('Relatórios do MV', S.relatorios.length ? `${S.relatorios.length} PDF(s) · produção ${S.relatorios.length && mvDom ? rotuloMes(mvDom.mes) : '—'}` : 'nenhum carregado', mvDom)}
-        ${arq('Laudos do Apolo', S.apolo ? `produção ${rotuloMes(domAp?.mes)}` : 'não carregado', domAp)}
-        ${arq('Power BI', S.pbi ? `${S.pbi.linhas.length.toLocaleString('pt-BR')} lançamentos · ${rotuloMes(domPb?.mes)}` : 'não carregado', domPb)}
-        <p class="small muted">Esperado: produção ${rotuloMes(esp)}. Os arquivos ficam só na memória desta sessão.</p></div>
-      <div><h3>O que foi feito nesta competência</h3>
-        <div class="l"><div>Rodadas de conferência<small>${prestConf} prestador(es)</small></div><span class="v">${R.conf.length}</span></div>
-        <div class="l"><div>Rodadas de correção de prestador<small>${unCorr ? `unidade(s) ${esc(unCorr)}` : '—'}</small></div><span class="v">${R.corr.length}</span></div>
-        <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
-        <div class="l"><div>Fluxo mensal<small>${R.indFx ? `${R.indFx.ok} de ${R.indFx.total} etapas concluídas · ${R.indFx.vencidas.length} vencida(s)` : 'checklist não iniciado'}</small></div><span class="v">${R.indFx ? pct + '%' : '—'}</span></div>
-        ${R.indFx ? `<div class="barra"><i style="width:${pct}%"></i></div>` : ''}
-        ${(() => { const h = historicoCobertura(S.rodadas, ch, 4), cob = coberturaCompetencia(S.rodadas, ch), ant = h[h.length - 2], d = cob.total && ant?.total ? Math.round((cob.pct - ant.pct) * 10) / 10 : null, f = v => fmtPct(v);
-          return `<div class="l" id="cobInicio"><div>Cobertura automática<small>${cob.total ? `${cob.conferidas} de ${cob.total} linhas conferidas sem decisão manual${d !== null ? ` · ${d >= 0 ? '+' : ''}${f(d)} p.p. vs ${rotuloCompetencia(ant.chave)}` : ''}` : 'sem rodadas de conferência'} · <a href="#equivalencias" data-destrava>o que mais destrava</a></small></div><span class="v">${cob.total ? f(cob.pct) + '%' : '—'}</span></div>
-          ${cob.total ? `<div class="barra"><i style="width:${cob.pct}%"></i></div>` : ''}
-          <div class="hist-cob" title="Cobertura das últimas competências">${h.map(x => `<div><span style="height:${Math.max(2, Math.round(x.pct * 0.4))}px"${x.chave === ch ? ' class="atual"' : ''}></span>${x.total ? f(x.pct) + '%' : '—'}<small>${rotuloCompetencia(x.chave)}</small></div>`).join('')}</div>`; })()}</div>
-      <div><h3>Bases alteradas nesta competência</h3>
-        <div class="l"><div>Equivalências TUSS validadas<small>valem daqui em diante</small></div><span class="v">${R.eqVal}</span></div>
-        ${porTipo.length ? porTipo.map(([t, l]) => `<div class="l"><div>${esc(TIPOS_ALTERACAO[t] || t)}<small title="${esc(l.map(a => a.descricao).join('\n'))}">${esc(l[l.length - 1].descricao)}${l[l.length - 1].por ? ` · ${esc(l[l.length - 1].por)}` : ''}</small></div><span class="v">${l.length}</span></div>`).join('') : '<p class="small muted">Nenhuma outra alteração nas bases nesta competência.</p>'}</div>
-    </div>
-    <div class="fechamento"><div><strong>${fechada ? `Fechada em ${new Date(est.fechadaEm).toLocaleString('pt-BR')} por ${esc(est.fechadaPor || '—')}` : 'Fechar a competência'}</strong>
-      <p class="small muted">${fechada ? 'Somente leitura: sem rodadas novas, NCs ou mudanças no fluxo. Pendências podem ser levadas para a competência seguinte.' : 'Depois de pago e encaminhado ao Financeiro: a competência fica somente leitura. Reabrir exige justificativa e fica no histórico.'}</p>
-      ${est.historico?.length ? `<details class="small"><summary>Histórico (${est.historico.length})</summary><ul>${est.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por || '—')} · ${esc(h.acao)}${h.obs ? ` — ${esc(h.obs)}` : ''}</li>`).join('')}</ul></details>` : ''}</div>
-      <div class="acoes" style="margin:0"><button class="sec" id="compPacote" title="Pasta Comp_MM-AAAA (.zip): correção de prestador, NCs, planilhas usadas, relatórios por modalidade e unidade, conferências e planilha de controle">Exportar competência (pasta)</button>${fechada ? '<button class="sec" id="compReabrir">Reabrir…</button>' : `<button id="compFechar">Fechar ${rotuloCompetencia(ch)}…</button>`}</div></div></div>`;
+  const grupos = R.fx ? R.fx.modelo.grupos.filter(g => R.indFx.porGrupo[g.id]?.total && g.id !== 'prep') : [];
+  const pedidos = pedidosDoDia(R);
+  return `<div class="grid3 painel-comp ini-grid">
+    <div class="card" id="iniArquivos"><h3>Arquivos do mês</h3>
+      ${arq('Relatórios do MV', S.relatorios.length ? `${S.relatorios.length} PDF(s) · produção ${mvDom ? rotuloMes(mvDom.mes) : '—'}` : 'nenhum carregado', mvDom)}
+      <div class="estado small" id="stMV">${r.length ? '' : '<span class="muted">Nenhum PDF carregado.</span>'}</div>
+      ${arq('Laudos do Apolo', S.apolo ? `produção ${rotuloMes(domAp?.mes)}` : 'não carregado', domAp)}
+      <div class="estado small" id="stApolo">${a ? resumoApolo(a) + estadoGuardada('apolo', a) : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : ''}</div>
+      ${arq('Power BI <span class="muted small">(opcional)</span>', S.pbi ? `${S.pbi.linhas.length.toLocaleString('pt-BR')} lançamentos · ${rotuloMes(domPb?.mes)}` : 'não carregado', domPb)}
+      <div class="estado small" id="stPBI">${S.pbi ? `<span class="muted small">${esc(S.pbi.nome)}</span><div class="acoes" style="margin-top:6px"><button class="sec mini" id="btPbiBase">Atualizar base de dados com o Power BI</button></div>${estadoGuardada('pbi', S.pbi)}` : S.restaurando ? '<span class="muted">Restaurando a planilha guardada…</span>' : ''}</div>
+      <details class="ini-manual"${r.length || a ? '' : ' open'}><summary>Carregar manualmente…</summary>
+        <div class="dz" id="dzMV">Relatório(s) do MV (PDF)<small>um ou vários · Relatório de Repasse de Prestadores do SOULMV</small><input id="inMV" type="file" accept=".pdf,application/pdf" multiple hidden></div>
+        <div class="dz" id="dzApolo">Laudos do Apolo (.xlsx)<small>produção ${rotuloMes(esp)} · formato atual (BRANCH_NAME, TITLE…) ou antigo</small><input id="inApolo" type="file" accept=".xlsx" hidden></div>
+        <div class="dz" id="dzPBI">Power BI (.xlsx)<small>opcional, só consulta</small><input id="inPBI" type="file" accept=".xlsx" hidden></div></details>
+      <p class="small muted" style="margin:6px 0 0">Esperado: produção ${rotuloMes(esp)}.</p></div>
+    <div class="card"><h3>Andamento</h3>
+      ${grupos.length ? grupos.map(g => { const pg = R.indFx.porGrupo[g.id]; return `<div class="l"><div>${esc(g.nome.replace(/^Repasse (de )?/, ''))}<small>${pg.ok} de ${pg.total} etapas${pg.vencidas ? ` · <span class="txt-err">${pg.vencidas} vencida(s)</span>` : ''}</small></div><span class="v">${Math.round(pg.ok / pg.total * 100)}%</span></div><div class="barra"><i style="width:${Math.round(pg.ok / pg.total * 100)}%"></i></div>`; }).join('') : `<div class="l"><div>Etapas do mês<small>checklist não iniciado · <a href="#fluxo">iniciar</a></small></div><span class="v">—</span></div>`}
+      <div class="l"><div>Conferências<small>${new Set(R.conf.map(r => r.prestadorCod)).size} prestador(es) · ${R.semAceite} sem aceite</small></div><span class="v">${R.conf.length}</span></div>
+      <div class="l"><div>Não conformidades<small>${R.indNC.porSituacao.aberta} abertas · ${R.indNC.porSituacao.enviada + R.indNC.porSituacao.tratativa} enviadas ao Qualiex</small></div><span class="v">${R.ncs.length}</span></div>
+      ${(() => { const h = historicoCobertura(S.rodadas, ch, 4), cob = coberturaCompetencia(S.rodadas, ch), ant = h[h.length - 2], d = cob.total && ant?.total ? Math.round((cob.pct - ant.pct) * 10) / 10 : null, f = v => fmtPct(v);
+        return `<div class="l" id="cobInicio"><div>Cobertura automática<small>${cob.total ? `${cob.conferidas} de ${cob.total} linhas conferidas sem decisão manual${d !== null ? ` · ${d >= 0 ? '+' : ''}${f(d)} p.p. vs ${rotuloCompetencia(ant.chave)}` : ''}` : 'sem rodadas de conferência'} · <a href="#equivalencias" data-destrava>o que mais destrava</a></small></div><span class="v">${cob.total ? f(cob.pct) + '%' : '—'}</span></div>
+        ${cob.total ? `<div class="barra"><i style="width:${cob.pct}%"></i></div>` : ''}
+        <div class="hist-cob" title="Cobertura das últimas competências">${h.map(x => `<div><span style="height:${Math.max(2, Math.round(x.pct * 0.4))}px"${x.chave === ch ? ' class="atual"' : ''}></span>${x.total ? f(x.pct) + '%' : '—'}<small>${rotuloCompetencia(x.chave)}</small></div>`).join('')}</div>`; })()}
+      ${R.indFx ? `<p class="small muted" style="margin:6px 0 0">${R.indFx.ok} de ${R.indFx.total} etapas do mês concluídas (${pct}%).</p>` : ''}</div>
+    <div class="card"><h3>Pede você</h3>
+      ${pedidos.length ? `<ul class="ini-pede">${pedidos.map(([t, sub, ir, bt]) => `<li><span><b>${t}</b><small>${sub}</small></span>${ir ? `<button class="sec mini" data-ir="${ir}">${bt}</button>` : ''}</li>`).join('')}</ul>` : '<p class="txt-ok">Nada esperando por você agora ✓</p>'}</div>
+  </div>`;
 }
 function ligarPainelCompetencia() {
   const ch = S.comp;

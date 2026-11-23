@@ -32,7 +32,7 @@ await p.fill('#dlgCorpo input[name=data]', '2026-10-08'); await p.click('#dlgBot
 await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf.prazoManual, null, { timeout: 3000 }).catch(() => {});
 ok(await p.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf.prazoManual) === '2026-10-08', 'prazo definido em etapa sem prazo no modelo');
 // Documental
-await p.click('[data-g="usg"] [data-docadd="usg"]'); await p.fill('#dlgCorpo input[name=cod]', '15'); await p.fill('#dlgCorpo input[name=nome]', 'MARCELO MIYAZAKI YOSHIDA'); await p.click('#dlgBotoes button[value=ok]');
+await p.click('[data-g="usg"] .fx-doc > summary'); await p.click('[data-g="usg"] [data-docadd="usg"]'); await p.fill('#dlgCorpo input[name=cod]', '15'); await p.fill('#dlgCorpo input[name=nome]', 'MARCELO MIYAZAKI YOSHIDA'); await p.click('#dlgBotoes button[value=ok]');
 await p.waitForSelector('[data-g="usg"] tr[data-doc="15"]');
 await p.fill('[data-g="usg"] tr[data-doc="15"] input[data-d="relatorio"]', '2026-10-09'); await p.dispatchEvent('[data-g="usg"] tr[data-doc="15"] input[data-d="relatorio"]', 'change');
 await p.fill('[data-g="usg"] tr[data-doc="15"] input[data-d="nfRecebida"]', '2026-10-13'); await p.dispatchEvent('[data-g="usg"] tr[data-doc="15"] input[data-d="nfRecebida"]', 'change');

@@ -35,7 +35,7 @@ await ir('inicio');
 await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 60000 });
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
 await p.waitForSelector('.painel-comp'); await p.waitForSelector('#stApolo .guardada');
-const arqs = await p.$$eval('.painel-comp .grid3 > div:first-child .v', e => e.map(x => x.textContent));
+const arqs = await p.$$eval('#iniArquivos .v', e => e.map(x => x.textContent));
 ok(arqs[0] === 'ok' && arqs[1] === 'ok' && !(await p.$('#pag-inicio .aviso-fixo')), `arquivos de produção 09/2026 conferem com a competência 10/2026 (${arqs.join(', ')})`);
 
 // 2) Conferência gravada na competência do topo.
@@ -63,7 +63,7 @@ await p.click('#compProx'); await p.waitForFunction(() => /10\/2026/.test(docume
 // 4) Alteração nas bases registrada na competência.
 await ir('bases'); await p.click('[data-bsub="faturistas"]'); await p.click('#fatAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo input[name=nome]', 'TESTE.FATURISTA'); await okDlg();
 await ir('inicio');
-ok(/Faturistas[\s\S]*TESTE\.FATURISTA/.test(await p.textContent('.painel-comp .grid3 > div:last-child')), 'painel: faturista cadastrado aparece em «Bases alteradas nesta competência»');
+ok(/Faturistas[\s\S]*TESTE\.FATURISTA/.test(await p.textContent('#iniBases')), 'painel: faturista cadastrado aparece em «Bases alteradas nesta competência»');
 ok(await S(() => window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'faturistas' && a.por === 'Teste Competência')), 'alteração guarda tipo e quem fez');
 
 // 5) Iniciar o fluxo e fechar a competência (os arquivos ficam só na sessão: recarregar o MV e o Apolo).

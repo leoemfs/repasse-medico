@@ -360,6 +360,6 @@ function ligarPastaRaiz() {
 // Chamado por RENDER.inicio (10-inicio.js), depois do resto do Início.
 function complementoInicioPastaRaiz() {
   const pg = $('pag-inicio'); if (!pg) return;
-  const alvo = pg.querySelector('.painel-comp'); const html = cartaoPastaRaiz();
+  const alvo = pg.querySelector('.ini-dia'); const html = cartaoPastaRaiz();
   if (html) { alvo ? alvo.insertAdjacentHTML('afterend', html) : pg.insertAdjacentHTML('afterbegin', html); ligarPastaRaiz(); }
 }

@@ -296,7 +296,9 @@ function desenharSubnav(pag) {
   const el = $('subnav'); if (!el) return;
   const grupo = SUBNAV[PAI_PAGINA[pag] || pag];
   el.hidden = !grupo;
-  el.innerHTML = grupo ? grupo.map(([k, t]) => `<a href="#${k}" class="${k === pag ? 'on' : ''}"${k === pag ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('') : '';
+  el.classList.toggle('modo-abas', (PAI_PAGINA[pag] || pag) === 'fechamento');
+  el.innerHTML = !grupo ? '' : (PAI_PAGINA[pag] || pag) === 'fechamento' && typeof itensSubnavFechamento === 'function' ? itensSubnavFechamento(pag)
+    : grupo.map(([k, t]) => `<a href="#${k}" class="${k === pag ? 'on' : ''}"${k === pag ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('');
   el.setAttribute('aria-label', grupo ? PAGINAS[pag] : '');
 }
 function irPara(pag) {

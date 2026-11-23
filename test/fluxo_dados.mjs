@@ -42,7 +42,7 @@ await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.clic
 const doc = await S(() => { const g = window.__RM.S.fluxo.competencias['2026-10'].grupos; return { usg: Object.keys(g.usg.documental).length, img: Object.keys(g.img.documental).length, cur: Object.keys(g.curitiba.documental).length }; });
 ok(doc.usg === esperado.usg && doc.img === esperado.img && doc.cur === esperado.cur, `Fluxo do mês com os prestadores de Bases: USG ${doc.usg}, IMG ${doc.img}, Curitiba ${doc.cur}`);
 await abrirG('usg');
-await p.click('[data-g="usg"] [data-docrm="15"]'); await okDlg();
+await p.click('[data-g="usg"] .fx-doc > summary'); await p.click('[data-g="usg"] [data-docrm="15"]'); await okDlg();
 await p.goto(html + '#inicio'); await p.goto(html + '#fluxo'); await p.waitForSelector('.marco');
 ok(await S(() => !window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.documental['15']), 'removido do mês não volta sozinho');
 
