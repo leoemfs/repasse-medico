@@ -29,12 +29,6 @@ async function temPermissaoPasta(pedir = false) {
   if (await h.queryPermission({ mode: 'readwrite' }) === 'granted') return true;
   return pedir && h.requestPermission ? await h.requestPermission({ mode: 'readwrite' }) === 'granted' : false;
 }
-async function definirPastaSync(handle) {
-  SY.handle = handle; SY.lm = 0; SY.meta = null; SY.legado = ehPastaLegadaFluxo(handle); if (typeof SYQ !== 'undefined') { SYQ.lm = 0; SYQ.status = handle ? 'ok' : 'off'; }
-  if (handle) await dbSync('gravar', handle).catch(() => {}); else await dbSync('apagar').catch(() => {});
-  iniciarTimerSync();
-  if (handle) { await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } else { SY.status = 'off'; atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); }
-}
 async function escolherPastaSync() {
   if (!suportaPasta()) return avisar('Este navegador não grava em pastas. Use o Edge ou o Chrome no computador.', 'warn');
   const op = await exigirOperador(); if (!op) return;
@@ -44,9 +38,6 @@ async function escolherPastaSync() {
     await definirPastaSync(h); avisar(`Pasta raiz «${h.name}» conectada: Fluxo, equivalências e relatórios passam a usar as subpastas dela.`, 'ok');
   }
   catch (e) { if (e.name !== 'AbortError') avisar(`Não foi possível usar a pasta (${e.message}).`, 'err'); }
-}
-async function restaurarPastaSync() {
-  try { const h = await dbSync('ler'); if (h) { SY.handle = h; SY.legado = ehPastaLegadaFluxo(h); SY.status = await temPermissaoPasta() ? 'ok' : 'permissao'; iniciarTimerSync(); if (SY.status === 'ok') { await sincronizarFluxo(); await sincronizarEq(); if (S.cfg.parametros.lerPastaAoAbrir !== false) atualizarDaPasta({ silencioso: true }); } else atualizarBarraSync(); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); } } catch (e) { /* sem pasta guardada */ }
 }
 
 // Lê a pasta, mescla com a versão local e grava o resultado. interativo: pode abrir o diálogo de conflitos.
@@ -97,20 +88,7 @@ async function resolverConflitosFluxo(conflitos, remoto) {
       <label class="small"><input type="radio" name="c${i}" value="remoto"> A de ${esc(quem)}: ${esc(resumoValorFluxo(c.remoto))}</label></div>`).join('')}`, [['', 'Decidir depois', 'sec'], ['ok', 'Aplicar escolhas']]);
   return r.botao === 'ok' ? conflitos.map((c, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local') : null;
 }
-function iniciarTimerSync() {
-  clearInterval(SY.timer); if (!SY.handle) return;
-  SY.timer = setInterval(async () => {
-    if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
-    try { if (typeof checarEqPasta === 'function') checarEqPasta(); const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
-    catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
-    atualizarBarraSync();
-  }, 30000);
-}
 
-// Toda gravação do Fluxo agenda a sincronização (sem esperar).
-const gravarFluxoLocal = salvarFluxo;
-let syncAgendada = 0;
-salvarFluxo = function (msg = '') { gravarFluxoLocal(msg); if (SY.handle && SY.status !== 'permissao') { clearTimeout(syncAgendada); syncAgendada = setTimeout(() => sincronizarFluxo(), 800); } };
 
 /* ---------- Barra de sincronização ---------- */
 function barraSync() {
@@ -129,7 +107,7 @@ function ligarBarraSync(raiz) {
     const a = b.dataset.sy;
     if (a === 'escolher') return escolherPastaSync();
     if (a === 'desconectar') { if (await confirmar('Desconectar da pasta?', 'O Fluxo continua neste navegador; a pasta e o arquivo não são apagados.', 'Desconectar')) definirPastaSync(null); return; }
-    if (a === 'liberar') { if (await temPermissaoPasta(true)) { iniciarTimerSync(); await sincronizarFluxo({ interativo: true }); await sincronizarEq({ interativo: true }); if (location.hash === '#inicio' || !location.hash) RENDER.inicio(); return; } return avisar('O acesso à pasta não foi liberado.', 'warn'); }
+    if (a === 'liberar') { if (await liberarPastaSync() && (location.hash === '#inicio' || !location.hash)) RENDER.inicio(); return; }
     sincronizarFluxo({ interativo: true });
   });
 }
@@ -161,8 +139,14 @@ function atualizarResumosDivisao(comp) {
 function cartaoDivisao(comp) {
   if (atualizarResumosDivisao(comp)) salvarFluxo();
   const hora = iso => { const d = new Date(iso), hoje = isoDia(new Date()) === iso.slice(0, 10); return `${hoje ? 'hoje' : d.toLocaleDateString('pt-BR').slice(0, 5)} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; };
-  const cels = celulasDivisao().map(c => {
-    const d = comp.divisao?.[chaveDivisao(c.un, c.gr)], st = d?.status || 'livre', meu = d?.por === S.operador;
+  const todas = celulasDivisao().map(c => ({ ...c, d: comp.divisao?.[chaveDivisao(c.un, c.gr)] }));
+  // Fichas de filtro por usuário: Todos · Você · cada pessoa com unidade · Livres.
+  const pessoas = [...new Set(todas.filter(c => c.d && c.d.status !== 'livre' && c.d.por && c.d.por !== S.operador).map(c => c.d.por))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  const passa = (c, f) => f === 'todos' ? true : f === 'livres' ? (!c.d || c.d.status === 'livre') : (c.d && c.d.status !== 'livre' && c.d.por === (f === 'eu' ? S.operador : f.slice(2)));
+  const fichas = [['todos', 'Todos'], ...(S.operador ? [['eu', 'Você']] : []), ...pessoas.map(p => ['p:' + p, p]), ['livres', 'Livres']];
+  if (!fichas.some(([k]) => k === FX.dvFiltro)) FX.dvFiltro = 'todos';
+  const cartao = c => {
+    const d = c.d, st = d?.status || 'livre', meu = d?.por === S.operador;
     const r = (st !== 'livre' && !meu && d?.resumo) ? d.resumo : (c.resumo || d?.resumo);
     const falta = r ? (r.falta ? `faltam ${r.falta}${r.gerar ? ` · ${r.gerar} a gerar no MV` : ''}${r.conferindo ? ` · ${r.conferindo} conferindo` : ''}` : (r.laudaram ? 'todos com aceite' : 'sem laudos')) + (r.por && r.por !== S.operador ? ` <span class="muted">(resumo de ${esc(r.por)})</span>` : '') : '<span class="muted">carregue a planilha de laudos para ver o que falta</span>';
     const cls = st === 'concluida' ? 'ok' : st === 'assumida' ? (meu ? 'eu' : 'outro') : '';
@@ -170,14 +154,25 @@ function cartaoDivisao(comp) {
     const acoes = st === 'livre' ? `<button class="mini" data-dv="assumir">Assumir</button>` : st === 'assumida' ? (meu ? `<button class="sec mini" data-dv="liberar">Liberar</button><button class="${r && !r.falta && r.laudaram ? '' : 'sec '}mini" data-dv="concluir">Concluir</button>` : `<button class="sec mini" data-dv="assumir">Assumir eu</button>`) : `<button class="sec mini" data-dv="reabrir">Reabrir</button>`;
     return `<div class="dv-cel ${cls}" data-dvk="${c.un}|${c.gr}"><b>Unidade ${esc(c.un)} · ${c.gr === 'curitiba' ? 'Curitiba' : c.gr.toUpperCase()}</b><span class="dv-quem">${quem}</span>
       <small>${st === 'livre' ? '—' : `${st === 'concluida' ? 'concluiu' : 'assumiu'} ${hora(d.em)}`}</small><small>${falta}</small><div class="acoes">${acoes}</div></div>`;
+  };
+  // USG, IMG e Curitiba em blocos separados.
+  const blocos = [['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba']].map(([g, t]) => {
+    const doGrupo = todas.filter(c => c.gr === g); if (!doGrupo.length) return '';
+    const vis = doGrupo.filter(c => passa(c, FX.dvFiltro)), conc = doGrupo.filter(c => c.d?.status === 'concluida').length;
+    return `<section class="dv-bloco" data-dvg="${g}"><h3>${t} <span class="muted small">${conc} de ${doGrupo.length} concluída${doGrupo.length > 1 ? 's' : ''}</span></h3>
+      ${vis.length ? `<div class="dv-quadro">${vis.map(cartao).join('')}</div>` : '<p class="small muted">Nenhuma unidade neste filtro.</p>'}</section>`;
   }).join('');
+  const conta = k => todas.filter(c => passa(c, k)).length;
+  const barraFichas = `<div class="marcadores dv-fichas" style="margin:4px 0 0">${fichas.map(([k, t]) => `<button class="marc${FX.dvFiltro === k ? ' sel' : ''}" data-dvf="${esc(k)}">${esc(t)} <span class="muted">${conta(k)}</span></button>`).join('')}</div>`;
   const feed = feedFluxo(comp, 8);
   return `<div class="card" id="fxDivisao"><div class="fx-topo"><h2 style="margin:0">Divisão do trabalho <span class="muted small">competência ${rotuloCompetencia(comp.chave)}</span></h2></div>
     <p class="small muted">Quem está com cada unidade. «Assumir» marca o seu nome; os outros veem pela pasta da rede (barra acima). O «faltam» vem de Prestadores por unidade, gravado por quem está com a unidade.</p>
-    <div class="dv-quadro">${cels}</div>
+    ${barraFichas}
+    ${blocos}
     ${feed.length ? `<details class="dv-feed"${FX.feedAberto ? ' open' : ''}><summary>Últimas mudanças</summary>${feed.map(f => `<div><b>${esc(f.por || '—')}</b> ${esc(f.texto)} <small class="muted">· ${hora(f.em)}</small></div>`).join('')}</details>` : ''}</div>`;
 }
 function ligarDivisao(raiz, comp) {
+  raiz.querySelectorAll('[data-dvf]').forEach(b => b.onclick = () => { FX.dvFiltro = b.dataset.dvf; desenharDivisaoFluxo(); });
   raiz.querySelectorAll('[data-dv]').forEach(b => b.onclick = async () => {
     if (!exigirAberta(comp.chave, 'mudar a divisão do trabalho')) return;
     const op = await exigirOperador(); if (!op) return;
@@ -204,12 +199,11 @@ document.addEventListener('click', e => {
 });
 
 // Fluxo: barra de sincronização e divisão no topo do acompanhamento.
-const _desenharAcompanhamento = desenharAcompanhamento;
-desenharAcompanhamento = function () {
-  _desenharAcompanhamento();
+// Chamado por desenharAcompanhamento (25-fluxo.js).
+function barraSyncAcompanhamento() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
   c.insertAdjacentHTML('afterbegin', barraSync()); ligarBarraSync(c);
-};
+}
 // Subaba «Divisão do trabalho»: barra de sincronização + quadro unidade × grupo + últimas mudanças.
 function desenharDivisaoFluxo() {
   const c = $('fxCorpo'), comp = compAtual(); if (!c) return;
@@ -217,12 +211,11 @@ function desenharDivisaoFluxo() {
   ligarBarraSync(c); if (comp) ligarDivisao(c, comp);
 }
 // Prestadores por unidade e Conferência: aviso da divisão.
-const _desenharControleUnidade = desenharControleUnidade;
-desenharControleUnidade = async function () {
-  await _desenharControleUnidade();
+// Chamado por desenharControleUnidade (22-prestadores-unidade.js).
+function avisoDivisaoControle() {
   const alvo = document.querySelector('#pag-conferencia .cu-res'); if (!alvo || !CU.unidade || !CU.grupo) return;
   alvo.insertAdjacentHTML('beforebegin', avisoDivisao(CU.unidade, CU.grupo));
-};
+}
 document.addEventListener('change', e => {
   if (e.target.id !== 'cfUn' && e.target.id !== 'cfRel') return;
   document.querySelectorAll('#pag-conferencia .dv-aviso').forEach(x => x.remove());

@@ -221,6 +221,37 @@ function candidatosDaConferencia(res, ctx, cfg) {
   for (const x of res.linhas) { const t = !x.decisao && tipoCandidatoConferencia(x); if (t) out.push(candidatoDaLinhaConferencia(x, ctx, cfg, t)); }
   return out;
 }
+/* P1 (auditoria 16/11/2026) — Candidatos guardados sem crescer à toa.
+ * Escopo: na conferência com «Todos os médicos da unidade», os laudos «Só no laudo» de médicos que não são do prestador
+ * (pelo cadastro) pertencem ao relatório de outro médico: ficam na tabela, mas não viram candidatos a NC deste relatório.
+ * Ficam os do prestador, os sem médico e os que o Power BI mostra lançados para outro prestador (correção de prestador). */
+function escopoCandidatosNC(cands, medicosPrest) {
+  const meus = new Set(medicosPrest || []), dentro = [], fora = [];
+  if (!meus.size) return { dentro: cands, fora };
+  for (const c of cands) {
+    const m = norm(c.campos?.medico || '');
+    (c.tipo !== 'so-laudo' || !m || meus.has(m) || c.pbi?.situacao === 'outro-prestador' ? dentro : fora).push(c);
+  }
+  return { dentro, fora };
+}
+/* Guardar compacto: origem e competência (iguais em toda a análise) ficam uma vez na análise; campos vazios e o motivo
+ * longo não são guardados repetidos. expandirCandidatoNC devolve o candidato completo para a revisão e o registro. */
+const MAX_MOTIVO_CAND = 300;
+function compactarCandidatosNC(itens) {
+  const igual = f => { const v = itens.map(f).map(x => JSON.stringify(x ?? null)); return v.length && v.every(x => x === v[0]) ? JSON.parse(v[0]) : undefined; };
+  const comum = { origem: igual(c => c.origem), competencia: igual(c => c.competencia) };
+  const out = itens.map(c => {
+    const k = { ...c, campos: Object.fromEntries(Object.entries(c.campos || {}).filter(([, v]) => v !== '' && v !== null && v !== undefined)) };
+    if (comum.origem !== undefined) delete k.origem;
+    if (comum.competencia !== undefined) delete k.competencia;
+    if (k.motivo && k.motivo.length > MAX_MOTIVO_CAND) k.motivo = k.motivo.slice(0, MAX_MOTIVO_CAND - 1) + '…';
+    if (!k.chavesLinha?.length) delete k.chavesLinha;
+    return k;
+  });
+  return { itens: out, comum };
+}
+const expandirCandidatoNC = (c, f) => c.origem && c.competencia !== undefined && c.chavesLinha ? c
+  : { ...c, origem: c.origem || f?.comum?.origem || {}, competencia: c.competencia ?? f?.comum?.competencia ?? '', chavesLinha: c.chavesLinha || [] };
 function candidatoDaLinhaCorrecao(o, ctx, cfg, tipo = null) {
   const campos = camposDaLinha(o.r, o.laudo, ctx, cfg);
   const ehPrestador = tipo === 'prestador-identificado' || o.estado === 'identificado';

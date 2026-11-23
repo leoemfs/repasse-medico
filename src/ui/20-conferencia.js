@@ -7,9 +7,21 @@ const FAIXA = { 1: 'validada · mesma data', 2: 'validada · data na tolerância
 // Finalidade do PDF: o do prestador genérico vai para a Correção; os demais, para a Conferência.
 const finalidadePadrao = rel => String(rel.cab.prestadorCod) === String(S.cfg.parametros.prestadorGenerico || '2') ? 'correcao' : 'conferencia';
 const relatoriosPara = prefixo => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) === (prefixo === 'co' ? 'correcao' : 'conferencia'));
+/* Pedido de 17/11/2026: cada aba sincroniza só a pasta dela, sem reler tudo — Conferência lê «Relatórios para conferência»;
+ * Correção de prestador lê «Correção de prestador». Só aparece com a pasta raiz conectada. */
+function botaoSyncPasta(prefixo) {
+  if (!pastaConectadaConf()) return '';
+  const so = prefixo === 'co' ? 'correcao' : 'conferencia', nome = so === 'correcao' ? PASTA_CORR.nome : PASTA_REL.nome;
+  return `<button class="sec" data-syncpasta="${so}" title="Lê só «${esc(nome)}» da competência ${esc(rotuloCompetencia(S.comp))}: PDFs novos ou que mudaram">Sincronizar pasta</button>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-syncpasta]'); if (!b) return;
+  const so = b.dataset.syncpasta;
+  comProcessando(b, async () => { await atualizarDaPasta({ so }); (so === 'correcao' ? RENDER.correcao : RENDER.conferencia)(); }, 'a leitura da pasta');
+});
 function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
-  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
 }
 // Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
 const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };
@@ -27,7 +39,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
   const uns = [...new Set(todos.map(unDoRel).filter(Boolean))].sort((a, b) => +a - +b), grs = [...new Set(todos.map(grDoRel))];
   const filtro = todos.length > 1 ? `<div class="filtros cf-fil"><label class="campo">Relatórios da unidade<select id="${prefixo}FUn">${opcoes([['*', 'Todas'], ...uns.map(u => [u, `${u} - ${unidadePorCod(S.cfg, u)?.nome || ''}`])], F.un)}</select></label>
     <label class="campo">Grupo<select id="${prefixo}FGr">${opcoes([['*', 'Todos'], ...grs.map(g => [g, rotGr(g)])], F.gr)}</select></label>
-    <div class="campo"><span class="small muted">${rels.length} de ${todos.length} relatório(s)</span>${prefixo === 'cf' && rels.length > 1 && (F.un !== '*' || F.gr !== '*') ? `<button type="button" class="sec mini" data-cflote>Conferir os ${rels.length} relatórios filtrados</button>` : ''}</div></div>` : '';
+    <div class="campo"><span class="small muted">${rels.length} de ${todos.length} relatório(s)</span>${prefixo === 'cf' && rels.length > 1 && (F.un !== '*' || F.gr !== '*') ? `<button type="button" class="sec mini" data-cflote>Conferir os ${rels.length} relatórios filtrados</button>` : ''}${prefixo === 'cf' && rels.length && F.un !== '*' && F.gr !== '*' ? `<button type="button" class="sec mini" data-cfunica title="Todos os prestadores desta unidade e grupo num Excel só, gravado em ${esc(PASTA_PLAN_CONF.nome)}">Excel único: ${esc(rotGr(F.gr))} · unidade ${esc(F.un)} (${rels.length})</button>` : ''}</div></div>` : '';
   if (!rels.length) return filtro + '<p class="muted">Nenhum relatório com esse filtro.</p>';
   const relSel = ultimo?.relId && rels.some(r => r.id === ultimo.relId) ? ultimo.relId : rels[0]?.id;
   const rel = rels.find(r => r.id === relSel);
@@ -68,12 +80,14 @@ function cartaoOutraCompetencia(x, nome) {
   return x && x.ctx.chaveCompetencia !== S.comp ? `<div class="card"><p class="muted">A última ${nome} desta sessão é da competência ${rotuloCompetencia(x.ctx.chaveCompetencia)}. Volte para ela no topo para ver o resultado, ou execute uma nova aqui em ${rotuloCompetencia(S.comp)}.</p></div>` : '';
 }
 
-RENDER.conferencia = () => {
+// Subaba «Prestadores por unidade» e as abas do topo (22-prestadores-unidade.js) entram aqui, explicitamente (P2).
+RENDER.conferencia = () => { if (CU.sub === 'unidades') return desenharControleUnidade(); desenharPaginaConferencia(); complementoConferenciaUnidades(); };
+function desenharPaginaConferencia() {
   const p = $('pag-conferencia');
-  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos(); return; }
+  if (!S.relatorios.length || !S.apolo) { p.innerHTML = faltamArquivos('cf'); return; }
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }
-  p.innerHTML = `${cartaoAvisoProducao()}<div class="card"><h2>Parâmetros</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
-    <div class="acoes"><button id="cfRodar">Executar conferência</button><span class="muted small">Cada execução vira uma rodada registrada, com versões das bases e parâmetros.</span></div></div>
+  p.innerHTML = `${cartaoAvisoProducao()}<div class="card cf-param"><h2>O que conferir</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
+    <div class="acoes"><button id="cfRodar">${S.conf && S.conf.ctx.chaveCompetencia === S.comp ? 'Conferir' : 'Executar conferência'}</button>${botaoSyncPasta('cf')}<span class="muted small" title="Cada execução vira uma rodada registrada, com versões das bases e parâmetros. O histórico fica na aba «Histórico e detalhes».">A unidade dos laudos vem do relatório (pasta ou nome do arquivo); o médico do laudo, do cadastro do prestador.</span></div></div>
     <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
@@ -106,8 +120,8 @@ RENDER.conferencia = () => {
   $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
-function faltamArquivos() {
-  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`;
+function faltamArquivos(prefixo = 'cf') {
+  return `<div class="card"><h2>Faltam arquivos</h2><p class="lead">Carregue ${S.relatorios.length ? '' : 'o relatório do MV (PDF)'}${!S.relatorios.length && !S.apolo ? ' e ' : ''}${S.apolo ? '' : 'a planilha de laudos do Apolo'} no Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button>${botaoSyncPasta(prefixo)}</div></div>`;
 }
 
 async function executarConferencia() {
@@ -134,13 +148,16 @@ async function rodarConferencia(x, un, tol, medSel) {
   S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
   ctx.fonteNC = `conf|${x.id}|${un}`;
   // Conciliação com o Power BI (SOL-F9): explica os «Só no laudo» e sugere natureza e responsável.
-  const cands = candidatosDaConferencia(res, ctx, S.cfg);
+  let cands = candidatosDaConferencia(res, ctx, S.cfg);
   if (S.pbi) {
     const opcPBI = { unidadeCod: un, tol, prestadorCod: x.rel.cab.prestadorCod, cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), idxPrest: indicePrestadores(S.cfg) };
     for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } }
     ctx.pbiResumo = enriquecerCandidatosComPBI(cands, S.pbi, opcPBI); ctx.pbiNome = S.pbi.nome;
   }
-  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, cands);
+  // P1: com todos os médicos no escopo, os candidatos «Só no laudo» ficam só os do prestador (quando há cadastro dele na unidade).
+  let fora = 0;
+  if (!medicos) { const ligados = medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod); if (ligados.length && laudosDaUnidade(S.apolo, S.cfg, un).some(l => ligados.includes(l.mn))) { const e = escopoCandidatosNC(cands, ligados); cands = e.dentro; fora = e.fora.length; } }
+  guardarCandidatosNC(ctx.fonteNC, `Conferência ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${unidade}`, `Conf. ${x.rel.cab.prestadorCod} · un. ${un}`, cands, fora);
   return { res, ctx, rodada };
 }
 /* Depois de validar equivalências: roda de novo, com os mesmos parâmetros, a última conferência de cada
@@ -160,7 +177,7 @@ async function rodarDeNovoAfetadas(rodadas) {
 /* SOL-F43 — A prévia de conferência é a conferência oficial: o que entra no fechamento é Devido + Aceito.
  * Resultado em abas (Prévia · O que falta decidir · NCs e correções no MV · Aceite do relatório · Detalhes e equivalências),
  * para não rolar uma página longa. A aba escolhida fica na sessão. */
-const ABAS_CONF = [['previa', 'Prévia de conferência'], ['decidir', 'O que falta decidir'], ['nc', 'NCs e correções no MV'], ['aceite', 'Aceite do relatório'], ['detalhes', 'Detalhes e equivalências']];
+const ABAS_CONF = [['previa', 'Prévia de conferência'], ['decidir', 'O que falta decidir'], ['nc', 'NCs e correções no MV'], ['aceite', 'Aceite do relatório'], ['detalhes', 'Histórico e detalhes']];
 const pillClasse = k => k ? `<span class="st cl-${k}" title="${esc(CLASSES_FECH[k].def)}">${esc(CLASSES_FECH[k].nome)}</span>` : '<span class="small muted">sem valor</span>';
 function irAbaConf(k) { if (!S.conf) return; S.conf.aba = k; desenharConferencia(); $('cfAbas')?.scrollIntoView({ block: 'start' }); }
 function desenharConferencia() {
@@ -174,33 +191,46 @@ function desenharConferencia() {
   const barra = T.total ? ORDEM_CLASSES.map(k => `<span class="cl-${k}" style="width:${T[k].valor / T.total * 100}%" title="${esc(CLASSES_FECH[k].nome)}: R$ ${fmtBR(T[k].valor)}"></span>`).join('') : '';
   const ordem = Object.keys(STATUS_CONF).sort((a, b) => STATUS_CONF[a].ordem - STATUS_CONF[b].ordem);
   const comV = res.linhas.filter(x => x.r), opc = (f, rot) => [...new Map(comV.map(x => [f(x), rot(x)])).entries()].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
-  const tile = k => `<button class="tot-cl${S.conf.filtroClasse === k ? ' sel' : ''}" data-cl="${k}" title="${esc(CLASSES_FECH[k].def)}"><span class="faixa cl-${k}"></span><b>R$ ${fmtBR(T[k].valor)}</b><small>${esc(CLASSES_FECH[k].nome)} · ${T[k].n} linha(s) · ${CLASSES_FECH[k].entra ? 'entra no fechamento' : 'fora do fechamento'}</small></button>`;
+  // SOL-F41 (v3.0.0-alpha.13): dias de todas as linhas (MV e «Só no laudo»), título e médico do laudo, observação com/sem.
+  const diasF = [...new Map(res.linhas.map(x => x.r?.data || x.l?.data).filter(Boolean).map(d => [isoDia(d), fmtData(d)])).entries()].sort((a, b) => a[0].localeCompare(b[0]));
+  const opcL = f => [...contar(res.linhas.filter(x => x.l && f(x.l)), x => f(x.l))].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  const tile = k => `<button class="tot-cl${S.conf.filtroClasse === k ? ' sel' : ''}" data-cl="${k}" title="${esc(CLASSES_FECH[k].def)} · ${CLASSES_FECH[k].entra ? 'entra no fechamento' : 'fora do fechamento'} · clique para filtrar"><span class="faixa cl-${k}"></span><small>${esc(CLASSES_FECH[k].nome)}</small><b>R$ ${fmtBR(T[k].valor)}</b><small>${T[k].n} linha(s)${k === 'pend' && T[k].n ? ' · fora até decidir' : ''}</small></button>`;
+  // v3.0.0-alpha.20 (simplificação): filtros ativos viram etiquetas; os 8 filtros ficam na gaveta «Filtros».
+  const fAtivos = [['fProc', 'Procedimento'], ['fData', 'Data'], ['fDataAte', 'até'], ['fConv', 'Convênio'], ['fTit', 'Título'], ['fMed', 'Médico']].filter(([k]) => S.conf[k] && S.conf[k] !== '*');
+  const nFiltros = fAtivos.length + (fObsAtual() ? 1 : 0);
+  if (nFiltros) S.conf.verFiltros = true;
+  const rotData = v => fmtData(new Date(v + 'T12:00:00'));
+  const etiquetas = [...fAtivos.map(([k, t]) => `<button type="button" class="cf-etq" data-tirar="${k}" title="Tirar este filtro">${t}: ${esc(k.startsWith('fData') ? rotData(S.conf[k]) : S.conf[k])} ✕</button>`), ...(fObsAtual() ? [`<button type="button" class="cf-etq" data-tirar="fObs">${fObsAtual() === 'com' ? 'Com' : 'Sem'} observação ✕</button>`] : []), ...(S.conf.filtroClasse ? [`<button type="button" class="cf-etq" data-tirar="filtroClasse">Classe: ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)} ✕</button>`] : [])].join('');
   const secao = (k, html) => `<section class="cf-sec" data-cfsec="${k}"${aba === k ? '' : ' hidden'} role="tabpanel" aria-labelledby="cfAba-${k}">${html}</section>`;
-  c.innerHTML = `<div class="card cf-frase"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
+  c.innerHTML = `<div class="card cf-frase"><div class="cf-res-topo"><div class="cf-res-tit"><h2>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · ${esc(ctx.unidadeNome)} <span class="muted small">rodada ${esc(ctx.rodadaId)}</span></h2>
+      <div class="tot-cl pagar"><small>PARA PAGAMENTO (Devido + Aceito)</small><b>R$ ${fmtBR(T.pagar)}</b><small>de R$ ${fmtBR(T.total)} no relatório do MV</small></div></div>
+      <div class="cf-cls">${ORDEM_CLASSES.map(tile).join('')}</div></div>
     <div class="cf-barra cf-barra-cl">${barra}</div>
-    <p style="margin:6px 0"><b>${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0}%.</b> <b>R$ ${fmtBR(T.pagar)} para pagamento</b> (Devido + Aceito) de R$ ${fmtBR(T.total)} no relatório do MV. ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}; R$ ${fmtBR(T.pend.valor)} pendente(s) ficam fora do fechamento até decidir.` : 'Nada falta decidir neste relatório: é só registrar o aceite.'}${alertas ? ` <b style="color:var(--err)">${alertas} item(ns) que deviam ter saído do MV continuam no relatório.</b>` : ''}</p>
-    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button class="sec" id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button></div>
-    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : (S.pbi ? '' : '<p class="small muted">Carregue o Power BI no Início para explicar os «Só no laudo» (lançamento, conta aberta, remessa, quem fechou).</p>')}</div>
+    <p class="small" style="margin:6px 0">${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0}%. ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}.` : 'Nada falta decidir: é só registrar o aceite.'}${alertas ? ` <b style="color:var(--err)">${alertas} item(ns) que deviam ter saído do MV continuam no relatório.</b>` : ''} <span class="muted">Clique numa classe para filtrar.</span></p>
+    <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button>${botaoReconferir(ctx)}</div>
+    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : ''}</div>
     <nav class="cf-abas" id="cfAbas" role="tablist" aria-label="Áreas da conferência">${ABAS_CONF.map(([k, t]) => { const n = k === 'decidir' ? CZ.faltam : k === 'nc' ? alertas : 0; return `<button role="tab" id="cfAba-${k}" data-cfaba="${k}" aria-selected="${aba === k}" class="${aba === k ? 'on' : ''}">${t}${n ? `<span class="n${k === 'nc' ? ' alerta' : ''}">${n}</span>` : ''}</button>`; }).join('')}</nav>
-    ${secao('previa', `<div class="card"><div class="totais-cl">
-      <div class="tot-cl pagar"><small>VALOR PARA PAGAMENTO (Devido + Aceito)</small><b>R$ ${fmtBR(T.pagar)}</b><small>é o que vai para o Fechamento</small></div>${ORDEM_CLASSES.map(tile).join('')}</div>
-      <p class="small muted" style="margin:6px 0 0">Devido + Aceito + Pendente + NC + Excluído = R$ ${fmtBR(T.total)} = total do relatório do MV${Math.abs(T.total - r2(comV.reduce((s, x) => s + x.r.vlRepasse, 0))) < 0.011 ? ' ✓' : ''} · clique num valor para filtrar a tabela.</p></div>
-    <div class="card"><h2>Linhas do relatório</h2>
-      <div class="tiles">${ordem.map(k => `<button class="tile st-${k}${res.porStatus[k].n ? '' : ' vazio'}${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porStatus[k].n}</b><small>${esc(STATUS_CONF[k].nome)}</small>${res.porStatus[k].vlRepasse ? `<small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porStatus[k].vlRepasse)}</small>` : ''}</button>`).join('')}</div>
-      <div class="marcadores">${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('') || '<span class="muted small">Sem marcadores.</span>'}</div>
-      <div class="cf-filtros">
-        <label class="campo">Buscar<input type="search" id="cfBusca" placeholder="paciente, código, título ou médico…" value="${esc(S.conf.busca)}"></label>
+    ${secao('previa', `<div class="card"><h2 class="sr-only">Linhas do relatório</h2>
+      <div class="cf-rapido"><input type="search" id="cfBusca" aria-label="Buscar" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}">
+        <label class="small cf-sofalta"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label>
+        <div class="marcadores" style="margin:0">${ordem.filter(k => res.porStatus[k].n).map(k => `<button class="marc st-chip${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}" title="Situação: ${esc(STATUS_CONF[k].nome)}${res.porStatus[k].vlRepasse ? ` · R$ ${fmtBR(res.porStatus[k].vlRepasse)}` : ''}">${esc(STATUS_CONF[k].nome)} · ${res.porStatus[k].n}</button>`).join('')}${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('')}</div>
+        <span class="sy-esp"></span><button type="button" class="sec mini" id="cfFiltrosBt" aria-expanded="${!!S.conf.verFiltros}" aria-controls="cfGaveta">Filtros${nFiltros ? ` (${nFiltros})` : ''}</button></div>
+      ${etiquetas ? `<div class="cf-etqs">${etiquetas}</div>` : ''}
+      <div class="cf-filtros cf-gaveta" id="cfGaveta"${S.conf.verFiltros ? '' : ' hidden'}>
         <label class="campo">Procedimento<select id="cfFProc"><option value="*">Todos</option>${opc(x => x.r.codigo, x => `${x.r.codigo} · ${x.r.procDesc}`).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fProc === v ? ' selected' : ''}>${esc(t)} (${comV.filter(x => x.r.codigo === v).length})</option>`).join('')}</select></label>
-        <label class="campo">Data<select id="cfFData"><option value="*">Todas</option>${opc(x => isoDia(x.r.data), x => fmtData(x.r.data)).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fData === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <label class="campo">Data${S.conf.fDataAte && S.conf.fDataAte !== '*' ? ' (de)' : ''}<select id="cfFData"><option value="*">${S.conf.fDataAte && S.conf.fDataAte !== '*' ? 'Desde o início' : 'Todas'}</option>${diasF.map(([v, t]) => `<option value="${esc(v)}"${S.conf.fData === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+        <label class="campo">até<select id="cfFDataAte" aria-label="Data até"><option value="*">—</option>${diasF.map(([v, t]) => `<option value="${esc(v)}"${S.conf.fDataAte === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
         <label class="campo">Convênio<select id="cfFConv"><option value="*">Todos</option>${opc(x => x.r.convenio, x => x.r.convenio).map(([v, t]) => `<option value="${esc(v)}"${S.conf.fConv === v ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
-        <div class="cf-fchk"><label class="small"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label><label class="small"><input type="checkbox" id="cfFObs"${S.conf.fObs ? ' checked' : ''}> com observação</label></div></div>
+        <label class="campo">Título do laudo<select id="cfFTit"><option value="*">Todos</option>${opcL(l => l.titulo).map(([v, n]) => `<option value="${esc(v)}"${S.conf.fTit === v ? ' selected' : ''}>${esc(v)} (${n})</option>`).join('')}</select></label>
+        <label class="campo">Médico do laudo<select id="cfFMed"><option value="*">Todos</option>${opcL(l => l.medico).map(([v, n]) => `<option value="${esc(v)}"${S.conf.fMed === v ? ' selected' : ''}>${esc(v)} (${n})</option>`).join('')}</select></label>
+        <label class="campo">Observação<select id="cfFObs">${opcoes([['', 'Todas'], ['com', 'Com observação'], ['sem', 'Sem observação']], fObsAtual())}</select></label></div>
       <div class="cf-selinfo small" id="cfSelInfo"></div>
       ${S.conf.filtroLinhas ? `<div class="cf-fl small"><b>Mostrando as ${S.conf.filtroLinhas.idx.length} linha(s) de:</b> ${esc(S.conf.filtroLinhas.titulo)} <button class="sec mini" id="cfFlLimpar">Mostrar todas</button></div>` : ''}
       <div id="cfTab" style="margin-top:10px"></div></div>`)}
     ${secao('decidir', CZ.faltam ? cartaoCausas(CZ, res) : '<div class="card"><h2>O que falta decidir</h2><p class="muted">Nada falta decidir neste relatório.</p></div>')}
     ${secao('nc', cartaoCorrecoesMV(corr) + (ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''))}
     ${secao('aceite', `<div class="card cf-aceite-card">${quadroAceite()}</div>`)}
-    ${secao('detalhes', `<div class="card"><h2>Detalhes da rodada</h2>
+    ${secao('detalhes', `${cartaoHistoricoRelatorio(ctx)}<div class="card"><h2>Detalhes da rodada</h2>
       <dl class="kv"><dt>Relatório</dt><dd>${esc(ctx.relatorio.cab.prestadorCod)} - ${esc(ctx.relatorio.cab.prestadorNome)} · repasse ${esc(textoRepasses(ctx.relatorio.cab))}</dd>
       <dt>Unidade</dt><dd>${esc(ctx.unidadeNome)}</dd><dt>Médico(s) no escopo</dt><dd>${esc(ctx.medicosNomes || 'Todos os médicos')}</dd>
       <dt>Período de produção</dt><dd>${res.periodo ? `${fmtData(res.periodo[0])} a ${fmtData(res.periodo[1])}` : '—'} · modalidades ${esc(res.modalidades.join(', ') || '—')}</dd>
@@ -212,16 +242,21 @@ function desenharConferencia() {
   c.querySelectorAll('[data-cfaba]').forEach(b => b.onclick = () => irAbaConf(b.dataset.cfaba));
   c.querySelectorAll('[data-cl]').forEach(b => b.onclick = () => { S.conf.filtroClasse = S.conf.filtroClasse === b.dataset.cl ? null : b.dataset.cl; if (S.conf.filtroClasse) S.conf.soFalta = false; desenharConferencia(); });
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
+  c.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => { const k = b.dataset.tirar; S.conf[k] = k === 'fObs' ? '' : k === 'filtroClasse' ? null : '*'; desenharConferencia(); });
+  $('cfFiltrosBt').onclick = () => { S.conf.verFiltros = !S.conf.verFiltros; $('cfGaveta').hidden = !S.conf.verFiltros; $('cfFiltrosBt').setAttribute('aria-expanded', String(S.conf.verFiltros)); };
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
-  // Os dois botões de Excel (topo e tabela) fazem a mesma coisa.
-  c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp));
+  // Os dois botões de Excel (topo e tabela) exportam tudo; «só o filtrado» fica na faixa do filtro. Com «Processando…» (P1).
+  c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => exportarExcelConf(bt, res, ctx));
+  ligarReconferir(c);
   if ($('cfIrCausas')) $('cfIrCausas').onclick = () => irAbaConf('decidir');
   if ($('cfIrAceite')) $('cfIrAceite').onclick = () => irAbaConf('aceite');
   $('cfVerTodas').onclick = () => { Object.assign(S.conf, { soFalta: false, filtroLinhas: null, filtroClasse: null, aba: 'previa' }); desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); };
   if ($('cfFlLimpar')) $('cfFlLimpar').onclick = () => { S.conf.filtroLinhas = null; desenharConferencia(); };
   ligarCausas(c, CZ, res, ctx);
   ligarQuadroAceite();
-  ligarCorrecoesMV(c, res, ctx);
+  // Um dia, ou de… até… (só «até»: desde o início).
+  const naFaixaDeData = d => { const de = S.conf.fData && S.conf.fData !== '*' ? S.conf.fData : '', ate = S.conf.fDataAte && S.conf.fDataAte !== '*' ? S.conf.fDataAte : '';
+    if (!de && !ate) return true; if (!ate) return d === de; return (!de || d >= de) && d <= ate; };
   const filtrar = () => {
     const q = norm(S.conf.busca);
     const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
@@ -230,72 +265,195 @@ function desenharConferencia() {
       && (!S.conf.filtroStatus.size || S.conf.filtroStatus.has(x.status))
       && (!S.conf.filtroMarc.size || [...S.conf.filtroMarc].every(m => m.startsWith('dec-') ? x.decisao?.tipo === m.slice(4) : x.marcadores.has(m)))
       && (!S.conf.fProc || S.conf.fProc === '*' || x.r?.codigo === S.conf.fProc)
-      && (!S.conf.fData || S.conf.fData === '*' || isoDia(x.r?.data || x.l?.data) === S.conf.fData)
+      && naFaixaDeData(isoDia(x.r?.data || x.l?.data))
       && (!S.conf.fConv || S.conf.fConv === '*' || (x.r?.convenio || '') === S.conf.fConv)
-      && (!S.conf.fObs || observacoesDaLinha(idxObs, x.r, x.l).length)
+      && (!S.conf.fTit || S.conf.fTit === '*' || x.l?.titulo === S.conf.fTit)
+      && (!S.conf.fMed || S.conf.fMed === '*' || x.l?.medico === S.conf.fMed)
+      && (!fObsAtual() || (observacoesDaLinha(idxObs, x.r, x.l).length > 0) === (fObsAtual() === 'com'))
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
   };
   // Contagem e soma do filtro + ações em lote sobre as linhas pendentes visíveis.
+  /* v3.0.0-alpha.20 (simplificação): as ações em lote só aparecem quando há linhas marcadas ou um filtro escolhido.
+   * Com linhas marcadas, valem para as marcadas; sem marcação, para as do filtro (como antes). */
+  S.conf.sel = S.conf.sel || new Set();
+  const filtroAtivo = () => !!(S.conf.busca || S.conf.filtroStatus.size || S.conf.filtroMarc.size || S.conf.filtroClasse || S.conf.filtroLinhas || nFiltros);
   const infoSel = vis => {
-    const pend = vis.filter(x => x.r && classeDaLinhaConf(x) === 'pend' && !x.decisao), el = $('cfSelInfo'); if (!el) return;
-    el.innerHTML = `<b>${vis.length} linha(s) no filtro · R$ ${fmtBR(vis.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0))}</b>${S.conf.filtroClasse ? ` · ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)}` : ''}<span class="sy-esp"></span>
-      <button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLimpar">Limpar filtros</button><button class="mini" id="cfExcel2" data-cfexcel>Exportar Excel</button>`;
-    $('cfExcel2').onclick = () => entregarArquivo(xlsxConferencia(res, { ...ctx, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }), nomeArquivoAnalise('conferencia', ctx), 'conf', ctx.chaveCompetencia || S.comp);
-    $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fConv: '*', fObs: false }); desenharConferencia(); };
-    $('cfLoteAceitar').onclick = async () => { if (await considerarLinhas(res, pend.map(x => res.linhas.indexOf(x)), `${pend.length} linha(s) pendente(s) do filtro · R$ ${fmtBR(pend.reduce((s, x) => s + x.r.vlRepasse, 0))}`, '')) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
-    $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoDaLinhaConferencia(x, ctx, S.cfg)))) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); } };
+    const el = $('cfSelInfo'); if (!el) return;
+    const visSet = new Set(vis.map(x => res.linhas.indexOf(x)));
+    for (const i of [...S.conf.sel]) if (!visSet.has(i)) S.conf.sel.delete(i);
+    const marcadas = S.conf.sel.size ? vis.filter(x => S.conf.sel.has(res.linhas.indexOf(x))) : null, alvo = marcadas || vis;
+    const pend = alvo.filter(x => x.r && classeDaLinhaConf(x) === 'pend' && !x.decisao);
+    const slVis = alvo.filter(x => x.l && !x.r && x.status === 'so-laudo' && !x.decisao);   // SOL-F41: dispensar em lote
+    const lote = !!marcadas || filtroAtivo();
+    el.classList.toggle('cf-selbar', !!marcadas);
+    el.innerHTML = `<b>${marcadas ? `${marcadas.length} marcada(s)` : `${vis.length} linha(s)${filtroAtivo() ? ' no filtro' : ''}`} · R$ ${fmtBR(alvo.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0))}</b>${S.conf.filtroClasse ? ` · ${esc(CLASSES_FECH[S.conf.filtroClasse].nome)}` : ''}${marcadas ? ' <button class="sec mini" id="cfDesmarcar">Desmarcar</button>' : ''}<span class="sy-esp"></span>
+      ${lote ? `<button class="mini" id="cfLoteAceitar"${pend.length ? '' : ' disabled'}>Aceitar para pagamento as ${pend.length} pendente(s)…</button><button class="sec mini" id="cfLoteNC"${pend.length ? '' : ' disabled'}>Registrar NC das ${pend.length} pendente(s)…</button>${slVis.length ? `<button class="sec mini" id="cfLoteDisp">Dispensar os ${slVis.length} laudo(s) «Só no laudo»…</button>` : ''}<button class="sec mini" id="cfLoteObs"${alvo.length ? '' : ' disabled'}>Observação nas ${alvo.length} linha(s)…</button>` : '<span class="muted">Marque linhas (ou filtre) para decidir em lote.</span>'}
+      ${filtroAtivo() ? '<button class="sec mini" id="cfLimpar">Limpar filtros</button>' : ''}${alvo.length < res.linhas.length ? `<button class="sec mini" id="cfExcelFiltro">Exportar só ${marcadas ? 'as marcadas' : 'o filtrado'} (${alvo.length})</button>` : ''}`;
+    if ($('cfDesmarcar')) $('cfDesmarcar').onclick = () => { S.conf.sel.clear(); refiltrar(); };
+    if ($('cfExcelFiltro')) $('cfExcelFiltro').onclick = () => exportarExcelConf($('cfExcelFiltro'), resultadoFiltrado(res, alvo), { ...ctx, filtroTexto: marcadas ? `${alvo.length} linha(s) marcada(s)` : textoFiltroConf(vis) });
+    if ($('cfLimpar')) $('cfLimpar').onclick = () => { S.conf.filtroStatus.clear(); S.conf.filtroMarc.clear(); S.conf.sel.clear(); Object.assign(S.conf, { busca: '', filtroLinhas: null, filtroClasse: null, fProc: '*', fData: '*', fDataAte: '*', fConv: '*', fTit: '*', fMed: '*', fObs: '' }); desenharConferencia(); };
+    if (!lote) return;
+    const fim = () => { S.conf.sel.clear(); aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); };
+    $('cfLoteAceitar').onclick = async () => { if (await considerarLinhas(res, pend.map(x => res.linhas.indexOf(x)), `${pend.length} linha(s) pendente(s) ${marcadas ? 'marcada(s)' : 'do filtro'} · R$ ${fmtBR(pend.reduce((s, x) => s + x.r.vlRepasse, 0))}`, '')) fim(); };
+    $('cfLoteNC').onclick = async () => { if (await abrirRegistroNC(pend.map(x => candidatoComObservacao(x, ctx)))) fim(); };
+    if ($('cfLoteDisp')) $('cfLoteDisp').onclick = async () => { if (await dispensarLaudos(res, slVis.map(x => res.linhas.indexOf(x)))) fim(); };
+    $('cfLoteObs').onclick = async () => { if (await observacaoEmLote(alvo)) { S.conf.sel.clear(); desenharConferencia(); } };
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
-      { t: 'Classe', html: x => pillClasse(classeDaLinhaConf(x)) },
-      { t: 'Situação', html: x => chipStatus(x.status, STATUS_CONF[x.status].nome) + chipDecisao(x.decisao) + (observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : '') },
+      { t: '', html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
+      { t: 'Classe · situação', html: x => `${pillClasse(classeDaLinhaConf(x))}<div class="cf-sit">${chipStatus(x.status, STATUS_CONF[x.status].nome)}${chipDecisao(x.decisao)}${observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : ''}</div>` },
       { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
       { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
       { t: 'O que falta / por quê', v: x => x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo] || ''}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : classeDaLinhaConf(x) === 'excluido' ? (x.tipo === 'hm' ? 'HM sem regra do prestador: não compõe repasse — excluir do MV' : `${TIPOS_ITEM[x.tipo] || x.tipo}: não compõe repasse`) : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
       { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
     detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
-      return `<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div><p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
+      return `${comparacaoMVLaudo(x)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${esc(m)}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${esc(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
       ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}
       <h4 style="margin-top:8px">Observação</h4><textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
       ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]}) · título ${Math.round((cd.af || 0) * 100)}%${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
   });
-  infoSel(filtrar());
   const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); };
+  infoSel(filtrar());
+  // «Decidir e ir para a próxima»: depois de uma decisão na linha aberta, abre a linha que ficou na mesma posição.
+  if (S.conf.abrirPos != null) { const v = filtrar(); if (v.length) t.abrir(Math.min(S.conf.abrirPos, v.length - 1)); S.conf.abrirPos = null; }
+  $('cfTab').addEventListener('change', e => {
+    const cb = e.target.closest('[data-sel]'); if (!cb) return;
+    const i = +cb.dataset.sel; cb.checked ? S.conf.sel.add(i) : S.conf.sel.delete(i); infoSel(filtrar());
+  });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; refiltrar(); };
   $('cfFProc').onchange = e => { S.conf.fProc = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfFData').onchange = e => { S.conf.fData = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfFConv').onchange = e => { S.conf.fConv = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfSoFalta').onchange = e => { S.conf.soFalta = e.target.checked; desenharConferencia(); };
-  $('cfFObs').onchange = e => { S.conf.fObs = e.target.checked; desenharConferencia(); };
+  $('cfFObs').onchange = e => { S.conf.fObs = e.target.value; if (e.target.value) S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFDataAte').onchange = e => { S.conf.fDataAte = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFTit').onchange = e => { S.conf.fTit = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
+  $('cfFMed').onchange = e => { S.conf.fMed = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
   $('cfTab').addEventListener('click', async e => {
     const b = e.target.closest('[data-nc-linha],[data-considerar],[data-desconsiderar],[data-dispensar],[data-resolvido],[data-escolher],[data-obs-salvar]'); if (!b) return;
     let ok = false;
-    if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoDaLinhaConferencia(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]);
+    if (b.dataset.ncLinha !== undefined) ok = await abrirRegistroNC([candidatoComObservacao(res.linhas[+b.dataset.ncLinha], ctx)]);
     else if (b.dataset.considerar !== undefined) ok = await considerarNoRepasse(res.linhas[+b.dataset.considerar]);
     else if (b.dataset.dispensar !== undefined) ok = await dispensarLaudos(res, [+b.dataset.dispensar]);
     else if (b.dataset.resolvido !== undefined) ok = await resolvidoNoMV(res.linhas[+b.dataset.resolvido], ctx);
     else if (b.dataset.escolher !== undefined) { const [i, j] = b.dataset.escolher.split('|').map(Number), x = res.linhas[i], cd = x.cands[j]; ok = await considerarNoRepasse(x, `Laudo escolhido entre ${x.cands.length} candidatos: «${cd.l.titulo}» (${cd.l.medico || 'sem médico'}, ${fmtData(cd.l.data)})`); }
     else if (b.dataset.obsSalvar !== undefined) ok = await salvarObservacaoLinha(res.linhas[+b.dataset.obsSalvar], $('cfTab').querySelector(`[data-obs="${b.dataset.obsSalvar}"]`)?.value || '');
     else ok = await removerDecisaoConsiderar(res.linhas[+b.dataset.desconsiderar]);
-    if (ok) { aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
+    if (ok) { if (b.dataset.obsSalvar === undefined && b.dataset.desconsiderar === undefined) { const v = filtrar(), pos = v.indexOf(res.linhas[+(b.dataset.ncLinha ?? b.dataset.considerar ?? b.dataset.dispensar ?? b.dataset.resolvido ?? String(b.dataset.escolher).split('|')[0])]); if (pos >= 0) S.conf.abrirPos = pos; }
+      aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
+}
+/* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
+function comparacaoMVLaudo(x) {
+  if (!x.r || !x.l) return '';
+  const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
+  const linha = (rot, mv, la, estado, dif) => `<div class="${dif ? 'dif' : ''}"><span>${rot}</span><span>${esc(mv || '—')}</span><span>${esc(la || '—')} ${estado}</span></div>`;
+  const b = (ok, t) => `<span class="badge ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
+  const mesmoDia = isoDia(x.r.data) === isoDia(x.l.data), eqOk = cd?.proc?.estado === 'validada';
+  return `<div class="cf-cmp"><div class="cf-cmp-cab"><span></span><b>MV</b><b>Laudo (Apolo)</b></div>
+    ${linha('Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), cd && cd.nm < 3)}
+    ${linha('Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia)}
+    ${linha('Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, ROTULO_EQ[cd.proc.estado] || cd.proc.estado) : '', cd && !eqOk)}
+    ${linha('Convênio', x.r.convenio, x.l.convenio, b(igual(x.r.convenio, x.l.convenio), igual(x.r.convenio, x.l.convenio) ? 'igual' : 'diferente'), !igual(x.r.convenio, x.l.convenio))}
+    ${linha('Médico', '', x.l.medico, '', false)}</div>`;
+}
+/* Histórico deste relatório (antes só na tela «Rodadas»): cada rodada, o valor para pagamento e o aceite. */
+function cartaoHistoricoRelatorio(ctx) {
+  const idx = indiceDecisoesComp(ctx.chaveCompetencia);
+  const rs = (S.rodadas || []).filter(r => r.tipo === 'conferencia' && competenciaDaRodada(r) === ctx.chaveCompetencia && String(r.prestadorCod) === String(ctx.relatorio.cab.prestadorCod) && String(r.unidadeCod) === String(ctx.unidadeCod)).sort((a, b) => b.em.localeCompare(a.em));
+  if (!rs.length) return '';
+  const pagar = r => r.resumida || !usaRegraF43(r) ? '—' : fmtBR(totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)).pagar);
+  return `<div class="card"><h2>Histórico deste relatório <span class="small muted">${rs.length} rodada(s) · <a href="#rodadas">todas as rodadas</a></span></h2><div class="tw"><table><thead><tr><th>Quando</th><th>Quem</th><th>PDF do MV</th><th class="n">Para pagamento</th><th>Resultado</th><th>Aceite</th></tr></thead><tbody>
+    ${rs.map(r => `<tr${r.id === ctx.rodadaId ? ' class="cf-hist-atual"' : ''}><td>${new Date(r.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}${r.id === ctx.rodadaId ? ' <span class="badge info">esta</span>' : ''}</td><td>${esc(r.operador || '—')}</td><td class="small">${esc((r.arquivos || []).find(a => a.papel === 'MV')?.nome || '—')}</td><td class="n">${pagar(r)}</td>
+      <td class="small">${esc(Object.entries(r.contagens || {}).filter(([, n]) => n).map(([k, n]) => `${STATUS_CONF[k]?.nome || k}: ${n}`).join(' · '))}</td><td>${r.aceite ? `<span class="badge ok">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleDateString('pt-BR')}</span>` : r.resumida ? '<span class="small muted">resumida</span>' : '<span class="badge warn">sem aceite</span>'}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+// Excel da conferência ao lado do PDF: 05 - Relatórios de repasse MV › USG | IMG | Curitiba › unidade (estrutura padronizada).
+function subpastaDaConferencia(ctx) {
+  const x = S.relatorios.find(r => r.id === ctx.relId), g = x ? grDoRel(x) : '', u = unidadePorCod(S.cfg, ctx.unidadeCod);
+  if (!GRUPOS_REL[g]) return [];
+  return g === 'curitiba' ? [GRUPOS_REL.curitiba] : [GRUPOS_REL[g], ...(u ? [nomePastaUnidadeRel(u)] : [])];
+}
+const fObsAtual = () => S.conf?.fObs === true ? 'com' : (S.conf?.fObs || '');
+/* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
+ * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
+function exportarExcelConf(bt, res, ctx) {
+  const idxObs = indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes);
+  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
+    nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp, subpastaDaConferencia(ctx)), 'a exportação do Excel');
+}
+function textoFiltroConf(vis) {
+  const c = S.conf, partes = [];
+  if (c.filtroClasse) partes.push(`classe ${CLASSES_FECH[c.filtroClasse].nome}`);
+  if (c.filtroStatus.size) partes.push(`situação ${[...c.filtroStatus].map(k => STATUS_CONF[k]?.nome || k).join(', ')}`);
+  if (c.filtroMarc.size) partes.push(`marcador ${[...c.filtroMarc].map(k => k.startsWith('dec-') ? TIPOS_DECISAO[k.slice(4)] : MARCADORES[k] || k).join(', ')}`);
+  if (c.fProc && c.fProc !== '*') partes.push(`procedimento ${c.fProc}`);
+  if (c.fDataAte && c.fDataAte !== '*') partes.push(`data ${c.fData && c.fData !== '*' ? `de ${fmtData(paraData(c.fData))} ` : ''}até ${fmtData(paraData(c.fDataAte))}`);
+  else if (c.fData && c.fData !== '*') partes.push(`data ${fmtData(paraData(c.fData))}`);
+  if (c.fConv && c.fConv !== '*') partes.push(`convênio ${c.fConv}`);
+  if (c.fTit && c.fTit !== '*') partes.push(`título «${c.fTit}»`);
+  if (c.fMed && c.fMed !== '*') partes.push(`médico ${c.fMed}`);
+  if (fObsAtual()) partes.push(fObsAtual() === 'com' ? 'com observação' : 'sem observação');
+  if (c.busca) partes.push(`busca «${c.busca}»`);
+  if (c.filtroLinhas) partes.push(c.filtroLinhas.titulo);
+  if (c.soFalta !== false && !c.filtroLinhas && !c.filtroStatus.size && !c.filtroClasse) partes.push('só o que falta decidir');
+  return `${vis.length} linha(s) · ${partes.join(' · ') || 'filtro da tela'}`;
+}
+/* P1 — Reconferir em um clique: relê o PDF (da pasta da competência, ou um arquivo escolhido) e confere de novo com a mesma
+ * unidade, médico, tolerância e aba. Antes eram 4 ou 5 passos (Início → atualizar → Conferência → escolher → executar). */
+const pastaConectadaConf = () => typeof SY !== 'undefined' && !!SY.handle && !SY.legado;
+function botaoReconferir(ctx) {
+  const x = S.relatorios.find(r => r.id === ctx.relId), daPasta = pastaConectadaConf() && !!x?.caminhoPasta;
+  return `<button class="sec" id="cfReconferir" title="Mantém unidade, médico, tolerância e a aba aberta">${daPasta ? 'Reler o PDF da pasta e conferir de novo' : 'Carregar o PDF novo e conferir de novo'}</button><input type="file" id="cfReArq" accept=".pdf,application/pdf" hidden>`;
+}
+function ligarReconferir(c) {
+  const bt = c.querySelector('#cfReconferir'), arq = c.querySelector('#cfReArq'); if (!bt) return;
+  bt.onclick = () => {
+    const x = S.relatorios.find(r => r.id === S.conf.ctx.relId);
+    if (pastaConectadaConf() && x?.caminhoPasta) return comProcessando(bt, () => reconferir(null), 'a reconferência');
+    arq.value = ''; arq.click();
+  };
+  arq.onchange = () => arq.files[0] && comProcessando(bt, () => reconferir(arq.files[0]), 'a reconferência');
+}
+async function reconferir(arquivo) {
+  if (!exigirAberta(S.comp, 'executar uma conferência')) return;
+  const { ctx } = S.conf, aba = S.conf.aba || 'previa', atual = S.relatorios.find(r => r.id === ctx.relId);
+  const prest = String(ctx.relatorio.cab.prestadorCod), hashAntes = (ctx.arquivos || []).find(a => a.papel === 'MV')?.hash || '';
+  let x = null;
+  if (!arquivo) {
+    await atualizarDaPasta({ silencioso: true });
+    x = S.relatorios.find(r => r.caminhoPasta && r.caminhoPasta === atual?.caminhoPasta)
+      || S.relatorios.find(r => r.caminhoPasta && String(r.rel.cab.prestadorCod) === prest && r.unidadePasta === atual?.unidadePasta && (r.grupoPasta || '') === (atual?.grupoPasta || ''));
+    if (!x) return avisar('O PDF deste relatório não foi encontrado na pasta da competência. Use «Carregar o PDF novo» ou confira no Início.', 'warn');
+  } else {
+    const n0 = S.relatorios.length; await carregarPDFs([arquivo]);
+    if (S.relatorios.length === n0) { x = S.relatorios.find(r => r.nome === arquivo.name && String(r.rel.cab.prestadorCod) === prest); if (!x) return; }
+    else {
+      x = S.relatorios.at(-1);
+      if (String(x.rel.cab.prestadorCod) !== prest) { S.relatorios.pop(); return avisar(`${arquivo.name} é do prestador ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}, não do ${prest}. Nada foi conferido.`, 'warn'); }
+      if (atual) { for (const k of ['unidadePasta', 'grupoPasta', 'caminhoPasta']) if (atual[k] !== undefined) x[k] = atual[k]; x.finalidade = atual.finalidade || x.finalidade; S.relatorios = S.relatorios.filter(r => r !== atual); }
+    }
+  }
+  await rodarConferencia(x, ctx.unidadeCod, ctx.parametros?.tol ?? S.cfg.parametros.tolConferencia, ctx.medicoSel || '@prest');
+  S.conf.aba = aba;
+  RENDER.conferencia();
+  avisar(x.hash === hashAntes ? 'Conferido de novo com o mesmo PDF (o arquivo não mudou). As decisões e equivalências atuais já valem.' : 'PDF novo lido e conferido de novo: veja a aba «NCs e correções no MV» para a reconferência.', x.hash === hashAntes ? 'info' : 'ok');
 }
 // Aba «NCs e correções no MV»: o que devia ter saído do MV e o que já saiu (reconferência, SOL-F42).
 function cartaoCorrecoesMV(corr) {
   const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
   const cont = [...corr.ncs.filter(x => x.situacao === 'continua'), ...corr.resolvidos.filter(x => x.situacao === 'continua'), ...corr.hm.filter(x => x.continua)];
-  const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'] };
+  const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'], lancada: ['ok', 'Corrigida: lançada no MV (o laudo agora tem par; a NC não passa para a linha)'] };
   return `<div class="card"><h2>Correções no MV</h2>
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
     <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
     <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
     <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
-function ligarCorrecoesMV() { }
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;
@@ -365,6 +523,25 @@ async function dispensarLaudos(res, idxs) {
   salvarCompReg(); avisar(`${ls.length} laudo(s) dispensado(s) nesta competência.`, 'ok');
   return true;
 }
+/* SOL-F41 (v3.0.0-alpha.13) — A observação da linha vai para a NC registrada a partir dela (no campo Observações). */
+function candidatoComObservacao(x, ctx) {
+  const c = candidatoDaLinhaConferencia(x, ctx, S.cfg);
+  const obs = observacoesDaLinha(indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes), x.r, x.l);
+  if (obs.length) c.obsLinha = textoObservacoes(obs);
+  return c;
+}
+// Observação em lote: o mesmo texto em todas as linhas visíveis do filtro (cada uma pela sua chave, sem nome de paciente).
+async function observacaoEmLote(vis) {
+  if (!exigirAberta(S.comp, 'registrar observações')) return false;
+  const op = await exigirOperador(); if (!op) return false;
+  const r = await dialogo(`Observação em ${vis.length} linha(s)`, `<p class="small muted">O texto entra em cada linha visível do filtro, com quem e quando. Fica na competência ${rotuloCompetencia(S.comp)} e aparece nas próximas rodadas; não muda a classe nem a situação.</p>
+    <label class="campo">Observação<textarea name="txt" rows="3"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Salvar']]);
+  if (r.botao !== 'ok') return false;
+  if (!r.campos.txt.trim()) { avisar('Escreva a observação.', 'warn'); return false; }
+  for (const x of vis) registrarObservacao(S.compReg, S.comp, chavesDaLinha(x.r, x.l), r.campos.txt, op);
+  salvarCompReg(); avisar(`Observação registrada em ${vis.length} linha(s).`, 'ok');
+  return true;
+}
 async function removerDecisaoConsiderar(x) {
   if (!exigirAberta(S.comp, 'alterar decisões')) return false;
   if (!await confirmar('Remover decisão?', 'A linha volta a aparecer como pendente na conferência.', 'Remover')) return false;
@@ -383,9 +560,11 @@ function proximoRelatorioConf() {
 function quadroAceite() {
   const r = rodadaDaConf(); if (!r) return '';
   const chave = competenciaDaRodada(r), fechada = compFechada(chave), idx = indiceDecisoesComp(chave);
-  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => idx.has(l.kd) || (l.kl && idx.has(l.kl)));
-  const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}</p>`;
-  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => idx.get(l.kd)?.tipo === 'nc' || (l.kl && idx.get(l.kl)?.tipo === 'nc')).length;
+  const abertas = r.linhas.filter(l => !linhaResolvida(l)), comDecisao = abertas.filter(l => decisaoDaLinhaRodada(idx, l));
+  // SOL-F41: quantas linhas desta conferência têm observação.
+  const idxObsA = indiceObservacoes(estadoCompetencia(S.compReg, chave).observacoes), nObs = S.conf?.ctx?.rodadaId === r.id ? S.conf.res.linhas.filter(x => observacoesDaLinha(idxObsA, x.r, x.l).length).length : 0;
+  const TC = totaisPorClasse(r.linhas, l => classeDaLinhaRodada(l, idx)), resumoCl = `<p class="small" style="margin:6px 0"><b>Para pagamento: R$ ${fmtBR(TC.pagar)}</b> (Devido R$ ${fmtBR(TC.devido.valor)} + Aceito R$ ${fmtBR(TC.aceito.valor)}) · fora do fechamento: pendente R$ ${fmtBR(TC.pend.valor)} · NC R$ ${fmtBR(TC.nc.valor)} · excluído R$ ${fmtBR(TC.excluido.valor)}${nObs ? ` · <span id="cfAceiteObsN">${nObs} linha(s) com observação</span>` : ''}</p>`;
+  const pend = pendenciasDaRodada(r, idx).length, prox = proximoRelatorioConf(), nNC = comDecisao.filter(l => decisaoDaLinhaRodada(idx, l)?.tipo === 'nc').length;
   if (r.aceite) return `<div class="aceite-box feito" id="cfAceite"><b>Aceite do relatório</b> <span class="badge ok">aceito</span>${resumoCl}
     <p class="small" style="margin:6px 0">${esc(r.aceite.por)} · ${new Date(r.aceite.em).toLocaleString('pt-BR')}${r.aceite.obs ? ` — «${esc(r.aceite.obs)}»` : ''} · ${r.aceite.pendencias} pendência(s) no aceite</p>
     <div class="acoes" style="margin:0">${fechada ? '<span class="small muted">Competência fechada: reabra no Início para desfazer.</span>' : '<button class="sec mini" id="cfDesfazer">Desfazer aceite</button>'}<a href="#rodadas" class="small">Ver em Rodadas</a>
@@ -458,7 +637,44 @@ document.addEventListener('click', async e => {
     await rodarConferencia(x, un, tol, presente ? '@prest' : '*');
     await new Promise(r => setTimeout(r, 0));
   }
-  S.rodadas = await dbTodas();
-  avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.`, 'ok');
+  S.rodadas = await dbRodadasJanela();
+  avisar(`${ok.length} conferência(s) rodadas${semUn.length ? `; ${semUn.length} sem unidade ficaram de fora` : ''}. Acompanhe em «Prestadores por unidade» e dê o aceite em cada uma.${F.un !== '*' && F.gr !== '*' ? ' Para a planilha de controle da unidade, use «Excel único».' : ''}`, 'ok');
   RENDER.conferencia();
+});
+
+/* SOL-F45 (v3.0.0-alpha.17) — Excel único da unidade × grupo: todos os prestadores dos relatórios filtrados (unidade e
+ * grupo escolhidos no seletor) e quem laudou sem relatório, num arquivo só, gravado em «09 - Planilhas de repasse
+ * conferidos › IMG | USG › unidade» (Curitiba: «09 › Curitiba»). Cada relatório é conferido de novo na hora, com os
+ * parâmetros da última rodada dele na competência; nenhuma rodada é gravada. Relatório sem rodada entra como «sem conferência». */
+function itensPlanilhaUnidade(un, gr, ch = S.comp) {
+  const rels = relatoriosPara('cf').filter(x => unDoRel(x) === un && grDoRel(x) === gr), idxDec = indiceDecisoesComp(ch), uNome = `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
+  return rels.map(x => {
+    const rod = (S.rodadas || []).filter(r => r.tipo === 'conferencia' && competenciaDaRodada(r) === ch && String(r.unidadeCod) === String(un) && (r.arquivos || []).some(a => a.papel === 'MV' && a.hash === x.hash))
+      .sort((a, b) => b.em.localeCompare(a.em))[0] || null;
+    const ctx = { chaveCompetencia: ch, relId: x.id, relatorio: { ...x.rel, arquivo: x.rel.arquivo || x.nome }, apoloNome: S.apolo?.nome || '', unidadeCod: un, unidadeNome: uNome, parametros: rod?.parametros || {}, operador: S.operador, rodadaId: rod?.id || '' };
+    if (!rod || !S.apolo) return { res: null, ctx, rodada: null };
+    const medSel = rod.parametros?.medico || '@prest', medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
+    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
+    return { res, ctx, rodada: rod };
+  });
+}
+const nomePlanilhaUnidade = (un, gr, ch = S.comp) => `conferidos_${gr === 'curitiba' ? 'curitiba' : gr}_unidade_${String(un).replace(/[^\w-]/g, '')}_comp_${ch.slice(5)}-${ch.slice(0, 4)}.xlsx`;
+const subpastaPlanilhaUnidade = (un, gr) => { const u = unidadePorCod(S.cfg, un); return gr === 'curitiba' ? [GRUPOS_REL.curitiba] : [GRUPOS_REL[gr], ...(u ? [nomePastaUnidadeRel(u)] : [])]; };
+async function gerarPlanilhaUnidade(bt, un, gr) {
+  if (!S.apolo) return avisar('Carregue a planilha de laudos no Início.', 'warn');
+  return comProcessando(bt, async () => {
+    S.rodadas = await dbRodadasJanela();
+    const itens = itensPlanilhaUnidade(un, gr), ctl = controleAtual();
+    const G = ctl?.unidades.find(u => String(u.cod) === String(un))?.grupos.find(g => g.grupo === gr);
+    const xlsx = xlsxConferenciaUnidade(itens, G?.itens || [], { chave: S.comp, unidadeCod: un, unidadeNome: `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`, grupo: gr, operador: S.operador, apoloNome: S.apolo.nome, eqRevisao: S.eq.revisao,
+      colunasExportacao: colunasExportacaoAtuais(), compostas: S.eq.compostas || [], idxObs: indiceObservacoes(estadoCompetencia(S.compReg, S.comp).observacoes) });
+    const sem = itens.filter(x => !x.res).length;
+    await entregarArquivo(xlsx, nomePlanilhaUnidade(un, gr), 'conferidos', S.comp, subpastaPlanilhaUnidade(un, gr));
+    if (sem) avisar(`${sem} de ${itens.length} relatório(s) ainda sem conferência nesta competência: entram na aba «Prestadores» como «Relatório sem conferência». Use «Conferir os relatórios filtrados» e gere de novo.`, 'warn');
+  }, 'o Excel único da unidade');
+}
+document.addEventListener('click', e => {
+  const bt = e.target.closest('[data-cfunica]'); if (!bt) return;
+  const F = FILTRO_REL.cf; if (F.un === '*' || F.gr === '*') return avisar('Escolha a unidade e o grupo no filtro dos relatórios.', 'warn');
+  gerarPlanilhaUnidade(bt, F.un, F.gr);
 });

@@ -2,6 +2,76 @@
   "_leia": "Versões lançadas publicadas no GitHub Pages (a primeira é a atual). Lançar = acrescentar a nova versão no topo e enviar à main; o workflow «Publicar versão no GitHub Pages» publica.",
   "versoes": [
     {
+      "versao": "3.0.0-alpha.20",
+      "commit": "0ef1a637e91044547aa4475497dd15f2611ae913",
+      "data": "2026-11-23"
+    },
+    {
+      "versao": "3.0.0-alpha.19",
+      "commit": "defcd77fe484aa4ed4c3ff554a99389612c142d3",
+      "data": "2026-11-23"
+    },
+    {
+      "versao": "3.0.0-alpha.18",
+      "commit": "99ea6d6404a381ca3b54bfd2a0ec010991d70eab",
+      "data": "2026-11-23"
+    },
+    {
+      "versao": "3.0.0-alpha.17",
+      "commit": "229a7640129ea7e6e26337a14a3db48eeab68912",
+      "data": "2026-11-19"
+    },
+    {
+      "versao": "3.0.0-alpha.16",
+      "commit": "a32e757cf87f03905067ee4567c9bb37b85e6ab9",
+      "data": "2026-11-19"
+    },
+    {
+      "versao": "3.0.0-alpha.15",
+      "commit": "e6da2e11f0affc49d9913d5141e574bc8b24bc2c",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.14",
+      "commit": "dc837e5ed2ea3bb52df59e56179d55dac1fb1383",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.13",
+      "commit": "742773e2d0341e6aba5b732d29f4a5cad50afe40",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.12",
+      "commit": "761948ff53e3cdf1fbeb92a167b4744f351b5ffb",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.11",
+      "commit": "c92d9ed6fe682eacb497034631641a3bc56cecc0",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.10",
+      "commit": "dcb1ca86eec5b92140b1a8e81acf41837c42ee37",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.9",
+      "commit": "842f0a0a714c852166dc17d873aaf12466b6ac69",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.8",
+      "commit": "038992c36d9d6ad8a4bc638888c8fff7fe4abf6e",
+      "data": "2026-11-17"
+    },
+    {
+      "versao": "3.0.0-alpha.7",
+      "commit": "ab58bff1f6c4f3a9e63677ab3c0546b696ae491f",
+      "data": "2026-11-17"
+    },
+    {
       "versao": "3.0.0-alpha.6",
       "commit": "fc0726406350be50ff09ad4c952749150280d168",
       "data": "2026-11-16"

@@ -68,8 +68,8 @@ await cheio.context().close();
 await ana.evaluate(() => { const { S } = window.__RM; S.cfg.prestadores.push({ cod: '15', nomeMV: 'MEDICO QUINZE', aliases: [], naoRealizaRepasse: false, origem: 'teste', em: new Date().toISOString(), regras: {} }); window.__RM.t.salvarCfg(); });
 await ana.evaluate(() => window.__RM.irPara('bases'));
 await conectar(ana);
-const arqCfg = pasta + 'Configuração compartilhada/configuracao.json';
-ok(fs.existsSync(arqCfg) && JSON.parse(fs.readFileSync(arqCfg, 'utf8')).atualizadoPor === 'Ana Teste', 'ao conectar a pasta raiz, a configuração vai para «Configuração compartilhada/configuracao.json», com quem gravou');
+const arqCfg = pasta + '01 - Sistema/Configurações compartilhadas/configuracao.json';   // estrutura padronizada (v3.0.0-alpha.14)
+ok(fs.existsSync(arqCfg) && JSON.parse(fs.readFileSync(arqCfg, 'utf8')).atualizadoPor === 'Ana Teste', 'ao conectar a pasta raiz, a configuração vai para «01 - Sistema/Configurações compartilhadas/configuracao.json», com quem gravou');
 const semPaciente = !/operador|"tema"|acento/.test(fs.readFileSync(arqCfg, 'utf8'));
 ok(semPaciente, 'preferências individuais (operador, tema, cor) não vão para a pasta');
 const leo = await usuario('Leo Teste');
@@ -118,10 +118,10 @@ await leo.uncheck('#dlgCorpo [name="p_configuracao"]');
 await okDlg(leo);
 await leo.waitForTimeout(500); if (await leo.isVisible('#dlg[open]')) await okDlg(leo, '');   // «Agora não» no juntar
 await leo.evaluate(() => window.__RM.t.sincronizarEq());
-const eqPasta = JSON.parse(fs.readFileSync(pasta + 'Equivalência TUSS (sincronização)/equivalencias.json', 'utf8')).eq.itens.find(e => e.codigo === '40901114');
+const eqPasta = JSON.parse(fs.readFileSync(pasta + '01 - Sistema/Equivalências TUSS/equivalencias.json', 'utf8')).eq.itens.find(e => e.codigo === '40901114');
 const leoSt = await leo.evaluate(() => window.__RM.t.syncEqEstado().status);
 ok(eqPasta.status === 'validada' && leoSt === 'juntar', `o backup antigo restaurado não sobrescreve a pasta: a relação continua validada lá e o Leo precisa escolher ao juntar (${eqPasta.status}, ${leoSt})`);
-const bks = fs.readdirSync(pasta + 'backups');
+const bks = fs.readdirSync(pasta + '01 - Sistema/Backups');
 ok(bks.some(n => /^backup_repasse_\d{8}-\d{6}_LEO_TESTE\.json$/.test(n)), `antes de restaurar, o estado atual vira backup na pasta (${bks.join(', ')})`);
 
 // 5) Integridade do backup: arquivo alterado ou incompleto é recusado.
@@ -129,7 +129,7 @@ const integ = await ana.evaluate(() => { const { t } = window.__RM; const bk = t
 ok(JSON.stringify(integ) === '[true,false,false]', `backup íntegro passa; parte alterada ou ausente é recusada (${integ})`);
 const nomeBk = await ana.evaluate(async () => { const { t } = window.__RM; return t.gravarBackupPasta(t.montarBackup(t.partesAtuaisBackup({}), { operador: 'Ana Teste' }), { auto: true, silencioso: false }); });
 if (!nomeBk) console.log('aviso:', await ana.textContent('#aviso'));
-ok(/_auto\.json$/.test(nomeBk) && fs.existsSync(pasta + 'backups/' + nomeBk), `backup automático gravado e conferido na pasta (${nomeBk})`);
+ok(/_auto\.json$/.test(nomeBk) && fs.existsSync(pasta + '01 - Sistema/Backups/' + nomeBk), `backup automático gravado e conferido na pasta (${nomeBk})`);
 
 // 6) Títulos do Apolo: títulos distintos, sugestão e confirmação na mesma tela.
 await ana.evaluate(() => {
@@ -167,7 +167,7 @@ await ana.screenshot({ path: out + 'v3_titulos_apolo.png' });
 
 // 7) Modelos de exportação: «Padrão» = layout atual; modelo próprio muda só a aba principal.
 const exp = await ana.evaluate(() => { const { t } = window.__RM; return { padrao: t.colunasDoModelo(null).map(c => c.rotulo), custom: t.colunasDoModelo(['paciente', 'conta', 'situacao', 'xx']).map(c => c.rotulo) }; });
-ok(exp.padrao.join('|') === 'Situação|Decisão na competência|Paciente|Data|Cód. TUSS MV|Procedimento no MV|Laudo (TITLE)|O que falta / por quê|Vl Repasse|Convênio MV|Unidade MV|Grupo de procedimento MV|Médico MV|Paciente MV|Paciente Apolo|Data Apolo|Descrição do estudo (STUDY)|Convênio Apolo|Unidade Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise', 'modelo «Padrão» tem exatamente as 23 colunas e a ordem do layout operacional');
+ok(exp.padrao.join('|') === 'Situação|Decisão na competência|Paciente|Data|Cód. TUSS MV|Procedimento no MV|Laudo (TITLE)|O que falta / por quê|Vl Repasse|Convênio MV|Unidade MV|Grupo de procedimento MV|Médico MV|Paciente MV|Paciente Apolo|Data Apolo|Descrição do estudo (STUDY)|Convênio Apolo|Unidade Apolo|Modalidade Apolo|Médico Apolo|Ressalvas|Observações e análise|Observação (na linha)', 'modelo «Padrão» tem as 23 colunas do layout operacional + «Observação (na linha)» (SOL-F41, alpha.13) e a ordem do layout operacional');
 ok(exp.custom.join('|') === 'Paciente|Conta|Situação', `modelo próprio: escolhe e ordena colunas, ignora id desconhecido (${exp.custom})`);
 await ana.evaluate(() => window.__RM.irPara('configuracoes'));
 await ana.locator('[data-cfsub=\"exportacao\"]:visible').click(); await ana.waitForSelector('#exSalvarComo');
@@ -182,16 +182,14 @@ ok(JSON.parse(fs.readFileSync(arqCfg, 'utf8')).cfg.modelosExportacao.some(m => m
 for (const k of ['geral', 'conferencia', 'pastas', 'backup', 'sobre']) { await ana.locator(`[data-cfsub=\"${k}\"]:visible`).click(); await ana.waitForTimeout(120); }
 await ana.locator('[data-cfsub=\"geral\"]:visible').click(); await ana.check('[name="acento"][value="petroleo"]', { force: true }); await ana.waitForTimeout(150);
 ok((await ana.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim())) === '#0e6670', 'cor de destaque «Petróleo» aplicada (--accent)');
-await ana.locator('[data-cfsub=\"bases\"]:visible').click(); await ana.waitForFunction(() => location.hash === '#bases');
-await ana.waitForSelector('#pag-bases .cfg-abas', { timeout: 5000 }).catch(() => {});
+ok(!(await ana.$('[data-cfsub=\"bases\"]')), 'Configurações sem a aba «Bases e regras» (alpha.20: uma porta só, pelo menu)');
+await ana.click('.nav a[data-pag="bases"]'); await ana.waitForFunction(() => location.hash === '#bases');
+await ana.waitForSelector('#cfgSync', { timeout: 5000 }).catch(() => {});
 const bInfo = await ana.evaluate(() => [location.hash, document.getElementById('pag-bases').hidden, !!document.querySelector('#pag-bases .cfg-abas'), !!document.getElementById('cfgSync'), document.getElementById('cfgSync')?.closest('section')?.id]);
-ok(bInfo.join() === '#bases,false,true,true,pag-bases', `Bases e regras abre como categoria das Configurações, com a barra de sincronização da configuração (${bInfo})`);
+ok(bInfo.join() === '#bases,false,false,true,pag-bases', `Bases e regras abre pelo menu, com a barra de sincronização da configuração (${bInfo})`);
 await ana.screenshot({ path: out + 'v3_configuracoes_bases.png' });
-await ana.locator('[data-cfsub=\"pastas\"]:visible').click(); await ana.waitForSelector('[data-pasta="backups"]');
-await ana.fill('[data-pasta="backups"]', 'Backups do repasse'); await ana.click('#psSalvarNomes'); await ana.waitForTimeout(200);
-const nomePasta = await ana.evaluate(async () => { const { t } = window.__RM; return t.gravarBackupPasta(t.montarBackup(t.partesAtuaisBackup({}), {}), { silencioso: true }); });
-if (!nomePasta) console.log('dirs', fs.readdirSync(pasta), await ana.evaluate(() => [window.__RM.S.cfg.pastas, document.getElementById('aviso').textContent]));
-ok(nomePasta && fs.existsSync(pasta + 'Backups do repasse/' + nomePasta), 'nome da pasta de backups configurado na tela vale para a próxima gravação');
+await ana.evaluate(() => window.__RM.irPara('configuracoes')); await ana.locator('[data-cfsub=\"pastas\"]:visible').click(); await ana.waitForSelector('#cardEstrutura');
+ok(/01 - Sistema/.test(await ana.textContent('#cardEstrutura')) && /05 - Relatórios de repasse MV/.test(await ana.textContent('#cardEstrutura')), 'Configurações → Pastas mostra a estrutura padronizada (01 - Sistema, ano, competência)');
 await ana.screenshot({ path: out + 'v3_configuracoes_pastas.png' });
 
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.slice(0, 5).join(' | ') : ''));

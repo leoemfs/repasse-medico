@@ -16,6 +16,8 @@ function carregarNC() {
   S.nc.candidatos = S.nc.candidatos || []; S.ncCand = S.nc.candidatos;
   S.ncDispensados = new Set((S.nc.dispensados || []).map(d => d.chave));
   if (n) { salvarNC(); setTimeout(() => avisar(`${n} não conformidade(s) passaram de ${retencaoNC()} dias: nome e ID do paciente foram apagados (retenção).`, 'info'), 400); }
+  // SOL-F41: observações das linhas seguem a mesma retenção (texto livre pode ter dado de paciente).
+  if (S.compReg && aplicarRetencaoObservacoes(S.compReg, retencaoNC())) salvarCompReg();
 }
 function salvarNC(msg = '') {
   if (!gravarLocal(CHAVES.nc, S.nc)) avisar('Não foi possível gravar as não conformidades neste navegador. Exporte a planilha para não perder o trabalho.', 'err');
@@ -27,15 +29,17 @@ function atualizarNavNC() {
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
   b.hidden = !n; b.textContent = n;
   const a = b.closest('a'), nome = n ? `Não conformidades · ${n} aberta(s), não enviadas` : 'Não conformidades';
-  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome; sincronizarPontos();
+  a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 
 /* ---------- Candidatos das análises (SOL-F17) ----------
  * Guardados na base de NCs, por competência, com a mesma retenção (60 dias): ao recarregar a página
  * a revisão continua de onde parou. A análise rodada de novo substitui os candidatos dela. */
-function guardarCandidatosNC(chave, rotulo, curto, itens) {
+// v3.0.0-alpha.10 (P1): guardados compactos (compactarCandidatosNC); «fora» = laudos de outros médicos que ficaram fora do escopo.
+function guardarCandidatosNC(chave, rotulo, curto, lista, fora = 0) {
+  const { itens, comum } = compactarCandidatosNC(lista);
   S.nc.candidatos = (S.nc.candidatos || []).filter(f => f.chave !== chave);
-  S.nc.candidatos.push({ chave, rotulo, curto, itens, competencia: S.comp, em: agoraISO() });
+  S.nc.candidatos.push({ chave, rotulo, curto, itens, comum, ...(fora ? { fora } : {}), competencia: S.comp, em: agoraISO() });
   S.ncCand = S.nc.candidatos; salvarNC();
 }
 function dispensarCandidatosNC(cands) {
@@ -49,8 +53,9 @@ function candidatosNC(filtro = {}) {
   const reg = chavesRegistradasNC(), disp = S.ncDispensados || new Set(), out = [];
   for (const f of S.ncCand || []) {
     if (filtro.fonte ? f.chave !== filtro.fonte : f.competencia !== S.comp) continue;
-    for (const c of f.itens) {
-      if (filtro.tipo && c.tipo !== filtro.tipo) continue;
+    for (const c0 of f.itens) {
+      if (filtro.tipo && c0.tipo !== filtro.tipo) continue;
+      const c = expandirCandidatoNC(c0, f);
       out.push({ c, fonte: f, estado: reg.has(c.chave) ? 'registrada' : disp.has(c.chave) ? 'dispensada' : 'nova' });
     }
   }
@@ -59,8 +64,9 @@ function candidatosNC(filtro = {}) {
 // Cartão usado na conferência e na correção: resumo dos candidatos desta análise e atalho para a revisão.
 function cartaoCandidatosNC(fonte) {
   const lista = candidatosNC({ fonte }), novos = lista.filter(x => x.estado === 'nova');
-  const porTipo = [...contar(lista, x => x.c.tipo)];
+  const porTipo = [...contar(lista, x => x.c.tipo)], fora = (S.ncCand || []).find(f => f.chave === fonte)?.fora || 0;
   return `<div class="card nc-cartao"><h2>Possíveis não conformidades <span class="muted small">${novos.length} para revisar · ${lista.length - novos.length} já registradas ou dispensadas</span></h2>
+    ${fora ? `<p class="small muted">${fora} laudo(s) «Só no laudo» de outros médicos da unidade não viraram candidatos: pelo cadastro, são do relatório de outro prestador (continuam na tabela).</p>` : ''}
     <p class="lead">O sistema só separa os candidatos. Você revisa, aponta o que é NC e escolhe a natureza e o responsável. Também dá para apontar qualquer linha da tabela: abra o detalhe e use «Apontar como NC».</p>
     ${porTipo.length ? `<div class="marcadores">${porTipo.map(([t, n]) => `<span class="marc">${esc(TIPOS_CANDIDATO_NC[t].nome)} · ${n}</span>`).join('')}</div>
     <div class="acoes"><button data-revisar-nc="${esc(fonte)}">Revisar na aba Não conformidades</button></div>` : '<p class="muted small">Nenhum candidato nesta análise.</p>'}</div>`;
@@ -231,8 +237,6 @@ function desenharRevisao() {
 }
 
 /* ---------- Registro a partir de candidatos ---------- */
-const datalistFaturistas = () => `<datalist id="dlFat">${S.cfg.faturistas.filter(f => f.ativo !== false).map(f => `<option value="${esc(f.nome)}"></option>`).join('')}</datalist>`;
-const datalistUnidades = () => `<datalist id="dlUn">${[...new Set(S.cfg.unidades.flatMap(u => [...(u.apolo || []), u.nome]))].map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>`;
 // Devolve verdadeiro se registrou algo.
 async function abrirRegistroNC(cands) {
   if (!exigirAberta(S.comp, 'registrar NCs')) return false;
@@ -248,7 +252,8 @@ async function abrirRegistroNC(cands) {
     ${campoBusca({ nome: 'responsavel', rotulo: 'Responsável pelo fechamento da conta', fonte: 'faturista', dica: pbiSug ? `vazio = sugerido pelo Power BI (${pbiSug} linha(s))` : '' })}
     <label class="campo">Impacta o pagamento<select name="impacta">${opcoes([['', 'Padrão da natureza'], ['sim', 'Sim'], ['nao', 'Não']], '')}</select></label>
     <label class="campo">Competência<input type="month" name="competencia" value="${esc(compSug)}"></label></div>
-    <label class="campo">Observações<textarea name="obs" rows="2"></textarea></label>`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
+    <label class="campo">Observações<textarea name="obs" rows="2">${cands.length === 1 && cands[0].obsLinha ? esc(`Observação da linha: ${cands[0].obsLinha}`) : ''}</textarea></label>
+    ${cands.length > 1 && cands.some(c => c.obsLinha) ? `<p class="small muted">${cands.filter(c => c.obsLinha).length} linha(s) têm observação: ela vai para as Observações da NC de cada uma.</p>` : ''}`, [['', 'Cancelar', 'sec'], ['ok', 'Registrar']]);
   if (r.botao !== 'ok') return false;
   const e = r.campos;
   await cadastrosNovosDoDialogo();
@@ -257,7 +262,8 @@ async function abrirRegistroNC(cands) {
   if (!exigirAberta(e.competencia, 'registrar NCs')) return false;
   const dados = cands.map(c => {
     const responsavel = e.responsavel.trim() || faturistaDoAtendimento(S.pbi, c.campos.idAtendimento, c.campos.conta) || (c.categoria === 'particular' && !e.categoria ? 'PARTICULAR - EQUIPE UNIDADE' : '');
-    return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs: e.obs.trim(), impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
+    const obs = cands.length > 1 && c.obsLinha ? [e.obs.trim(), `Observação da linha: ${c.obsLinha}`].filter(Boolean).join(' · ') : e.obs.trim();
+    return dadosDoCandidato(c, { natureza: e.natureza, categoria: e.categoria, competencia: e.competencia, responsavel, detalhe: e.detalhe.trim(), obs, impactaPagamento: e.impacta ? e.impacta === 'sim' : undefined });
   });
   const { novas, repetidas } = registrarNCs(S.nc, dados, op);
   salvarNC(`${novas.length} NC(s) registrada(s) em ${rotuloCompetencia(e.competencia)}${repetidas.length ? ` · ${repetidas.length} já existiam e não foram repetidas` : ''}.`);

@@ -3,6 +3,7 @@
 // Fechamento só com Devido + Aceito (rodadas antigas com o total do MV). Dados fictícios.
 import { createRequire } from 'module';
 import fs from 'fs';
+const abrirF = async () => { if (!(await p.isVisible('#cfGaveta'))) await p.click('#cfFiltrosBt'); };
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/';
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
@@ -42,7 +43,7 @@ ok(await p.isVisible('[data-cfsec="previa"]') && !(await p.isVisible('[data-cfse
 // Abas.
 for (const k of ['decidir', 'nc', 'aceite', 'detalhes', 'previa']) { await p.click(`[data-cfaba="${k}"]`); await p.waitForTimeout(100); ok(await p.isVisible(`[data-cfsec="${k}"]`), `aba «${k}» abre sem recarregar`); }
 // Filtro por procedimento + data, com contagem e soma.
-await p.selectOption('#cfFProc', '40901173'); await p.waitForTimeout(150); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFProc', '40901173'); await p.waitForTimeout(150); await abrirF(); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
 const info = await p.textContent('#cfSelInfo');
 ok(/1 linha\(s\) no filtro · R\$ 30,00/.test(info), `filtro por procedimento e data mostra contagem e soma (${info.replace(/\s+/g, ' ').slice(0, 60)})`);
 // Aceitar em lote a pendente do filtro (ressalva de convênio).

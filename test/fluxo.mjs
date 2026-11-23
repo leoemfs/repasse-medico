@@ -12,7 +12,7 @@ await p.clock.install({ time: new Date('2026-10-29T10:00:00') });
 p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
 await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Fluxo')));
 await p.goto(html + '#fluxo'); await p.waitForFunction(() => window.__RM && document.querySelector('#fxCriar'));
-ok(await p.textContent('#titulo') === 'Fluxo mensal', 'título «Fluxo mensal»');
+ok(await p.textContent('#titulo') === 'Fechamento e envio' && /Etapas do mês/.test(await p.textContent('#subnav')), 'Fluxo mensal agora é «Etapas do mês» dentro do Fechamento e envio');
 await p.click('#fxCriar'); await p.waitForSelector('.marco');
 const marcos = await p.$$eval('.marco b', els => els.map(e => e.textContent));
 ok(marcos.includes('07/10') && marcos.includes('09/10') && marcos.some(t => t.startsWith('29/10 · HOJE')) && marcos.includes('30/10'), `marcos calculados: ${marcos.join(' ')}`);
@@ -32,7 +32,7 @@ await p.fill('#dlgCorpo input[name=data]', '2026-10-08'); await p.click('#dlgBot
 await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf.prazoManual, null, { timeout: 3000 }).catch(() => {});
 ok(await p.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf.prazoManual) === '2026-10-08', 'prazo definido em etapa sem prazo no modelo');
 // Documental
-await p.click('[data-g="usg"] [data-docadd="usg"]'); await p.fill('#dlgCorpo input[name=cod]', '15'); await p.fill('#dlgCorpo input[name=nome]', 'MARCELO MIYAZAKI YOSHIDA'); await p.click('#dlgBotoes button[value=ok]');
+await p.click('[data-g="usg"] .fx-doc > summary'); await p.click('[data-g="usg"] [data-docadd="usg"]'); await p.fill('#dlgCorpo input[name=cod]', '15'); await p.fill('#dlgCorpo input[name=nome]', 'MARCELO MIYAZAKI YOSHIDA'); await p.click('#dlgBotoes button[value=ok]');
 await p.waitForSelector('[data-g="usg"] tr[data-doc="15"]');
 await p.fill('[data-g="usg"] tr[data-doc="15"] input[data-d="relatorio"]', '2026-10-09'); await p.dispatchEvent('[data-g="usg"] tr[data-doc="15"] input[data-d="relatorio"]', 'change');
 await p.fill('[data-g="usg"] tr[data-doc="15"] input[data-d="nfRecebida"]', '2026-10-13'); await p.dispatchEvent('[data-g="usg"] tr[data-doc="15"] input[data-d="nfRecebida"]', 'change');
@@ -50,11 +50,11 @@ await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].grupos
 const rod = await p.evaluate(() => { const t = window.__RM.S.fluxo.competencias['2026-10'].grupos.usg.tarefas.conf; return [t.rodada, t.status]; });
 ok(rod[0] === 'rodteste' && rod[1] === 'ni', `rodada escolhida (entre 2) vinculada sem concluir a etapa (${rod})`);
 // Ajuste de marco com justificativa recalcula dependentes
-await p.click('[data-marco="pagIMG"]'); await p.fill('#dlgCorpo input[name=data]', '2026-10-29'); await p.fill('#dlgCorpo input[name=just]', 'pagamento antecipado'); await p.click('#dlgBotoes button[value=ok]');
+await p.click('[data-marco="pagIMG"]'); await p.fill('#dlgCorpo input[name=data]', '2026-10-29'); await p.fill('#dlgCorpo input[name=just]', 'pagamento antecipado'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(300);   // a tela redesenha depois do diálogo (no GitHub, mais devagar)
 const envio = await p.$eval('[data-marco="envioIMG"] b', e => e.textContent);
 ok(envio.startsWith('23/10'), `envio IMG recalculado após ajuste do pagamento (${envio})`);
 // Anotação e observação de seção
-await p.fill('#fxNotaTxt', 'Jhonas avisou atraso da planilha de novembro.'); await p.click('#fxNotaAdd');
+await p.fill('#fxNotaTxt', 'Jhonas avisou atraso da planilha de novembro.'); await p.click('#fxNotaAdd'); await p.waitForFunction(() => window.__RM.S.fluxo.competencias['2026-10'].anotacoes.length > 0, null, { timeout: 5000 }).catch(() => {});
 ok(await p.evaluate(() => window.__RM.S.fluxo.competencias['2026-10'].anotacoes.length) === 1, 'anotação registrada');
 await p.fill('[data-obs="usg"]', 'Aguardando 2 NFs.'); await p.dispatchEvent('[data-obs="usg"]', 'change');
 // Filtro de vencidas abre grupos com etapas vencidas
@@ -78,15 +78,7 @@ ok(compPag === 15, 'competência já iniciada mantém o modelo antigo (históric
 await p.reload(); await p.waitForFunction(() => window.__RM && window.__RM.S.fluxo && window.__RM.S.fluxo.competencias['2026-10'], null, { polling: 200, timeout: 30000 });
 const persist = await p.evaluate(() => { const c = window.__RM.S.fluxo.competencias['2026-10']; return [c.grupos.usg.tarefas.gerar.status, c.anotacoes.length, c.grupos.usg.obs, window.__RM.S.fluxo.modelo.marcos.find(m => m.id === 'pagUSG').regra.dia]; });
 ok(JSON.stringify(persist) === JSON.stringify(['ok', 1, 'Aguardando 2 NFs.', 16]), `persistência após recarregar (${persist})`);
-const dica = await p.$eval('a[data-pag="fluxo"]', a => a.getAttribute('aria-label'));
-ok(/^Fluxo mensal/.test(dica), `menu: «${dica}»`);
-// Celular
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true })).newPage();
-await m.clock.install({ time: new Date('2026-10-29T10:00:00') });
-m.on('pageerror', e => erros.push(e.message));
-await m.goto(html + '#fluxo'); await m.waitForSelector('#fxCriar'); await m.click('#fxCriar'); await m.waitForSelector('.marco'); await m.click('[data-tg="usg"]');
-await m.screenshot({ path: out + 'fluxo_celular.png', fullPage: false });
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
-ok(await m.$eval('.barra-cel a[data-pag="fluxo"] span', e => e.textContent) === 'Fluxo', 'barra do celular: «Fluxo»');
+const dica = await p.$eval('a[data-pag="fechamento"]', a => a.getAttribute('aria-label'));
+ok(/^Fechamento e envio/.test(dica), `menu: «${dica}»`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

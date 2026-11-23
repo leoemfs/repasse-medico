@@ -9,13 +9,13 @@ Os dois usuários dividem a mesma **pasta raiz na rede** (Fluxo mensal, equival�
 | Pasta | Conteúdo |
 | --- | --- |
 | `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração (e mescla da configuração compartilhada), equivalências e títulos do Apolo, conferência, correção de prestador, rodadas, relatórios, modelos de exportação e backup |
-| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, fechamento, equivalências (títulos do Apolo, base, o que mais destrava), bases e regras, rodadas, configurações em categorias, sincronização pela pasta e aviso de versão |
+| `src/ui/` | Telas (menu com 7 itens desde a alpha.20, ver `docs/como-usar-navegacao.md`): início (painel do dia), conferência (com correção de prestador e histórico de rodadas), equivalências (títulos do Apolo, base, o que mais destrava), não conformidades, fechamento e envio (com as etapas do mês), bases e regras, configurações em categorias, sincronização pela pasta e aviso de versão |
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
 | `publicacao/` | Versões lançadas (`versoes.json`) e ícones do PWA |
 | `test/` | `motor.mjs` (motor no Chromium), `e2e.mjs` (ponta a ponta, por file://) `menu.mjs` (navegação), `fluxo.mjs` (fluxo mensal), `nc.mjs` (não conformidades), `competencia.mjs` (competência no topo) e `calendario.mjs` (dias úteis) |
-| `docs/` | Especificações, requisitos em levantamento e guias de uso |
+| `docs/` | Especificações, requisitos em levantamento e guias de uso (estrutura das pastas na rede: `como-usar-pastas.md`) |
 | `dados/` | Arquivos reais para teste. **Fora do Git** (dados de pacientes) |
 
 ## Comandos
@@ -23,9 +23,10 @@ Os dois usuários dividem a mesma **pasta raiz na rede** (Fluxo mensal, equival�
 ```bash
 node tools/build.mjs            # gera o HTML final em dist/
 node tools/build.mjs --harness  # gera dist/harness.html para test/motor.mjs
+node tools/testes.mjs           # monta e roda todos os testes que não precisam de dados/ (o mesmo do GitHub a cada envio)
 node test/motor.mjs             # motor com os arquivos de dados/
 node test/e2e.mjs               # interface completa com os arquivos de dados/
-node test/menu.mjs              # menu recolhível, Ctrl+B e barra do celular
+node test/menu.mjs              # menu recolhível, Ctrl+B e janela estreita (sem modo celular)
 node test/fluxo.mjs             # fluxo mensal (com data fixa em 29/10/2026)
 node test/nc.mjs                # não conformidades com os arquivos de dados/ (data fixa em 30/10/2026)
 node test/competencia.mjs       # competência no topo, encapsulamento, fechar/reabrir (data fixa em 30/10/2026)
@@ -44,7 +45,8 @@ node test/prestadores_unidade.mjs # prestadores por unidade (SOL-F35) com a comp
 node test/conferencia_causas.mjs # conferência por causa: o que falta decidir, validar e conferir de novo, Excel (comp. 10/2026 real)
 node test/conferencia_lote.mjs  # vários PDFs do mesmo prestador: filtro por unidade e grupo e conferência em lote (comp. 10/2026 real)
 node test/pasta_raiz.mjs        # pasta raiz na rede: criar pastas, ler PDFs e planilhas, sincronizar equivalências (SOL-F37/F38)
-node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36)
+node test/fluxo_sync.mjs        # Fluxo sincronizado pela pasta da rede com dois usuários e divisão das unidades (SOL-F36), com blocos USG/IMG/Curitiba e fichas de filtro por usuário
+# (inclui a divisão em blocos USG, IMG e Curitiba e as fichas de filtro por usuário)
 node test/compostas_comp10.mjs  # regras compostas na competência 10/2026 real: simulação × efetividade e cobertura
 node test/conciliacao.mjs       # conciliação com o Power BI (F9)
 node test/planilhas_guardadas.mjs # planilhas de laudos e do Power BI guardadas por competência
@@ -57,7 +59,20 @@ node test/excel_conferencia.mjs  # v3.0: Excel da conferência sempre baixa (com
 node test/exames.mjs             # v3.0: exame (USG com Doppler em uma ou duas páginas) e «Dispensar laudo»
 node test/mv_varios_repasses.mjs # v3.0: PDF do MV com mais de um repasse (complementar e manual)
 node test/conferencia_oficial.mjs # v3.0: classes do fechamento, abas, filtros, lote, observação, resolvido no MV, reconferência e fechamento
+node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
+node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
+node test/quadro_fechamento.mjs # v3.0: SOL-F19 — quadro por prestador no Fechamento (colunas pelos dados, «Aguardando terceiros», aba no Excel de indicadores)
+node test/estrutura_pastas.mjs  # v3.0: estrutura padronizada (01 - Sistema, um ano por pasta, 12 competências), leitura da nova e da antiga, nada sobrescrito
+node test/planilha_unidade.mjs   # v3.0: Excel único da unidade × grupo (IMG/USG/Curitiba), gravado em «09 - Planilhas de repasse conferidos»
+node test/f41_conferencia.mjs   # v3.0: SOL-F41 — filtros por título, médico, intervalo de datas e observação; lote de dispensa e observação; observação no Excel, aceite, NC e retenção
+node test/p3_regras_config.mjs # v3.0: modalidade por grupo e HM da V3 configuráveis em Bases e regras; texto de privacidade
+node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
+node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios
+node test/pasta_por_aba.mjs    # v3.0: «Sincronizar pasta» por aba, Correção de prestador sem subpastas (unidade pelo nome) e avisos do Fechamento recolhíveis
+node test/retrospectiva.mjs    # v3.0: SOL-F20 — Retrospectiva (PDCA) no Fluxo mensal: lead time, rodadas até o aceite, terceiros, NCs com reincidência, antecedência, comparação entre meses, melhorias e backlog
+node test/bench_pior_caso.mjs  # desempenho: 3.000 linhas × 30 mil laudos com homônimos; resultado idêntico (assinatura) e limite de tempo (precisa do --harness)
 node test/usg_mesmo_dia.mjs      # v3.0: vários USG do mesmo paciente no mesmo dia — o título do laudo desempata (dados fictícios)
+node test/cadastro_usg.mjs       # v3.0: cadastro de USG pela planilha de controle — faixa 42%, migração das faixas, residente que muda de faixa e % por unidade
 ```
 
 ## Publicação (GitHub Pages)
@@ -75,4 +90,5 @@ A ferramenta fica em **https://leoemfs.github.io/repasse-medico/**, sempre na ú
 1. Regra de negócio só em `src/engine/`; as telas apenas chamam o motor.
 2. Toda mudança começa como solicitação com critério de aceite; o teste entra junto.
 3. Uma versão por vez; `MOTOR_VERSAO` em `src/engine/00-util.js` sobe a cada entrega.
-4. Antes de entregar: `motor.mjs` e `e2e.mjs` sem erros, Excels reabertos e totais reconciliados.
+4. Antes de entregar: `node tools/testes.mjs` sem falhas (o GitHub roda o mesmo a cada envio, em «Testes»), `motor.mjs` e `e2e.mjs` sem erros com os arquivos de `dados/`, Excels reabertos e totais reconciliados.
+5. Uma tela chama os complementos dela explicitamente (ex.: `RENDER.inicio` chama `complementoInicioPastaRaiz`). Nenhum arquivo redefine função de outro. A sincronização com a pasta (Fluxo, Equivalências e Configuração) é orquestrada em `src/ui/29c-sincronizacao.js`: toda gravação (`salvarCfg`, `salvarEq`, `salvarFluxo`) chama `agendarSincronizacao`.

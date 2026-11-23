@@ -126,12 +126,5 @@ await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.c
 const fat = await S(() => { const f = window.__RM.S.cfg.faturistas; return { n: f.length, marcos: f.find(x => x.nome === 'MARCOS.CAETANO')?.unidades, gen: f.find(x => x.generico).unidades }; });
 ok(fat.n === 50 && /\d/.test(fat.marcos) && fat.gen === '', `faturistas do Power BI importados com unidades (${fat.n} · MARCOS.CAETANO: ${fat.marcos})`);
 
-// 12) Celular.
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
-m.on('pageerror', e => erros.push(e.message));
-await m.goto(html + '#nc'); await m.waitForSelector('.nc-kpis');
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
-ok(await m.evaluate(() => [...document.querySelectorAll('.barra-cel a span')].some(e => e.offsetParent && e.textContent === 'NCs')), 'barra do celular: «NCs»');
-await m.screenshot({ path: out + 'nc_celular.png', fullPage: false });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

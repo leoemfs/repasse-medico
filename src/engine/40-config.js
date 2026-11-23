@@ -110,12 +110,20 @@ function registrarFaturistas(cfg, nomes, origem) {
 }
 
 /* ---------- Classificação do tipo de item (RN-199) ---------- */
+// P2: cada padrão é compilado uma vez (antes, a cada linha do relatório). Padrão inválido fica em cache como null.
+const _cacheRegex = new Map();
+function regexClassificacao(padrao) {
+  if (_cacheRegex.has(padrao)) return _cacheRegex.get(padrao);
+  let re = null; try { re = new RegExp(padrao); } catch (e) { re = null; }
+  if (_cacheRegex.size > 1000) _cacheRegex.clear();
+  _cacheRegex.set(padrao, re); return re;
+}
 function classificarItem(reg, regras) {
   const campos = { grupo: norm(reg.grupoNome), descricao: norm(reg.procDesc), codigo: String(reg.codigo) };
   for (const r of regras) {
     if (!r.ativa) continue;
     const alvo = campos[r.campo]; if (alvo === undefined) continue;
-    let re; try { re = new RegExp(r.padrao); } catch (e) { continue; }
+    const re = regexClassificacao(r.padrao); if (!re) continue;
     if (re.test(alvo)) return { tipo: r.tipo, regra: r.id };
   }
   return { tipo: 'desconhecido', regra: '' };

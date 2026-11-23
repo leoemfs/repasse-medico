@@ -14,13 +14,11 @@ const controleAtual = () => S.apolo ? controlePrestadoresUnidade({ laudos: S.apo
 const abasConferencia = () => `<div class="subabas" role="tablist" style="margin-bottom:12px">${[['conferir', 'Conferir relatório'], ['unidades', 'Prestadores por unidade']].map(([k, t]) => `<button role="tab" class="${CU.sub === k ? 'on' : ''}" aria-selected="${CU.sub === k}" data-cusub="${k}">${t}</button>`).join('')}</div>`;
 const ligarAbasConferencia = raiz => raiz.querySelectorAll('[data-cusub]').forEach(b => b.onclick = () => { CU.sub = b.dataset.cusub; RENDER.conferencia(); });
 
-const _renderConferencia = RENDER.conferencia;
-RENDER.conferencia = () => {
-  if (CU.sub === 'unidades') return desenharControleUnidade();
-  _renderConferencia();
+// Chamado por RENDER.conferencia (20-conferencia.js): abas do topo e o «Abrir conferência» vindo daqui.
+function complementoConferenciaUnidades() {
   const p = $('pag-conferencia'); p.insertAdjacentHTML('afterbegin', abasConferencia()); ligarAbasConferencia(p);
   if (CU.abrir) { const a = CU.abrir; CU.abrir = null; preSelecionarConferencia(a); }
-};
+}
 // «Abrir conferência»: escolhe o PDF do prestador (se carregado), a unidade e o médico do prestador.
 function preSelecionarConferencia(a) {
   const doPrest = S.relatorios.filter(x => String(x.rel.cab.prestadorCod) === String(a.cod) && (x.finalidade || finalidadePadrao(x.rel)) !== 'correcao');
@@ -33,9 +31,11 @@ function preSelecionarConferencia(a) {
   $('cfRel').scrollIntoView({ block: 'center' });
 }
 
-async function desenharControleUnidade() {
+// O aviso da divisão do trabalho (28-fluxo-sync.js) entra aqui, explicitamente (P2).
+async function desenharControleUnidade() { await desenharControleUnidadeBase(); avisoDivisaoControle(); }
+async function desenharControleUnidadeBase() {
   const pg = $('pag-conferencia');
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   if (!S.apolo) { pg.innerHTML = abasConferencia() + `<div class="card"><h2>Prestadores por unidade</h2><p class="lead">Carregue a planilha de laudos do Apolo no Início. A lista de quem precisa de repasse sai dela, por unidade.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div></div>`; return ligarAbasConferencia(pg); }
   const ctl = controleAtual(), uns = ctl.unidades.filter(u => u.grupos.some(G => G.itens.length));
   const gruposDe = u => u.grupos.map(G => G.grupo);
@@ -65,7 +65,7 @@ async function desenharControleUnidade() {
     <div class="cu-un" role="tablist">${uns.map(x => `<button class="${x.cod === CU.unidade ? 'on' : ''}" data-cuun="${x.cod}" title="${esc(x.nome)}">Unidade ${esc(x.cod)}<span class="q">${faltaUn(x)}</span></button>`).join('')}</div>
     ${ctl.semUnidade.length ? `<p class="small badge warn">Unidade do Apolo sem código no cadastro (Bases → Unidades, campo Apolo): ${ctl.semUnidade.map(x => `${esc(x.nome)} (${x.laudos} laudos)`).join(', ')}</p>` : ''}
     ${u ? `<div class="subabas" role="tablist">${u.grupos.map(g => `<button class="${g.grupo === CU.grupo ? 'on' : ''}" data-cugr="${g.grupo}">${GRUPOS_CONTROLE[g.grupo]} <em>${g.resumo.falta} falta(m)</em></button>`).join('')}</div>
-    <h3>Unidade ${esc(u.cod)} - ${esc(u.nome)} · ${GRUPOS_CONTROLE[G.grupo]}</h3>
+    <div class="fx-topo"><h3>Unidade ${esc(u.cod)} - ${esc(u.nome)} · ${GRUPOS_CONTROLE[G.grupo]}</h3><button class="sec mini" data-cuunica title="Todos os prestadores desta unidade e grupo num Excel só, gravado em ${esc(PASTA_PLAN_CONF.nome)}">Excel único da unidade (${relatoriosPara('cf').filter(x => unDoRel(x) === u.cod && grDoRel(x) === G.grupo).length} relatório(s))</button></div>
     <div class="cu-res">${k(r.laudaram, cur ? 'médicos V3 laudaram' : 'laudaram')}${k(r.aceitos, 'aceitos', 'ok')}${k(r.conferidos, 'conferindo (sem aceite)', 'info')}${r.semConferencia ? k(r.semConferencia, 'relatório sem conferência', 'warn') : ''}${k(r.gerar, 'a gerar no MV', 'err')}${r.semLaudo ? k(r.semLaudo, 'relatório sem laudo', 'warn') : ''}${r.semCadastro ? k(r.semCadastro, 'sem cadastro', 'warn') : ''}${r.fora + r.verificados ? k(r.fora + r.verificados, 'fora do repasse / verificados') : ''}</div>
     <div class="tw"><table class="cu-tab"><thead><tr><th>Cód.</th><th>Prestador</th>${cur ? '<th>Regra V3</th>' : ''}<th class="num">${cur ? 'Laudos que a SRA paga' : 'Laudos no Apolo'}</th>${cur ? '<th class="num">Fora da regra</th>' : ''}<th class="num">Linhas no MV</th><th>Situação</th><th></th></tr></thead><tbody>
     ${itens.map(x => `<tr class="${FALTA_CONTROLE.has(x.situacao) ? 'cu-falta' : ''}"><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}${x.cod ? '' : ' <span class="muted small">(Apolo)</span>'}</td>${cur ? `<td class="small">${esc(regraTxt(x.regraV3))}</td>` : ''}<td class="num">${fmtN(x.laudos)}</td>${cur ? `<td class="num">${x.foraRegra.length ? `${fmtN(x.foraRegra.reduce((s, f) => s + f.q, 0))}<div class="small muted">${x.foraRegra.map(f => esc(`${f.n}: ${f.q}`)).join(' · ')} (fora da regra)</div>` : '—'}</td>` : ''}<td class="num">${x.rodadaId ? fmtN(x.linhasMV) : '—'}</td><td>${sit(x)}</td><td>${acao(x)}</td></tr>`).join('') || `<tr><td colspan="8" class="muted">Nada faltando neste grupo.${CU.soFalta ? ' Desmarque «só o que falta» para ver todos.' : ''}</td></tr>`}
@@ -78,6 +78,7 @@ async function desenharControleUnidade() {
   pg.querySelectorAll('[data-cuun]').forEach(b => b.onclick = () => { CU.unidade = b.dataset.cuun; CU.grupo = ''; re(); });
   pg.querySelectorAll('[data-cugr]').forEach(b => b.onclick = () => { CU.grupo = b.dataset.cugr; re(); });
   $('cuSoFalta').onchange = e => { CU.soFalta = e.target.checked; re(); };
+  pg.querySelectorAll('[data-cuunica]').forEach(b => b.onclick = () => gerarPlanilhaUnidade(b, u.cod, G.grupo));
   $('cuExp').onclick = () => baixarZip(planilhaControleUnidade(ctl, S.comp), `prestadores_por_unidade_comp_${S.comp.slice(5)}-${S.comp.slice(0, 4)}.xlsx`);
   $('cuImp').onclick = () => imprimirControleUnidade(ctl);
   const acharItem = kk => G.itens.find(x => x.k === kk);

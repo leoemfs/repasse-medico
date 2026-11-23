@@ -67,6 +67,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
+  marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
+  aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
@@ -260,4 +262,19 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     periodo, modalidades: [...modsRelatorio], modsDesconhecidas, eqRevisao: eqBase.revisao,
     eqValidadas: eqBase.itens.filter(e => e.status === 'validada').length
   };
+}
+
+/* P1 (auditoria 16/11/2026) — «Exportar só o filtrado»: o mesmo resultado só com as linhas pedidas. Indicadores refeitos
+ * a partir delas (situação, marcadores, decisões e tipo de item); nada do resultado original muda. */
+function resultadoFiltrado(res, linhas) {
+  const porStatus = {}; for (const k of Object.keys(STATUS_CONF)) porStatus[k] = { n: 0, vlRepasse: 0, vlTotal: 0 };
+  const porMarcador = {}; for (const k of Object.keys(MARCADORES)) porMarcador[k] = 0;
+  const porDecisao = { nc: 0, considerar: 0, dispensado: 0, resolvido: 0 }, porTipo = {};
+  for (const x of linhas) {
+    const s = porStatus[x.status]; s.n++; if (x.r) { s.vlRepasse += x.r.vlRepasse; s.vlTotal += x.r.vlTotal; porTipo[x.tipo] = (porTipo[x.tipo] || 0) + 1; }
+    for (const m of x.marcadores) porMarcador[m]++;
+    if (x.decisao) porDecisao[x.decisao.tipo] = (porDecisao[x.decisao.tipo] || 0) + 1;
+  }
+  for (const s of Object.values(porStatus)) { s.vlRepasse = r2(s.vlRepasse); s.vlTotal = r2(s.vlTotal); }
+  return { ...res, linhas, porStatus, porMarcador, porDecisao, porTipo, filtrado: true };
 }

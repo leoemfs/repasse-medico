@@ -12,7 +12,7 @@ document.addEventListener('click', e => { if (e.target.closest('[data-destrava]'
 const SIT_PAR = { pendente: ['warn', 'pendente'], 'sem-cadastro': ['err', 'sem cadastro'], conflito: ['err', 'em conflito'] };
 
 async function desenharDestrava() {
-  S.rodadas = await dbTodas();
+  S.rodadas = await dbRodadasJanela();
   const pg = $('pag-equivalencias');
   const naoCorr = new Set((S.eq.naoCorrespondem || []).map(x => `${chaveTitulo(x.titulo)}|${x.codigo}`));
   const pares = paresQueTravam(S.rodadas, S.comp, S.eq, { unidade: DV.unidade }).filter(p => !naoCorr.has(p.chave));

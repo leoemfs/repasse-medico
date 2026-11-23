@@ -12,11 +12,6 @@ const celulasMV = (r, tipo, f = {}) => r ? [
   { v: r.remessa, st: { ...f, ...T } }, { v: r.conta, st: { ...f, ...T } }, { v: r.atendimento, st: { ...f, ...T } }, { v: r.paciente, st: f }, { v: r.convenio, st: f },
   { v: r.data, st: f }, { v: r.quant, st: f }, { v: r.vlRepasse, st: { ...f, fmt: 'money' } }, { v: r2(r.pct * 10000) / 10000, st: { ...f, fmt: 'pct' } }, { v: r.vlTotal, st: { ...f, fmt: 'money' } }, { v: TIPOS_ITEM[tipo] || tipo || '', st: f }
 ] : colunasMV.map(() => ({ v: '', st: f }));
-const colunasLaudo = ['Laudo: ID', 'Laudo: linha da planilha', 'Laudo: unidade', 'Laudo: paciente', 'Laudo: ID paciente', 'Laudo: TITLE', 'Laudo: STUDY_DESCRIPTION', 'Laudo: data', 'Laudo: convênio', 'Laudo: modalidade', 'Laudo: médico'];
-const celulasLaudo = (l, f = {}) => l ? [
-  { v: l.idLaudo, st: { ...f, ...T } }, { v: l.linhaPlanilha, st: f }, { v: l.unidade, st: f }, { v: l.paciente, st: f }, { v: l.idPac, st: { ...f, ...T } }, { v: l.titulo, st: f },
-  { v: l.descricao, st: f }, { v: l.data || '', st: f }, { v: l.convenio, st: f }, { v: l.modalidade, st: f }, { v: l.medico, st: f }
-] : colunasLaudo.map(() => ({ v: '', st: f }));
 const linhasMeta = meta => meta.map(([a, b]) => [{ v: a, st: { b: true } }, { v: b ?? '', st: { wrap: true } }]);
 
 // Excel da extração (MV original), um por PDF.
@@ -93,6 +88,7 @@ function xlsxConferencia(res, ctx) {
     ['Modalidades do relatório', res.modalidades.join(', ') || '—'], ['Tolerância de data (dias)', ctx.parametros.tol],
     ['Linhas do MV', res.nMV], ['Procedimentos do MV', res.nProcedimentos], ['Laudos da unidade', res.nLaudosUnidade], ['Laudos no escopo «Só no laudo»', res.nLaudosEscopo], ['Pares formados', res.nPares],
     ['Equivalências validadas usadas (revisão da base)', `${res.eqValidadas} validadas · revisão ${res.eqRevisao}`], ['Versão do motor', MOTOR_VERSAO], ['Rodada', ctx.rodadaId || ''],
+    ...(ctx.filtroTexto ? [['Exportação', `SÓ O FILTRADO NA TELA: ${ctx.filtroTexto}. O Resumo e as abas valem só para essas linhas.`]] : []),
     ['Leitura', '«Conferido» = existe um laudo único e consistente; não prova que o valor está correto. Valores não são critério desta conferência.'],
     ['Decisões', 'NC e «aceitar para pagamento» são registradas na ferramenta (aba Conferência, detalhe da linha) e valem para toda nova rodada da competência.'], ['Privacidade', AVISO_LGPD]])];
   // Técnico: chaves, faixa do par e equivalência usada
@@ -117,6 +113,88 @@ function xlsxConferencia(res, ctx) {
     { nome: 'Títulos sem validação', larguras: [70, 12], linhas: [cabecalho(['TITLE do Apolo no escopo sem nenhuma equivalência validada', 'Laudos']), ...res.titulosSemValidacao.map(([t, n]) => [t, n])], filtro: true },
     { nome: 'Candidatos', larguras: [8, 12, 30, 11, 24, 7, 50, 30, 11, 12, 10, 14, 10], linhas: C, filtro: true },
     { nome: 'MV original', larguras: [8, 30, 7, 12, 50, 28, 9, 10, 11, 32, 28, 11, 7, 11, 9, 11, 22], linhas: [cabecalho(colunasMV), ...res.linhas.filter(x => x.r).sort((a, b) => a.r.seq - b.r.seq).map(x => celulasMV(x.r, x.tipo))], filtro: true }
+  ]);
+}
+
+/* SOL-F45 (v3.0.0-alpha.17) — Planilha única da unidade × grupo (IMG, USG ou Curitiba): todos os prestadores que
+ * produziram na competência, num Excel só, para trabalhar com filtros e manter uma planilha de controle por unidade.
+ * itens: [{ res, ctx, rodada }] — conferência de cada relatório do MV, refeita com os parâmetros da última rodada dele e a
+ *        base de equivalências atual (res = null quando o relatório ainda não tem conferência na competência).
+ * controle: itens do grupo em «Prestadores por unidade» (quem laudou), para listar também quem ainda não tem relatório.
+ * meta: { chave, unidadeCod, unidadeNome, grupo, operador, apoloNome, eqRevisao, colunasExportacao, compostas, idxObs }.
+ * Mesmas regras da conferência de cada prestador: nada é recalculado aqui além da soma por classe (Devido + Aceito). */
+function xlsxConferenciaUnidade(itens, controle, meta) {
+  const SIT = { ...CAB, fill: '404040' }, AP = { ...CAB, fill: '2E7D32' }, OBS = { ...CAB, fill: '7F7F7F' }, PR = { ...CAB, fill: '1F4E78' };
+  const textoDecisao = d => d ? `${TIPOS_DECISAO[d.tipo]}${d.justificativa ? ': ' + d.justificativa : ''}${d.tipo === 'nc' && d.situacao ? ` (${SITUACAO_NC[d.situacao] || d.situacao})` : ''}` : '';
+  const cols = colunasDoModelo(meta.colunasExportacao), GRUPO = { sit: SIT, ap: AP, obs: OBS };
+  const rotGrupo = { usg: 'USG', img: 'IMG', curitiba: 'Curitiba (V3)' }[meta.grupo] || String(meta.grupo || '').toUpperCase();
+  const comConf = itens.filter(x => x.res).sort((a, b) => String(a.ctx.relatorio.cab.prestadorNome).localeCompare(String(b.ctx.relatorio.cab.prestadorNome)) || String(a.ctx.relatorio.cab.prestadorCod).localeCompare(String(b.ctx.relatorio.cab.prestadorCod)));
+  const prest = it => [{ v: String(it.ctx.relatorio.cab.prestadorCod || ''), st: T }, it.ctx.relatorio.cab.prestadorNome || ''];
+  // Aba «Conferência»: as linhas de todos os prestadores, com o prestador nas duas primeiras colunas.
+  const P = [[...cabecalho(['Cód. prestador', 'Prestador'], PR), ...cols.map(c => ({ v: c.rotulo, st: GRUPO[c.grupo] || CAB }))]];
+  const F = [cabecalho(['Cód. prestador', 'Prestador', 'O que decidir', 'Ação sugerida', 'Linhas na decisão', 'Paciente', 'Data', 'Cód. TUSS MV', 'Procedimento no MV', 'Laudo (TITLE)', 'Convênio MV', 'Convênio laudo', 'Vl Repasse', 'Por quê'])];
+  const porCodigo = new Map();
+  const resumo = [];
+  for (const it of comConf) {
+    const { res, ctx } = it, CZ = causasDaConferencia(res, meta.compostas || []), c2 = { ...ctx, idxObs: meta.idxObs };
+    res.linhas.forEach((x, i) => {
+      const dec = x.decisao, aux = { f: { fill: STATUS_CONF[x.status].cor }, dec, textoDecisao, falta: dec || x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(i) || x.motivos[0] || '') };
+      P.push([...prest(it), ...cols.map(c => c.valor(x, c2, aux))]);
+    });
+    [...CZ.grupos, ...CZ.umaUma].forEach(g => {
+      for (const i of g.linhas) { const x = res.linhas[i], r = x.r, l = x.l;
+        F.push([...prest(it), { v: g.rotulo, st: { wrap: true } }, { v: g.acao, st: { wrap: true } }, g.linhas.length, r?.paciente || l?.paciente || '', r?.data || l?.data || '', { v: r?.codigo || '', st: T }, r?.procDesc || '', l?.titulo || '', r?.convenio || '', l?.convenio || '', r ? { v: r.vlRepasse, st: { fmt: 'money' } } : '', { v: x.motivos.join(' | '), st: { wrap: true } }]); }
+    });
+    for (const e of res.porCodigo) { const a = porCodigo.get(e.codigo) || { codigo: e.codigo, desc: e.desc, mv: 0, conferido: 0, ressalva: 0, prestadores: new Set() }; a.mv += e.mv; a.conferido += e.conferido; a.ressalva += e.ressalva; a.prestadores.add(String(ctx.relatorio.cab.prestadorCod)); porCodigo.set(e.codigo, a); }
+    const TC = totaisPorClasse(res.linhas, classeDaLinhaConf), soLaudo = res.linhas.filter(x => x.status === 'so-laudo' && !x.decisao).length;
+    resumo.push({ it, TC, soLaudo, totalMV: r2(res.linhas.reduce((s, x) => s + (x.r?.vlRepasse || 0), 0)), nMV: res.nMV, faltam: CZ.faltam });
+  }
+  if (F.length === 1) F.push(['', 'Nada falta decidir nos relatórios desta planilha.']);
+  // Aba «Prestadores»: uma linha por prestador (com relatório ou só com laudo), valores por classe e situação.
+  const R = [cabecalho(['Cód. prestador', 'Prestador', 'Situação', 'Aceite do relatório', 'Laudos no Apolo', 'Linhas no MV', 'Total do MV (Vl Repasse)', 'Devido', 'Aceito', 'Para pagamento (Devido + Aceito)', 'Pendente', 'Não conformidade', 'Excluído', 'Decisões que faltam', '«Só no laudo» sem decisão', 'Relatório do MV', 'Última rodada'])];
+  const ctlPorCod = new Map((controle || []).filter(x => x.cod).map(x => [String(x.cod), x]));
+  const tot = { mv: 0, devido: 0, aceito: 0, pagar: 0, pend: 0, nc: 0, excluido: 0, nMV: 0, laudos: 0, faltam: 0, soLaudo: 0 };
+  const money = v => ({ v, st: { fmt: 'money' } });
+  for (const z of resumo) {
+    const cab = z.it.ctx.relatorio.cab, rod = z.it.rodada, c = ctlPorCod.get(String(cab.prestadorCod)), TC = z.TC;
+    const sit = rod?.aceite ? (z.faltam ? `Aceito — ${z.faltam} pendência(s) em aberto` : 'Aceito') : z.faltam ? `Conferindo — faltam ${z.faltam} decisão(ões)` : 'Conferido, sem aceite';
+    R.push([...prest(z.it), { v: sit, st: { fill: rod?.aceite ? 'C6EFCE' : z.faltam ? 'FFEB9C' : 'DDEBF7', b: true } }, rod?.aceite ? `${rod.aceite.por || ''} · ${String(rod.aceite.em || '').slice(0, 10).split('-').reverse().join('/')}` : '',
+      c ? c.laudos : '', z.nMV, money(z.totalMV), money(TC.devido.valor), money(TC.aceito.valor), { v: TC.pagar, st: { fmt: 'money', b: true } }, money(TC.pend.valor), money(TC.nc.valor), money(TC.excluido.valor), z.faltam, z.soLaudo,
+      z.it.ctx.relatorio.arquivo || '', rod ? `${String(rod.em).slice(0, 10).split('-').reverse().join('/')} · ${rod.operador || ''}` : '']);
+    Object.assign(tot, { mv: tot.mv + z.totalMV, devido: tot.devido + TC.devido.valor, aceito: tot.aceito + TC.aceito.valor, pagar: tot.pagar + TC.pagar, pend: tot.pend + TC.pend.valor, nc: tot.nc + TC.nc.valor, excluido: tot.excluido + TC.excluido.valor, nMV: tot.nMV + z.nMV, laudos: tot.laudos + (c?.laudos || 0), faltam: tot.faltam + z.faltam, soLaudo: tot.soLaudo + z.soLaudo });
+  }
+  // Relatório carregado, mas sem conferência na competência.
+  for (const it of itens.filter(x => !x.res)) {
+    const cab = it.ctx.relatorio.cab, c = ctlPorCod.get(String(cab.prestadorCod));
+    R.push([...prest(it), { v: 'Relatório sem conferência', st: { fill: 'FCE4D6', b: true } }, '', c ? c.laudos : '', it.ctx.relatorio.regs.length, money(r2(it.ctx.relatorio.regs.reduce((s, r) => s + r.vlRepasse, 0))), '', '', '', '', '', '', '', '', it.ctx.relatorio.arquivo || '', '']);
+  }
+  // Quem laudou na unidade e grupo e não tem relatório nesta planilha (situação de «Prestadores por unidade»).
+  const comRel = new Set(itens.map(it => String(it.ctx.relatorio.cab.prestadorCod)));
+  for (const c of (controle || []).filter(x => !(x.cod && comRel.has(String(x.cod))) && x.situacao !== 'fora')) {
+    R.push([{ v: c.cod || '', st: T }, c.nome, { v: SITUACAO_CONTROLE[c.situacao]?.[1] || c.situacao, st: { fill: c.situacao === 'gerar' ? 'FFC7CE' : 'EDEDED', b: true } }, c.aceite ? 'sim' : '', c.laudos, c.linhasMV || '', '', '', '', '', '', '', '', '', '', '', '']);
+    tot.laudos += c.laudos;
+  }
+  const B = { b: true, bt: true };
+  R.push([{ v: 'TOTAL', st: B }, { v: `${resumo.length} prestador(es) conferido(s)`, st: B }, { v: '', st: B }, { v: '', st: B }, { v: tot.laudos, st: B }, { v: tot.nMV, st: B },
+    ...[tot.mv, tot.devido, tot.aceito, tot.pagar, tot.pend, tot.nc, tot.excluido].map(v => ({ v: r2(v), st: { ...B, fmt: 'money' } })), { v: tot.faltam, st: B }, { v: tot.soLaudo, st: B }, { v: '', st: B }, { v: '', st: B }]);
+  R.push([], [{ v: 'Leitura', st: { b: true } }, { v: 'Para pagamento = Devido + Aceito (SOL-F43). Devido + Aceito + Pendente + NC + Excluído = total do MV de cada prestador. «Laudos no Apolo» vem de «Prestadores por unidade» (quem laudou na unidade e grupo).', st: { wrap: true } }]);
+  const I = [cabecalho(['Item', 'Valor']), ...linhasMeta([
+    ['Gerado em', new Date().toLocaleString('pt-BR')], ['Operador', meta.operador || '(não informado)'], ['Competência', meta.chave ? rotuloCompetencia(meta.chave) : ''],
+    ['Unidade', meta.unidadeNome || meta.unidadeCod], ['Grupo', rotGrupo], ['Planilha de laudos', meta.apoloNome || ''],
+    ['Relatórios do MV na planilha', itens.length], ['Com conferência', comConf.length], ['Sem conferência', itens.length - comConf.length],
+    ['Equivalências (revisão da base)', meta.eqRevisao ?? ''], ['Versão do motor', MOTOR_VERSAO],
+    ['Como foi feita', 'Cada relatório foi conferido de novo na hora, com os parâmetros (unidade, tolerância, médico) da última rodada dele na competência, a base de equivalências atual e as decisões registradas. Nenhuma rodada nova é gravada por esta planilha.'],
+    ['Decisões', 'NC, «aceito para pagamento», dispensas e observações são registradas na ferramenta; aqui só aparecem. Use os filtros desta planilha para controle.'],
+    ...itens.map(it => ['Relatório', `${it.ctx.relatorio.cab.prestadorCod} - ${it.ctx.relatorio.cab.prestadorNome} · ${it.ctx.relatorio.arquivo || ''}${it.rodada ? ` · rodada ${it.rodada.id}` : ' · sem conferência'}`]),
+    ['Privacidade', AVISO_LGPD]])];
+  const PC = [cabecalho(['Código TUSS', 'Descrição MV', 'Linhas no MV', 'Conferidas', 'Com ressalva', 'Prestadores'])];
+  for (const e of [...porCodigo.values()].sort((a, b) => b.mv - a.mv)) PC.push([{ v: e.codigo, st: T }, e.desc, e.mv, e.conferido, e.ressalva, [...e.prestadores].join(', ')]);
+  return criarXlsx([
+    { nome: 'Prestadores', larguras: [12, 36, 34, 22, 12, 11, 16, 14, 14, 18, 14, 14, 14, 12, 14, 50, 24], linhas: R, filtro: true },
+    { nome: 'Conferência', larguras: [12, 30, ...cols.map(c => c.larg)], linhas: P, filtro: true },
+    { nome: 'O que falta decidir', larguras: [12, 30, 60, 44, 10, 32, 11, 12, 40, 40, 22, 22, 12, 80], linhas: F, filtro: F.length > 2 },
+    { nome: 'Por procedimento', larguras: [12, 50, 12, 12, 12, 40], linhas: PC, filtro: true },
+    { nome: 'Informações', larguras: [34, 110], linhas: I, filtro: false, congelar: false }
   ]);
 }
 

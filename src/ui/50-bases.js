@@ -2,8 +2,16 @@
  * Bases: unidades, prestadores (código MV ↔ médico do Apolo), regras de tipo de item e Power BI
  * ============================================================ */
 const BS = { sub: 'unidades', soSemTipo: false };
-const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['pbi', 'Power BI']];
+/* v3.0.0-alpha.20 (simplificação): as 8 subabas em dois grupos — «Usados no mês» à mão e «Avançado» (quase nunca muda). */
+const SUBS_BASES = [['prestadores', 'Prestadores e regras'], ['unidades', 'Unidades e faixas'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['classes', 'Classes e valores IMG'], ['itens', 'Tipo de item'], ['modalidades', 'Modalidades e HM V3'], ['pbi', 'Power BI']];
+const SUBS_BASES_AVANCADO = new Set(['classes', 'itens', 'modalidades', 'pbi']);
+// Bases e regras: barra da configuração compartilhada no topo (P2). Desde a alpha.20 é só um item do menu (saiu das abas de Configurações).
 RENDER.bases = () => {
+  const r = desenharBases(), pg = $('pag-bases');
+  if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
+  return r;
+};
+function desenharBases() {
   const medApolo = S.apolo ? [...contar(S.apolo.laudos.filter(l => l.medico), l => l.medico)].sort((a, b) => a[0].localeCompare(b[0])) : [];
   const idxP = indicePrestadores(S.cfg);
   const semVinculo = medApolo.filter(([m]) => !idxP.has(norm(m)));
@@ -11,7 +19,7 @@ RENDER.bases = () => {
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
   const pctTxt = v => v === null || v === undefined || v === '' ? '' : String(r2(v * 10000) / 100);
   $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
-  <div class="subabas" role="tablist">${SUBS_BASES.map(([k, t]) => `<button role="tab" class="${BS.sub === k ? 'on' : ''}" aria-selected="${BS.sub === k}" data-bsub="${k}">${t}</button>`).join('')}</div>
+  <div class="subabas bs-abas" role="tablist"><span class="bs-grupo">Usados no mês</span>${SUBS_BASES.map(([k, t]) => `${k === 'classes' ? '<span class="bs-grupo bs-av">Avançado</span>' : ''}<button role="tab" class="${BS.sub === k ? 'on' : ''}${SUBS_BASES_AVANCADO.has(k) ? ' bs-avb' : ''}" aria-selected="${BS.sub === k}" data-bsub="${k}">${t}</button>`).join('')}</div>
   <div class="card" data-sub="unidades"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th>CNPJ para a NF</th><th>% USG médicos</th><th>% USG residentes</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>
@@ -48,6 +56,7 @@ RENDER.bases = () => {
       <td><input type="text" data-cl="${i}" data-c="nota" value="${esc(r.nota || '')}"></td><td><button class="perigo" data-clrm="${i}">✕</button></td></tr>`).join('')}</tbody></table></div>
     <div class="acoes"><button id="clSalvar">Salvar regras</button><button id="clAdd" class="sec">+ Regra</button><button id="clPad" class="sec">Restaurar padrão</button></div></div>
 
+${cardModalidadesHM()}
   <div class="card" data-sub="pbi"><h2>Power BI (consulta)</h2><p class="lead">Base auxiliar: cataloga o que existe no faturamento. Não participa da conferência nem da identificação de prestador.</p>
     ${S.pbi ? `<dl class="kv"><dt>Arquivo</dt><dd>${esc(S.pbi.nome)}</dd><dt>Período</dt><dd>${S.pbi.periodo ? `${fmtData(S.pbi.periodo[0])} a ${fmtData(S.pbi.periodo[1])}` : '—'}</dd><dt>Linhas</dt><dd>${S.pbi.linhas.length.toLocaleString('pt-BR')}</dd></dl>
       <div class="grid3" style="margin-top:10px"><div><h3>Unidades</h3><ul class="small">${S.pbi.unidades.map(([u, n]) => `<li>${esc(u)} — ${n}</li>`).join('')}</ul></div>
@@ -191,3 +200,39 @@ async function cadastrarMedicoApolo(nome, laudos) {
   }
   BS.semVincAberto = true; RENDER.bases();
 }
+
+/* P3 (v3.0.0-alpha.12) — Regras que antes só mudavam com nova versão: modalidade do Apolo por grupo do MV e HM da V3. */
+function cardModalidadesHM() {
+  const mod = S.cfg.modalidadesGrupo?.length ? S.cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(S.cfg.hmV3 || {}) };
+  const grupos = [...new Set((S.relatorios || []).flatMap(x => x.rel.regs.map(r => r.grupoNome)).filter(Boolean))].sort();
+  return `<div class="card" data-sub="modalidades" id="cardModHM"><h2>Modalidade do Apolo por grupo do MV</h2>
+    <p class="lead">A conferência só procura laudos da modalidade do grupo de procedimento (ex.: ULTRASSONOGRAFIA → US). Em cada linha, os trechos do nome do grupo separados por «|» e as modalidades do Apolo separadas por vírgula. A primeira linha que casar vale; grupo sem linha não restringe a modalidade.</p>
+    <div class="tw"><table><thead><tr><th>Trechos do grupo do MV</th><th>Modalidades do Apolo</th><th></th></tr></thead><tbody>${mod.map((x, i) => `<tr>
+      <td><input type="text" data-mg="${i}" data-c="padrao" value="${esc(x.padrao)}" style="width:100%"></td><td><input type="text" data-mg="${i}" data-c="modalidades" value="${esc(x.modalidades)}" style="width:110px"></td>
+      <td><button class="perigo mini" data-mgrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
+    ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
+    <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
+    <p class="lead">O HM de uma linha da V3 é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio. Os demais HM não compõem o repasse (excluir do MV).</p>
+    <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
+      <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
+    <div class="acoes"><button id="mhSalvar">Salvar</button><button id="mgAdd" class="sec">+ Grupo</button><button id="mhPad" class="sec">Restaurar padrão</button></div>
+    <p class="small muted">Valem a partir da próxima conferência. Rodadas já feitas não mudam: execute a conferência de novo.</p></div>`;
+}
+function lerModalidadesHM() {
+  const linhas = [], pg = $('cardModHM');
+  pg.querySelectorAll('[data-mg][data-c="padrao"]').forEach(inp => { const i = inp.dataset.mg, m = pg.querySelector(`[data-mg="${i}"][data-c="modalidades"]`).value.trim(); if (inp.value.trim() || m) linhas.push({ padrao: inp.value.trim(), modalidades: m.toUpperCase() }); });
+  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim() } };
+}
+document.addEventListener('click', async e => {
+  const c = $('cardModHM'); if (!c || !c.contains(e.target)) return;
+  const b = e.target.closest('#mhSalvar,#mgAdd,#mhPad,[data-mgrm]'); if (!b) return;
+  const { linhas, hm } = lerModalidadesHM();
+  if (b.id === 'mgAdd') { S.cfg.modalidadesGrupo = [...linhas, { padrao: '', modalidades: '' }]; S.cfg.hmV3 = hm; return RENDER.bases(); }
+  if (b.dataset.mgrm !== undefined) { S.cfg.modalidadesGrupo = linhas.filter((_, i) => i !== +b.dataset.mgrm); S.cfg.hmV3 = hm; return RENDER.bases(); }
+  if (b.id === 'mhPad') { if (!await confirmar('Restaurar o padrão?', 'Modalidades por grupo e HM da V3 voltam ao padrão da ferramenta.', 'Restaurar')) return; delete S.cfg.modalidadesGrupo; delete S.cfg.hmV3; salvarCfg('Modalidades por grupo e HM da V3 restaurados ao padrão.', 'regras'); return RENDER.bases(); }
+  const ruim = linhas.filter(x => !x.padrao.trim() || !x.modalidades.trim());
+  if (ruim.length) return avisar('Cada linha precisa dos trechos do grupo e das modalidades (ou remova a linha).', 'warn');
+  if (!hm.procedimentos || !hm.convenios) return avisar('Informe os trechos de procedimento e de convênio do HM da V3.', 'warn');
+  S.cfg.modalidadesGrupo = linhas; S.cfg.hmV3 = hm;
+  salvarCfg('Modalidades por grupo e HM da V3 salvos. Valem a partir da próxima conferência.', 'regras'); RENDER.bases();
+});

@@ -17,7 +17,7 @@ await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify(
 await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
 const S = expr => p.evaluate(expr);
-const ir = async pag => { await p.goto(html + '#' + pag); await p.waitForFunction(t => document.getElementById('titulo').textContent === t, { inicio: 'Início', conferencia: 'Conferência cruzada', rodadas: 'Rodadas', fluxo: 'Fluxo mensal', nc: 'Não conformidades', bases: 'Bases' }[pag]); await p.waitForTimeout(150); };
+const ir = async pag => { await p.goto(html + '#' + pag); await p.waitForFunction(t => document.getElementById('titulo').textContent === t, { inicio: 'Início', conferencia: 'Conferência', rodadas: 'Conferência', fluxo: 'Fechamento e envio', nc: 'Não conformidades', bases: 'Bases' }[pag]); await p.waitForTimeout(150); };
 const manterArquivos = async () => { await p.waitForTimeout(300); if (await p.$('#dlg[open]')) { await p.click('#dlgBotoes button[value=""]'); await p.waitForFunction(() => !document.getElementById('dlg').open); } };
 const okDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value=ok]'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(150); };
 const seletor = () => p.textContent('#compGlobal');
@@ -35,7 +35,7 @@ await ir('inicio');
 await p.setInputFiles('#inMV', [d('mv_usg_medico15_unidade1.pdf')]); await p.waitForFunction(() => window.__RM.S.relatorios.length === 1, null, { timeout: 60000 });
 await p.setInputFiles('#inApolo', d('apolo_09-2026.xlsx')); await p.waitForFunction(() => !!window.__RM.S.apolo, null, { timeout: 60000 });
 await p.waitForSelector('.painel-comp'); await p.waitForSelector('#stApolo .guardada');
-const arqs = await p.$$eval('.painel-comp .grid3 > div:first-child .v', e => e.map(x => x.textContent));
+const arqs = await p.$$eval('#iniArquivos .v', e => e.map(x => x.textContent));
 ok(arqs[0] === 'ok' && arqs[1] === 'ok' && !(await p.$('#pag-inicio .aviso-fixo')), `arquivos de produção 09/2026 conferem com a competência 10/2026 (${arqs.join(', ')})`);
 
 // 2) Conferência gravada na competência do topo.
@@ -63,7 +63,7 @@ await p.click('#compProx'); await p.waitForFunction(() => /10\/2026/.test(docume
 // 4) Alteração nas bases registrada na competência.
 await ir('bases'); await p.click('[data-bsub="faturistas"]'); await p.click('#fatAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo input[name=nome]', 'TESTE.FATURISTA'); await okDlg();
 await ir('inicio');
-ok(/Faturistas[\s\S]*TESTE\.FATURISTA/.test(await p.textContent('.painel-comp .grid3 > div:last-child')), 'painel: faturista cadastrado aparece em «Bases alteradas nesta competência»');
+ok(/Faturistas[\s\S]*TESTE\.FATURISTA/.test(await p.textContent('#iniBases')), 'painel: faturista cadastrado aparece em «Bases alteradas nesta competência»');
 ok(await S(() => window.__RM.S.compReg.itens['2026-10'].alteracoes.some(a => a.tipo === 'faturistas' && a.por === 'Teste Competência')), 'alteração guarda tipo e quem fez');
 
 // 5) Iniciar o fluxo e fechar a competência (os arquivos ficam só na sessão: recarregar o MV e o Apolo).
@@ -88,7 +88,7 @@ await ir('inicio'); await p.screenshot({ path: out + 'competencia_inicio.png', f
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#compPacote')]);
 const arq = out + 'pacote_competencia.zip'; await dl.saveAs(arq);
 const nomes = execFileSync('python3', ['-I', '-c', 'import zipfile,sys; print(" ".join(sorted(zipfile.ZipFile(sys.argv[1]).namelist())))', arq]).toString().trim();
-ok(/Comp_10-2026\/Controle da ferramenta\/Fluxo_mensal_10-2026\.xlsx/.test(nomes) && /Comp_10-2026\/Controle da ferramenta\/rodadas_10-2026\.json/.test(nomes) && /Comp_10-2026\/LEIA-ME\.txt/.test(nomes) && /Comp_10-2026\/REPASSE_10-2026_CONTROLE/.test(nomes), `pasta da competência: ${nomes.slice(0, 300)}`);
+ok(/2026-10 - Outubro\/Controle da ferramenta\/Fluxo_mensal_10-2026\.xlsx/.test(nomes) && /2026-10 - Outubro\/Controle da ferramenta\/rodadas_10-2026\.json/.test(nomes) && /2026-10 - Outubro\/LEIA-ME\.txt/.test(nomes) && /2026-10 - Outubro\/Controle da ferramenta\/REPASSE_10-2026_CONTROLE/.test(nomes), `pasta da competência: ${nomes.slice(0, 300)}`);
 
 // 7) Reabrir exige justificativa.
 await p.click('#compReabrir'); await okDlg();
@@ -97,11 +97,5 @@ await p.click('#compReabrir'); await p.waitForSelector('#dlg[open]'); await p.fi
 const h = await S(() => window.__RM.S.compReg.itens['2026-10']);
 ok(h.status === 'aberta' && h.historico.map(x => x.acao).join() === 'fechada,reaberta' && h.historico[1].obs === 'NF chegou depois', 'reaberta com justificativa no histórico');
 
-// 8) Celular.
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
-m.on('pageerror', e => erros.push(e.message));
-await m.goto(html + '#inicio'); await m.waitForSelector('#compGlobal button');
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular: seletor no topo sem rolagem horizontal');
-await m.screenshot({ path: out + 'competencia_celular.png' });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

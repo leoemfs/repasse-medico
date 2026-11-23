@@ -1,4 +1,4 @@
-// Teste do menu: recolher/expandir (☰ e Ctrl+B), memória da escolha, dica e barra do celular.
+// Teste do menu: recolher/expandir (☰ e Ctrl+B), memória da escolha, dica e janela estreita (sem modo celular).
 import { createRequire } from 'module';
 import fs from 'fs';
 const { chromium } = createRequire(import.meta.url)('playwright');
@@ -26,28 +26,14 @@ await p.keyboard.press('Control+b');
 ok(await larg() === 232, 'Ctrl+B expande');
 await p.keyboard.press('Control+b');
 ok(await larg() === 64, 'Ctrl+B recolhe');
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
+// v3.0.0-alpha.12: sem modo celular (decisão do usuário, P3 da auditoria). Janela estreita no computador: o mesmo menu.
+const m = await (await b.newContext({ viewport: { width: 700, height: 800 } })).newPage();
 m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#inicio'); await m.waitForFunction(() => window.__RM);
-const barra = await m.evaluate(() => { const r = document.querySelector('.barra-cel').getBoundingClientRect(); return { y: Math.round(r.bottom), n: [...document.querySelectorAll('.barra-cel a')].filter(e => e.offsetParent).length, rotulos: [...document.querySelectorAll('.barra-cel a span')].map(e => e.textContent).join(','), hamb: !!document.getElementById('btnMenu').offsetParent, gaveta: Math.round(document.querySelector('.nav').getBoundingClientRect().right) }; });
-ok(barra.y === 844 && barra.n === 6 && barra.rotulos === 'Início,Fluxo,Conferir,Prestador,NCs,Fechar', `barra fixa no rodapé com 6 atalhos (${barra.rotulos})`);
-ok(barra.hamb && barra.gaveta <= 0, '☰ visível ao lado do logo; gaveta fechada');
-const ordemTopo = await m.evaluate(() => { const h = document.getElementById('btnMenu').getBoundingClientRect(), l = document.querySelector('.brand-mark').getBoundingClientRect(); return h.right <= l.left; });
-ok(ordemTopo, '☰ à esquerda do logo');
-await m.tap('.barra-cel a[data-pag="correcao"]'); await m.waitForFunction(() => document.getElementById('titulo').textContent !== 'Início', null, { timeout: 3000 }).catch(() => {});
-ok(await m.textContent('#titulo') === 'Correção de prestador', 'toque na barra navega');
-await m.tap('#btnMenu'); await m.waitForTimeout(350);
-const gav = await m.evaluate(() => ({ x: Math.round(document.querySelector('.nav').getBoundingClientRect().left), n: [...document.querySelectorAll('.nav a[data-pag]')].filter(a => a.querySelector('.rot').offsetParent).length, grupos: [...document.querySelectorAll('.grupo-nav')].map(e => e.textContent).join('|'), veu: !document.getElementById('veuGaveta').hidden }));
-ok(gav.x === 0 && gav.n === 10 && gav.veu && gav.grupos === 'TRABALHO DO MÊS|CONFIGURAÇÕES', `☰ abre a gaveta com as 10 abas em dois grupos (${JSON.stringify(gav)})`);
-await m.screenshot({ path: out + 'menu_gaveta.png' });
-await m.tap('.nav a[data-pag="bases"]'); await m.waitForTimeout(350);
-ok(await m.textContent('#titulo') === 'Bases e regras' && await m.evaluate(() => document.querySelector('.nav').getBoundingClientRect().right <= 0 && document.getElementById('veuGaveta').hidden), 'tocar numa aba da gaveta navega e fecha a gaveta');
-await m.tap('#btnMenu'); await m.waitForTimeout(300); await m.mouse.click(370, 400); await m.waitForTimeout(300);
-ok(await m.evaluate(() => document.querySelector('.nav').getBoundingClientRect().right <= 0), 'tocar fora fecha a gaveta');
-await m.evaluate(() => { const p = document.getElementById('navPend'); p.hidden = false; p.textContent = '3'; window.__RM.irPara('inicio'); });
-ok(await m.evaluate(() => document.getElementById('btnMenu').classList.contains('com-ponto')), 'ponto laranja no ☰ quando uma aba fora da barra tem pendência (Equivalências)');
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'sem rolagem horizontal');
-await m.goto(html + '#inicio'); await m.waitForTimeout(200);
-await m.screenshot({ path: out + 'menu_celular.png' });
+const estreita = await m.evaluate(() => ({ barra: !!document.querySelector('.barra-cel,#barraCel,#veuGaveta,.gaveta-cab'), larg: Math.round(document.querySelector('.sidebar').getBoundingClientRect().width), abas: [...document.querySelectorAll('.nav a[data-pag]')].filter(a => a.offsetParent).length }));
+ok(!estreita.barra && estreita.larg === 232 && estreita.abas === 7, `janela estreita: mesmo menu lateral com as 7 abas, sem gaveta nem barra inferior (${JSON.stringify(estreita)})`);
+await m.click('#btnMenu');
+ok(Math.round(await m.evaluate(() => document.querySelector('.sidebar').getBoundingClientRect().width)) === 64, 'na janela estreita, ☰ recolhe o menu');
+await m.screenshot({ path: out + 'menu_estreito.png' });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

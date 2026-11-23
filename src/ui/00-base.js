@@ -31,7 +31,7 @@ const S = {
 
 /* ---------- Armazenamento local ---------- */
 const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias',
-  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar' };
+  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar', pdfsIgnorados: 'rm2.pdfsIgnorados' };
 // Preferências de cada pessoa (ficam neste navegador e não vão para a pasta compartilhada).
 const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta'];
 // Modelo de exportação escolhido por esta pessoa (Configurações → Exportação).
@@ -91,17 +91,25 @@ function registrarAlteracaoBase(motivo, tipo) {
   if (!motivo || !S.compReg) return;
   registrarAlteracao(S.compReg, S.comp, S.operador, tipo || tipoDaAlteracao(motivo), motivo); salvarCompReg();
 }
-function salvarCfg(motivo = '', tipo = '') {
+// P2 (v3.0.0-alpha.11): salvar = gravar neste navegador + agendar a sincronização com a pasta (29c-sincronizacao.js).
+// A própria sincronização e a restauração usam só o gravar*Local, para não agendar de novo.
+function salvarCfg(motivo = '', tipo = '') { gravarCfgLocal(motivo, tipo); agendarSincronizacao('cfg'); }
+function gravarCfgLocal(motivo = '', tipo = '') {
+  aplicarRegrasConfig(S.cfg);   // modalidade por grupo e HM da V3 (P3)
   registrarAlteracaoBase(motivo, tipo);
   S.cfg.revisao = (S.cfg.revisao || 0) + 1; S.cfg.atualizadoEm = agoraISO();
   if (!gravarLocal(CHAVES.cfg, S.cfg)) avisar('Não foi possível gravar a configuração neste navegador. Exporte um backup em Configurações para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
 }
 function salvarEq(motivo = '') {
+  // P2 (v3.0.0-alpha.11): relações resolvidas por regra composta validada ficam «cobertas» ao GRAVAR (antes, a tela de
+  // Equivalências fazia isso — e gravava — só por abrir).
+  aplicarCobertas(S.eq, S.operador, S.comp);
   registrarAlteracaoBase(motivo, 'equivalencias');
   if (!gravarLocal(CHAVES.eq, S.eq)) avisar('Não foi possível gravar a base de equivalências neste navegador. Exporte o JSON para não perder as alterações.', 'err');
   else if (motivo) avisar(motivo, 'ok');
   atualizarNavPendencias();
+  agendarSincronizacao('eq');
 }
 // Cópia de segurança antes de substituir uma base inteira (RN-215).
 // v3.0: a base inteira vai ser trocada (backup, desfazer, substituir): a próxima sincronização com a pasta compara
@@ -119,29 +127,58 @@ function abrirDB() {
   return new Promise(res => {
     try {
       // v2: «arquivos» guarda as planilhas de laudos e do Power BI por competência (já lidas, sem CPF).
-      const rq = indexedDB.open('repasse-medico-v2', 2);
-      rq.onupgradeneeded = () => { const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' }); };
+      // v3 (3.0.0-alpha.10): índice «comp» nas rodadas, para ler só a competência aberta e as vizinhas.
+      const rq = indexedDB.open('repasse-medico-v2', 3);
+      rq.onupgradeneeded = e => {
+        const db = rq.result; for (const n of ['rodadas', 'arquivos']) if (!db.objectStoreNames.contains(n)) db.createObjectStore(n, { keyPath: 'id' });
+        const st = rq.transaction.objectStore('rodadas');
+        if (!st.indexNames.contains('comp')) {
+          st.createIndex('comp', 'comp');
+          st.openCursor().onsuccess = ev => { const c = ev.target.result; if (!c) return; const r = c.value; if (r.comp !== competenciaDaRodada(r)) { r.comp = competenciaDaRodada(r); c.update(r); } c.continue(); };
+        }
+      };
       rq.onsuccess = () => { DB.db = rq.result; DB.ok = true; res(true); };
       rq.onerror = () => res(false);
     } catch (e) { res(false); }
   });
 }
+// Todas as rodadas (Rodadas → todas as competências, restauração). As telas usam dbRodadasJanela.
 function dbTodas() {
   if (!DB.ok) return Promise.resolve(S.rodadas);
-  return new Promise(res => { const rq = DB.db.transaction('rodadas').objectStore('rodadas').getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); });
+  return new Promise(res => { const rq = DB.db.transaction('rodadas').objectStore('rodadas').getAll(); rq.onsuccess = () => res((rq.result || []).map(normalizarChavesRodada)); rq.onerror = () => res([]); });
+}
+// P1: só as rodadas da competência aberta e das vizinhas (índice «comp»), ou só as de uma competência (para o backup).
+function dbRodadasJanela(ch = S.comp, so = false) {
+  const [de, ate] = so ? [ch, ch] : janelaCompetencias(ch);
+  if (!DB.ok) return Promise.resolve(S.rodadas.filter(r => { const c = competenciaDaRodada(r); return c >= de && c <= ate; }));
+  return new Promise(res => {
+    try {
+      const rq = DB.db.transaction('rodadas').objectStore('rodadas').index('comp').getAll(IDBKeyRange.bound(de, ate));
+      rq.onsuccess = () => res((rq.result || []).map(normalizarChavesRodada)); rq.onerror = () => res([]);
+    } catch (e) { dbTodas().then(t => res(t.filter(r => { const c = competenciaDaRodada(r); return c >= de && c <= ate; }))); }
+  });
 }
 function dbGravar(r) {
   if (!DB.ok) return Promise.resolve(false);
+  r.comp = competenciaDaRodada(r);
   return new Promise(res => { const tx = DB.db.transaction('rodadas', 'readwrite'); tx.objectStore('rodadas').put(r); tx.oncomplete = () => res(true); tx.onerror = () => res(false); });
 }
 function dbApagar(id) {
   if (!DB.ok) return Promise.resolve(false);
   return new Promise(res => { const tx = DB.db.transaction('rodadas', 'readwrite'); id ? tx.objectStore('rodadas').delete(id) : tx.objectStore('rodadas').clear(); tx.oncomplete = () => res(true); tx.onerror = () => res(false); });
 }
-async function guardarRodada(r) {
+async function guardarRodada(r, { reter = true } = {}) {
   const i = S.rodadas.findIndex(x => x.id === r.id);
   if (i >= 0) S.rodadas[i] = r; else S.rodadas.push(r);
-  return dbGravar(r);
+  const ok = await dbGravar(r);
+  if (reter) await reterRodadas(new Set([grupoRodada(r)]));
+  return ok;
+}
+// Retenção (P1): resume as rodadas substituídas dos grupos indicados (ou de todos, na abertura).
+async function reterRodadas(grupos = null, base = S.rodadas) {
+  const lista = rodadasParaResumir(base, grupos);
+  for (const r of lista) { resumirRodada(r); await dbGravar(r); const j = S.rodadas.findIndex(x => x.id === r.id); if (j >= 0) S.rodadas[j] = r; }
+  return lista.length;
 }
 
 /* ---------- Mensagens, diálogos e downloads ---------- */
@@ -170,7 +207,7 @@ async function exigirOperador() {
   if (r.botao === 'ok' && nome) { S.operador = nome; gravarLocal(CHAVES.operador, nome); mostrarOperador(); return nome; }
   return '';
 }
-function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; if ($('operadorGaveta')) $('operadorGaveta').textContent = $('operadorTopo').textContent; }
+function mostrarOperador() { $('operadorTopo').textContent = S.operador ? `Operador: ${S.operador}` : 'Operador não informado'; }
 async function baixarZip(zip, nome) {
   const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
   baixarBlob(blob, nome);
@@ -209,6 +246,8 @@ function carregarCompetencia() {
 function mudarCompetencia(chave) {
   if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
   S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  // P1: as telas usam as rodadas da competência aberta e das vizinhas; recarrega e redesenha.
+  if (typeof DB !== 'undefined' && DB.ok) dbRodadasJanela(chave).then(r => { if (S.comp !== chave) return; S.rodadas = r; irPara(paginaAtual, true); });
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
   atualizarNavFluxo();
   irPara(paginaAtual, true);
@@ -244,26 +283,42 @@ function desenharSeletorCompetencia() {
 }
 
 /* ---------- Navegação ---------- */
-const PAGINAS = { inicio: 'Início', fluxo: 'Fluxo mensal', conferencia: 'Conferência cruzada', correcao: 'Correção de prestador', nc: 'Não conformidades', fechamento: 'Fechamento', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Rodadas', configuracoes: 'Configurações' };
+// v3.0.0-alpha.20 (simplificação): menu com 7 itens. Correção de prestador e Rodadas ficam dentro da Conferência;
+// o Fluxo mensal (etapas e marcos) fica dentro do Fechamento e envio. As rotas antigas continuam valendo.
+const PAGINAS = { inicio: 'Início', fluxo: 'Fechamento e envio', conferencia: 'Conferência', correcao: 'Conferência', nc: 'Não conformidades', fechamento: 'Fechamento e envio', equivalencias: 'Equivalências TUSS', bases: 'Bases e regras', rodadas: 'Conferência', configuracoes: 'Configurações' };
+const PAI_PAGINA = { correcao: 'conferencia', rodadas: 'conferencia', fluxo: 'fechamento' };
+const SUBNAV = {
+  conferencia: [['conferencia', 'Conferência cruzada'], ['correcao', 'Correção de prestador'], ['rodadas', 'Histórico de rodadas']],
+  fechamento: [['fluxo', 'Etapas do mês'], ['fechamento', 'Repasses e envio']]
+};
 const RENDER = {};
+function desenharSubnav(pag) {
+  const el = $('subnav'); if (!el) return;
+  const grupo = SUBNAV[PAI_PAGINA[pag] || pag];
+  el.hidden = !grupo;
+  el.classList.toggle('modo-abas', (PAI_PAGINA[pag] || pag) === 'fechamento');
+  el.innerHTML = !grupo ? '' : (PAI_PAGINA[pag] || pag) === 'fechamento' && typeof itensSubnavFechamento === 'function' ? itensSubnavFechamento(pag)
+    : grupo.map(([k, t]) => `<a href="#${k}" class="${k === pag ? 'on' : ''}"${k === pag ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('');
+  el.setAttribute('aria-label', grupo ? PAGINAS[pag] : '');
+}
 function irPara(pag) {
   if (!PAGINAS[pag]) pag = 'inicio';
   paginaAtual = pag;
   desenharSeletorCompetencia();
   for (const k of Object.keys(PAGINAS)) $('pag-' + k).hidden = k !== pag;
-  document.querySelectorAll('.nav a, .barra-cel a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === pag));
-  sincronizarPontos();
+  const ativo = PAI_PAGINA[pag] || pag;
+  document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === ativo));
   $('titulo').textContent = PAGINAS[pag];
+  desenharSubnav(pag);
   if (RENDER[pag]) RENDER[pag]();
   window.scrollTo(0, 0);
 }
 function atualizarNavPendencias() {
   const n = S.eq ? S.eq.itens.filter(e => e.status === 'pendente').length : 0;
   const b = $('navPend'); b.hidden = !n; b.textContent = n; b.title = `${n} equivalências pendentes de validação`;
-  // A dica e o nome lido pelo leitor de tela levam o número; recolhido/celular, o selo vira só um ponto.
+  // A dica e o nome lido pelo leitor de tela levam o número; recolhido, o selo vira só um ponto.
   const a = b.closest('a'), nome = n ? `Equivalências TUSS · ${n} pendentes` : 'Equivalências TUSS';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
-  sincronizarPontos();
 }
 
 /* ---------- Menu lateral recolhível (☰ e Ctrl+B); a escolha fica salva neste navegador ---------- */
@@ -271,57 +326,13 @@ function aplicarMenu(recolhido) {
   document.querySelector('.shell').classList.toggle('recolhido', recolhido);
   const b = $('btnMenu'); b.setAttribute('aria-expanded', String(!recolhido)); b.setAttribute('aria-label', recolhido ? 'Expandir menu' : 'Recolher menu');
 }
-/* Celular: ☰ ao lado do logo abre a gaveta com todas as abas; a barra de baixo tem 6 atalhos. */
-const BARRA_CEL = ['inicio', 'fluxo', 'conferencia', 'correcao', 'nc', 'fechamento'];
-const ehCelular = () => window.matchMedia('(max-width:760px)').matches;
-function abrirGaveta(abrir) {
-  document.querySelector('.shell').classList.toggle('gaveta-aberta', abrir);
-  $('veuGaveta').hidden = !abrir;
-  $('btnMenu').setAttribute('aria-expanded', String(abrir));
-  document.body.style.overflow = abrir ? 'hidden' : '';
-}
-function montarBarraCel() {
-  $('barraCel').innerHTML = BARRA_CEL.map(pag => {
-    const a = document.querySelector(`.nav a[data-pag="${pag}"]`);
-    return `<a href="#${pag}" data-pag="${pag}" aria-label="${esc(PAGINAS[pag])}">${a.querySelector('svg').outerHTML}<span>${esc(a.querySelector('.curto').textContent)}</span><i class="ponto" hidden></i></a>`;
-  }).join('');
-}
-// Pontos da barra e do ☰: mesma informação dos selos do menu (o menu é a fonte).
-function sincronizarPontos() {
-  const barra = $('barraCel'); if (!barra || !barra.children.length) return;
-  let foraDaBarra = false;
-  document.querySelectorAll('.nav a[data-pag]').forEach(a => {
-    const pill = a.querySelector('.pill'), tem = !!pill && !pill.hidden, pag = a.dataset.pag;
-    const ponto = barra.querySelector(`a[data-pag="${pag}"] .ponto`);
-    if (ponto) { ponto.hidden = !tem; barra.querySelector(`a[data-pag="${pag}"]`).setAttribute('aria-label', a.getAttribute('aria-label')); }
-    else if (tem) foraDaBarra = true;
-  });
-  $('btnMenu').classList.toggle('com-ponto', foraDaBarra);
-}
 function alternarMenu() {
-  if (ehCelular()) return abrirGaveta(!document.querySelector('.shell').classList.contains('gaveta-aberta'));
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
 function iniciarMenu() {
   aplicarMenu(lerLocal(CHAVES.menu) === true);
   $('btnMenu').onclick = alternarMenu;
-  montarBarraCel();
-  $('btFecharGaveta').onclick = () => abrirGaveta(false);
-  $('veuGaveta').onclick = () => abrirGaveta(false);
-  $('navPrincipal').addEventListener('click', e => { if (e.target.closest('a[data-pag]') && ehCelular()) abrirGaveta(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.shell').classList.contains('gaveta-aberta')) abrirGaveta(false); });
-  // Deslizar da borda esquerda abre; deslizar para a esquerda fecha.
-  let x0 = null, y0 = 0;
-  document.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (x0 === null || !ehCelular()) return;
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0), aberta = document.querySelector('.shell').classList.contains('gaveta-aberta');
-    if (!aberta && x0 < 24 && dx > 60 && dy < 50) abrirGaveta(true);
-    else if (aberta && dx < -60 && dy < 50) abrirGaveta(false);
-    x0 = null;
-  }, { passive: true });
-  window.matchMedia('(max-width:760px)').addEventListener('change', () => abrirGaveta(false));
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
 
@@ -339,7 +350,7 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
     if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(); });
   };
   desenhar();
-  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); } };
+  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');

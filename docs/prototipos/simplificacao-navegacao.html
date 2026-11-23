@@ -1,0 +1,676 @@
+<title>Repasse Médico — navegação simplificada</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
+  --ok:#17663a;--okbg:#e3f3e8;--warn:#8a5300;--warnbg:#fff3dc;--err:#a8251c;--errbg:#fdecea;--info:#1f5f99;--infobg:#e7f0fa;
+  --s-conferido:#c6efce;--s-ressalva:#ffeb9c;--s-pendente:#fce4d6;--s-fat:#ffc7ce;--s-laudo:#f8cbad;--s-hm:#d9e1f2;--s-np:#e2efda;--s-cls:#e4e4e4;--s-t:#1d2939;--on-accent:#fff;
+  color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --s-conferido:#1d4a2b;--s-ressalva:#4d3d10;--s-pendente:#4a2f20;--s-fat:#4d2126;--s-laudo:#4c2c1a;--s-hm:#243049;--s-np:#25381f;--s-cls:#333b46;--s-t:#eef2f7;--on-accent:#0b1520;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121821;--card:#1b2330;--text:#e6ebf2;--muted:#9aa8ba;--line:#2f3a4a;--accent:#5fa3e3;--accent2:#7db7ee;--side:#0d131b;--side-t:#b8c4d4;
+  --ok:#7fd69c;--okbg:#163323;--warn:#f2bd68;--warnbg:#3a2b12;--err:#ff9087;--errbg:#3e1b19;--info:#8cc0f0;--infobg:#17293d;
+  --s-conferido:#1d4a2b;--s-ressalva:#4d3d10;--s-pendente:#4a2f20;--s-fat:#4d2126;--s-laudo:#4c2c1a;--s-hm:#243049;--s-np:#25381f;--s-cls:#333b46;--s-t:#eef2f7;--on-accent:#0b1520;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.shell{--menu:232px;display:grid;grid-template-columns:var(--menu) minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--side) var(--menu),var(--bg) var(--menu))}
+.shell.recolhido{--menu:64px}
+.sidebar{background:var(--side);color:var(--side-t);padding:16px 10px;display:flex;flex-direction:column;gap:16px;position:sticky;top:0;height:100vh;overflow-y:auto;z-index:4}
+.brand{display:flex;gap:8px;align-items:center;padding:0 2px 14px 4px;border-bottom:1px solid #2c3b4e;white-space:nowrap}
+.brand-mark{width:36px;height:36px;border-radius:10px;display:block;flex:none}
+.brand-nome{min-width:0;flex:1;overflow:hidden}.brand strong{display:block;color:#fff;font-size:14px}.brand small{color:#93a4b9;font-size:11px}
+.hamb{margin-left:auto;flex:none;width:32px;height:32px;padding:0;display:grid;place-items:center;background:none;border:0;border-radius:8px;color:var(--side-t);cursor:pointer}
+.hamb:hover{background:#223349;color:#fff;border:0}.hamb svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav a{position:relative;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:8px;color:var(--side-t);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
+.nav a svg{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a:hover{background:#223349;color:#fff}.nav a.ativo{background:var(--nav-ativo,#2a5d8c);color:#fff}
+.nav .curto,.nav .dica{display:none}
+.pill{margin-left:auto;flex:none;background:#d97b29;color:#fff;border-radius:999px;font-size:11px;padding:1px 7px}
+.side-note{margin-top:auto;background:#1f2f42;border:1px solid #2f4258;border-radius:10px;padding:10px 12px;font-size:11.5px}.side-note strong{color:#fff}.side-note p{margin:4px 0 0}
+/* Menu recolhido: só ícones, como atalhos; nome em dica ao passar o mouse; pendências como ponto */
+.recolhido .sidebar{overflow:visible}
+.recolhido .brand{justify-content:center;padding:2px 0 14px}.recolhido .brand-mark,.recolhido .brand-nome,.recolhido .rot,.recolhido .side-note{display:none}
+.recolhido .hamb{margin:0}
+.recolhido .nav a{justify-content:center;padding:10px 0}
+.recolhido .pill{position:absolute;top:6px;left:calc(50% + 6px);width:9px;height:9px;padding:0;font-size:0;border:2px solid var(--side);box-sizing:content-box}
+.recolhido .nav a:hover .dica,.recolhido .nav a:focus-visible .dica{display:block;position:absolute;left:56px;top:50%;transform:translateY(-50%);background:#0d131b;color:#fff;font-size:12px;padding:5px 9px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:10;pointer-events:none}
+.main{padding:22px clamp(16px,2.6vw,36px) 40px;min-width:0}
+.topo{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.topo h1{margin:2px 0 0;font-size:24px}.eyebrow{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--muted)}
+.topo-dir{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--muted)}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.ok{background:var(--okbg);color:var(--ok)}.warn{background:var(--warnbg);color:var(--warn)}.err{background:var(--errbg);color:var(--err)}.info{background:var(--infobg);color:var(--info)}
+.aviso{border-radius:10px;padding:10px 14px;margin:0 0 14px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 8px}.card h3{font-size:14px;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 12px;max-width:900px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.dz{border:2px dashed var(--line);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--accent);font-weight:600;transition:.15s}
+.dz:hover,.dz.over{border-color:var(--accent);background:var(--infobg)}
+.dz small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.fonte .estado{margin-top:10px;font-size:13px}
+button,.btn{font:inherit;font-weight:600;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);border-radius:8px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+button:hover{background:var(--accent2);border-color:var(--accent2)}
+button.sec{background:transparent;color:var(--accent)}button.sec:hover{background:var(--infobg)}
+button.perigo{background:transparent;color:var(--err);border-color:var(--err)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+label.campo{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+input[type=text],input[type=number],input[type=search],select,textarea{font:inherit;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;width:100%}
+textarea{min-height:90px;font-family:Consolas,monospace;font-size:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tile{display:block;border-radius:10px;padding:10px 12px;cursor:pointer;border:2px solid transparent;color:var(--s-t);text-align:left;background:var(--s-cls);font:inherit}
+.tile b{display:block;font-size:22px}.tile small{font-size:12px;font-weight:600}
+.tile.sel{border-color:var(--text)}.tile.vazio{opacity:.45}
+.st-conferido,.st-identificado{background:var(--s-conferido)}.st-ressalva,.st-conflito{background:var(--s-ressalva)}.st-pendente{background:var(--s-pendente)}
+.st-so-faturamento,.st-nao-identificado{background:var(--s-fat)}.st-so-laudo{background:var(--s-laudo)}.st-hm-pendente{background:var(--s-hm)}
+.st-nao-procedimental{background:var(--s-np)}.st-classificacao-pendente,.st-insuficiente{background:var(--s-cls)}
+.marcadores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.marc{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--card);cursor:pointer;color:var(--text)}
+.marc.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tw{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:62vh;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{position:sticky;top:0;background:var(--accent);color:var(--on-accent);z-index:1;white-space:nowrap}
+td.n,th.n{text-align:right;white-space:nowrap}
+tbody tr.clicavel{cursor:pointer}tbody tr.clicavel:hover td{filter:brightness(.97)}
+td .st,td .badge{white-space:nowrap}td .st{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;color:var(--s-t);white-space:nowrap}
+tr.detalhe td{background:var(--bg)}
+.det{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;font-size:12.5px}.det h4{margin:0 0 4px;font-size:12px;color:var(--muted)}
+.det ul{margin:0;padding-left:18px}
+.paginacao{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px;font-size:12px}
+.filtros{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:end}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:600;min-width:0;overflow-wrap:anywhere}
+details.card>summary{cursor:pointer;font-weight:700;color:var(--accent)}
+ul.avisos{margin:6px 0;padding-left:18px;color:var(--warn);font-size:12.5px}
+.passos{counter-reset:p;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.passos li{counter-increment:p;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start}
+.passos li::before{content:counter(p);width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:12px}
+.passos li.feito::before{content:"✓";background:var(--ok)}
+.barra{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}.barra i{display:block;height:100%;background:var(--accent);width:0}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);max-width:560px;width:calc(100% - 32px);padding:18px}
+dialog::backdrop{background:rgba(10,15,25,.45)}dialog h3{margin:0 0 10px}.dlg-botoes{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.rodape{margin-top:28px;font-size:12px;color:var(--muted)}
+code{font-size:12px;background:var(--bg);padding:1px 5px;border-radius:5px}
+@media (max-width:1000px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:1fr 1fr}.filtros{grid-template-columns:1fr 1fr}}
+/* Janela estreita no computador (v3.0.0-alpha.12: sem modo celular): o menu continua o mesmo, recolhível com ☰ ou Ctrl+B;
+ * só as grades viram uma coluna. */
+@media (max-width:760px){.grid2,.grid3,.grid4,.filtros,.det{grid-template-columns:1fr}.topo h1{font-size:20px}.main{padding:16px}}
+/* ===== Fluxo mensal ===== */
+.txt-err{color:var(--err);font-weight:700}.txt-warn{color:var(--warn);font-weight:700}.txt-ok{color:var(--ok);font-weight:700}
+button.ic{padding:5px 10px}
+.subabas{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:14px}
+.subabas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;margin-bottom:-2px}
+.subabas button.on{color:var(--accent);border-bottom-color:var(--accent)}.subabas button:hover{background:var(--infobg);color:var(--accent)}
+.fx-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.comp-nav{display:flex;align-items:center;gap:8px}.comp-nav b{font-size:15px;min-width:160px;text-align:center}
+.fx-kpis .card{margin-bottom:0}.fx-kpis{margin-bottom:14px}
+.kpi h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.kpi dl{margin:0}.kpi dl div{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:13px}.kpi dt{color:var(--muted)}.kpi dd{margin:0;font-weight:700;white-space:nowrap}
+.marcos-linha{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.marco{flex:none;min-width:132px;max-width:190px;display:block;text-align:left;font-weight:400;font-size:12px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.marco:hover{background:var(--infobg);border-color:var(--accent)}.marco b{display:block;font-size:13px}.marco small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.marco.passado{opacity:.7}.marco.hoje{border:2px solid var(--err);background:var(--errbg)}.marco.prox{border-color:var(--warn);background:var(--warnbg)}
+.fx-filtros{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:6px 0 12px}.fx-filtros input{max-width:320px}
+.grupo-fx{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.gcab{width:100%;display:grid;grid-template-columns:18px minmax(200px,1.3fr) 150px minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;border-radius:0;color:var(--text);font-weight:400;text-align:left;padding:12px 14px}
+.gcab:hover{background:var(--bg)}.seta{color:var(--muted);transition:transform .15s;font-size:11px}.grupo-fx.aberto .seta{transform:rotate(90deg)}
+.gnome b{display:block}.gnome small,.gprog small{color:var(--muted);font-size:12px}.gprazo{font-size:12.5px;min-width:0}.gprazo small{display:block}
+.gprog .barra{margin:0 0 3px}
+.dep{display:block;color:#6b3fa0;font-size:11.5px}
+.gcorpo{display:none;border-top:1px solid var(--line);padding:12px 14px 14px}.grupo-fx.aberto .gcorpo{display:block}
+.stt{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.s-ni{background:#eceff3;color:#55606e}.s-and{background:var(--infobg);color:var(--info)}.s-ter{background:#efe7fa;color:#6b3fa0}.s-cor{background:var(--errbg);color:var(--err)}.s-ok{background:var(--okbg);color:var(--ok)}.s-na{background:#f1f1f1;color:#8a8a8a}
+.tab-fx td{vertical-align:middle}.tab-fx th{position:static}.tab-fx input,.tab-fx select{padding:4px 6px;font-size:12.5px}
+.tab-fx input[type=date]{min-width:128px}.tab-fx .t-nome{min-width:240px}.tab-fx .t-nome small{display:block}
+.nw{white-space:nowrap}.lnk{background:none;border:0;color:var(--accent);padding:2px 0;font-weight:600;text-decoration:underline dotted}.lnk:hover{background:none}
+.regra-fixa{background:var(--warnbg);color:var(--warn);border-radius:8px;padding:6px 10px;font-size:12.5px;margin:0 0 10px}
+.sub-fx{font-size:12px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.obs-sec{margin-top:12px}.obs-sec textarea{font-family:inherit;font-size:13px;min-height:54px}
+.nota-nova{display:grid;grid-template-columns:1fr 220px auto;gap:8px;align-items:start}.nota-nova textarea{font-family:inherit;font-size:13px;min-height:44px}
+.notas{list-style:none;padding:0;margin:12px 0 0}.notas li{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:8px 0}.notas p{margin:2px 0 0;white-space:pre-wrap}
+.opt-rod{display:block;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.regra-ed{display:flex;gap:6px;flex-wrap:wrap}.regra-ed select,.regra-ed input{width:auto}
+@media (max-width:760px){.gcab{grid-template-columns:18px 1fr}.gcab>:nth-child(n+3){grid-column:2}.nota-nova{grid-template-columns:1fr}.comp-nav b{min-width:0}}
+.tab-fx select[data-c="status"]{min-width:168px;font-weight:600;border-radius:999px}
+.tab-fx input[data-c="responsavel"]{min-width:150px}.tab-fx input[data-c="obs"]{min-width:200px}
+.tab-fx select.sel-ok{background:var(--okbg);color:var(--ok)}.tab-fx select.sel-and{background:var(--infobg);color:var(--info)}.tab-fx select.sel-ter{background:#efe7fa;color:#6b3fa0}
+.tab-fx select.sel-cor{background:var(--errbg);color:var(--err)}.tab-fx select.sel-na{color:#8a8a8a}
+.gcab>.stt{justify-self:start}
+/* ---------- Não conformidades ---------- */
+.nc-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.nc-kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}.nc-kpi b{display:block;font-size:24px}.nc-kpi small{color:var(--muted);font-size:12px}
+.nc-kpi.err b{color:var(--err)}.nc-kpi.warn b{color:var(--warn)}.nc-kpi.ok b{color:var(--ok)}
+.nc-duas{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+.nc-duas h3,.legenda h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.barras .l{display:grid;grid-template-columns:minmax(0,230px) 1fr 34px;gap:8px;align-items:center;font-size:12.5px;margin:4px 0}
+.barras .l span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.barras i{display:block;height:12px;border-radius:3px;background:var(--accent)}.barras .l b{text-align:right}
+.nc-cand .l{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}.nc-cand h3+.l,.nc-cand p+.l{border-top:0}
+.nc-cand small{display:block;color:var(--muted);font-size:12px}.nc-cand .l b{white-space:nowrap}
+button.mini{padding:4px 10px;font-size:12px}
+.nc-abas{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:10px;overflow-x:auto}
+.nc-abas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;margin-bottom:-2px;white-space:nowrap}
+.nc-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}.nc-abas button:hover{background:var(--infobg);color:var(--accent)}
+.nc-abas em{font-style:normal;background:var(--infobg);color:var(--info);border-radius:999px;font-size:11px;padding:1px 7px;margin-left:5px}
+.nc-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.nc-filtros select,.nc-filtros input{width:auto;min-width:0;max-width:100%;font-size:12.5px}.nc-filtros input{flex:1 1 220px}
+.nc-sit{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.s-ab{background:var(--errbg);color:var(--err)}.s-env{background:var(--infobg);color:var(--info)}.s-tra{background:#efe7fa;color:#6b3fa0}.s-reg{background:var(--okbg);color:var(--ok)}.s-np{background:#eceff3;color:#55606e}
+.nc-nat{display:block;font-weight:600}.nc-det{display:block;color:var(--muted);font-size:12px}
+.nc-orig{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--infobg);color:var(--muted);white-space:nowrap}
+.nc-lote{margin-top:10px}.legenda{border-style:dashed}.legenda ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--muted)}.legenda li{margin:3px 0}
+.aviso-fixo{border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+@media (max-width:1000px){.nc-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-duas{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){.nc-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.barras .l{grid-template-columns:minmax(0,1fr) 70px 30px}.nc-cand small{overflow-wrap:anywhere}}
+.nc-motivo{display:block;min-width:260px}
+/* ---------- Competência no topo ---------- */
+.comp-global{display:flex;align-items:center;gap:8px;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:5px 8px}
+.comp-global .ic{width:30px;height:30px;padding:0;display:grid;place-items:center}
+.comp-rot{text-align:center;min-width:170px}.comp-rot b{display:block;font-size:14.5px;white-space:nowrap}.comp-rot small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.comp-st{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;vertical-align:middle;margin-left:2px}
+.comp-st.aberta{background:var(--okbg);color:var(--ok)}.comp-st.fechada{background:var(--errbg);color:var(--err)}
+.comp-aviso{background:var(--errbg);color:var(--err);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;font-weight:600}
+.fx-titulo{font-size:15px;margin:0}
+.painel-comp .l{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}.painel-comp h3+.l{border-top:0}
+.painel-comp .l small{display:block;color:var(--muted);font-size:12px}.painel-comp .v{font-weight:700;white-space:nowrap}
+.painel-comp h3{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.barra{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}.barra i{display:block;height:100%;background:var(--accent)}
+.fechamento{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.fechamento p{margin:4px 0 0}
+.nota-global{margin:0 0 10px}
+@media (max-width:760px){.topo-dir{width:100%}.comp-global{flex:1 1 100%;justify-content:space-between}.comp-rot{min-width:0}.comp-rot small{white-space:normal}}
+.comp-global[hidden]{display:none}
+.conflitos li{margin:4px 0}.opcao-conf{display:block;margin:6px 0;font-size:13px}
+.st.dec-nc,.marc.dec-nc{background:var(--okbg);color:var(--ok)}.st.dec-considerar,.marc.dec-considerar{background:#efe7fa;color:#6b3fa0}
+.st.dec-dispensado,.marc.dec-dispensado{background:var(--line);color:var(--muted)}
+td .st.dec-nc,td .st.dec-considerar,td .st.dec-dispensado{margin-left:4px}
+.card[hidden]{display:none}
+/* ---------- Fechamento ---------- */
+.fs{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.fs-verificar{background:var(--errbg);color:var(--err)}.fs-sem{background:#fff0d6;color:#9a5b00}.fs-conferido{background:#eceff3;color:#55606e}.fs-enviado{background:var(--infobg);color:var(--info)}.fs-concluido{background:var(--okbg);color:var(--ok)}
+.fh-tab td,.fh-tab th{white-space:nowrap}.fh-tab td input{font-size:12px;padding:2px 5px}
+.fh-faixa td{background:var(--infobg);color:var(--accent);font-weight:700}.fh-cnpj td{font-size:10.5px;color:var(--muted)}.fh-total td{font-weight:800;border-top:2px solid var(--line)}
+.fh-aviso{display:inline-block;max-width:320px;white-space:normal;color:var(--warn);font-size:11.5px;font-weight:600}
+.fh-sub{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.fh-ind{width:100%;font-size:13px}.fh-ind td{padding:4px 0;border-bottom:1px solid var(--line)}
+.aviso-fixo.ok{background:var(--okbg);color:var(--ok)}
+small.evid{display:block;color:var(--info)}
+.subabas button em{font-style:normal;font-size:11px;color:var(--muted);font-weight:400;margin-left:4px}
+.subabas{overflow-x:auto}.subabas button{white-space:nowrap}
+.nc-kpi .fs{white-space:normal}
+.fh-tab th.fh-un{white-space:normal;min-width:84px;max-width:120px;line-height:1.2}.fh-tab th.fh-un small{display:block;font-weight:400;font-size:10px;opacity:.85}
+.fh-tab .fh-nome{position:sticky;left:0;z-index:1;background:var(--card);box-shadow:1px 0 0 var(--line)}
+.fh-tab th.fh-nome{background:var(--accent)}
+/* Cabeçalho acima das linhas ao rolar para baixo; o título da coluna do prestador acima de tudo (fixo nos dois sentidos). */
+.fh-tab th{z-index:2}.fh-tab th.fh-nome{z-index:3}
+.fh-faixa td.fh-pct{font-size:12.5px;white-space:nowrap}
+.fontes .card{margin-bottom:0}.grid3.fontes{margin-bottom:14px}
+/* ---------- Campo de busca no cadastro ---------- */
+.campo-busca{position:relative}
+.busca-lista{position:absolute;left:0;right:0;top:100%;margin-top:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.16);z-index:60;max-height:280px;overflow-y:auto}
+.busca-lista[hidden]{display:none}
+.busca-lista .op{display:flex;gap:10px;align-items:baseline;padding:7px 10px;font-size:13px;color:var(--text);cursor:pointer}
+.busca-lista .op.on,.busca-lista .op:hover{background:var(--infobg)}
+.busca-lista .op b{min-width:48px;color:var(--accent)}.busca-lista .op small{margin-left:auto;color:var(--muted);font-size:11px;text-align:right}
+.busca-lista .op.novo{border-top:1px solid var(--line);color:var(--accent);font-weight:600}.busca-lista .op.vazio{color:var(--muted);cursor:default}
+#dlgCorpo{overflow:visible}
+/* Menu da situação do prestador (Fechamento) */
+button.fs{border:0;cursor:pointer;font:inherit;font-size:11px;font-weight:700}
+.fs-manual{display:block;font-size:11px;color:var(--err);white-space:normal;max-width:240px;margin-top:2px}
+.menu-sit{position:fixed;z-index:80;width:320px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:6px}
+.menu-sit .cab{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:6px 10px 4px;font-weight:700}
+.menu-sit button{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:13px;font-weight:500}
+.menu-sit button:hover{background:var(--infobg)}.menu-sit small{color:var(--muted);font-size:11px;white-space:nowrap}
+.menu-sit hr{border:0;border-top:1px solid var(--line);margin:4px 0}.menu-sit .rodape{font-size:12px;color:var(--muted);padding:6px 10px}
+.memoria-v3{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin:0;max-height:52vh;overflow:auto}
+dialog:has(.dlg-largo){max-width:900px}
+.alerta-desc{border-radius:8px;padding:7px 10px;margin:4px 0;font-size:13px;background:var(--bg);border:1px solid var(--line)}
+button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--warnbg);color:var(--warn);border:1px solid transparent;white-space:nowrap;cursor:pointer}
+.fh-avisos-bt .seta{display:inline-block;transition:transform .15s}.fh-avisos-bt.aberto .seta{transform:rotate(90deg)}button.fh-avisos-bt:hover{border-color:var(--warn)}
+.fh-det .fh-det-corpo{position:sticky;left:0;max-width:min(900px,calc(100vw - 80px));white-space:normal;font-size:12.5px}.fh-det ul{margin:4px 0 2px;padding-left:18px}.fh-det li{margin:2px 0}
+.lista-semvinc{columns:2 340px;padding-left:18px}.lista-semvinc li{break-inside:avoid;margin:3px 0}.lista-semvinc li button{margin-left:6px;padding:1px 8px;font-size:11.5px}
+.opcoes-check{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:4px 0}
+.opcoes-check label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
+.opcoes-check label:has(input:checked){border-color:var(--accent);background:var(--infobg)}
+.opcoes-check input{margin-top:3px;width:16px;height:16px;flex:none}.opcoes-check b{display:block;font-size:13.5px}.opcoes-check small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.35}
+.aceite-box{border:2px solid var(--accent);border-radius:12px;padding:12px 14px;margin:12px 0;background:var(--infobg)}
+.aceite-box.feito{border-color:var(--ok);background:var(--okbg)}.aceite-box .campo{margin-top:4px}
+.hist-cob{display:flex;align-items:flex-end;gap:8px;margin-top:6px}.hist-cob div{flex:1;text-align:center;font-size:11px;color:var(--muted)}.hist-cob small{display:block;font-size:10px}
+.hist-cob span{display:block;width:60%;margin:0 auto 3px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.7}.hist-cob span.atual{background:var(--ok);opacity:1}
+.lote-dv{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--infobg);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.lote-dv.vazio{opacity:.8}
+.sug-fx{display:block;margin-top:3px;font-size:11.5px;color:var(--info)}.sug-fx button{margin-left:4px;padding:1px 8px;font-size:11px}
+.pbi-resumo{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:13px}.pbi-resumo .marc{cursor:default}
+.guardada{margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--bg);border:1px solid var(--line)}
+.tag-cp{display:inline-block;font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:1px;background:var(--bg)}
+.item-cp{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.8fr) minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
+.item-cp .alt-cp{width:100%;margin-top:-4px}.sim-cp{background:var(--okbg);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px}
+@media (max-width:700px){.item-cp{grid-template-columns:1fr}}
+/* SOL-F35 — Prestadores por unidade */
+.aviso-fixo.err{background:var(--errbg);color:var(--err)}
+.cu-un{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.cu-un button{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-weight:600}
+.cu-un button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cu-un .q{margin-left:6px;font-weight:800}
+.cu-res{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.cu-k{border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px;min-width:90px}
+.cu-k b{display:block;font-size:17px}
+.cu-tab tr.cu-falta td{background:var(--warnbg)}
+.cu-outros{border:1px dashed var(--line);border-radius:10px;padding:6px 10px;margin-top:10px}
+.cu-outros summary{cursor:pointer;color:var(--muted);font-weight:600}
+.cu-ini .linha-ini{padding:6px 0;border-bottom:1px solid var(--line)}
+.fh-ctl{margin:14px 0 8px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:0 12px}
+.fh-ctl>summary{cursor:pointer;padding:10px 0;list-style:revert}
+.fh-ctl[open]>summary{border-bottom:1px solid var(--line);margin-bottom:8px}
+.fh-ctl .aviso-fixo{margin:6px 0}
+.bolinha{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--err);font-size:12px;font-weight:700;vertical-align:middle;color:var(--card)}
+.bolinha.warn{background:var(--warn)}
+.fh-ctl[open] .bolinha{opacity:.55}
+/* SOL-F36 — Fluxo sincronizado e divisão do trabalho */
+.sy-barra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-radius:12px;padding:8px 12px;font-size:12.5px;margin-bottom:12px;border:1px solid var(--line)}
+.sy-barra.ok{background:var(--okbg);border-color:var(--ok)}.sy-barra.warn{background:var(--warnbg);border-color:var(--warn)}.sy-barra.off{background:var(--card)}
+.sy-barra code{font-size:12px;word-break:break-all}.sy-esp{flex:1}
+.sy-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block}.sy-barra.ok .sy-dot{background:var(--ok)}.sy-barra.warn .sy-dot{background:var(--warn)}
+.sy-conf{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;display:flex;flex-direction:column;gap:4px}
+.dv-fichas .marc.sel .muted{color:inherit;opacity:.8}.dv-bloco{margin-top:14px}.dv-bloco h3{margin:0 0 4px;font-size:14px}
+.dv-quadro{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:8px}
+.dv-cel{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px;display:flex;flex-direction:column;gap:2px}
+.dv-cel small{color:var(--muted)}.dv-cel .acoes{margin-top:6px}
+.dv-cel.eu{border-color:var(--accent);background:var(--infobg)}.dv-cel.outro{border-color:#b89be0;background:#f4eefb}.dv-cel.ok{border-color:var(--ok);background:var(--okbg)}
+.dv-quem{font-weight:700}.dv-cel.outro .dv-quem{color:#5b3d99}
+.dv-feed{margin-top:10px;font-size:12.5px}.dv-feed summary{cursor:pointer;color:var(--muted);font-weight:600}.dv-feed div{padding:4px 0;border-bottom:1px solid var(--line)}
+.dv-aviso{border:1px solid #b89be0;background:#f4eefb;border-radius:10px;padding:8px 12px;font-size:12.5px;margin:8px 0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dv-cel.outro,:root:not([data-theme="light"]) .dv-aviso{background:#2a2140;border-color:#6b4fa0}:root:not([data-theme="light"]) .dv-cel.outro .dv-quem{color:#cdb6f2}}
+:root[data-theme="dark"] .dv-cel.outro,:root[data-theme="dark"] .dv-aviso{background:#2a2140;border-color:#6b4fa0}
+/* Equivalências: agrupar por título (compostas na lista de pendentes) */
+.cp-bt{background:#5b3d99;border-color:#5b3d99;color:#fff}.cp-bt:disabled{opacity:.5}
+.eq-grupos td{vertical-align:top}.tag-cod{display:flex;gap:6px;align-items:baseline;font-size:12.5px;padding:2px 0}
+/* Pasta raiz no Início */
+.pr-card.ok{border-left:4px solid var(--ok)}.pr-card.warn{border-left:4px solid var(--warn)}.pr-card.off{border-left:4px solid var(--accent)}
+.pr-st{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+/* Início: filtros da lista de relatórios do MV */
+.lm-filtros{margin-bottom:4px}.lm-tab{max-height:560px;overflow:auto}
+.cf-fil{margin-bottom:6px}.cf-fil .campo{min-width:180px}
+/* SOL-F40 — Conferência por causa */
+.cf-barra{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:8px 0}
+.cf-barra span{display:block;height:100%}
+.cf-det{margin-top:10px}.cf-det summary{cursor:pointer;color:var(--muted);font-weight:600;font-size:13px}
+.cz{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.cz small{color:var(--muted);display:block;font-size:12px;margin-top:2px}.cz.cz-sl{background:var(--infobg)}
+.cz-n{font-size:22px;font-weight:800;text-align:right;line-height:1}.cz-n small{font-size:11px;font-weight:600}
+.cz-sep{border-top:1px dashed var(--line);margin:12px 0 4px;padding-top:8px;font-size:12.5px;color:var(--muted);font-weight:600}
+.cf-fl{background:var(--infobg);border-radius:8px;padding:6px 10px;margin-top:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+@media (max-width:700px){.cz{grid-template-columns:minmax(0,1fr)}.cz-n{text-align:left}}
+.cp-leitura{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:4px;max-width:420px;line-height:1.35}
+.modo-cp{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:13px}
+/* Cadastro de regra composta em 4 perguntas */
+.cp-passo{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;margin:12px 0}
+.cp-n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:13px}
+.cp-passo h4{margin:3px 0 6px;font-size:14px;text-transform:none;letter-spacing:0;color:var(--text)}
+.cp-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.cp-chip{background:var(--infobg);color:var(--info);border-radius:999px;padding:3px 4px 3px 10px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.cp-chip button{background:none;border:0;color:inherit;padding:0 6px;font-weight:800;cursor:pointer}
+.cp-modo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.cp-modo button{text-align:left;background:var(--card);color:var(--text);border:2px solid var(--line);border-radius:10px;padding:8px 10px;font-weight:400}
+.cp-modo button.on{border-color:var(--accent);background:var(--infobg)}.cp-modo small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.cp-proc{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:4px 0;font-size:13px}
+.cp-qtd{display:inline-flex;align-items:center;gap:4px;font-size:12.5px}.cp-qtd button{padding:0 8px;min-height:24px}
+.cp-x{background:none;border:0;color:var(--err);font-weight:800;cursor:pointer;padding:0 6px}
+.cp-ou{text-align:center;font-size:12px;font-weight:800;color:var(--muted)}
+.cp-exc{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;border:1px dashed var(--line);border-radius:8px;padding:6px 10px;margin-bottom:6px}
+.cp-exc input[type=text]{width:140px}.cp-exc select{max-width:260px}
+.cp-como{background:var(--okbg);border:1px solid var(--ok);border-radius:10px;padding:8px 12px;font-size:13px;margin-top:6px}
+.cp-mais{margin-top:6px}.cp-mais summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:12.5px}
+@media (max-width:700px){.cp-modo{grid-template-columns:1fr}}
+/* v3.0 — Configurações em categorias, cor de destaque, modelos de exportação e aviso de versão */
+.cfg-abas{margin:0 0 14px}
+.acentos{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.acento{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 6px;border:1px solid var(--line);border-radius:999px;cursor:pointer;background:var(--card)}
+.acento input{position:absolute;opacity:0;pointer-events:none}
+.acento i{width:18px;height:18px;border-radius:50%;display:block}
+.acento.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.acento:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.ex-cols{columns:3 260px;padding-left:22px;margin:8px 0}
+.ex-cols li{break-inside:avoid;display:flex;align-items:center;gap:6px;justify-content:space-between;padding:2px 0}
+.ex-cols li.off{color:var(--muted)}
+.ex-mov{display:inline-flex;gap:2px}.ex-mov .mini{padding:0 7px;min-width:0}
+.aviso-versao{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--warnbg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:12px}
+.aviso-versao span{color:var(--text)}.aviso-versao button{margin-left:auto}
+.tt-lista{max-height:62vh;overflow:auto}
+.tt-titulo{cursor:pointer}.tt-titulo.on td{background:var(--infobg)}
+.tt-painel{position:sticky;top:12px}
+.tt-sug{list-style:none;padding:0;margin:6px 0}
+.tt-sug li{display:flex;gap:8px;align-items:baseline;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.tt-sug li:last-child{border-bottom:0}
+.tt-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1100px){.tt-grid{grid-template-columns:minmax(0,1fr)}.tt-painel{position:static}}
+/* SOL-F43 — conferência oficial: classes de fechamento, totais, abas, filtros e correções no MV */
+:root{--cl-devido:#c6efce;--cl-aceito:#e4dcf5;--cl-pend:#ffeb9c;--cl-nc:#ffc7ce;--cl-excluido:#e4e4e4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}}
+:root[data-theme="dark"]{--cl-devido:#1d4a2b;--cl-aceito:#3a2f55;--cl-pend:#4d3d10;--cl-nc:#4d2126;--cl-excluido:#333b46}
+.cl-devido{background:var(--cl-devido)}.cl-aceito{background:var(--cl-aceito)}.cl-pend{background:var(--cl-pend)}.cl-nc{background:var(--cl-nc)}.cl-excluido{background:var(--cl-excluido)}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{color:var(--s-t)}
+.cf-barra-cl{display:flex}.cf-barra-cl span{display:block;height:100%}
+.cf-abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin:4px 0 12px;padding-top:4px}
+.cf-abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;margin-bottom:-2px;white-space:nowrap;font-weight:600}
+.cf-abas button:hover{color:var(--text);background:transparent}
+.cf-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.cf-abas .n{display:inline-block;vertical-align:1px;line-height:16px;margin-left:6px;border-radius:999px;padding:0 7px;font-size:11px;background:var(--line);color:var(--text)}
+.cf-abas .n.alerta{background:var(--err);color:#fff}
+.totais-cl{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(5,minmax(120px,1fr));gap:8px}
+.tot-cl{border-radius:10px;padding:10px 12px;border:1px solid var(--line);background:var(--card);cursor:pointer;text-align:left;color:var(--text);font-weight:400}
+.tot-cl:hover{background:var(--card);border-color:var(--accent)}
+.tot-cl b{display:block;font-size:18px;font-variant-numeric:tabular-nums}.tot-cl small{display:block;color:var(--muted);font-size:11.5px}
+.tot-cl .faixa{display:block;height:5px;border-radius:3px;margin-bottom:6px}
+.tot-cl.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.tot-cl.pagar{background:var(--accent);border-color:var(--accent);color:var(--on-accent);cursor:default}
+.tot-cl.pagar b{font-size:24px}.tot-cl.pagar small{color:var(--on-accent);opacity:.88}
+.cf-filtros{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;align-items:end;margin-top:10px}.cf-filtros>label:first-child{grid-column:span 2}
+.cf-filtros .campo{margin:0;min-width:0}.cf-filtros select{max-width:100%}
+.cf-fchk{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
+.cf-selinfo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--infobg)}
+.aviso-mv{border:1px solid var(--err);background:var(--errbg);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
+.aviso-mv b{color:var(--err)}
+.obs-i{color:var(--accent);font-weight:700}
+.cf-obs{width:100%;min-height:52px}
+.st.dec-resolvido,.marc.dec-resolvido{background:var(--warnbg);color:var(--warn)}
+.fh-classes{margin-bottom:2px;white-space:normal}
+@media (max-width:1100px){.totais-cl{grid-template-columns:repeat(3,minmax(0,1fr))}.tot-cl.pagar{grid-column:1/-1}}
+@media (max-width:760px){.totais-cl{grid-template-columns:1fr 1fr}}
+.st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{display:inline-block;padding:2px 8px;border-radius:999px;font-weight:700;font-size:11.5px;white-space:nowrap}
+.arvore{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;line-height:1.5;margin:8px 0}
+/* SOL-F19 — Quadro por prestador (Fechamento) */
+.quadro{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto;padding-bottom:4px}
+.qd-col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:120px}
+.qd-col h3{font-size:13px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+.qd-n{background:var(--line);border-radius:10px;padding:0 8px;font-size:12px}
+.qd-card{display:flex;flex-direction:column;align-items:stretch;gap:3px;width:100%;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:7px 8px;margin:0 0 6px;font-weight:400;cursor:pointer}
+.qd-card:hover{background:var(--card);border-color:var(--accent)}
+.qd-card.qd-verif{border-left-color:var(--err)}
+.qd-nome{font-weight:600;font-size:13px}.qd-meta,.qd-data{font-size:11.5px;color:var(--muted)}
+.qd-tag{font-size:11px;border-radius:6px;padding:1px 6px;align-self:flex-start}
+.qd-tag.warn{background:var(--warnbg);color:var(--warn)}.qd-tag.err{background:var(--errbg);color:var(--err)}.qd-tag.info{background:var(--infobg);color:var(--info)}
+.qd-concluido .qd-card{border-left-color:var(--ok)}.qd-terceiros .qd-card{border-left-color:var(--warn)}
+/* SOL-F20 — Retrospectiva (Fluxo mensal) */
+.rt-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.rt-kpi{margin:0;padding:12px 14px}.rt-kpi h3{margin:0 0 4px;font-size:12px;color:var(--muted);font-weight:700}.rt-kpi b{display:block;font-size:22px}.rt-kpi small{display:block;font-size:12px;margin-top:2px}
+.rt-tend{font-size:11px;font-weight:700}.rt-tend.melhor{color:var(--ok)}.rt-tend.pior{color:var(--err)}
+.rt-comp td.rt-atual{background:var(--infobg);font-weight:600}.rt-comp th.rt-atual{text-decoration:underline;text-underline-offset:3px}
+.rt-barra{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 70px;gap:4px 10px;align-items:center;margin:6px 0}
+.rt-barra>div{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.rt-barra i{display:block;height:100%;background:var(--accent2)}
+.rt-barra.gargalo i{background:var(--err)}.rt-barra b{text-align:right;font-size:13px}.rt-barra small{grid-column:2/4;margin-top:-4px}
+.rt-lista{list-style:none;padding:0;margin:8px 0 0}.rt-lista li{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-top:1px solid var(--line);padding:8px 0}.rt-lista p{margin:0 0 2px;white-space:pre-wrap}
+.rt-lista select{max-width:150px}
+.rt-nova{display:grid;grid-template-columns:minmax(0,1fr) 220px auto;gap:8px;align-items:start}.rt-nova textarea{width:100%}
+@media (max-width:760px){.rt-nova{grid-template-columns:minmax(0,1fr)}.rt-barra{grid-template-columns:minmax(0,1fr) 60px}.rt-barra>div{grid-column:1/3;grid-row:2}.rt-barra small{grid-column:1/3}.rt-grid{grid-template-columns:minmax(0,1fr)}}
+
+
+.prev-banner{background:var(--infobg);color:var(--info);border:1px dashed var(--info);border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:12px}
+.prev-nota{background:var(--warnbg);color:var(--text);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:12px}
+.prev-lista{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:8px}.prev-lista li{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prev-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.prev-modo{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.prev-modo button{border:0;border-radius:0;background:var(--card);color:var(--muted)}.prev-modo button.on{background:var(--accent);color:var(--on-accent)}
+.prev-fech{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px;align-items:start}
+.prev-avanc{margin:10px 0;border:1px solid var(--line);border-radius:8px;padding:8px 10px}.prev-avanc summary{cursor:pointer;font-weight:600;color:var(--muted)}
+.prev-indic{font-size:12px}
+
+.prev-pede li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.prev-pede li>span:first-child{min-width:28px;text-align:center}
+.badge.neutro{background:var(--line);color:var(--text)}
+.prev-selbar[hidden],.prev-gaveta[hidden],.prev-escolher[hidden]{display:none!important}
+.prev-param{padding:12px 16px}.prev-dlg{margin-top:10px;padding:12px;border:1px solid var(--accent);border-radius:10px;background:var(--bg)}.prev-dlg[hidden]{display:none}
+.prev-envs{display:grid;gap:2px;justify-items:start}.prev-env{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px 1px 4px;white-space:nowrap;cursor:pointer}.prev-env.on{background:var(--okbg);color:var(--ok);border-color:transparent}.prev-env input{margin:0}.prev-envc{text-align:center}.prev-pillmini{font-size:11px;background:var(--warnbg);color:var(--warn);border-radius:999px;padding:0 7px;margin-left:4px;font-weight:700}
+.prev-menu{position:relative}.prev-menu summary{list-style:none;cursor:pointer;padding:8px 14px;border:1px solid var(--accent);border-radius:8px;color:var(--accent);font-weight:600;background:var(--card)}.prev-menu>div{position:absolute;right:0;top:calc(100% + 4px);z-index:5;display:grid;gap:6px;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);min-width:230px}
+.prev-kpis{gap:12px}.nc-kpis.prev-chips .marc{border-radius:10px;text-align:left}.nc-kpis .marc.sel{box-shadow:0 0 0 2px var(--accent) inset}.gprog .barra{display:block}.prev-kpis{gap:12px}.nc-kpis.prev-chips .marc{border-radius:10px;text-align:left}.nc-kpis .marc.sel{box-shadow:0 0 0 2px var(--accent) inset}.prev-escolher{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.prev-param-linha{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;font-size:13px}
+.prev-res-topo{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.prev-pagar{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.prev-cls{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.prev-cl{display:grid;grid-template-columns:10px auto;column-gap:6px;align-items:center;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--line);font-weight:400;padding:6px 10px}
+.prev-cl>span{width:10px;height:10px;border-radius:3px;grid-row:span 3}.prev-cl b{font-variant-numeric:tabular-nums}.prev-cl small{color:var(--muted);font-size:11px}.prev-cl.sel{box-shadow:0 0 0 2px var(--accent) inset}
+.prev-barra-filtros{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.prev-busca{min-width:260px;flex:0 1 340px}
+.prev-etq{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}.prev-tag{font-size:12px;background:var(--infobg);color:var(--info);border-radius:999px;padding:2px 10px;cursor:pointer}
+.prev-gaveta{margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.prev-selbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--accent);color:var(--on-accent)}.prev-selbar button.sec{background:var(--card)}
+.prev-tab tr.prev-aberta td{background:var(--infobg)}.prev-det{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;padding:6px 2px}
+.prev-cmp>div{display:grid;grid-template-columns:110px 1fr 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:12.5px}.prev-cmp>div>span:first-child{color:var(--muted)}
+.prev-cmp .prev-cmp-cab{border-bottom:2px solid var(--line)}.prev-cmp .dif{background:var(--warnbg)}
+.prev-causa{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.prev-hoje-topo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.prev-minha{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.prev-and{display:flex;flex-direction:column;gap:10px}.prev-and-t{display:flex;justify-content:space-between;align-items:baseline}
+.prev-barra{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line);margin:3px 0}.prev-barra span{display:block;height:100%}
+.prev-leg{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 3px 0 8px;vertical-align:-1px}
+.prev-carregar summary{cursor:pointer;color:var(--accent)}
+.prev-feito summary{cursor:pointer}
+@media (max-width:1100px){.prev-grid3{grid-template-columns:1fr}.prev-fech{grid-template-columns:1fr}}
+
+</style>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>prévia · navegação simplificada</small></div></div>
+    <nav class="nav" id="navPrincipal" aria-label="Navegação principal"><h4 class="grupo-nav">TRABALHO DO MÊS</h4>
+<a href="#inicio" data-pag="inicio" class="ativo" aria-label="Início"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="rot">Início</span><span class="curto" aria-hidden="true">Início</span><span class="dica" aria-hidden="true">Início</span></a>
+<a href="#conferencia" data-pag="conferencia" class="" aria-label="Conferência"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13"/><path d="M14 4l4 4-4 4"/><path d="M20 16H7"/><path d="M10 12l-4 4 4 4"/></svg><span class="rot">Conferência</span><span class="curto" aria-hidden="true">Conferir</span><b class="pill">24</b><span class="dica" aria-hidden="true">Conferência</span></a>
+<a href="#equivalencias" data-pag="equivalencias" class="" aria-label="Equivalências TUSS"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/><path d="M10 7h4a3 3 0 0 1 3 3v4"/><path d="M15 12l2 2 2-2"/></svg><span class="rot">Equivalências TUSS</span><span class="curto" aria-hidden="true">TUSS</span><span class="dica" aria-hidden="true">Equivalências TUSS</span></a>
+<a href="#nc" data-pag="nc" class="" aria-label="Não conformidades"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5L2.8 19.5h18.4z"/><path d="M12 10v4.5"/><path d="M12 17.2v.1"/></svg><span class="rot">Não conformidades</span><span class="curto" aria-hidden="true">NCs</span><b class="pill">3</b><span class="dica" aria-hidden="true">Não conformidades</span></a>
+<a href="#fechamento" data-pag="fechamento" class="" aria-label="Fechamento e envio"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8"/><path d="M8.5 16.5l1.8 1.8 3.7-3.7"/></svg><span class="rot">Fechamento e envio</span><span class="curto" aria-hidden="true">Fechar</span><span class="dica" aria-hidden="true">Fechamento e envio</span></a>
+<h4 class="grupo-nav">CONFIGURAÇÕES</h4>
+<a href="#bases" data-pag="bases" class="" aria-label="Bases e regras"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span class="rot">Bases e regras</span><span class="curto" aria-hidden="true">Bases</span><span class="dica" aria-hidden="true">Bases e regras</span></a>
+<a href="#configuracoes" data-pag="configuracoes" class="" aria-label="Configurações"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="rot">Configurações</span><span class="curto" aria-hidden="true">Ajustes</span><span class="dica" aria-hidden="true">Configurações</span></a></nav>
+    <div class="side-note"><strong>Prévia</strong><p>Sem código do app. Dados fictícios. Clique no menu para ver cada tela.</p></div>
+  </aside>
+  <main class="main">
+    <div class="prev-banner"><b>Prévia da simplificação (10 → 7 itens no menu).</b> Saem do menu: Correção de prestador (vai para dentro da Conferência), Rodadas (vira «Detalhes e histórico» da Conferência) e Fluxo mensal (junta com o Fechamento). Nenhuma regra muda.</div>
+    <header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1 id="titulo">Início</h1></div>
+      <div class="topo-dir"><span class="chip">Competência 11/2026</span><span class="chip prev-indic">Pasta: conectada ✓</span><span class="chip">Operador: Leo</span></div></header>
+    <section class="pag" id="prev-inicio"><div class="prev-nota"><b>O que muda:</b> o Início vira o <b>painel do dia</b>: o que falta fazer, em uma tela. Saem daqui o passo a passo «Preparar o repasse», os 3 quadros grandes de upload (viram «Carregar manualmente», fechado), os 2 cartões que só levavam à Conferência e à Correção (o menu já faz isso) e a lista longa de relatórios carregados — que vira a tabela «Relatórios do mês» com situação e ação. A pasta raiz vira o aviso no topo; configurar fica em Configurações. Os marcos completos e as etapas continuam no «Fechamento e envio».</div>
+<div class="card prev-hoje">
+ <div class="prev-hoje-topo"><div><span class="eyebrow">COMPETÊNCIA 11/2026 · ABERTA</span><h2 style="margin:2px 0 0">Segunda, 24/11 · produção 10/2026</h2></div>
+  <div class="prev-minha"><span class="small muted">Divisão do trabalho:</span> <span class="badge info">Você: USG un. 1 e 17 · IMG un. 1</span> <span class="badge neutro">Ana: USG un. 2, 4 e 10 · Curitiba</span> <label class="small"><input type="checkbox" checked> só a minha parte</label></div></div>
+ <div class="marcos-linha" style="margin-top:10px">
+  <button class="marco passado"><b>10/11</b>Envio de relatórios USG<small>5 dias antes do pagamento</small></button>
+  <button class="marco passado"><b>16/11</b>Pagamento USG<small>dia 15 (útil anterior)</small></button>
+  <button class="marco hoje"><b>24/11 · hoje</b>NCs de USG<small>15º dia útil</small></button>
+  <button class="marco hoje"><b>24/11 · hoje</b>Início da classificação / IMG<small>15º dia útil</small></button>
+  <button class="marco prox"><b>25/11</b>Envio de relatórios IMG<small>5 dias antes do pagamento IMG</small></button>
+  <button class="marco prox"><b>25/11</b>Envio Curitiba<small>o que vier primeiro</small></button>
+  <button class="marco"><b>30/11</b>Pagamento IMG e Sedação<small>último dia útil</small></button>
+  <a class="small" href="#fechamento" data-ir="fechamento" style="align-self:center;white-space:nowrap">Todos os marcos e etapas →</a></div></div>
+
+<div class="prev-grid3">
+ <div class="card"><h2>Arquivos do mês</h2>
+  <div class="painel-comp" style="padding:0;border:0;box-shadow:none">
+   <div class="l"><div>Relatórios do MV <small>Comp_11-2026 › Relatórios para conferência</small></div><span class="v"><span class="badge ok">14 PDFs</span></span></div>
+   <div class="l"><div>Laudos do Apolo <small>apolo_10-2026.xlsx · 27.412 laudos · guardada</small></div><span class="v"><span class="badge ok">ok</span></span></div>
+   <div class="l"><div>Power BI <small>explica os «Só no laudo» e sugere o responsável da NC</small></div><span class="v"><span class="badge warn">falta</span></span></div>
+   <div class="l"><div>Última leitura da pasta <small>hoje 08:12 · 2 PDFs novos · 1 atualizado</small></div><span class="v"><span class="badge neutro">1 ignorado</span></span></div></div>
+  <div class="acoes"><button>Atualizar da pasta</button><details class="prev-carregar"><summary class="small">Carregar manualmente…</summary><div class="dz" style="margin-top:6px">Arraste PDFs do MV, a planilha do Apolo ou do Power BI<small>a ferramenta reconhece qual é qual</small></div></details></div></div>
+
+ <div class="card"><h2>Andamento por repasse</h2>
+  <div class="prev-and">
+   <div><div class="prev-and-t"><b>USG</b><span class="small muted">14 prestadores</span></div><div class="prev-barra"><span class="cl-devido" style="width:57%"></span><span class="cl-aceito" style="width:21%"></span><span class="cl-pend" style="width:14%"></span></div><div class="small muted">8 enviados · 3 aceitos · 2 conferindo · 1 a conferir</div></div>
+   <div><div class="prev-and-t"><b>IMG</b><span class="small muted">10 prestadores</span></div><div class="prev-barra"><span class="cl-aceito" style="width:20%"></span><span class="cl-pend" style="width:50%"></span></div><div class="small muted">2 aceitos · 5 conferindo · 3 a conferir</div></div>
+   <div><div class="prev-and-t"><b>Curitiba (V3)</b><span class="small muted">3 médicos</span></div><div class="prev-barra"><span class="cl-pend" style="width:33%"></span></div><div class="small muted">1 conferindo · 2 a conferir · <b style="color:var(--warn)">envio amanhã</b></div></div>
+   <div><div class="prev-and-t"><b>Sedação</b><span class="small muted">2 prestadores</span></div><div class="prev-barra"></div><div class="small muted">aguardando relatórios das máquinas</div></div></div>
+  <p class="small muted" style="margin:6px 0 0"><span class="prev-leg cl-devido"></span>enviado <span class="prev-leg cl-aceito"></span>aceito <span class="prev-leg cl-pend"></span>conferindo</p></div>
+
+ <div class="card"><h2>Pede você</h2>
+  <ul class="prev-lista prev-pede">
+   <li><span class="badge err">2</span> <span>procedimentos com NC <b>continuam no MV</b> (R$ 52,50)</span> <button class="mini sec">Ver</button></li>
+   <li><span class="badge warn">24</span> <span>decisões em 3 relatórios</span> <button class="mini sec">Continuar</button></li>
+   <li><span class="badge warn">2</span> <span>médicos laudaram e não têm relatório no MV</span> <button class="mini sec">Gerar no MV</button></li>
+   <li><span class="badge info">5</span> <span>títulos do Apolo sem equivalência</span> <button class="mini sec">Resolver</button></li>
+   <li><span class="badge info">3</span> <span>NCs aguardando correção no MV</span><span></span></li>
+   <li><span class="badge neutro">1</span> <span>PDF de outra produção ignorado na pasta</span><span></span></li></ul></div>
+</div>
+
+<div class="card"><div class="fx-topo" style="margin-bottom:8px"><h2 style="margin:0">Relatórios do mês</h2>
+  <div class="marcadores" style="margin:0"><button class="marc sel">Todos · 14</button><button class="marc">A conferir · 3</button><button class="marc">Com decisões · 3</button><button class="marc">Aceitos · 5</button><button class="marc">Enviados · 3</button></div></div>
+ <div class="tw"><table><thead><tr><th>Prestador</th><th>Unidade · grupo</th><th>Repasse</th><th>Situação</th><th class="n">Para pagamento</th><th class="n">Pendente</th><th></th></tr></thead><tbody>
+  <tr><td>7873 - Gabriel Bianchini</td><td>1 · USG</td><td class="small">25037</td><td><span class="st st-pendente">a conferir</span></td><td class="n">—</td><td class="n">—</td><td><button class="mini">Conferir</button></td></tr>
+  <tr><td>15 - Marcelo Miyazaki</td><td>1 · IMG</td><td class="small">25022 + 25029</td><td><span class="st st-ressalva">24 decisões</span></td><td class="n">3.792,44</td><td class="n" style="color:var(--warn)">875,13</td><td><button class="mini sec">Continuar</button></td></tr>
+  <tr><td>10264 - Melanie Butarello</td><td>1 · IMG</td><td class="small">25022</td><td><span class="st st-ressalva">2 decisões</span></td><td class="n">397,80</td><td class="n" style="color:var(--warn)">35,00</td><td><button class="mini sec">Continuar</button></td></tr>
+  <tr><td>3 - Rafael</td><td>17 · USG</td><td class="small">25031</td><td><span class="st st-conferido">aceito</span></td><td class="n">2.693,49</td><td class="n">—</td><td><button class="mini sec">Copiar e-mail</button></td></tr>
+  <tr><td>7 - Marcelo Marini</td><td>17 · USG</td><td class="small">25031</td><td><span class="badge info">e-mail enviado</span></td><td class="n">8.084,46</td><td class="n">—</td><td><button class="mini sec">Ver</button></td></tr>
+  <tr><td>2 - Prestador genérico</td><td>10 · Correção</td><td class="small">25040</td><td><span class="st st-pendente">a identificar</span></td><td class="n">—</td><td class="n">—</td><td><button class="mini">Corrigir prestador</button></td></tr></tbody></table></div>
+ <p class="small muted" style="margin:6px 0 0">Clique numa linha para abrir a conferência desse relatório já com unidade e médico escolhidos. Mostrando 6 de 14 (só a minha parte).</p></div>
+
+<details class="card prev-feito"><summary><b>Feito nesta competência</b> <span class="small muted">— 31 rodadas · 18 aceites · 12 NCs registradas · 4 alterações nas bases</span></summary>
+ <div class="painel-comp" style="padding:0;border:0;box-shadow:none;margin-top:8px"><div class="l"><div>Ana validou 6 equivalências <small>«USG DE MAMAS COM DOPPLER», «ULTRASSONOGRAFIA DE TIREOIDE»…</small></div><span class="v small">ontem 17:40</span></div><div class="l"><div>Leo cadastrou o alias «Marcelo Yuiti Miyazaki» → 15 <small>Bases e regras</small></div><span class="v small">22/11 10:05</span></div></div></details>
+</section><section class="pag" id="prev-conferencia" hidden><div class="prev-nota"><b>O que muda:</b> <b>uma tela para conferir e corrigir prestador</b> (seletor no topo). Depois de executar, os parâmetros viram uma linha; <b>«Trocar relatório ou parâmetros» abre a escolha</b> (relatório da lista por unidade e grupo; a unidade dos laudos vem do relatório). Os 8 cartões de situação somem: a <b>classe</b> (Devido, Aceito, Pendente, NC, Excluído) é a única faixa de totais, e a situação aparece na própria linha. Os 8 filtros ficam atrás de «Filtros» (os ativos aparecem como etiquetas). Os 7 botões de lote só aparecem quando você marca linhas. A linha aberta mostra MV × laudo lado a lado, com a diferença destacada, e «Decidir e ir para a próxima». «Prestadores por unidade» vai para o Início («Pede você» e «Relatórios do mês»). «Rodadas» vira a aba «Histórico».</div>
+<div class="card prev-param">
+ <div class="prev-modo" role="tablist"><button class="on">Conferência cruzada</button><button>Correção de prestador</button></div>
+ <div class="prev-param-linha"><b>15 - DR X</b> · unidade 17 - AlphaSonic Londrina (Palhano) · USG · repasse 25022 <span class="small muted">· médico do laudo: do prestador · tolerância 7 dias · rodada 3, hoje 10:42</span>
+  <span class="sy-esp"></span><button class="sec mini" data-abre="prev-escolher">Trocar relatório ou parâmetros</button><button class="mini">Reler o PDF e conferir de novo</button><button class="sec mini">Exportar Excel</button></div>
+ <div class="prev-escolher" id="prev-escolher" hidden>
+  <p class="small" style="margin:10px 0 8px"><b>Como se escolhe o que conferir.</b> Há três caminhos: <b>(1)</b> no Início, em «Relatórios do mês», o botão «Conferir» da linha abre esta tela já com tudo preenchido; <b>(2)</b> aqui, escolhendo o relatório na lista abaixo; <b>(3)</b> «Conferir os N da unidade», que confere todos de uma vez. A <b>unidade dos laudos vem do relatório</b> (o PDF do MV já diz a unidade) e só muda em «Mais opções».</p>
+  <div class="prev-barra-filtros">
+   <label class="campo" style="margin:0">Unidade<select><option>17 - AlphaSonic Londrina (Palhano)</option><option>Todas</option><option>1 - Unidade Centro</option></select></label>
+   <label class="campo" style="margin:0">Grupo<select><option>USG</option><option>IMG</option><option>Curitiba</option><option>Todos</option></select></label>
+   <div class="marcadores" style="margin:0;align-self:end"><button class="marc">Falta conferir · 3</button><button class="marc">Em andamento · 1</button><button class="marc">Aceitos · 0</button><button class="marc sel">Todos · 4</button></div>
+   <label class="small" style="align-self:end"><input type="checkbox" checked> só a minha parte</label>
+   <span class="sy-esp"></span><input type="search" placeholder="Buscar prestador…" style="align-self:end;max-width:200px"></div>
+  <div class="tw" style="margin-top:8px"><table class="prev-tab"><thead><tr><th></th><th>Prestador</th><th>Unidade</th><th>Grupo</th><th>Repasse</th><th>Situação</th><th class="n">Total no MV</th></tr></thead><tbody>
+   <tr class="prev-aberta"><td><input type="radio" name="prev-rel" checked></td><td><b>15 - DR X</b></td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge warn">em andamento · rodada 3</span></td><td class="n">150,00</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>7873 - Gabriel Bianchini</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">2.480,00</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>412 - Dra. Helena Prado</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">1.915,50</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>88 - Dr. Ivo Campos</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">740,00</td></tr></tbody></table></div>
+  <details class="small" style="margin-top:8px"><summary>Mais opções (raramente mudam)</summary><div class="grid4" style="margin-top:8px">
+   <label class="campo">Unidade dos laudos<select><option>17 - AlphaSonic Londrina (Palhano) · a do relatório</option><option>Todas as unidades (não recomendado)</option></select></label>
+   <label class="campo">Médico do laudo («Só no laudo»)<select><option>Do prestador (Dr. X)</option><option>Todos</option></select></label>
+   <label class="campo">Tolerância de data (dias)<input type="number" value="7"></label>
+   <label class="campo">Relatório do MV<select><option>mv_15.pdf · da pasta (hoje 09:12)</option><option>Carregar outro PDF…</option></select></label></div></details>
+  <div class="acoes"><button>Conferir 15 - DR X</button><button class="sec">Conferir os 4 da unidade 17 · USG</button><button class="sec">Excel único: USG · unidade 17</button><button class="sec" data-abre="prev-escolher">Cancelar</button></div></div></div>
+
+<div class="card cf-frase" style="padding-bottom:10px">
+ <div class="prev-res-topo"><div><span class="eyebrow">PARA PAGAMENTO</span><div class="prev-pagar">R$ 75,00 <span class="small muted">de R$ 150,00 no MV</span></div></div>
+  <div class="prev-cls">
+   <button class="prev-cl sel"><span class="cl-devido"></span>Devido <b>R$ 75,00</b><small>5 linhas</small></button>
+   <button class="prev-cl"><span class="cl-aceito"></span>Aceito <b>R$ 0,00</b><small>0</small></button>
+   <button class="prev-cl"><span class="cl-pend"></span>Pendente <b>R$ 70,00</b><small>5 · fora até decidir</small></button>
+   <button class="prev-cl"><span class="cl-nc"></span>NC <b>R$ 0,00</b><small>0</small></button>
+   <button class="prev-cl"><span class="cl-excluido"></span>Excluído <b>R$ 5,00</b><small>1 taxa</small></button></div></div>
+ <div class="cf-barra cf-barra-cl" style="margin:10px 0 0"><span class="cl-devido" style="width:50%"></span><span class="cl-pend" style="width:46.7%"></span><span class="cl-excluido" style="width:3.3%"></span></div></div>
+
+<nav class="cf-abas" data-grupo="cf"><button class="on" data-alvo="cf-previa">Prévia de conferência</button><button data-alvo="cf-decidir">O que falta decidir<span class="n">3</span></button><button data-alvo="cf-nc">NCs e correções no MV<span class="n alerta">2</span></button><button data-alvo="cf-aceite">Aceite do relatório</button><button data-alvo="cf-hist">Histórico</button></nav>
+
+<section data-sec="cf-previa">
+<div class="card">
+ <div class="prev-barra-filtros">
+  <input type="search" placeholder="Buscar paciente, código, título ou médico…" class="prev-busca">
+  <div class="marcadores" style="margin:0"><button class="marc sel">Falta decidir · 6</button><button class="marc">Ambíguos · 4</button><button class="marc">Ressalvas · 1</button><button class="marc">Só no laudo · 1</button><button class="marc">Todas · 12</button></div>
+  <span class="sy-esp"></span><button class="sec mini" data-abre="prev-gaveta">Filtros (2)</button></div>
+ <div class="prev-etq"><span class="prev-tag">Procedimento: 40901173 US TIREOIDE ✕</span><span class="prev-tag">Data: 03/10 a 12/10 ✕</span><span class="small muted">6 linhas · R$ 70,00</span></div>
+ <div class="prev-gaveta" id="prev-gaveta" hidden><div class="grid4">
+  <label class="campo">Procedimento<select><option>40901173 · US TIREOIDE (10)</option></select></label><label class="campo">Data de<select><option>03/10</option></select></label><label class="campo">até<select><option>12/10</option></select></label><label class="campo">Convênio<select><option>Todos</option></select></label>
+  <label class="campo">Título do laudo<select><option>Todos</option></select></label><label class="campo">Médico do laudo<select><option>Todos</option></select></label><label class="campo">Observação<select><option>Todas</option></select></label></div></div>
+ <div class="prev-selbar" id="prev-selbar" hidden><b id="prev-seln">2 selecionadas · R$ 29,00</b><span class="sy-esp"></span><button class="mini">Aceitar para pagamento…</button><button class="sec mini">Registrar NC…</button><button class="sec mini">Resolvido no MV…</button><button class="sec mini">Observação…</button><button class="sec mini">Exportar só estas</button></div>
+ <div class="tw" style="margin-top:8px"><table class="prev-tab"><thead><tr><th><input type="checkbox" class="prev-todas" title="Selecionar todas do filtro"></th><th>Classe · situação</th><th>Paciente</th><th>Data</th><th>Procedimento no MV</th><th>Laudo (Apolo)</th><th>O que falta</th><th class="n">Vl Repasse</th></tr></thead><tbody>
+  <tr><td><input type="checkbox" class="prev-sel"></td><td><span class="st cl-pend">Pendente</span><div class="small muted">ambíguo</div></td><td>ANA PAULA ROCHA</td><td>03/10</td><td>40901173 · US TIREOIDE</td><td>USG ESTRANHO</td><td class="small">Código validado para outros títulos</td><td class="n">10,00</td></tr>
+  <tr class="prev-aberta"><td><input type="checkbox" class="prev-sel"></td><td><span class="st cl-pend">Pendente</span><div class="small muted">conferido com ressalva</div></td><td>CARLA DIAS MOTA</td><td>05/10</td><td>40901173 · US TIREOIDE</td><td>USG TIREOIDE</td><td class="small">Convênio diferente</td><td class="n">12,00</td></tr>
+  <tr class="detalhe"><td colspan="8"><div class="prev-det">
+   <div class="prev-cmp"><div class="prev-cmp-cab"><span></span><b>MV</b><b>Laudo (Apolo)</b></div>
+    <div><span>Paciente</span><span>CARLA DIAS MOTA</span><span>CARLA DIAS MOTA <span class="badge ok">igual</span></span></div>
+    <div><span>Data</span><span>05/10/2026</span><span>05/10/2026 <span class="badge ok">igual</span></span></div>
+    <div><span>Procedimento</span><span>40901173 · US TIREOIDE</span><span>USG TIREOIDE <span class="badge ok">equivalência validada</span></span></div>
+    <div class="dif"><span>Convênio</span><span>UNIMED</span><span>HOSPITAL X <span class="badge warn">diferente</span></span></div>
+    <div><span>Médico</span><span>15 - DR X</span><span>Dr. X <span class="badge ok">mesmo prestador</span></span></div></div>
+   <div><h4 style="margin:0 0 6px">Decidir</h4>
+    <div class="acoes" style="margin:0"><button class="mini">Aceitar para pagamento</button><button class="sec mini">Registrar NC</button><button class="sec mini">Resolvido no MV</button></div>
+    <label class="campo" style="margin-top:8px">Justificativa<input type="text" value="Mesmo convênio escrito de outro jeito"></label>
+    <div class="acoes"><button class="mini">Decidir e ir para a próxima ↓</button><span class="small muted">atalhos: ↑ ↓ entre pendências · A aceitar · N NC</span></div>
+    <details class="small" style="margin-top:6px"><summary>Observação · candidatos · linha do MV e laudo completos</summary><p class="muted">Conta 9002 · atendimento 7002 · página 1 · repasse 25022 · laudo 502 (linha 4 da planilha). Candidatos: 1.</p><textarea rows="2" placeholder="observação interna (fica na competência)"></textarea></details></div></div></td></tr>
+  <tr><td><input type="checkbox" class="prev-sel"></td><td><span class="st cl-pend">Pendente</span><div class="small muted">ambíguo</div></td><td>DORA NUNES PIRES</td><td>06/10</td><td>40901173 · US TIREOIDE</td><td>USG ESTRANHO</td><td class="small">Código validado para outros títulos</td><td class="n">13,00</td></tr>
+  <tr><td><input type="checkbox" class="prev-sel"></td><td><span class="st cl-pend">Pendente</span><div class="small muted">ambíguo</div></td><td>GISELE MARTINS</td><td>09/10</td><td>40901173 · US TIREOIDE</td><td>USG ESTRANHO</td><td class="small">Código validado para outros títulos</td><td class="n">16,00</td></tr>
+  <tr><td><input type="checkbox" class="prev-sel"></td><td><span class="small muted">sem valor</span><div class="small muted">só no laudo</div></td><td>KARINA LOPES</td><td>15/10</td><td>—</td><td>USG MAMAS</td><td class="small">Sem lançamento neste relatório <button class="mini sec">Dispensar</button></td><td class="n">—</td></tr></tbody></table></div>
+ <p class="small muted" style="margin:6px 0 0">5 de 6 linhas · clique numa linha para abrir.</p></div>
+</section>
+
+<section data-sec="cf-decidir" hidden><div class="card"><h2>O que falta decidir <span class="small muted">3 decisões resolvem 6 linhas · da que resolve mais para a que resolve menos</span></h2>
+ <div class="prev-causa"><div><b>Código validado para outros títulos: «USG ESTRANHO» × 40901173</b><div class="small muted">4 linhas · R$ 58,00 · ANA PAULA ROCHA, DORA NUNES PIRES, GISELE MARTINS…</div></div><div class="acoes" style="margin:0"><button class="mini">Um ou outro (os dois valem)</button><button class="sec mini">Lançamento errado → NC</button><button class="sec mini">Ver as 4</button></div></div>
+ <div class="prev-causa"><div><b>Convênio diferente: MV «UNIMED» × laudo «HOSPITAL X»</b><div class="small muted">1 linha · R$ 12,00</div></div><div class="acoes" style="margin:0"><button class="mini">Aceitar (mesmo convênio)</button><button class="sec mini">Registrar NC</button></div></div>
+ <div class="prev-causa"><div><b>Só no laudo — sem lançamento neste relatório</b><div class="small muted">1 laudo · KARINA LOPES · USG MAMAS · 15/10</div></div><div class="acoes" style="margin:0"><button class="mini">Registrar NC (não lançado)</button><button class="sec mini">Correção de prestador…</button><button class="sec mini">Dispensar…</button></div></div></div></section>
+
+<section data-sec="cf-nc" hidden><div class="card"><h2>NCs e correções no MV</h2>
+ <div class="aviso-mv"><b>⚠ 2 itens que deviam ter saído do MV continuam no relatório reimportado — R$ 52,50 ainda compõem a produção.</b> Retire no MV e use «Reler o PDF e conferir de novo».</div>
+ <div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>
+  <tr><td><span class="badge err">Não corrigida: continua no MV</span></td><td class="small">DORA NUNES PIRES · 06/10 · 40901173 · R$ 13,00</td><td class="small">Procedimento não lançado · Leo · 12/11</td></tr>
+  <tr><td><span class="badge ok">Corrigida no MV</span></td><td class="small">GABRIELA SOUZA · 05/10 · 40901220 · R$ 17,50</td><td class="small">Lançamento indevido · Ana · 11/11</td></tr></tbody></table></div>
+ <p class="small" style="margin-top:10px"><b>Candidatos a NC desta conferência:</b> 1 laudo «Só no laudo» · <button class="mini sec">Revisar candidatos</button></p></div></section>
+
+<section data-sec="cf-aceite" hidden><div class="card"><div class="aceite-box"><b>Aceite do relatório</b> <span class="badge warn">sem aceite</span>
+ <p class="small" style="margin:6px 0"><b>Para pagamento: R$ 75,00</b> (Devido R$ 75,00 + Aceito R$ 0,00) · fora: pendente R$ 70,00 · NC R$ 0,00 · excluído R$ 5,00</p>
+ <label class="campo">Observação do aceite (obrigatória: há pendências)<textarea rows="2"></textarea></label>
+ <div class="acoes" style="margin:0"><button>Registrar aceite</button><button class="sec">Registrar aceite e ir para o próximo relatório</button></div>
+ <p class="small muted" style="margin:6px 0 0">Próximo relatório da sua parte: 7873 - Gabriel Bianchini · un. 1 · USG.</p></div></div></section>
+
+<section data-sec="cf-hist" hidden><div class="card"><h2>Histórico deste relatório <span class="small muted">(antes era a tela «Rodadas»)</span></h2>
+ <div class="tw"><table><thead><tr><th>Rodada</th><th>Quando</th><th>Quem</th><th>PDF</th><th class="n">Para pagamento</th><th>Pendentes</th><th>Aceite</th><th>Mudou em relação à anterior</th></tr></thead><tbody>
+  <tr><td>3</td><td>hoje 10:42</td><td>Leo</td><td class="small">mv_15.pdf (novo)</td><td class="n">75,00</td><td>6</td><td><span class="badge warn">sem aceite</span></td><td class="small">2 passaram a conferido · 1 NC corrigida</td></tr>
+  <tr><td>2</td><td>12/11 16:05</td><td>Leo</td><td class="small">mv_15.pdf</td><td class="n">62,00</td><td>8</td><td>—</td><td class="small">equivalência validada: «USG TIREOIDE»</td></tr>
+  <tr><td>1</td><td>11/11 09:30</td><td>Ana</td><td class="small">mv_15.pdf</td><td class="n">40,00</td><td>10</td><td>—</td><td class="small">primeira rodada</td></tr></tbody></table></div>
+ <details class="small" style="margin-top:8px"><summary>Detalhes da rodada e equivalências usadas</summary><p class="muted">Período 01/10 a 31/10 · 11 linhas do MV · 11 laudos no escopo · 612 equivalências validadas (revisão 87).</p></details></div></section>
+</section><section class="pag" id="prev-equivalencias" hidden><div class="prev-nota"><b>O que muda:</b> <b>sem mudança</b> nesta etapa (Títulos do Apolo, Base de equivalências e O que mais destrava continuam iguais).</div><div class="card"><div class="subabas"><button class="on">Títulos do Apolo</button><button>Base de equivalências</button><button>O que mais destrava</button></div><p class="muted">Igual à versão atual.</p></div></section><section class="pag" id="prev-nc" hidden><div class="prev-nota"><b>O que muda:</b> <b>sem mudança</b> nesta etapa. A situação de correção no MV de cada NC (aguardando / corrigida / continua no MV) passa a aparecer também aqui, como coluna.</div><div class="card"><p class="muted">Igual à versão atual, com a coluna «Correção no MV».</p></div></section><section class="pag" id="prev-fechamento" hidden><div class="prev-nota"><b>O que muda:</b> <b>Fluxo mensal e Fechamento viram uma tela.</b> O que você gosta do Fluxo fica igual: a linha de <b>Marcos da competência</b> (clique na data para ajustar, com justificativa) e o <b>checklist de etapas por repasse</b> (Preparação, USG, Classificação, IMG, Curitiba, Sedação, NCs), com os filtros Vencidas / Vencem em 3 dias / Aguardando terceiros, as sugestões 💡 e as observações. O que muda: (1) o <b>controle documental</b> (e-mail, NF recebida, NF ao Financeiro) deixa de ser uma tabela à parte dentro de cada grupo do Fluxo e vira <b>três caixinhas na linha do prestador</b> em cada repasse; marcar grava a data e atualiza a situação e o checklist; (2) a subaba «Quadro» some: as situações (Verificar, A enviar, Enviado, Concluído) viram filtros no topo de cada repasse; (3) «Divisão do trabalho» vira «Quem faz o quê neste mês» dentro das etapas, «Retrospectiva» entra em Indicadores e «Modelo e prazos» vai para Configurações; (4) os 3 botões de exportação viram um menu «Exportar». </div><div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência 11/2026</h2><div class="acoes" style="margin:0"><details class="prev-menu"><summary class="btn-sec">Exportar ▾</summary><div><button class="sec">Planilha de controle</button><button class="sec">Indicadores</button><button class="sec">Checklist do mês (.xlsx)</button><button>Pasta da competência (.zip)</button></div></details></div></div>
+<div class="aviso-fixo warn"><b>PRÉVIA</b> — 3 prestador(es) com rodada sem aceite. A planilha sai marcada como prévia até todos terem aceite.</div>
+<div class="card"><h3>Marcos da competência <span class="muted small">— clique para ajustar a data (com justificativa)</span></h3><div class="marcos-linha"><button class="marco passado" data-marco="Fechamento USG (geração no MV)" data-data="09/11" data-regra="5º dia útil"><b>09/11</b>Fechamento USG (geração no MV)<small>5º dia útil</small></button><button class="marco passado" data-marco="Envio de relatórios USG" data-data="06/11" data-regra="5 dias antes do pagamento USG"><b>06/11 ✎</b>Envio de relatórios USG<small>5 dias antes do pagamento USG</small></button><button class="marco passado" data-marco="Pagamento USG" data-data="13/11" data-regra="dia 15 (anterior se não útil)"><b>13/11</b>Pagamento USG<small>dia 15 (anterior se não útil)</small></button><button class="marco passado" data-marco="Ecodoppler Dr. Eudes" data-data="13/11" data-regra="9º dia útil"><b>13/11</b>Ecodoppler Dr. Eudes<small>9º dia útil</small></button><button class="marco hoje" data-marco="NCs de USG" data-data="24/11" data-regra="15º dia útil"><b>24/11 · HOJE</b>NCs de USG<small>15º dia útil</small></button><button class="marco hoje" data-marco="Início da classificação / IMG" data-data="24/11" data-regra="15º dia útil"><b>24/11 · HOJE</b>Início da classificação / IMG<small>15º dia útil</small></button><button class="marco prox" data-marco="Envio de relatórios IMG" data-data="25/11" data-regra="5 dias antes do pagamento IMG"><b>25/11</b>Envio de relatórios IMG<small>5 dias antes do pagamento IMG</small></button><button class="marco prox" data-marco="Envio de relatórios Curitiba" data-data="25/11" data-regra="o menor entre fim e 5 dias antes do pagto"><b>25/11</b>Envio de relatórios Curitiba<small>o menor entre fim e 5 dias antes do pagto</small></button><button class="marco prox" data-marco="Envio de relatórios Sedação" data-data="25/11" data-regra="5 dias antes do pagamento"><b>25/11</b>Envio de relatórios Sedação<small>5 dias antes do pagamento</small></button><button class="marco " data-marco="Pagamento IMG" data-data="30/11" data-regra="último dia útil"><b>30/11</b>Pagamento IMG<small>último dia útil</small></button><button class="marco " data-marco="Pagamento Curitiba" data-data="30/11" data-regra="último dia útil"><b>30/11</b>Pagamento Curitiba<small>último dia útil</small></button><button class="marco " data-marco="NCs de IMG e demais" data-data="30/11" data-regra="último dia útil"><b>30/11</b>NCs de IMG e demais<small>último dia útil</small></button><button class="marco " data-marco="Curitiba — finalizar e enviar" data-data="01/12" data-regra="20º dia útil"><b>01/12</b>Curitiba — finalizar e enviar<small>20º dia útil</small></button></div>
+ <div class="prev-dlg" id="prev-dlg" hidden><b id="prev-dlg-t">Data de «…»</b><p class="small" id="prev-dlg-r"></p><div class="grid2"><label class="campo">Data efetiva nesta competência<input type="text" id="prev-dlg-d"></label><label class="campo">Justificativa (obrigatória para exceção)<input type="text" placeholder="Ex.: feriado municipal"></label></div><div class="acoes" style="margin:0"><button class="sec mini" data-fecha-dlg>Cancelar</button><button class="sec mini" data-fecha-dlg>Voltar à regra</button><button class="mini" data-fecha-dlg>Salvar</button></div></div></div>
+<nav class="subabas" data-grupo="fh" role="tablist"><button class="on" data-alvo="fh-etapas">Etapas do mês <span class="prev-pillmini">21</span></button><button data-alvo="fh-usg">Repasse USG <em>pagto 13/11</em></button><button data-alvo="fh-img">Repasse IMG <em>pagto 30/11</em></button><button data-alvo="fh-cur">Repasse Curitiba (V3) <em>pagto 30/11</em></button><button data-alvo="fh-prod">Produção USG e classe</button><button data-alvo="fh-ind">Indicadores e retrospectiva</button></nav>
+<section data-sec="fh-etapas"><div class="grid2 prev-kpis"><div class="card kpi"><h3>Entrega documental</h3><dl><div><dt>Relatórios e prévias enviados</dt><dd>18 de 44</dd></div><div><dt>Notas fiscais recebidas</dt><dd>13 de 44</dd></div><div><dt>NFs encaminhadas ao Financeiro</dt><dd>12 de 13</dd></div><div><dt>Prestadores com documentação incompleta</dt><dd class="txt-err">2</dd></div></dl></div>
+<div class="card kpi"><h3>Prazos</h3><dl><div><dt>NCs de USG</dt><dd class="txt-warn">hoje</dd></div><div><dt>Envio de relatórios IMG</dt><dd class="txt-warn">25/11 · 1 d</dd></div><div><dt>Envio de relatórios Curitiba</dt><dd class="txt-warn">25/11 · 1 d</dd></div><div><dt>Receber relatório da máquina — Dr. Paulo</dt><dd class="txt-err">vencido há 14 d</dd></div><div><dt>Etapas abertas</dt><dd>21</dd></div></dl></div></div>
+<div class="fx-filtros"><div class="marcadores prev-chips" style="margin:0"><button class="marc sel">Todas as etapas</button><button class="marc">Vencidas · 1</button><button class="marc">Vencem em 3 dias · 6</button><button class="marc">Aguardando terceiros · 2</button><button class="marc">Pendente de correção · 1</button><button class="marc">Não concluídas · 21</button></div>
+ <label class="small"><input type="checkbox"> só a minha parte</label><input type="search" placeholder="Buscar etapa, prestador ou observação…"></div>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Preparação do mês</b><small>Apolo · regras dos prestadores · relatórios das máquinas · PET-CT · ecodoppler</small></span><span class="gprog"><span class="barra"><i style="width:90%"></i></span><small>9 de 10 etapas</small></span><span class="gprazo"><span class="txt-err">vencido · 06/11 Receber relatório da máquina — Dr. Paulo</span></span><span class="stt s-ter">Aguardando terceiros</span></button><div class="gcorpo"></div></section>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Repasse de Ultrassonografia (USG)</b><small>fechamento no 5º dia útil · pagamento no dia 15</small></span><span class="gprog"><span class="barra"><i style="width:100%"></i></span><small>8 de 8 etapas</small></span><span class="gprazo"><span class="">sem prazo aberto</span></span><span class="stt s-ok">Concluída</span></button><div class="gcorpo"></div></section>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Classificação dos prestadores por produção</b><small>produção bruta de USG → classes A/B/C/D</small></span><span class="gprog"><span class="barra"><i style="width:25%"></i></span><small>1 de 4 etapas</small></span><span class="gprazo"><span class="txt-warn">hoje · 24/11 Apurar a produção bruta de USG</span></span><span class="stt s-and">Em andamento</span></button><div class="gcorpo"></div></section>
+<section class="grupo-fx aberto"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Repasse de IMG — demais modalidades</b><small>todas as unidades, exceto Curitiba · pagamento no último dia útil</small></span><span class="gprog"><span class="barra"><i style="width:14%"></i></span><small>1 de 7 etapas</small></span><span class="gprazo"><span class="txt-warn">25/11 Validação final para envio</span></span><span class="stt s-and">Em andamento</span></button><div class="gcorpo"><p class="regra-fixa">📌 Todas as unidades, exceto Curitiba. Classe do prestador vem da produção de USG (aba «Produção USG e classe»).</p>
+<div class="tw"><table class="tab-fx"><thead><tr><th>Etapa</th><th>Status</th><th>Prazo</th><th>Início</th><th>Concluída em</th><th>Responsável</th><th>Observação</th></tr></thead><tbody><tr><td class="t-nome"><span class="badge info">marco</span> Gerar o repasse de IMG no MV</td><td><select data-c="status" class="sel-ok"><option>Não iniciada</option><option>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option selected>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk ">24/11</button></td><td>24/11</td><td>24/11</td><td>Leo</td><td class="small">14 PDFs na pasta</td></tr><tr><td class="t-nome">Conferência dos valores e procedimentos<small><a href="#conferencia">11 de 18 relatórios com aceite — abrir a Conferência</a></small><small class="sug-fx">💡 Sugestão: <b>Em andamento</b> — 11 de 18 com aceite. <button class="sec mini">Confirmar</button></small></td><td><select data-c="status" class="sel-and"><option>Não iniciada</option><option selected>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk ">—</button></td><td>24/11</td><td></td><td>Leo · Ana</td><td class="small"></td></tr><tr><td class="t-nome">Identificação das divergências</td><td><select data-c="status" class="sel-and"><option>Não iniciada</option><option selected>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk ">—</button></td><td>24/11</td><td></td><td>Leo</td><td class="small"></td></tr><tr><td class="t-nome">Correções necessárias<small class="dep">aguarda: Identificação das divergências (aviso, não bloqueia)</small></td><td><select data-c="status" class="sel-cor"><option>Não iniciada</option><option>Em andamento</option><option>Aguardando terceiros</option><option selected>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk ">—</button></td><td></td><td></td><td>Faturamento</td><td class="small">2 NCs aguardam correção no MV</td></tr><tr><td class="t-nome">Validação final para envio</td><td><select data-c="status" class="sel-ni"><option selected>Não iniciada</option><option>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk txt-warn">25/11</button></td><td></td><td></td><td></td><td class="small"></td></tr><tr><td class="t-nome">Envio dos relatórios e prévias<small class="evid">📨 4 de 18 enviados — marcados na aba «Repasse IMG»</small></td><td><select data-c="status" class="sel-ni"><option selected>Não iniciada</option><option>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk txt-warn">25/11</button></td><td></td><td></td><td></td><td class="small"></td></tr><tr><td class="t-nome">Notas fiscais e encaminhamento ao Financeiro<small class="evid">🧾 1 NF recebida · 0 ao Financeiro — na aba «Repasse IMG»</small></td><td><select data-c="status" class="sel-ni"><option selected>Não iniciada</option><option>Em andamento</option><option>Aguardando terceiros</option><option>Pendente de correção</option><option>Concluída</option><option>Não aplicável</option></select></td><td class="nw"><button class="lnk ">30/11</button></td><td></td><td></td><td></td><td class="small"></td></tr></tbody></table></div>
+<p class="small muted" style="margin:8px 0 0">O <b>controle documental por prestador</b> (relatório enviado, NF recebida, NF ao Financeiro) sai daqui e passa para a linha de cada prestador na aba «Repasse IMG». Aqui fica só a contagem.</p>
+<label class="campo obs-sec">Observações da seção<textarea rows="2" placeholder="Ex.: aguardando conclusão de laudos, correção pendente no MV…"></textarea></label></div></section>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Repasse de Curitiba</b><small>fluxo próprio, sem separação USG/IMG · até o 20º dia útil</small></span><span class="gprog"><span class="barra"><i style="width:33%"></i></span><small>2 de 6 etapas</small></span><span class="gprazo"><span class="txt-warn">25/11 Envio dos relatórios e prévias</span></span><span class="stt s-and">Em andamento</span></button><div class="gcorpo"></div></section>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Repasse de Sedação</b><small>pagamento no último dia útil</small></span><span class="gprog"><span class="barra"><i style="width:0%"></i></span><small>0 de 4 etapas</small></span><span class="gprazo"><span class="txt-warn">25/11 Envio dos relatórios e prévias</span></span><span class="stt s-ni">Não iniciada</span></button><div class="gcorpo"></div></section>
+<section class="grupo-fx"><button class="gcab" data-tg><span class="seta">▶</span><span class="gnome"><b>Não conformidades</b><small>NCs de USG no 15º dia útil · demais no último dia útil</small></span><span class="gprog"><span class="barra"><i style="width:40%"></i></span><small>2 de 5 etapas</small></span><span class="gprazo"><span class="txt-warn">hoje · 24/11 NCs de USG</span></span><span class="stt s-and">Em andamento</span></button><div class="gcorpo"></div></section>
+<details class="card" style="margin-top:12px"><summary><b>Quem faz o quê neste mês</b> <span class="small muted">(antes: subaba «Divisão do trabalho» do Fluxo)</span></summary><div class="tw" style="margin-top:8px"><table><thead><tr><th>Pessoa</th><th>Repasses</th><th>Unidades</th></tr></thead><tbody><tr><td>Leo</td><td>USG, IMG</td><td>1, 10, 17</td></tr><tr><td>Ana</td><td>IMG, Curitiba, Sedação</td><td>5, 8, 12</td></tr></tbody></table></div><p class="small muted">A regra que vale todo mês fica em Configurações → Modelo do fluxo; aqui é só o ajuste deste mês.</p></details>
+<details class="card"><summary><b>Anotações da competência</b> <span class="small muted">· 2 anotações</span></summary><textarea rows="3" style="width:100%;margin-top:8px">Dr. Paulo avisou que manda o relatório da máquina na quarta.
+Curitiba: pagamento antecipado para 27/11 (feriado local).</textarea></details></section>
+<section data-sec="fh-usg" hidden><div class="nc-kpis prev-chips"><button class="nc-kpi err marc"><b>1</b><small><span class="fs fs-verificar">Verificar</span></small></button><button class="nc-kpi marc"><b>0</b><small><span class="fs fs-sem">Sem valores</span></small></button><button class="nc-kpi marc"><b>2</b><small><span class="fs fs-conferido">Conferido · a enviar</span></small></button><button class="nc-kpi marc"><b>3</b><small><span class="fs fs-enviado">E-mail enviado / aguardando nota</span></small></button><button class="nc-kpi marc"><b>8</b><small><span class="fs fs-concluido">Concluído</span></small></button></div>
+<div class="card" style="padding-top:10px"><div class="acoes" style="margin:0 0 8px"><input type="search" placeholder="Buscar prestador…" style="max-width:220px"><span class="small muted">14 prestadores · total geral R$ 48.317,22</span><span class="sy-esp"></span><button class="sec mini">Copiar prévias dos «a enviar» (2)</button></div>
+<div class="tw fh-tab"><table><thead><tr><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th><th class="n fh-un">1<small>Centro</small></th><th class="n fh-un">10<small>Gleba</small></th><th class="n fh-un">17<small>Palhano</small></th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th class="n">TOTAL GERAL</th><th>Envio</th><th></th></tr></thead><tbody>
+<tr class="fh-faixa"><td colspan="3">Faixa A — 30%</td><td class="n fh-pct">30%</td><td class="n fh-pct">30%</td><td class="n fh-pct">28%</td><td colspan="5"></td></tr><tr><td>15</td><td class="fh-nome">Marcelo Miyazaki<div class="small" style="color:var(--warn)">pendente R$ 875,13 fora do valor</div></td><td><span class="fs fs-verificar">Verificar ▾</span></td><td class="n">3.792,44</td><td class="n"></td><td class="n"></td><td class="n">3.792,44</td><td class="n"></td><td class="n"><b>3.792,44</b></td><td><div class="prev-envs"><label class="prev-env"><input type=checkbox>E-mail</label><label class="prev-env"><input type=checkbox>NF recebida</label><label class="prev-env"><input type=checkbox>NF ao Financeiro</label></div></td><td><button class="mini">Ir para a conferência</button></td></tr><tr><td>3</td><td class="fh-nome">Rafael Tanaka</td><td><span class="fs fs-conferido">Conferido · a enviar ▾</span></td><td class="n"></td><td class="n"></td><td class="n">2.693,49</td><td class="n">2.693,49</td><td class="n"></td><td class="n"><b>2.693,49</b></td><td><div class="prev-envs"><label class="prev-env"><input type=checkbox>E-mail</label><label class="prev-env"><input type=checkbox>NF recebida</label><label class="prev-env"><input type=checkbox>NF ao Financeiro</label></div></td><td><button class="sec mini">Copiar prévia</button></td></tr><tr><td>7873</td><td class="fh-nome">Gabriel Bianchini</td><td><span class="fs fs-conferido">Conferido · a enviar ▾</span></td><td class="n">1.120,00</td><td class="n"></td><td class="n">2.480,00</td><td class="n">3.600,00</td><td class="n">120,00 ✎</td><td class="n"><b>3.480,00</b></td><td><div class="prev-envs"><label class="prev-env"><input type=checkbox>E-mail</label><label class="prev-env"><input type=checkbox>NF recebida</label><label class="prev-env"><input type=checkbox>NF ao Financeiro</label></div></td><td><button class="sec mini">Copiar prévia</button></td></tr><tr><td>7</td><td class="fh-nome">Marcelo Marini</td><td><span class="fs fs-enviado">E-mail enviado ▾</span></td><td class="n">5.104,46</td><td class="n"></td><td class="n">2.980,00</td><td class="n">8.084,46</td><td class="n"></td><td class="n"><b>8.084,46</b></td><td><div class="prev-envs"><label class="prev-env on"><input type=checkbox checked>E-mail <small>10/11</small></label><label class="prev-env"><input type=checkbox>NF recebida</label><label class="prev-env"><input type=checkbox>NF ao Financeiro</label></div></td><td></td></tr><tr><td>412</td><td class="fh-nome">Helena Prado</td><td><span class="fs fs-enviado">E-mail enviado ▾</span></td><td class="n"></td><td class="n">1.915,50</td><td class="n"></td><td class="n">1.915,50</td><td class="n"></td><td class="n"><b>1.915,50</b></td><td><div class="prev-envs"><label class="prev-env on"><input type=checkbox checked>E-mail <small>10/11</small></label><label class="prev-env"><input type=checkbox>NF recebida</label><label class="prev-env"><input type=checkbox>NF ao Financeiro</label></div></td><td></td></tr>
+<tr class="fh-faixa"><td colspan="3">Faixa B — 25%</td><td class="n fh-pct">25%</td><td class="n fh-pct">25%</td><td class="n fh-pct">25%</td><td colspan="5"></td></tr><tr><td>16211</td><td class="fh-nome">Matheus Cazula</td><td><span class="fs fs-concluido">Concluído ▾</span></td><td class="n"></td><td class="n"></td><td class="n">160,30</td><td class="n">160,30</td><td class="n"></td><td class="n"><b>160,30</b></td><td><div class="prev-envs"><label class="prev-env on"><input type=checkbox checked>E-mail <small>07/11</small></label><label class="prev-env on"><input type=checkbox checked>NF recebida <small>11/11</small></label><label class="prev-env on"><input type=checkbox checked>NF ao Financeiro <small>12/11</small></label></div></td><td></td></tr><tr><td>88</td><td class="fh-nome">Ivo Campos</td><td><span class="fs fs-concluido">Concluído ▾</span></td><td class="n">740,00</td><td class="n"></td><td class="n"></td><td class="n">740,00</td><td class="n"></td><td class="n"><b>740,00</b></td><td><div class="prev-envs"><label class="prev-env on"><input type=checkbox checked>E-mail <small>07/11</small></label><label class="prev-env on"><input type=checkbox checked>NF recebida <small>12/11</small></label><label class="prev-env on"><input type=checkbox checked>NF ao Financeiro <small>12/11</small></label></div></td><td></td></tr>
+<tr class="prev-mais"><td colspan="11" class="small muted">… mais 7 prestadores</td></tr>
+<tr class="fh-total"><td></td><td>TOTAL USG</td><td></td><td class="n">22.904,12</td><td class="n">9.310,60</td><td class="n">16.222,50</td><td class="n">48.437,22</td><td class="n">120,00</td><td class="n"><b>48.317,22</b></td><td colspan="2"></td></tr></tbody></table></div>
+<details class="small" style="margin-top:8px"><summary>Colunas e ajustes menos usados: CNPJ para a NF, BOARD, PLANTÃO, observação do desconto, avisos</summary><p class="muted">Ficam aqui, fechados. O que tiver valor neste mês aparece como etiqueta na linha (ex.: «desconto 120,00 ✎»).</p></details>
+<label class="campo" style="margin-top:8px">Observações da planilha de USG<textarea rows="2"></textarea></label>
+<p class="small muted">Valor por unidade = para pagamento (Devido + Aceito) da última rodada com aceite. Marcar «E-mail», «NF recebida» ou «NF ao Financeiro» grava a data de hoje e atualiza a situação e o checklist. Pagamento 13/11.</p></div></section>
+<section data-sec="fh-img" hidden><div class="card"><p>Mesma tabela do USG, com a coluna <b>Classe</b> (A/B/C/D) e as colunas de envio na linha. As situações viram os mesmos filtros do topo.</p></div></section>
+<section data-sec="fh-cur" hidden><div class="card"><p>Mesma tabela, só com os médicos da V3. Envio e NF na linha.</p></div></section>
+<section data-sec="fh-prod" hidden><div class="card"><p class="muted">Sem mudança.</p></div></section>
+<section data-sec="fh-ind" hidden><div class="card"><p>Os indicadores de hoje + a <b>Retrospectiva</b> do Fluxo (comparação com os meses anteriores), que deixa de ser subaba separada.</p></div></section></section><section class="pag" id="prev-bases" hidden><div class="prev-nota"><b>O que muda:</b> as 8 subabas viram 2 grupos. «Usados no mês» fica à mão; «Avançado» (o que quase nunca muda) fica fechado até você abrir. A aba «Bases e regras» some de Configurações para não ter duas portas.</div>
+<div class="card"><div class="subabas"><b class="small muted" style="align-self:center;margin-right:6px">USADOS NO MÊS</b><button class="on">Prestadores e regras</button><button>Convênios</button><button>Faturistas</button></div>
+ <details class="prev-avanc"><summary>Avançado — Unidades e faixas · Classes e valores IMG · Tipo de item · Modalidades e HM V3 · Power BI</summary><p class="small muted">Abre as mesmas telas de hoje.</p></details>
+ <div class="acoes"><input type="search" placeholder="Buscar prestador por nome, código ou alias…" style="min-width:320px"><button class="sec">Novo prestador</button></div>
+ <div class="tw" style="margin-top:8px"><table><thead><tr><th>Código</th><th>Nome no MV</th><th>Aliases (Apolo)</th><th>Regras</th><th></th></tr></thead><tbody>
+  <tr><td>15</td><td>MARCELO MIYAZAKI</td><td class="small">Marcelo Yuiti Miyazaki</td><td class="small">USG faixa geral · IMG</td><td><button class="mini sec">Editar</button></td></tr>
+  <tr><td>10264</td><td>MELANIE EIKO A L M BUTARELLO</td><td class="small">Melanie Eiko Aranda Lopes Makiyama Butarello</td><td class="small">IMG</td><td><button class="mini sec">Editar</button></td></tr>
+  <tr><td>10490</td><td>IAN …</td><td class="small">—</td><td class="small">V3 · percentual 70%</td><td><button class="mini sec">Editar</button></td></tr></tbody></table></div></div></section><section class="pag" id="prev-configuracoes" hidden><div class="prev-nota"><b>O que muda:</b> a pasta raiz só é configurada aqui (no Início vira só o indicador). «Modelo do fluxo» entra aqui, junto dos outros ajustes permanentes.</div>
+<div class="subabas cfg-abas"><button>Geral</button><button>Conferência</button><button class="on">Pastas e sincronização</button><button>Modelo do fluxo</button><button>Exportação</button><button>Backup e dados</button><button>Sobre</button></div>
+<div class="card"><h2>Pasta raiz na rede</h2><dl class="kv"><dt>Pasta conectada</dt><dd><b>Repasse Médico</b></dd><dt>Fluxo · Equivalências · Configuração</dt><dd>sincronizados</dd></dl><div class="acoes"><button>Trocar pasta raiz…</button><button class="sec">Liberar acesso / sincronizar agora</button><button class="sec">Desconectar</button></div></div></section>
+  </main>
+</div>
+<script>
+const T = {'inicio': 'Início', 'conferencia': 'Conferência', 'equivalencias': 'Equivalências TUSS', 'nc': 'Não conformidades', 'fechamento': 'Fechamento e envio', 'bases': 'Bases e regras', 'configuracoes': 'Configurações'};
+document.addEventListener('click', e => { const a = e.target.closest('[data-ir]'); if (a) { e.preventDefault(); ir(a.dataset.ir); } });
+function ir(k) { if (!T[k]) k = 'inicio'; document.querySelectorAll('.pag').forEach(s => s.hidden = s.id !== 'prev-' + k); document.querySelectorAll('.nav a').forEach(a => a.classList.toggle('ativo', a.dataset.pag === k)); document.getElementById('titulo').textContent = T[k]; window.scrollTo(0, 0); }
+document.querySelectorAll('.nav a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); ir(a.dataset.pag); }));
+document.querySelectorAll('.subabas, .cf-abas, .prev-modo').forEach(g => g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); })));
+document.querySelectorAll('[data-grupo]').forEach(g => g.querySelectorAll('[data-alvo]').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('[data-sec]').forEach(x => { if (x.dataset.sec.startsWith(g.dataset.grupo + '-')) x.hidden = x.dataset.sec !== b.dataset.alvo; }); })));
+document.querySelectorAll('[data-abre]').forEach(b => b.addEventListener('click', () => { const el = document.getElementById(b.dataset.abre); el.hidden = !el.hidden; }));
+const sb = () => { const n = document.querySelectorAll('.prev-sel:checked').length, bar = document.getElementById('prev-selbar'); if (!bar) return; bar.hidden = !n; document.getElementById('prev-seln').textContent = n + ' selecionada(s)'; };
+document.querySelectorAll('.prev-sel').forEach(c => c.addEventListener('change', sb));
+document.querySelectorAll('.prev-todas').forEach(c => c.addEventListener('change', () => { document.querySelectorAll('.prev-sel').forEach(x => x.checked = c.checked); sb(); }));
+document.querySelectorAll('.marco[data-marco]').forEach(b => b.addEventListener('click', () => { const d = document.getElementById('prev-dlg'); d.hidden = false; document.getElementById('prev-dlg-t').textContent = 'Data de «' + b.dataset.marco + '»'; document.getElementById('prev-dlg-r').textContent = 'Regra: ' + b.dataset.regra + ' → ' + b.dataset.data + '. Prazos que dependem deste marco são recalculados.'; document.getElementById('prev-dlg-d').value = b.dataset.data + '/2026'; }));
+document.querySelectorAll('[data-fecha-dlg]').forEach(b => b.addEventListener('click', () => { document.getElementById('prev-dlg').hidden = true; }));
+document.querySelectorAll('[data-tg]').forEach(b => b.addEventListener('click', () => b.closest('.grupo-fx').classList.toggle('aberto')));
+document.querySelectorAll('.prev-chips').forEach(g => g.querySelectorAll('.marc').forEach(b => b.addEventListener('click', () => { g.querySelectorAll('.marc').forEach(x => x.classList.toggle('sel', x === b)); })));
+ir((location.hash || '').slice(1));
+</script>

@@ -57,6 +57,7 @@ await ana.click('#prCriar'); await okDlg(ana); await ana.waitForTimeout(800);
 ok(/pastas da competência em ordem/.test(await ana.textContent('.pr-card')), 'depois de criar, o Início mostra «pastas da competência em ordem»');
 const comp = R + 'Competências/Comp_10-2026/', usg1 = fs.readdirSync(comp + 'Relatórios para conferência/USG').find(n => /^Unidade 1 - /.test(n));
 ok(usg1 && fs.existsSync(comp + 'Relatórios para conferência/IMG') && fs.existsSync(comp + 'Relatórios para conferência/Curitiba') && fs.existsSync(comp + 'Correção de prestador') && fs.existsSync(R + 'Bases de dados/Comp_10-2026') && !fs.existsSync(R + 'Fluxo mensal'), `pastas criadas com os nomes que a ferramenta lê (ex.: Relatórios para conferência › USG › ${usg1}); «fluxo mensal» existente mantido`);
+ok(fs.readdirSync(comp + 'Correção de prestador').some(n => /^Unidade 5 - /.test(n)) && fs.readdirSync(comp + 'Correção de prestador').some(n => /^Unidade 1 - /.test(n)), 'Correção de prestador tem a pasta de cada unidade, inclusive a 5 (Curitiba)');
 await ana.screenshot({ path: out + 'pasta_raiz_inicio.png' });
 // PDFs e planilhas do mês, lidos da pasta.
 fs.copyFileSync(d('mv_usg_medico15_unidade1.pdf'), comp + `Relatórios para conferência/USG/${usg1}/relatorio_dr15.pdf`); tocar(comp + `Relatórios para conferência/USG/${usg1}/relatorio_dr15.pdf`);

@@ -47,11 +47,6 @@ function mesDominante(datas) {
   const [mes, n] = [...contar(v, d => isoDia(d).slice(0, 7))].sort((a, b) => b[1] - a[1])[0];
   return { mes, parcela: n / v.length };
 }
-function conferirProducao(datas, chave) {
-  const dom = mesDominante(datas), esperado = producaoEsperada(chave);
-  if (!dom) return { estado: 'sem-data', esperado, encontrado: '' };
-  return { estado: dom.mes === esperado ? 'ok' : 'outro', esperado, encontrado: dom.mes, parcela: dom.parcela };
-}
 const rotuloMes = m => m ? `${m.slice(5)}/${m.slice(0, 4)}` : '—';
 // Competência de uma rodada: a escolhida no topo quando ela foi executada (rodadas antigas: mês da execução).
 const competenciaDaRodada = r => r.chaveCompetencia || (r.em ? r.em.slice(0, 7) : '');

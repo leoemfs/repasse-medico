@@ -28,6 +28,8 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
   const linhas = [], ocorrencias = new Map(), usoLaudo = new Map();
+  marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
+  aplicarRegrasConfig(cfg);
 
   for (const r of relatorio.regs) {
     const cls = classificarItem(r, cfg.classificacao);

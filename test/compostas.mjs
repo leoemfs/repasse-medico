@@ -159,7 +159,7 @@ await p.locator('table.eq-grupos tr:has-text("DOPPLER MAMAS") [data-gac="juntos"
 ok((await p.$$eval('#dlgCorpo .cp-proc > span:first-child > b', e => e.map(x => x.textContent).sort())).join(',') === '40901114,40901386', '«Juntos» abre o cadastro da regra com os dois códigos do título');
 await okDlg('');
 // Regra desativada: as relações cobertas voltam a pendente.
-await p.evaluate(() => { const { S: E, t } = window.__RM, r = E.eq.compostas.find(c => /MAMOGRAFIA DIGITAL/.test(c.nome)); t.alterarStatusComposta(E.eq, r.id, 'desativada', 'Teste', 'teste'); });
+await p.evaluate(() => { const { S: E, t } = window.__RM, r = E.eq.compostas.find(c => /MAMOGRAFIA DIGITAL/.test(c.nome)); t.alterarStatusComposta(E.eq, r.id, 'desativada', 'Teste', 'teste'); t.salvarEq('Regra desativada.'); });   // como a tela: desativar e gravar (v3.0.0-alpha.11: a cobertura é aplicada ao gravar, não ao abrir a tela)
 await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqVis');
 ok(await p.evaluate(() => window.__RM.S.eq.itens.filter(e => e.titulo === 'MAMOGRAFIA DIGITAL').every(e => e.status === 'pendente')), 'regra desativada: as relações cobertas voltam a pendente');
 // Botão na barra: regra composta com as selecionadas.

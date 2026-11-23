@@ -1,10 +1,109 @@
 # Próximas funções — requisitos registrados
 
-**SOL-F44 implementada na v3.0.0-alpha.7** (vários USG no mesmo dia: o título desempata). **SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
+**SOL-F46 implementada na v3.0.0-alpha.21** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes na seção da SOL-F46.
+
+**SOL-F20 implementada na v3.0.0-alpha.18** (23/11/2026): Retrospectiva mensal (PDCA) como subaba do Fluxo mensal. Detalhes na seção da SOL-F20.
+
+**SOL-F45 implementada na v3.0.0-alpha.17** (19/11/2026): Excel único da unidade × grupo, gravado em `09 - Planilhas de repasse conferidos`. Detalhes abaixo.
+
+**Atualização de 17/11/2026 — v3.0.0-alpha.9 a alpha.12.** A auditoria técnica de 16/11/2026 (`auditoria-tecnica-2026-11-16.md`) foi feita inteira, do P0 ao P3, e entraram os pedidos de 17/11 (SOL-F44, abaixo). Resumo:
+
+| Versão | O que entrou |
+|---|---|
+| **3.0.0-alpha.9** | **P0, valor pago.** (1) A NC «não lançado» de um laudo «Só no laudo» não passa mais para o lançamento que o MV fez depois: a linha nova segue a própria classe, e a NC aparece como «Corrigida: lançada no MV». (2) Linha repetida no MV: «Esta é a repetida → NC» tira do fechamento só a duplicata, e a cobrança legítima continua Devido. |
+| **3.0.0-alpha.10** | **P1.** Reconferir em um clique, mantendo unidade, médico e aba. Excel com «Processando…» e «Exportar só o filtrado». Candidatos a NC só do prestador, guardados compactos. Rodadas lidas por competência, com retenção (ficam inteiras as com aceite e as mais recentes de cada PDF) e backup só da competência aberta. |
+| **3.0.0-alpha.11** | **P2.** Pior caso da conferência de 14,9 s para cerca de 2 s, com o mesmo resultado. Nenhum arquivo redefine função de outro, e a sincronização das três bases ficou num módulo só. A tela de Equivalências não grava ao abrir. Teste de ponta a ponta com arquivos fictícios e testes no GitHub a cada envio. Também a **SOL-F44**. |
+| **3.0.0-alpha.12** | **P3.** Código sem uso removido. **Modo celular removido** (decisão do usuário em 17/11). Texto de privacidade atualizado. Modalidade do Apolo por grupo do MV e HM da V3 configuráveis em Bases e regras → «Modalidades e HM V3». |
+
+Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
+
+## SOL-F45 — Estrutura padronizada das pastas na rede — **IMPLEMENTADA na v3.0.0-alpha.14** (pedido de 17/11/2026; guia em `como-usar-pastas.md`; teste: `test/estrutura_pastas.mjs`)
+
+**Pedido do usuário:** padronizar a pasta raiz `App repasse médico`:
+- `01 - Sistema` com os arquivos permanentes;
+- uma pasta por ano (`02 - Repasse 2026`, `03 - Repasse 2027`…);
+- 12 competências por ano (`2026-11 - Novembro`), todas com a mesma estrutura (01 a 08).
+
+Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «construa repasse 2027 baseando-se nesse novo método» e avisar e guiar quando algo precisar ser movido à mão. O que ele disse ao escolher: «essa pasta de relatório de prestador não precisa se preocupar pois é uma pasta onde eu salvo os arquivos depois de toda a conferência», ou seja, o PDF final para o médico, sem o valor total.
+
+**Como ficou:**
+- **Criar pastas:** «Criar pastas da competência», «de 2026» e «de 2027» criam a estrutura completa. Nada é duplicado.
+- **Ler:** a ferramenta lê a estrutura nova e a antiga.
+  - Na 05, só USG, IMG e Curitiba são lidas.
+  - A unidade vem do nome da pasta, que é o nome da unidade.
+  - A correção usa o nome do arquivo (`nome_unidade`).
+- **Gravar:** os Excel vão para a estrutura nova (NCs na 02, correção na 01, conferência ao lado do PDF na 05), sem nunca substituir arquivo.
+- **Arquivos permanentes:** a ferramenta usa `01 - Sistema` quando existe; senão continua na pasta antiga da raiz (para os dois não se separarem no meio da mudança).
+- **Pastas manuais:** 06, 07 e 08 são só criadas; a ferramenta não grava nelas.
+- **Saíram** os nomes de pastas configuráveis (cfg.pastas).
+- **Pacote .zip** com os nomes novos.
+- **A mudança dos arquivos atuais é manual,** guiada:
+  - em Configurações → Pastas e em `como-usar-pastas.md`;
+  - no Início, o cartão da pasta raiz mostra o que ainda está no lugar antigo.
+
+**SOL-F39 e SOL-F10:** a SOL-F45 cobre o «pacote da competência controlando as pastas do mês», nas pastas que são da ferramenta. As pastas de relatórios aos prestadores, NFs e repasses avulsos ficam com a equipe, por decisão do usuário.
+
+## SOL-F45 — Excel único da unidade × grupo (planilha de controle por unidade) — **IMPLEMENTADA na v3.0.0-alpha.17** (pedido de 19/11/2026; teste: `test/planilha_unidade.mjs`)
+
+**Pedido:** «Na conferência cruzada, quando executo a conferência de um prestador posso gerar um Excel para controle e salvar na pasta da competência; posso conferir todos os relatórios da unidade ao mesmo tempo; posso gerar um único Excel com todos os prestadores conferidos? Assim poderei trabalhar com os filtros e manter uma planilha de controle, uma por unidade, por categoria (IMG, USG…).» Pasta: `09 - Planilhas de repasse conferidos › IMG › unidade` — planilha geral dos prestadores que produziram na competência, naquela modalidade e unidade.
+
+**O que já existia:** Excel por prestador («Exportar Excel», gravado em `05 › USG | IMG › unidade`, ao lado do PDF) e a conferência em lote («Conferir os N relatórios filtrados»), sem planilha única.
+
+**Como ficou:**
+- **Conferência → filtro «Relatórios da unidade» + «Grupo»**: com os dois escolhidos, aparece **«Excel único: IMG · unidade N (k)»** ao lado do lote. Também em **Prestadores por unidade**, no título de cada unidade × grupo.
+- **Um arquivo por unidade × grupo:** `conferidos_img_unidade_17_comp_11-2026.xlsx`, sempre baixado e, com a pasta conectada, gravado em `09 - Planilhas de repasse conferidos › IMG | USG › nome da unidade` (Curitiba: `09 › Curitiba`). Mesmo nome: grava « (2)», nunca substitui.
+- **Abas:**
+  - **Prestadores** — uma linha por prestador: situação (Aceito · Conferindo — faltam N decisões · Conferido sem aceite · Relatório sem conferência), aceite (quem e quando), laudos no Apolo, linhas e total do MV, **Devido · Aceito · Para pagamento · Pendente · NC · Excluído**, decisões que faltam, «Só no laudo» sem decisão, arquivo e última rodada. Entram também **quem laudou e não tem relatório** (situação de Prestadores por unidade: Gerar no MV, Sem cadastro…). Linha TOTAL da unidade.
+  - **Conferência** — as linhas de todos os prestadores, com **Cód. prestador** e **Prestador** nas duas primeiras colunas e as demais no modelo de exportação escolhido (Configurações → Exportação). Filtro ligado.
+  - **O que falta decidir** — com o prestador em cada linha.
+  - **Por procedimento** — código TUSS somado na unidade, com os prestadores.
+  - **Informações** — competência, unidade, grupo, relatórios e rodadas usados.
+- **Como é montado:** cada relatório é conferido de novo na hora, com os parâmetros da última rodada dele na competência (unidade, tolerância, médico), a base de equivalências atual e as decisões registradas — as mesmas regras da conferência de cada prestador. **Não grava rodada nova.** Relatório sem conferência entra só na aba Prestadores.
+- **Correção junto:** a `09 - Planilhas de repasse conferidos` começa com «Planilhas» e seria confundida com a `04 - Planilhas de conferência` na leitura da pasta (o Excel da 09 seria lido como planilha de laudos). A leitura agora ignora a 09. «Criar pastas da competência» cria a 09 com USG | IMG › unidades e Curitiba.
+
+## SOL-F44 — Ajustes de uso pedidos em 17/11/2026 — **IMPLEMENTADA na v3.0.0-alpha.11** (teste: `test/pasta_por_aba.mjs`)
+
+**Pedido do usuário:** «esses log de erro ocupa muito espaço, colocar em um alternante na parte inferior e deixar com bolinha de notificação quando o alternante estiver fechado. Nas pastas de correção, dentro da pasta de correção não precisa de subpastas; os arquivos ficam aqui organizados por nome_unidade. Outra coisa, um botão em cada aba para sincronizar com a pasta em questão […] assim sincroniza só a pasta em questão para não precisar reler todos os PDFs.»
+
+1. **Avisos do Fechamento** («N prestador(es) laudaram na unidade X e não têm relatório»):
+   - ficam num alternante no fim da tela, depois do conteúdo do fechamento;
+   - fechado, mostra uma bolinha com a quantidade de avisos: vermelha se há prestador sem relatório, amarela nos demais casos;
+   - aberto ou fechado, a escolha fica lembrada no navegador.
+2. **Correção de prestador sem subpastas por unidade:**
+   - «Criar pastas da competência» cria só `Competências › Comp_MM-AAAA › Correção de prestador`;
+   - a unidade de cada PDF vem do nome do arquivo, no formato `nome_unidade`. O trecho depois do último «_» pode ser o código (`_17`, `_Unidade 4`, `_un10`) ou parte do nome da unidade (`_Cambe`);
+   - as subpastas que já existem continuam sendo lidas, como organização antiga.
+3. **«Sincronizar pasta» em cada aba.** Lê só a pasta daquela aba, sem as planilhas e sem a outra pasta. Aparece com a pasta raiz conectada, inclusive quando ainda não há PDF carregado.
+   - **Conferência cruzada:** lê `Relatórios para conferência`.
+   - **Correção de prestador:** lê `Correção de prestador`.
+
+**SOL-F43 implementada na v3.0.0-alpha.6** (com a F42 e a maior parte da F41): classes de fechamento, abas, filtros, decisões em lote, «Resolvido no MV», observação por linha, reconferência com alertas e Fechamento só com Devido + Aceito. Guia: `como-usar-conferencia-oficial.md`.
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
-## SOL-F44 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.7** (17/11/2026)
+## Cadastro de USG pela planilha de controle: faixa «Repasse 42%» e residente que muda de faixa (23/11/2026, v3.0.0-alpha.21; teste: `test/cadastro_usg.mjs`)
+
+Pedido: atualizar o cadastro de USG com a lista atual de prestadores por faixa (geral, acréscimo de 2%, residentes, 40%, 42%, 50%, 55% e 70%), quem recebe BOARD e um desconto mensal recorrente. A lista com os nomes **não** fica no repositório: vai como planilha no formato da planilha de controle, para importar em Bases → Prestadores → «Importar regras da planilha de controle».
+
+Percentuais conferidos (já eram os do cadastro das unidades):
+
+| Faixa | Unid. 1 | 2 | 4 | 7 | 10 | 17 |
+|---|---|---|---|---|---|---|
+| Médicos geral | 44% | 49% | 40% | 40% | 44% | 42% |
+| Acréscimo de 2% | 46% | 51% | 42% | 42% | 46% | 44% |
+| Residentes | 35% | 35% | 35% | 35% | 35% | 35% |
+| 40%, 42%, 50%, 55%, 70% | fixo, independente da unidade (70%: só atuam na 17) |
+
+O que mudou no motor (`45-regras.js`):
+- **Faixa nova «Repasse 42%»** (fixa). Antes não existia: o bloco «REPASSE 42%» da planilha virava uma faixa sem cadastro, e o prestador ficava sem percentual esperado. Configurações antigas recebem as faixas padrão que faltam na posição do padrão, sem mexer nas que o usuário editou.
+- **Residente que muda de faixa volta a médico** na importação. Antes continuava «residente» e o IMG usava a tabela de residente.
+
+Limites da importação, mantidos:
+- **BOARD:** é um valor fixo mensal em R$, lido da coluna BOARD. Célula vazia mantém o valor já cadastrado, e a importação nunca zera um BOARD.
+- **Prestador fora da planilha:** continua com a faixa que tinha.
+- **Descontos parcelados** (pensão, por exemplo) não vêm da planilha. São cadastrados em Bases → Prestadores e regras → Descontos parcelados, com o nº de parcelas vazio para recorrente.
+
+## SOL-F46 — Vários USG do mesmo paciente no mesmo dia: o título do laudo desempata — **IMPLEMENTADA na v3.0.0-alpha.21** (pedido de 17/11/2026, entregue em 23/11/2026)
 
 **Problema (reproduzido com dados fictícios):** paciente com USG de abdome total, transvaginal e tireoide no mesmo atendimento, sem equivalência validada para esses títulos. O pareamento escolhia o laudo pela ordem da planilha:
 - o código do abdome total (40901122) ficava com o laudo de **tireoide**, e assim por diante;
@@ -144,7 +243,7 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
 4. Fechamento pela regra nova, com a proteção das competências antigas.
 5. Reconferência e alertas de NC (F42).
 
-## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — A FAZER · **URGENTE** (pedido de 13/11/2026)
+## SOL-F42 — NC sai do cálculo do fechamento e reconferência confirma a correção no MV — **IMPLEMENTADA na v3.0.0-alpha.6** com a SOL-F43 (pedido de 13/11/2026); na v3.0.0-alpha.9, a reconferência passa a mostrar também a NC «não lançado» que o MV lançou depois
 
 **Princípio (do usuário):** «a ferramenta precisa ser o reflexo fiel do que realmente está sendo pago ao prestador. Não basta identificar uma divergência: é necessário garantir que ela tenha sido tratada e que o cálculo do fechamento considere somente os procedimentos efetivamente devidos.»
 
@@ -190,7 +289,20 @@ O resultado da conferência hoje é uma página longa: frase e barra, Detalhes d
 - **SOL-F41:** filtros, observação, «Resolvido no MV», considerar em lote e Fechamento aberto por situação. O «Resolvido no MV» da F41 e o status de correção da F42 usam o **mesmo mecanismo** de confirmação na rodada seguinte.
 - **Pergunta da F41 (pendente sai ou não do valor): respondida na SOL-F43.** Pendente de análise **não** compõe o fechamento.
 
-## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — A FAZER · **URGENTE** (pedido de 13/11/2026)
+## SOL-F41 — Conferência autossuficiente: filtros na tabela e observação por linha — **IMPLEMENTADA**: a maior parte na v3.0.0-alpha.6 com a SOL-F43; «Exportar só o filtrado» e reconferir em um clique na alpha.10; o restante na alpha.13 (pedido de 13/11/2026)
+
+**O que entrou na v3.0.0-alpha.13** (teste: `test/f41_conferencia.mjs`):
+- **Filtros novos:** título do laudo, médico do laudo, intervalo de datas («Data» + «até») e observação («Com» ou «Sem»).
+- **Em lote, sobre o filtrado:**
+  - «Dispensar os N laudo(s) «Só no laudo»…»;
+  - «Observação nas N linha(s)…».
+- **Observação:**
+  - coluna «Observação (na linha)» no Excel, com autor e data, no catálogo e no fim do modelo «Padrão»;
+  - «N linha(s) com observação» no quadro do aceite;
+  - vai para as Observações da NC registrada a partir da linha (e em lote);
+  - segue a retenção das NCs (`retencaoNC`): passado o prazo, o texto é apagado e ficam quem escreveu e quando.
+- **Decisão do usuário (17/11/2026):** a observação é **só interna**. Não vai para o e-mail nem para a prévia do prestador no Fechamento.
+
 
 **Pedido do usuário:** «gostaria de filtros nessa prévia de conferência para poder trabalhar com procedimentos, datas específicas; dentro desse card que especifica a situação do paciente que clique quero um campo de observações para que eu possa colocar algo. O intuito é tornar a ferramenta autossuficiente para que eu não precise exportar o Excel e conferir à parte, pois os ajustes feitos na planilha Excel não entram no app, aí não gera as não conformes e cálculo de produção, fechamento.»
 
@@ -294,7 +406,7 @@ Para fechar o ciclo (conferência → NCs → produção → fechamento), cada a
 
 ### Perguntas em aberto
 - ~~Quais ajustes são feitos hoje na planilha?~~ Respondido em 13/11 (item 3.1).
-- A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?
+- ~~A observação deve ir para o e-mail/prévia do prestador no Fechamento, ou é só interna?~~ Respondido em 17/11: só interna.
 - ~~Ajuste de valor existe?~~ Respondido em 13/11: é consideração sem aceite (item 3.1). Fica a pergunta nova do item 3.1 (pendente sai ou não do valor).
 
 ## SOL-F4 — Competência no topo, válida para todas as abas — IMPLEMENTADA na v2.0.0-alpha.4
@@ -422,7 +534,7 @@ Pedido de 30/10/2026.
   - lançamento faltante.
 - **Cuidado de privacidade a definir na prévia:** CPF nunca é lido. O que guardar por paciente (nome, atendimento) segue a mesma retenção das NCs; o catálogo sem dados de pacientes pode ficar permanente.
 
-## SOL-F10 — Pasta da competência na rede — A IMPLEMENTAR
+## SOL-F10 — Pasta da competência na rede — **IMPLEMENTADA** em partes: pasta raiz (v2.1.0-alpha.9) e estrutura padronizada (SOL-F45, v3.0.0-alpha.14). O arquivamento dos PDFs por médico ficou com a equipe, por decisão do usuário em 17/11/2026
 
 Organização atual do usuário (30/10/2026), uma pasta por competência («REPASSE MM-AAAA»), salva na rede:
 - **CORREÇÃO DE PRESTADOR:** relatório da unidade 1 com prestador genérico e os demais relatórios.
@@ -473,7 +585,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 | 3 | SOL-F15 Cobertura de equivalências e validação em lote dos títulos mais frequentes | baixo | planejado |
 | 4 | SOL-F16 Status sugerido nas etapas do Fluxo · SOL-F17 Candidatos a NC guardados na competência | médio | planejado |
 | 5 | SOL-F10 Pasta da competência · SOL-F18 Base compartilhada para a equipe | médio/alto | planejado |
-| 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | planejado |
+| 6 | SOL-F19 Quadro Kanban por prestador · SOL-F20 Indicadores de fluxo (lead time, rodadas até o aceite) | médio | **implementado** (F19 na v3.0.0-alpha.15, F20 na v3.0.0-alpha.18) |
 | 7 | SOL-F21 Atualizar bases com o Power BI (com SOL-F9) · SOL-F5 Equivalências compostas | alto | planejado |
 | 0 | SOL-F22 Arquivos da sessão: limpar e separar conferência × correção · SOL-F23 Excel da conferência reorganizado | baixo/médio | **implementado na v2.0.0-alpha.6** |
 
@@ -484,7 +596,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - o aceite feito na conferência aparece em Rodadas e no Fechamento;
   - competência fechada bloqueia o aceite.
 
-## SOL-F12 — «Marcar como enviado» no Fechamento — PLANEJADO
+## SOL-F12 — «Marcar como enviado» no Fechamento — **IMPLEMENTADA** (menu de situação do Fechamento: «E-mail enviado», «NF recebida» e «NF encaminhada» gravam no controle documental do Fluxo, com desfazer e aviso quando o Fluxo não foi iniciado)
 - **Hoje:** a prévia é copiada no Fechamento, mas o «relatório enviado» é marcado no controle documental do Fluxo (~40 vaivéns por mês).
 - **Proposta:** depois de «Copiar prévia», o botão «Marcar como enviado» grava a data no controle documental do Fluxo. É o mesmo dado, sem cópia; o Fluxo continua sendo o dono.
 - **Aceite:**
@@ -540,7 +652,26 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - Ao salvar, avisa se a outra pessoa alterou o mesmo item desde a última leitura (conflito) e mostra as duas versões.
 - **Aceite:** a validação feita por uma pessoa aparece para a outra; nenhuma gravação apaga a alteração da outra sem aviso.
 
-## SOL-F19 — Quadro Kanban por prestador — PLANEJADO
+## SOL-F19 — Quadro Kanban por prestador — **IMPLEMENTADA na v3.0.0-alpha.15** (teste: `test/quadro_fechamento.mjs`; guia em `como-usar-fechamento.md`)
+
+**Decisões do usuário (17/11/2026):**
+- é uma subaba do Fechamento;
+- os cartões mudam de coluna sozinhos, pelos dados;
+- «Aguardando terceiros» é uma marca à mão, com motivo;
+- não tem limite de WIP.
+
+**Como ficou:**
+- **Subaba «Quadro»** com seletor de repasse: Todos, USG, IMG ou Curitiba.
+- **As 7 colunas e de onde vêm:**
+  - A conferir: sem rodada;
+  - Em correção: rodada sem aceite em alguma unidade;
+  - Aguardando terceiros: marca à mão;
+  - Com aceite;
+  - Enviado, NF recebida e Concluído: marcas do controle documental do Fluxo.
+- **Clique no cartão:** abre o menu da situação, com «E-mail enviado», «NF recebida», «NF encaminhada», «Aguardando terceiros…» (de quem e motivo) e «Abrir conferência».
+- **Excel de indicadores:** ganha a aba «Quadro», com a coluna de cada prestador e quem ele aguarda.
+
+**Proposta original:**
 - **Proposta:** visão em quadro no Fechamento (ou no Fluxo), com as colunas:
   1. a conferir;
   2. em correção;
@@ -552,7 +683,7 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - Também: limite configurável de prestadores «em correção» (WIP), com aviso quando passar.
 - **Definição de Pronto por prestador** = situação «Concluído»: aceite, divergências tratadas, prévia enviada, NF encaminhada.
 
-## SOL-F20 — Indicadores de fluxo para a retrospectiva mensal (PDCA) — PLANEJADO
+## SOL-F20 — Indicadores de fluxo para a retrospectiva mensal (PDCA) — **IMPLEMENTADA na v3.0.0-alpha.18** (teste: `test/retrospectiva.mjs`; guia em `como-usar-fluxo-mensal.md`)
 - **Indicadores:**
   - lead time por prestador (geração no MV → aceite → envio → NF);
   - nº de rodadas até o aceite;
@@ -561,6 +692,18 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
   - NCs por natureza e faturista (reincidência);
   - dias de antecedência na entrega ao Financeiro.
 - **Proposta:** uma aba «Retrospectiva» na competência, com comparação entre meses e um campo de «o que melhorar no próximo mês» (vira item do backlog).
+
+### SOL-F20 — implementação (v3.0.0-alpha.18, 23/11/2026)
+- **Onde:** Fluxo mensal → subaba **Retrospectiva**, da competência escolhida no topo. Nada é digitado de novo: tudo sai do Fluxo, das rodadas e aceites, do Fechamento e das NCs. Prazos em **dias úteis**, com os feriados do calendário do Fluxo.
+- **Lead time por prestador:** geração no MV → 1ª conferência → aceite → e-mail enviado → NF recebida → NF ao Financeiro, por etapa e no total. A geração é a data em que a etapa «Gerar» do grupo foi concluída no Fluxo; sem ela, vale o marco do modelo (5º dia útil no USG, início do IMG). O aceite conta quando todas as unidades do prestador têm aceite na última rodada. O quadro «Onde o tempo foi gasto» mostra a média de cada etapa e destaca o **gargalo do mês**.
+- **Rodadas até o aceite:** por relatório (prestador × unidade), incluindo as rodadas resumidas pela retenção. Mostra a média, o máximo, o % de aceites na 1ª rodada e a distribuição.
+- **Espera por terceiros:** tempo das etapas do Fluxo em «Aguardando terceiros» (pelo histórico de status) e das marcas «Aguardando terceiros» do Fechamento (SOL-F19). Ao tirar a marca, ela passa a ficar guardada num histórico (`fechamento.aguardandoHist`); antes ela era apagada. Soma por responsável.
+- **Cobertura de equivalências:** a da SOL-F15.
+- **NCs:** por natureza e por faturista, contando só as registradas na competência (sem as trazidas de outro mês e sem as «não procede»). **Reincidência** = o mesmo faturista com a mesma natureza em 2 ou mais dos últimos 3 meses.
+- **Dias de antecedência na entrega ao Financeiro:** por repasse (USG, IMG, Curitiba e Sedação), em dias úteis, da última NF encaminhada (controle documental) ou da etapa de NF concluída até o pagamento. Compara com a meta do modelo (`antecedenciaDias`, padrão 5).
+- **Comparação entre meses:** os indicadores da competência e dos 3 meses anteriores, com ▲▼ verde ou vermelho conforme melhorou ou piorou.
+- **PDCA:** «O que melhorar no próximo mês» registra itens no Fluxo da competência (lista `melhorias`), que **sincronizam pela pasta da rede** com o restante do Fluxo. Eles viram o **backlog** da competência seguinte, onde cada item é marcado como Em aberto, Em andamento, Feita ou Descartada (`backlog`, com observação). O que não for feito nem descartado segue sozinho para os meses seguintes (até 12).
+- **Excel da retrospectiva** com as abas Resumo (comparação), Lead time, Terceiros, NCs, Antecedência e Melhorias.
 
 ## SOL-F21 — Atualizar bases com o Power BI — IMPLEMENTADA na v2.0.0-alpha.11 (faturistas com unidades, convênios com tipo, procedimentos TUSS; o restante da SOL-F9 continua planejado)
 - **Hoje:** carregar no Início e depois importar faturistas e convênios em botões separados.
@@ -1101,7 +1244,7 @@ Pedido: «pode implementar a conexão com as pastas com as sincronizações nece
 - **Equivalências sincronizadas (SOL-F37):** `equivalencias.json` na pasta Equivalência TUSS; mescla por relação (código × título × escopo) e por regra composta; primeira vez mostra as duas bases e o resultado antes de juntar (cópia da sua base para desfazer); decisões diferentes pedem escolha com o histórico das duas; relações que chegam validadas geram aviso para rodar de novo as conferências afetadas. Barra de sincronização no topo de Equivalências.
 - Testes: `test/pasta_raiz.mjs` (pasta simulada em disco, dois usuários) e `test/fluxo_sync.mjs`.
 
-## SOL-F39 — Pacote da competência controlando todas as pastas do mês — A FAZER (09/11/2026)
+## SOL-F39 — Pacote da competência controlando todas as pastas do mês — **IMPLEMENTADA como SOL-F45** (v3.0.0-alpha.14), nas pastas que são da ferramenta. As pastas de relatórios aos prestadores, NFs e repasses avulsos ficam com a equipe (09/11/2026)
 Pedido: «Não precisa incluir tudo isso agora, mas é assim que organizo atualmente; o pacote da competência deve controlar tudo isso.» Pastas atuais do mês: CORREÇÃO DE PRESTEDOR · NAO CONFORMIDADES · NFs PAGAMENTO · PLANILHAS-CONFERENCIA · RELATORIOS-MV-CONFERENCIA · REPASSE 20% – PAULO ASSHAIAS FELIPE · REPASSE 25% – MARIANA MANFIO · REPASSE EUDES GUERRA – ECO · REPASSE IMG – RELATORIOS PRESTADORES · REPASSE PET – RELATORIOS PRESTADORES · REPASSE SEDAÇÃO – RELATORIOS PRESTADORES · REPASSE USG – RELATORIOS PRESTADORES · REPASSE V3 – RELATORIOS PRESTADORES.
 - O pacote da competência (exportação e pasta do mês) deve conhecer e controlar todas elas: o que existe, o que falta, o que já foi enviado (relatórios aos prestadores, NFs de pagamento), ligado ao Fluxo e ao Fechamento.
 

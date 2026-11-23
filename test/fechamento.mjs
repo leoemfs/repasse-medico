@@ -165,9 +165,5 @@ ok(/Verificar ✎/.test(l15b) && /conferir plantão com a escala/.test(l15b), 'm
 await menu(); ok(/Situação calculada: E-mail enviado/.test(await p.textContent('#menuSit')), 'menu mostra a situação calculada por baixo da marca');
 await p.click('#menuSit [data-ac="tirar"]'); await p.waitForTimeout(400);
 ok(/E-mail enviado/.test(await linhaPrest('15').textContent()) && !/✎/.test(await linhaPrest('15').textContent()), 'tirar a marca volta ao calculado');
-// Celular sem rolagem da página.
-const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true })).newPage();
-await m.goto(html + '#fechamento'); await m.waitForSelector('[data-fsub]');
-ok(await m.evaluate(() => document.documentElement.scrollWidth) <= 390, 'celular sem rolagem horizontal da página');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

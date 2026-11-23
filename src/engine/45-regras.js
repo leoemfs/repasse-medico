@@ -8,7 +8,7 @@ const FAIXAS_USG_PADRAO = [
   { id: 'geral', nome: 'Repasse médicos geral', base: 'unidade', acrescimo: 0 },
   { id: 'mais2', nome: 'Repasse com acréscimo de 2%', base: 'unidade', acrescimo: 0.02 },
   { id: 'residente', nome: 'Repasse residentes 35%', base: 'residente', acrescimo: 0 },
-  ...[40, 49, 50, 55, 70].map(n => ({ id: 'p' + n, nome: `Repasse ${n}%`, base: 'fixo', pct: n / 100 }))
+  ...[40, 42, 49, 50, 55, 70].map(n => ({ id: 'p' + n, nome: `Repasse ${n}%`, base: 'fixo', pct: n / 100 }))
 ];
 // Percentual de USG por unidade (médicos / residentes) e CNPJ para a nota fiscal.
 const UNIDADES_REGRAS = {
@@ -66,6 +66,12 @@ function migrarRegras(c) {
     if (u.pctUSG === undefined) { u.pctUSG = pad?.pctUSG ? { ...pad.pctUSG } : null; mudou = true; }
   }
   if (!Array.isArray(c.faixasUSG)) { c.faixasUSG = clone(FAIXAS_USG_PADRAO); mudou = true; }
+  // Faixa padrão nova (ex.: «Repasse 42%», 23/11/2026) entra na posição do padrão, sem mexer nas que o usuário editou.
+  FAIXAS_USG_PADRAO.forEach((f, i) => {
+    if (c.faixasUSG.some(x => x.id === f.id)) return;
+    const antes = FAIXAS_USG_PADRAO.slice(0, i).map(x => x.id), pos = c.faixasUSG.reduce((m, x, j) => antes.includes(x.id) ? j + 1 : m, 0);
+    c.faixasUSG.splice(pos, 0, clone(f)); mudou = true;
+  });
   if (!c.classes) { c.classes = classesPadrao(); mudou = true; }
   // 04/11/2026: a fusão de imagem passa a valer o percentual da unidade (antes R$ 250,00 fixo). Migra uma vez.
   if (c.classes && !c.classes.fusaoPctUnidade) { const f = (c.classes.equivalentes || []).find(e => e.padrao === 'FUSAO'); if (f && !f.pct) { f.pctUnidade = true; f.valor = 0; } c.classes.fusaoPctUnidade = true; mudou = true; }
@@ -183,7 +189,9 @@ function aplicarPlanilhaControle(cfg, lida, origem) {
     if (!p) { p = { cod: x.cod, nomeMV: x.nome, aliases: [], naoRealizaRepasse: false, origem, em: agoraISO(), regras: regrasPrestadorVazias() }; cfg.prestadores.push(p); novos++; }
     p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}) };
     Object.assign(p.regras, { faixaUSG: x.faixaUSG || p.regras.faixaUSG, board: x.board || p.regras.board, participaIMG: x.participaIMG || p.regras.participaIMG, v3: x.v3 || p.regras.v3, classeFixa: x.classeFixa || p.regras.classeFixa });
+    // A faixa da planilha define se é residente: quem saiu da faixa de residentes volta a ser médico (tabela do IMG).
     if (x.faixaUSG === 'residente') p.regras.tipo = 'residente';
+    else if (x.faixaUSG && p.regras.tipo === 'residente') p.regras.tipo = 'medico';
     atualizados++;
   }
   for (const [cod, c] of Object.entries(lida.cnpj)) { const u = unidadePorCod(cfg, cod); if (u && !u.cnpj) u.cnpj = c; }

@@ -31,6 +31,8 @@ const COLUNAS_EXPORT_CONF = [
   { id: 'medicoApolo', rotulo: 'Médico Apolo', grupo: 'ap', larg: 28, valor: x => x.l?.medico || '' },
   { id: 'ressalvas', rotulo: 'Ressalvas', grupo: 'obs', larg: 34, valor: x => ({ v: [...x.marcadores].map(m => MARCADORES[m]).join(' | '), st: { wrap: true } }) },
   { id: 'observacoes', rotulo: 'Observações e análise', grupo: 'obs', larg: 80, valor: x => ({ v: x.motivos.join(' | '), st: { wrap: true } }) },
+  // SOL-F41 (v3.0.0-alpha.13): a observação escrita na linha (Conferência), com quem e quando.
+  { id: 'observacaoLinha', rotulo: 'Observação (na linha)', grupo: 'obs', larg: 50, valor: (x, ctx) => ({ v: ctx?.idxObs ? textoObservacoes(observacoesDaLinha(ctx.idxObs, x.r, x.l)) : '', st: { wrap: true } }) },
   // Colunas que já existem nos dados e não estão no padrão (aba «Técnico» / «MV original»).
   { id: 'conta', rotulo: 'Conta', larg: 11, valor: x => ({ v: x.r?.conta || '', st: TXT }) },
   { id: 'atendimento', rotulo: 'Atendimento', larg: 12, valor: x => ({ v: x.r?.atendimento || '', st: TXT }) },
@@ -45,7 +47,7 @@ const COLUNAS_EXPORT_CONF = [
   { id: 'linhaPlanilha', rotulo: 'Laudo: linha da planilha', grupo: 'ap', larg: 10, valor: x => x.l?.linhaPlanilha || '' },
   { id: 'origem', rotulo: 'Origem (MV/Apolo)', larg: 8, valor: x => x.origem || '' }
 ];
-const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes'];
+const IDS_PADRAO_CONF = ['situacao', 'decisao', 'paciente', 'data', 'codigo', 'procMV', 'titulo', 'falta', 'vlRepasse', 'convenioMV', 'unidadeMV', 'grupoMV', 'medicoMV', 'pacienteMV', 'pacienteApolo', 'dataApolo', 'estudo', 'convenioApolo', 'unidadeApolo', 'modalidade', 'medicoApolo', 'ressalvas', 'observacoes', 'observacaoLinha'];
 const MODELOS_EXPORT_FIXOS = [
   { id: 'padrao', nome: 'Padrão — ordem de quem confere (layout operacional atual)', alvo: 'conferencia', colunas: IDS_PADRAO_CONF, fixo: true },
   { id: 'completo', nome: 'Completo — padrão + classe do fechamento e colunas técnicas (conta, atendimento, IDs, linha do MV)', alvo: 'conferencia', colunas: ['classe', ...IDS_PADRAO_CONF.slice(0, 9), 'conta', 'atendimento', 'remessa', 'vlTotal', 'quant', ...IDS_PADRAO_CONF.slice(9), 'repasseMV', 'linhaMV', 'paginaMV', 'tipoItem', 'idLaudo', 'linhaPlanilha', 'origem'], fixo: true }
