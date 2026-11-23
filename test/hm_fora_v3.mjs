@@ -105,10 +105,15 @@ ok(mig[0] === '^HM |(^| )HM$' && mig[1] === 'HONORARIO|HONOR MED|(^| )HM( |$)', 
 
 // ---------- 3. V3 (unidade 5): HM de USG Unimed continua pago; o de mamografia, excluído ----------
 const V = await rodar('16', '5');
+await p.click('#cfAba-aceite'); await p.waitForTimeout(100); await p.click('#cfAceitar'); await p.waitForTimeout(300); if (await p.isVisible('#dlg[open]')) { await p.click('#dlgBotoes button[value="ok"]'); await p.waitForTimeout(200); }
 const hmUSG = V.hm.find(h => /PF$/.test(h.g)), hmMG = V.hm.find(h => /MAMOGRAFIA/.test(h.g));
 ok(V.un === '5' && hmUSG?.cl === 'devido' && !hmUSG.m.includes('hm-excluir'), `V3: HM de USG Unimed é Devido (${hmUSG?.cl})`);
 ok(hmMG?.cl === 'excluido' && hmMG.m.includes('hm-v3-excluir') && !hmMG.m.includes('hm-excluir'), 'V3: HM de mamografia fica Excluído pela regra da V3 («HM V3 a excluir»)');
+const fV = await p.evaluate(() => { const { t } = window.__RM; const x = t.fechamentoAtual().prestadores.find(y => y.cod === '16'); return x?.avisos || []; });
+ok(fV.some(a => /unidade 5: 1 HM a excluir do MV \(R\$ 15,00\).*na V3 só o HM de USG Unimed é pago/.test(a)), `V3: aviso no Fechamento com a regra da V3 («${fV.find(a => /HM a excluir/.test(a))}»)`);
 ok(V.T.pagar === 60, `V3: para pagamento R$ ${V.T.pagar} (USG + HM de USG Unimed)`);
 
+const v3novo = await p.evaluate(() => ['10490', '6703', '17771'].every(c => window.__RM.S.cfg.prestadores.find(x => String(x.cod) === c)?.regras?.v3));
+ok(v3novo, 'instalação nova já vem com o cadastro padrão dos médicos da V3 (10490, 6703, 17771)');
 ok(!erros.length, `sem erros na tela${erros.length ? ': ' + erros.join(' | ') : ''}`);
 await b.close();

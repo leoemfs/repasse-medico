@@ -22,6 +22,17 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+## Correções da v3.0.0-alpha.25 — achadas com os arquivos reais de 11/2026 (23/11/2026)
+Arquivos enviados nesta sessão: relatórios do MV de 17771 (Matheus) e 6703 (Alexandre), da V3, e a planilha de laudos de 11/2026 (38.276 laudos). Os PDFs foram lidos com o total igual ao impresso (R$ 15.087,16 e R$ 12.059,00).
+- **HM:** os números batem com a SOL-F46.
+  - Alexandre: 30 HM de USG Unimed devidos (R$ 990,00) e 5 HM de raio-X a excluir (R$ 95,00).
+  - Matheus: 9 HM de USG Unimed devidos (R$ 315,00), 85 HM de mamografia a excluir (R$ 5.168,00) e 4 exames base Bradesco substituídos pelos 5 pacotes.
+- **Corrigido — instalação nova sem os médicos da V3:** num navegador novo, a configuração de fábrica não recebia as migrações, e o cadastro padrão da V3 (SOL-F46) não entrava. Os médicos caíam no Fechamento do IMG. Agora a instalação nova também passa pelas migrações.
+- **Corrigido — Fechamento não avisava o HM a excluir do médico V3:** o cálculo da V3 só vê o que entra no pagamento, e o HM excluído não aparece lá. Agora o aviso sai para todos, com a regra certa da unidade:
+  - unidade 5: «85 HM a excluir do MV (R$ 5.168,00), fora do valor: na V3 só o HM de USG Unimed é pago»;
+  - demais unidades: «… fora da V3 nenhum HM é pago».
+- **Não deu para validar com estes arquivos:** HM fora da V3 (os dois relatórios são da V3) e uso das equivalências (as equivalências validadas ficam no navegador e na pasta do usuário, não nos arquivos).
+
 ## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **IMPLEMENTADA na v3.0.0-alpha.24** (pedido de 23/11/2026; prévia e os 3 pontos aprovados; teste: `test/eq_uso.mjs`)
 Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstein-agz3lv`, «SOL-F41» na numeração antiga). Ela nunca entrou na `main`: a 3.0 começou da alpha.19. Precisa ser refeita sobre a 3.0.
 
