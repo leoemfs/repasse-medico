@@ -68,9 +68,10 @@ ok(porNome[1] === '4', `unidade pelo nome dela no arquivo (generico_${porNome[0]
 await p.goto(html + '#correcao'); await p.waitForTimeout(300);
 ok(await p.isVisible('[data-syncpasta="correcao"]'), 'aba Correção de prestador tem «Sincronizar pasta» (pasta conectada, nenhum PDF ainda)');
 await p.click('[data-syncpasta="correcao"]');
-await p.waitForFunction(() => window.__RM.S.relatorios.length > 0, null, { timeout: 20000 }); await p.waitForTimeout(400);
+await p.waitForFunction(() => window.__RM.S.relatorios.some(x => x.rel.cab.prestadorCod === '2'), null, { timeout: 20000 }); await p.waitForTimeout(400);
 const r1 = await p.evaluate(() => window.__RM.S.relatorios.map(x => `${x.rel.cab.prestadorCod}:${x.finalidade}:${x.unidadePasta}`));
-ok(r1.length === 1 && r1[0] === '2:correcao:17', `lê só a pasta da Correção (${r1.join(' · ')}), com a unidade 17 tirada do nome do arquivo`);
+// Desde a alpha.19, conectar a pasta já lê os PDFs da conferência; a Correção traz o dela, uma vez só.
+ok(r1.filter(x => x.startsWith('2:')).length === 1 && r1.includes('2:correcao:17'), `«Sincronizar pasta» da Correção traz o PDF dela (${r1.join(' · ')}), com a unidade 17 tirada do nome do arquivo`);
 ok(/Correção de prestador/.test(await p.textContent('#aviso')), `aviso diz que leu só a Correção de prestador (${(await p.textContent('#aviso')).slice(0, 80)})`);
 // Conferência: lê só «Relatórios para conferência».
 await p.goto(html + '#conferencia'); await p.waitForTimeout(300);

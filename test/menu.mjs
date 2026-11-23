@@ -31,7 +31,7 @@ const m = await (await b.newContext({ viewport: { width: 700, height: 800 } })).
 m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#inicio'); await m.waitForFunction(() => window.__RM);
 const estreita = await m.evaluate(() => ({ barra: !!document.querySelector('.barra-cel,#barraCel,#veuGaveta,.gaveta-cab'), larg: Math.round(document.querySelector('.sidebar').getBoundingClientRect().width), abas: [...document.querySelectorAll('.nav a[data-pag]')].filter(a => a.offsetParent).length }));
-ok(!estreita.barra && estreita.larg === 232 && estreita.abas === 10, `janela estreita: mesmo menu lateral com as 10 abas, sem gaveta nem barra inferior (${JSON.stringify(estreita)})`);
+ok(!estreita.barra && estreita.larg === 232 && estreita.abas === 7, `janela estreita: mesmo menu lateral com as 7 abas, sem gaveta nem barra inferior (${JSON.stringify(estreita)})`);
 await m.click('#btnMenu');
 ok(Math.round(await m.evaluate(() => document.querySelector('.sidebar').getBoundingClientRect().width)) === 64, 'na janela estreita, ☰ recolhe o menu');
 await m.screenshot({ path: out + 'menu_estreito.png' });

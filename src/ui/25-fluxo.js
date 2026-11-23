@@ -28,7 +28,7 @@ function atualizarNavFluxo() {
   const c = S.fluxo?.competencias[S.comp || chaveAtual()], b = $('navFluxo'); if (!b) return;
   const n = c ? indicadoresFluxo(c).vencidas.length : 0;
   b.hidden = !n; b.textContent = n;
-  const a = b.closest('a'), nome = n ? `Fluxo mensal · ${n} etapa(s) com prazo vencido` : 'Fluxo mensal';
+  const a = b.closest('a'), nome = n ? `Fechamento e envio · ${n} etapa(s) com prazo vencido` : 'Fechamento e envio';
   a.setAttribute('aria-label', nome); a.querySelector('.dica').textContent = nome;
 }
 const nomeTarefaRef = (comp, gId, ref) => {
@@ -41,7 +41,9 @@ RENDER.fluxo = async () => {
   if (DB.ok) S.rodadas = await dbRodadasJanela();   // sugestões e classificação usam as rodadas mais recentes
   FX.chave = S.comp || chaveAtual();
   const p = $('pag-fluxo');
-  p.innerHTML = `<div class="subabas" role="tablist"><button role="tab" class="${FX.sub === 'acomp' ? 'on' : ''}" data-sub="acomp" aria-selected="${FX.sub === 'acomp'}">Acompanhamento</button><button role="tab" class="${FX.sub === 'divisao' ? 'on' : ''}" data-sub="divisao" aria-selected="${FX.sub === 'divisao'}">Divisão do trabalho</button><button role="tab" class="${FX.sub === 'retro' ? 'on' : ''}" data-sub="retro" aria-selected="${FX.sub === 'retro'}">Retrospectiva</button><button role="tab" class="${FX.sub === 'modelo' ? 'on' : ''}" data-sub="modelo" aria-selected="${FX.sub === 'modelo'}">Modelo e prazos</button></div><div id="fxCorpo"></div>`;
+  // v3.0.0-alpha.20 (simplificação): as Etapas do mês são a tela; Divisão, Retrospectiva e Modelo ficam como links discretos.
+  const sub = (k, t) => `<button role="tab" class="lnk${FX.sub === k ? ' on' : ''}" data-sub="${k}" aria-selected="${FX.sub === k}">${t}</button>`;
+  p.innerHTML = `<div class="fx-mais" role="tablist" aria-label="Etapas do mês">${FX.sub === 'acomp' ? '<span class="small muted">Também:</span>' : sub('acomp', '← Etapas do mês')}${['divisao', 'retro', 'modelo'].map(k => sub(k, { divisao: 'Quem faz o quê (divisão do trabalho)', retro: 'Retrospectiva', modelo: 'Modelo e prazos' }[k])).join('<span class="muted">·</span>')}</div><div id="fxCorpo"></div>`;
   p.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { FX.sub = b.dataset.sub; RENDER.fluxo(); });
   FX.sub === 'modelo' ? desenharModeloFluxo() : FX.sub === 'divisao' ? desenharDivisaoFluxo() : FX.sub === 'retro' ? desenharRetrospectiva() : desenharAcompanhamento();
 };
@@ -68,6 +70,10 @@ function desenharAcompanhamentoBase() {
     const prox = [...ind.vencidas, ...ind.proximas].sort((a, b) => a.prazo - b.prazo).slice(0, 4);
     const pend = ['and', 'ter', 'cor'].reduce((a, k) => a + ind[k], 0);
     c.innerHTML = cab + `
+    <div class="card"><h3>Marcos da competência <span class="muted small">— clique para ajustar a data (com justificativa)</span></h3><div class="marcos-linha">${ind.marcos.map(m => {
+      const d = diaSerial(m.data) - hoje;
+      return `<button class="marco ${d === 0 ? 'hoje' : d < 0 ? 'passado' : d <= 3 ? 'prox' : ''}" data-marco="${m.id}" title="${esc(descreverRegra(m.regra, comp.modelo.marcos))}${m.manual ? ` · data manual: ${esc(m.justificativa)}` : ''}"><b>${fmtCurta(m.data)}${d === 0 ? ' · HOJE' : ''}${m.manual ? ' ✎' : ''}</b>${esc(m.nome)}<small>${esc(descreverRegra(m.regra, comp.modelo.marcos))}</small></button>`;
+    }).join('')}</div></div>
     <div class="grid3 fx-kpis">
       <div class="card kpi"><h3>Operacional</h3><dl>
         <div><dt>Etapas concluídas</dt><dd>${ind.ok} de ${ind.total}</dd></div><div><dt>Em andamento · aguardando terceiros</dt><dd>${ind.and} · ${ind.ter}</dd></div>
@@ -77,10 +83,6 @@ function desenharAcompanhamentoBase() {
         <div><dt>NFs encaminhadas ao Financeiro</dt><dd>${ind.doc.nfFinanceiro} de ${ind.doc.nfRecebidas}</dd></div><div><dt>Prestadores com documentação incompleta</dt><dd class="${ind.doc.incompletos ? 'txt-err' : ''}">${ind.doc.incompletos}</dd></div></dl></div>
       <div class="card kpi"><h3>Prazos</h3><dl>${prox.length ? prox.map(x => `<div><dt>${esc(x.nome)}</dt><dd class="${x.dias < 0 ? 'txt-err' : 'txt-warn'}">${x.dias < 0 ? `vencido há ${-x.dias} d` : x.dias === 0 ? 'hoje' : `${fmtCurta(x.prazo)} · ${x.dias} d`}</dd></div>`).join('') : '<div><dt>Nenhum prazo vencido ou próximo</dt><dd class="txt-ok">✓</dd></div>'}
         <div><dt>Etapas abertas</dt><dd>${pend + ind.ni}</dd></div></dl></div></div>
-    <div class="card"><h3>Marcos da competência <span class="muted small">— clique para ajustar a data (com justificativa)</span></h3><div class="marcos-linha">${ind.marcos.map(m => {
-      const d = diaSerial(m.data) - hoje;
-      return `<button class="marco ${d === 0 ? 'hoje' : d < 0 ? 'passado' : d <= 3 ? 'prox' : ''}" data-marco="${m.id}" title="${esc(descreverRegra(m.regra, comp.modelo.marcos))}${m.manual ? ` · data manual: ${esc(m.justificativa)}` : ''}"><b>${fmtCurta(m.data)}${d === 0 ? ' · HOJE' : ''}${m.manual ? ' ✎' : ''}</b>${esc(m.nome)}<small>${esc(descreverRegra(m.regra, comp.modelo.marcos))}</small></button>`;
-    }).join('')}</div></div>
     <div class="fx-filtros"><div class="marcadores" style="margin:0">${[['todos', 'Todas as etapas'], ['vencidas', 'Vencidas'], ['proximas', 'Vencem em 3 dias'], ['ter', 'Aguardando terceiros'], ['cor', 'Pendente de correção'], ['abertas', 'Não concluídas']].map(([k, t]) => `<button class="marc${FX.filtro === k ? ' sel' : ''}" data-f="${k}">${t}</button>`).join('')}</div>
       <input type="search" id="fxBusca" placeholder="Buscar etapa, prestador ou observação…" value="${esc(FX.busca)}"></div>
     <div id="fxGrupos"></div>
@@ -180,12 +182,13 @@ function corpoGrupo(comp, g, tarefas, mk) {
 function blocoDocumental(comp, g) {
   const lista = Object.values(comp.grupos[g.id].documental);
   const deBases = GRUPOS_FLUXO_BASES[g.id];
-  return `<h4 class="sub-fx">Controle documental por prestador</h4>${deBases ? `<p class="small muted">A lista vem de Bases (${g.id === 'usg' ? 'prestadores com faixa de USG' : g.id === 'img' ? 'prestadores que recebem IMG' : 'médicos V3'}); quem for cadastrado lá entra aqui sozinho. Remover daqui vale só para este mês.</p>` : ''}<div class="tw"><table class="tab-fx"><thead><tr><th>Prestador</th><th>Relatório e prévia enviados</th><th>NF recebida</th><th>NF encaminhada ao Financeiro</th><th>Pendência</th><th></th></tr></thead><tbody>${lista.length ? lista.map(d => `<tr data-doc="${esc(d.cod)}">
+  const n = lista.length, env = lista.filter(d => d.relatorio).length, nf = lista.filter(d => d.nfRecebida).length, fin = lista.filter(d => d.nfFinanceiro).length, rotG = { usg: 'Repasse USG', img: 'Repasse IMG', curitiba: 'Repasse Curitiba (V3)' }[g.id];
+  return `<details class="fx-doc"${FX.docAbertos?.has(g.id) ? ' open' : ''} data-docg="${g.id}"><summary><b>Envio e NF por prestador</b> <span class="small muted">${env} de ${n} e-mail(s) · ${nf} NF recebida(s) · ${fin} ao Financeiro${rotG ? ` — marque na linha de cada prestador em Fechamento e envio › ${rotG}` : ''}</span></summary>${deBases ? `<p class="small muted">A lista vem de Bases (${g.id === 'usg' ? 'prestadores com faixa de USG' : g.id === 'img' ? 'prestadores que recebem IMG' : 'médicos V3'}); quem for cadastrado lá entra aqui sozinho. Remover daqui vale só para este mês.</p>` : ''}<div class="tw"><table class="tab-fx"><thead><tr><th>Prestador</th><th>Relatório e prévia enviados</th><th>NF recebida</th><th>NF encaminhada ao Financeiro</th><th>Pendência</th><th></th></tr></thead><tbody>${lista.length ? lista.map(d => `<tr data-doc="${esc(d.cod)}">
       <td>${esc(d.cod)} · ${esc(d.nome)}${d.unidade ? ` <small class="muted">unid. ${esc(d.unidade)}</small>` : ''}${d.origem === 'Bases' ? ' <small class="muted" title="Incluído automaticamente pelas regras de Bases">· Bases</small>' : ''}</td>
       <td><input type="date" data-d="relatorio" value="${esc(d.relatorio)}" aria-label="Relatório enviado em"></td><td><input type="date" data-d="nfRecebida" value="${esc(d.nfRecebida)}" aria-label="NF recebida em"></td>
       <td><input type="date" data-d="nfFinanceiro" value="${esc(d.nfFinanceiro)}" aria-label="NF encaminhada em"></td><td><input type="text" data-d="pendencia" value="${esc(d.pendencia)}" aria-label="Pendência"></td>
       <td><button class="perigo ic" data-docrm="${esc(d.cod)}" title="Remover deste mês" aria-label="Remover deste mês">✕</button></td></tr>`).join('') : '<tr><td colspan="6" class="muted">Nenhum prestador neste fluxo. Adicione abaixo ou cadastre a lista no modelo.</td></tr>'}</tbody></table></div>
-    <div class="acoes"><button class="sec" data-docadd="${g.id}">+ Prestador</button><button class="sec" data-docmv="${g.id}">Importar dos relatórios do MV carregados</button><button class="sec" data-docmodelo="${g.id}">Salvar esta lista no modelo</button></div>`;
+    <div class="acoes"><button class="sec" data-docadd="${g.id}">+ Prestador</button><button class="sec" data-docmv="${g.id}">Importar dos relatórios do MV carregados</button><button class="sec" data-docmodelo="${g.id}">Salvar esta lista no modelo</button></div></details>`;
 }
 function blocoMatriz(comp, g) {
   const un = S.cfg.unidades.filter(u => !(g.matriz.excetoUnidades || []).includes(String(u.cod))), mz = comp.grupos[g.id].matriz;
@@ -405,3 +408,6 @@ function desenharModeloFluxo() {
     salvarFluxo(`Modelo aplicado ao mês ${rotuloCompetencia(FX.chave)}.`);
   };
 }
+
+FX.docAbertos = FX.docAbertos || new Set();
+document.addEventListener('toggle', e => { const d = e.target; if (d.classList?.contains('fx-doc')) d.open ? FX.docAbertos.add(d.dataset.docg) : FX.docAbertos.delete(d.dataset.docg); }, true);

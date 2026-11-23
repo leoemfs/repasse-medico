@@ -2,12 +2,13 @@
  * Bases: unidades, prestadores (código MV ↔ médico do Apolo), regras de tipo de item e Power BI
  * ============================================================ */
 const BS = { sub: 'unidades', soSemTipo: false };
-const SUBS_BASES = [['unidades', 'Unidades e faixas'], ['prestadores', 'Prestadores e regras'], ['classes', 'Classes e valores IMG'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['itens', 'Tipo de item'], ['modalidades', 'Modalidades e HM V3'], ['pbi', 'Power BI']];
-// Bases e regras = categoria das Configurações: abas no topo e a barra da configuração compartilhada (P2; antes em 97-decoracoes.js).
+/* v3.0.0-alpha.20 (simplificação): as 8 subabas em dois grupos — «Usados no mês» à mão e «Avançado» (quase nunca muda). */
+const SUBS_BASES = [['prestadores', 'Prestadores e regras'], ['unidades', 'Unidades e faixas'], ['convenios', 'Convênios'], ['faturistas', 'Faturistas'], ['classes', 'Classes e valores IMG'], ['itens', 'Tipo de item'], ['modalidades', 'Modalidades e HM V3'], ['pbi', 'Power BI']];
+const SUBS_BASES_AVANCADO = new Set(['classes', 'itens', 'modalidades', 'pbi']);
+// Bases e regras: barra da configuração compartilhada no topo (P2). Desde a alpha.20 é só um item do menu (saiu das abas de Configurações).
 RENDER.bases = () => {
   const r = desenharBases(), pg = $('pag-bases');
   if (pg && !$('cfgSync')) { pg.insertAdjacentHTML('afterbegin', barraCfg()); ligarBarraCfg(); }
-  if (pg && !pg.querySelector('.cfg-abas')) { pg.insertAdjacentHTML('afterbegin', abasConfiguracoes('bases')); ligarAbasConfiguracoes(pg); }
   return r;
 };
 function desenharBases() {
@@ -18,7 +19,7 @@ function desenharBases() {
   const branchSemUn = branches.filter(([b]) => !S.cfg.unidades.some(u => (u.apolo || []).map(norm).includes(norm(b))));
   const pctTxt = v => v === null || v === undefined || v === '' ? '' : String(r2(v * 10000) / 100);
   $('pag-bases').innerHTML = `<p class="small muted nota-global">As bases valem para todas as competências. Cada alteração fica registrada na competência em uso (${rotuloCompetencia(S.comp)}) e aparece no painel do Início.</p>
-  <div class="subabas" role="tablist">${SUBS_BASES.map(([k, t]) => `<button role="tab" class="${BS.sub === k ? 'on' : ''}" aria-selected="${BS.sub === k}" data-bsub="${k}">${t}</button>`).join('')}</div>
+  <div class="subabas bs-abas" role="tablist"><span class="bs-grupo">Usados no mês</span>${SUBS_BASES.map(([k, t]) => `${k === 'classes' ? '<span class="bs-grupo bs-av">Avançado</span>' : ''}<button role="tab" class="${BS.sub === k ? 'on' : ''}${SUBS_BASES_AVANCADO.has(k) ? ' bs-avb' : ''}" aria-selected="${BS.sub === k}" data-bsub="${k}">${t}</button>`).join('')}</div>
   <div class="card" data-sub="unidades"><h2>Unidades</h2><p class="lead">A unidade escolhida na sessão filtra os laudos do Apolo pelos nomes cadastrados aqui (BRANCH_NAME). Vários nomes: separe por «|».</p>
     ${branchSemUn.length ? `<p class="badge warn">Unidades do Apolo sem cadastro: ${branchSemUn.map(([b, n]) => `${esc(b)} (${n})`).join(', ')}</p>` : ''}
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Nome</th><th>Nome(s) no Apolo</th><th>Nome no Power BI</th><th>Empresa</th><th>CNPJ para a NF</th><th>% USG médicos</th><th>% USG residentes</th><th></th></tr></thead><tbody>${S.cfg.unidades.map((u, i) => `<tr>

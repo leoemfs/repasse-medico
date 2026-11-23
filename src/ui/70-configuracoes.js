@@ -5,12 +5,14 @@
  * O que é da equipe vai com a configuração compartilhada (pasta da rede); o que é de cada pessoa fica no navegador.
  * ============================================================ */
 const CF = { sub: 'geral', colunas: null, modelo: '' };
-const ABAS_CONFIG = [['geral', 'Geral'], ['conferencia', 'Conferência'], ['bases', 'Bases e regras'], ['pastas', 'Pastas e sincronização'], ['exportacao', 'Exportação'], ['backup', 'Backup e dados'], ['sobre', 'Sobre']];
+// v3.0.0-alpha.20 (simplificação): «Bases e regras» é só o item do menu; «Modelo do fluxo» (prazos e etapas) entra aqui.
+const ABAS_CONFIG = [['geral', 'Geral'], ['conferencia', 'Conferência'], ['pastas', 'Pastas e sincronização'], ['fluxo', 'Modelo do fluxo'], ['exportacao', 'Exportação'], ['backup', 'Backup e dados'], ['sobre', 'Sobre']];
 const abasConfiguracoes = atual => `<div class="subabas cfg-abas" role="tablist" aria-label="Categorias de configuração">${ABAS_CONFIG.map(([k, t]) => `<button role="tab" class="${atual === k ? 'on' : ''}" aria-selected="${atual === k}" data-cfsub="${k}">${t}</button>`).join('')}</div>`;
 function ligarAbasConfiguracoes(raiz) {
   raiz.querySelectorAll('[data-cfsub]').forEach(b => b.onclick = () => {
     const k = b.dataset.cfsub;
     if (k === 'bases') { if (location.hash !== '#bases') location.hash = '#bases'; return; }
+    if (k === 'fluxo') { FX.sub = 'modelo'; if (location.hash !== '#fluxo') location.hash = '#fluxo'; else RENDER.fluxo(); return; }
     CF.sub = k; if (location.hash !== '#configuracoes') location.hash = '#configuracoes'; else RENDER.configuracoes();
   });
 }

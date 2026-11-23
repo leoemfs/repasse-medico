@@ -4,6 +4,7 @@
 import { createRequire } from 'module';
 import fs from 'fs';
 import { execFileSync } from 'child_process';
+const abrirF = async () => { if (!(await p.isVisible('#cfGaveta'))) await p.click('#cfFiltrosBt'); };
 const { chromium } = createRequire(import.meta.url)('playwright');
 const raiz = new URL('..', import.meta.url).pathname, out = raiz + 'test/saida/ficticio/';
 const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
@@ -70,9 +71,13 @@ const classes = () => p.evaluate(() => window.__RM.S.conf.res.linhas.filter(x =>
 const totais = () => p.evaluate(() => window.__RM.t.totaisPorClasse(window.__RM.S.conf.res.linhas, window.__RM.t.classeDaLinhaConf));
 ok(await classes() === 'ANA:devido BRUNA:devido CARLA:pend DORA:pend ELIS:pend', `classes da conferência: ${await classes()}`);
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.some(x => !x.r && x.status === 'so-laudo' && x.l.paciente === 'FABIO NUNES LEAL')), 'laudo sem lançamento aparece «Só no laudo»');
+await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
+ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
+await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
+await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
-await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
+await abrirF(); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
 await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito'); await okDlg();
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // NC na linha sem laudo, pelo detalhe da linha.
@@ -121,6 +126,19 @@ ok(f.v === 60 && f.cl?.pend === 50 && f.cl?.nc === 40, `Fechamento do DR X na un
 ok(/60,00/.test(await p.textContent('#fhCorpo')), 'a tela do Fechamento mostra o valor para pagamento');
 const fhX = await baixar('#fhExp', 'fechamento.xlsx').catch(() => '');
 ok(fhX && Object.keys(abas(fhX)).length > 0, 'planilha de controle do fechamento exportada e reaberta');
-await p.screenshot({ path: out + 'fechamento.png' });
+// v3.0.0-alpha.20: Etapas do mês dentro do Fechamento e envio; envio marcado na linha do prestador.
+await p.goto(html + '#fluxo'); await p.waitForSelector('#fxCriar'); await p.click('#fxCriar'); await p.waitForSelector('.marco');
+ok(/Etapas do mês/.test(await p.textContent('#subnav')) && await p.evaluate(() => document.querySelector('.nav a.ativo')?.dataset.pag) === 'fechamento', 'Etapas do mês ficam no Fechamento e envio (menu e subabas)');
+await p.screenshot({ path: out + 'etapas.png', fullPage: true });
+await p.click('#subnav [data-fsub="usg"]'); await p.waitForSelector('#fhCorpo [data-envio]', { timeout: 15000 });
+const env = await p.getAttribute('#fhCorpo [data-envio$="|relatorio"]', 'data-envio');
+await p.click(`[data-envio="${env}"]`); await p.waitForTimeout(300);
+ok(await p.evaluate(e => { const [m, cod] = e.split('|'), c = window.__RM.S.fluxo.competencias[window.__RM.S.comp]; return !!c.grupos[m].documental[cod]?.relatorio; }, env), `e-mail marcado na linha do prestador grava no controle documental (${env})`);
+await p.click('[data-fsit="enviado"]'); await p.waitForTimeout(200);
+ok((await p.$$('#fhCorpo [data-envio$="|relatorio"].on')).length >= 1 && (await p.$$('#fhCorpo [data-envio$="|relatorio"]:not(.on)')).length === 0, 'situação vira filtro: «E-mail enviado» mostra só quem já recebeu');
+await p.screenshot({ path: out + 'fechamento.png', fullPage: true });
+await p.goto(html + '#inicio'); await p.waitForSelector('.ini-dia'); await p.waitForTimeout(300);
+ok(await p.isVisible('#iniArquivos') && /Pede você/.test(await p.textContent('#pag-inicio')) && await p.isVisible('.ini-dia .mi'), 'Início como painel do dia: marcos, arquivos do mês e «Pede você»');
+await p.screenshot({ path: out + 'inicio.png', fullPage: true });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.slice(0, 3).join(' | ') : ''));
 await b.close();

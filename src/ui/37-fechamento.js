@@ -33,20 +33,22 @@ RENDER.fechamento = async () => {
   const f = fechamentoAtual(), mk = marcosFech(S.comp), fechada = compFechada();
   const lista = FH.sub === 'img' ? f.img : FH.sub === 'curitiba' ? f.curitiba : f.usg;
   const cont = k => lista.filter(x => x.situacao === k).length;
+  const passaSit = k => !FH.fSit || FH.fSit === k;
   $('pag-fechamento').innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Fechamento da competência ${rotuloCompetencia(S.comp)}</h2>
-    <div class="acoes" style="margin:0"><button class="sec" id="fhInd">Exportar indicadores</button><button class="sec" id="fhExp">Exportar planilha de controle</button><button id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Exportar competência (pasta)</button></div></div>
+    <div class="acoes fh-exp" style="margin:0"><span class="small muted">Exportar:</span><button class="sec mini" id="fhExp" title="Planilha de controle do repasse">Planilha de controle</button><button class="sec mini" id="fhInd">Indicadores</button><button class="sec mini" id="fhPasta" title="Pasta Comp_MM-AAAA (.zip) com correção de prestador, NCs, planilhas usadas, relatórios, conferências e esta planilha">Pasta da competência</button></div></div>
     ${f.previa ? `<div class="aviso-fixo warn"><b>PRÉVIA</b> — ${f.semAceite ? `${f.semAceite} prestador(es) com rodada sem aceite` : 'nenhuma rodada de conferência nesta competência'}. A planilha sai marcada como prévia até todos terem aceite.</div>` : '<div class="aviso-fixo ok">Todos os prestadores com valores têm aceite: a exportação sai como versão final.</div>'}
-    <div class="subabas" role="tablist">${[['usg', `Repasse USG <em>pagto ${fmtCurta(mk.pagUSG)}</em>`], ['img', `Repasse IMG <em>pagto ${fmtCurta(mk.pagIMG)}</em>`], ['curitiba', `Repasse Curitiba (V3) <em>pagto ${fmtCurta(mk.pagCuritiba)}</em>`], ['quadro', 'Quadro'], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores']].map(([k, t]) => `<button role="tab" class="${FH.sub === k ? 'on' : ''}" aria-selected="${FH.sub === k}" data-fsub="${k}">${t}</button>`).join('')}</div>
-    ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis">${Object.keys(SITUACAO_FECH).map(k => `<div class="nc-kpi"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></div>`).join('')}</div>` : ''}
+    ${['usg', 'img', 'curitiba'].includes(FH.sub) ? `<div class="nc-kpis fh-sits">${Object.keys(SITUACAO_FECH).map(k => `<button type="button" class="nc-kpi${FH.fSit === k ? ' sel' : ''}" data-fsit="${k}" title="Mostrar só «${esc(SITUACAO_FECH[k].nome)}»"><b>${cont(k)}</b><small>${chipSitFech(k)}</small></button>`).join('')}<button type="button" class="sec mini fh-quadro" data-fsub="quadro" title="As mesmas situações em colunas, como quadro">Ver como quadro</button></div>` : ''}
     <div id="fhCorpo"></div>
     ${avisosFechamentoControle()}`;
-  $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; RENDER.fechamento(); });
+  $('pag-fechamento').querySelectorAll('[data-fsub]').forEach(b => b.onclick = () => { FH.sub = b.dataset.fsub; FH.fSit = null; RENDER.fechamento(); desenharSubnav('fechamento'); });
+  $('pag-fechamento').querySelectorAll('[data-fsit]').forEach(b => b.onclick = () => { FH.fSit = FH.fSit === b.dataset.fsit ? null : b.dataset.fsit; RENDER.fechamento(); });
   $('fhExp').onclick = () => exportarFechamento(f, mk);
   $('fhPasta').onclick = async () => { await exportarPastaCompetencia(S.comp); registrarEvidenciaEnvio(f, false); };
   $('fhInd').onclick = () => baixarZip(xlsxIndicadoresFechamento(f, { ...indicadoresFechamento(f, S.cfg, S.nc.itens.filter(x => x.competencia === S.comp)), cobertura: coberturaCompetencia(S.rodadas, S.comp), controleUnidade: S.apolo ? avisosControleUnidade(controleAtual()).filter(a => a.tipo !== 'sem-cadastro') : [] }, { operador: S.operador }), `Indicadores_fechamento_${S.comp.slice(5)}-${S.comp.slice(0, 4)}_${carimbo()}.xlsx`);
   const corpo = $('fhCorpo');
   if (FH.sub === 'usg') desenharUSG(corpo, f, mk); else if (FH.sub === 'img') desenharIMG(corpo, f, mk, 'img'); else if (FH.sub === 'curitiba') desenharCuritiba(corpo, f, mk); else if (FH.sub === 'producao') desenharProducao(corpo, f); else if (FH.sub === 'quadro') desenharQuadro(corpo, f); else desenharIndicadoresFech(corpo, f);
-  if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm]').forEach(x => { x.disabled = true; });
+  ligarEnvioFech(corpo, f);
+  if (fechada) corpo.querySelectorAll('input, textarea, [data-nf-nova], [data-nf-ed], [data-nf-rm], [data-envio]').forEach(x => { x.disabled = true; });
 };
 
 const celValor = v => v === undefined ? '' : fmtBR(v);
@@ -65,10 +67,10 @@ function desenharUSG(corpo, f, mk) {
   const faixas = [...new Set(f.usg.map(x => x.p?.regras?.faixaUSG || ''))];
   corpo.innerHTML = `<div class="tw fh-tab"><table><thead><tr><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th>${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}</small></th>`).join('')}<th class="n">BOARD</th><th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead><tbody>
     <tr class="fh-cnpj"><td></td><td>CNPJ para a NF</td><td></td>${un.map(u => `<td>${esc(u.cnpj || '')}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjBoard)}</td><td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="6"></td></tr>
-    ${faixas.map(fx => { const fa = S.cfg.faixasUSG.find(y => y.id === fx), l = f.usg.filter(x => (x.p?.regras?.faixaUSG || '') === fx);
+    ${faixas.map(fx => { const fa = S.cfg.faixasUSG.find(y => y.id === fx), l = f.usg.filter(x => (x.p?.regras?.faixaUSG || '') === fx && (!FH.fSit || x.situacao === FH.fSit));
       // Percentual da faixa embaixo de cada unidade, alinhado com a coluna.
       return `<tr class="fh-faixa"><td colspan="3">${esc(fa?.nome || 'Sem faixa cadastrada (Bases → Prestadores e regras)')}</td>${un.map(u => { const p = fa ? pctUSGEsperado(S.cfg, { regras: { faixaUSG: fx, pctUSGUnidade: {} } }, u.cod) : null; return `<td class="n fh-pct">${p === null ? '' : r2(p * 100) + '%'}</td>`; }).join('')}<td colspan="8"></td></tr>` +
-        l.map(x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'usg')}</td>${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}
+        l.map(x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'usg')}${envioFech('usg', x)}</td>${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}
           <td class="n">${x.board ? fmtBR(x.board) : ''}</td><td class="n">${inputAjuste('usg', x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste('usg', x, 'descontos')}</td><td>${inputAjuste('usg', x, 'obs', 160)}</td>
           <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="usg|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>${detAvisos(x)}`).join(''); }).join('')}
     <tr class="fh-total"><td></td><td>TOTAL USG</td><td></td>${un.map(u => `<td class="n">${fmtBR(f.usg.reduce((s, x) => s + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.board, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.plantao, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.total, 0))}</td><td class="n">${fmtBR(f.usg.reduce((s, x) => s + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(f.usg.reduce((s, x) => s + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr>
@@ -83,12 +85,12 @@ const listaFech = (f, modo) => modo === 'usg' ? f.usg : modo === 'curitiba' ? f.
 function desenharIMG(corpo, f, mk, modo) {
   const v3 = modo === 'curitiba', lista = listaFech(f, modo);
   const un = S.cfg.unidades.filter(u => u.cnpj && (v3 ? (u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)) : (u.pctUSG || u.cod === '5' || lista.some(x => x.unidades[u.cod] !== undefined)))).sort((a, b) => +a.cod - +b.cod);
-  const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, modo)}</td>
+  const linha = x => `<tr><td class="n">${x.classeFixa ? '<span class="small">fixo</span>' : x.producaoUSG ? fmtBR(x.producaoUSG) : '<span class="small muted">sem prod. USG</span>'}</td><td><b>${esc(x.classe)}</b></td><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, modo)}${envioFech(modo, x)}</td>
     ${un.map(u => `<td class="n">${celValor(x.unidades[u.cod])}</td>`).join('')}<td class="n">${inputAjuste(x.tipo, x, 'plantao')}</td><td class="n">${fmtBR(x.total)}</td><td class="n">${inputAjuste(x.tipo, x, 'descontos')}</td><td>${inputAjuste(x.tipo, x, 'obs', 160)}</td>
     <td class="n"><b>${fmtBR(x.totalGeral)}</b></td><td>${avisosHtml(x)}</td><td>${x.temValores ? `<button class="sec mini" data-copiar="${modo}|${esc(x.cod)}">Copiar prévia</button>` : ''}</td></tr>${detAvisos(x)}`;
   const cab = `<thead><tr><th class="n">Produção USG</th><th>Classe</th><th>Cód.</th><th class="fh-nome">Prestador</th><th>Situação</th>${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>`;
   corpo.innerHTML = `
-    <div class="tw fh-tab"><table>${cab}<tbody><tr class="fh-cnpj"><td colspan="5">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="6"></td></tr>${lista.map(linha).join('')}</tbody></table></div>
+    <div class="tw fh-tab"><table>${cab}<tbody><tr class="fh-cnpj"><td colspan="5">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="6"></td></tr>${lista.filter(x => !FH.fSit || x.situacao === FH.fSit).map(linha).join('')}</tbody></table></div>
     ${lista.length ? '' : `<p class="muted">${v3 ? 'Nenhum médico da V3: marque «Médico V3» nas regras do prestador (Bases → Prestadores e regras).' : 'Nenhum prestador de IMG: marque «Recebe repasse de IMG» em Bases → Prestadores e regras (ou importe a planilha de controle).'}</p>`}
     ${cartaoDescontosFech(f, modo)}${cartaoNF(f, modo)}
     <label class="campo">Observações da planilha de ${v3 ? 'Curitiba' : 'IMG'}<textarea id="${v3 ? 'fhObsCur' : 'fhObsIMG'}" rows="2">${esc(f.fech.obs[v3 ? 'curitiba' : 'img'] || '')}</textarea></label>
@@ -103,7 +105,7 @@ function desenharCuritiba(corpo, f, mk) {
   const lista = f.curitiba;
   const un = S.cfg.unidades.filter(u => u.cnpj && (ehUnidadeV3(S.cfg, u.cod) || lista.some(x => x.unidades[u.cod] !== undefined))).sort((a, b) => (ehUnidadeV3(S.cfg, b.cod) - ehUnidadeV3(S.cfg, a.cod)) || +a.cod - +b.cod);
   const v = (x, fn) => x.v3 ? fn(x.v3) : '<span class="muted small">—</span>';
-  const linha = x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'curitiba')}</td>
+  const linha = x => `<tr><td>${esc(x.cod)}</td><td class="fh-nome">${esc(x.nome)}</td><td>${chipSitFech(x.situacao, x, 'curitiba')}${envioFech('curitiba', x)}</td>
     <td class="n">${v(x, c => c.exames.toLocaleString('pt-BR'))}</td><td class="n">${v(x, c => fmtBR(c.brutoUSG))}</td><td class="n">${v(x, c => c.hmNaBase || c.hm.valor ? fmtBR(c.hm.valor) : '<span class="muted small">não entra</span>')}</td>
     <td class="n">${v(x, c => fmtBR(c.modo === 'fixo' ? c.outrosValor : c.outros.reduce((s2, o) => s2 + o.valor, 0)))}</td><td class="n">${v(x, c => c.modo === 'fixo' ? '<span class="small">valor fixo</span>' : c.forma === 'por-laudo' ? '<span class="small">por laudo</span>' : fmtBR(c.liquido))}</td>
     <td class="n">${v(x, c => c.pct ? `<b>${fmtBR(c.pct).replace(',00', '')}%</b>${c.faixa ? `<small class="nc-det">${esc(rotuloFaixaV3(c.faixa))}</small>` : ''}` : c.forma === 'por-laudo' ? `<small>R$ ${fmtBR(c.valorLaudo)}</small>` : '')}</td>
@@ -114,7 +116,7 @@ function desenharCuritiba(corpo, f, mk) {
   corpo.innerHTML = `<p class="small muted">Só os médicos da V3 (Curitiba). A unidade ${un.filter(u => ehUnidadeV3(S.cfg, u.cod)).map(u => esc(u.cod)).join(', ') || '5'} é calculada pela regra de cada médico (Bases → Prestadores → Médicos V3): Doppler conta como USG, HM só de USG/Doppler Unimed. Sem regra, vale o valor do relatório do MV. Classe A/B/C/D não se aplica.</p>
     <div class="tw fh-tab"><table><thead><tr><th>Cód.</th><th class="fh-nome">Médico V3</th><th>Situação</th><th class="n">Exames USG</th><th class="n">USG (bruto)</th><th class="n">HM Unimed</th><th class="n">Outros</th><th class="n">Líquido</th><th class="n">%</th>
       ${un.map(u => `<th class="n fh-un" title="${esc(u.nome)}">${esc(u.cod)}<small>${esc(u.nome)}${ehUnidadeV3(S.cfg, u.cod) ? ' · total da NF' : ''}</small></th>`).join('')}<th class="n">PLANTÃO</th><th class="n">TOTAL</th><th class="n">DESCONTOS</th><th>Obs. do desconto</th><th class="n">TOTAL GERAL</th><th>Avisos</th><th></th></tr></thead>
-      <tbody><tr class="fh-cnpj"><td colspan="9">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="7"></td></tr>${lista.map(linha).join('')}
+      <tbody><tr class="fh-cnpj"><td colspan="9">CNPJ para a NF</td>${un.map(u => `<td>${esc(u.cnpj)}</td>`).join('')}<td>${esc(S.cfg.fechamento.cnpjPlantao)}</td><td colspan="7"></td></tr>${lista.filter(x => !FH.fSit || x.situacao === FH.fSit).map(linha).join('')}
       <tr class="fh-total"><td></td><td>TOTAL CURITIBA</td><td colspan="7"></td>${un.map(u => `<td class="n">${fmtBR(lista.reduce((s2, x) => s2 + (x.unidades[u.cod] || 0), 0))}</td>`).join('')}<td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.plantao, 0))}</td><td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.total, 0))}</td><td class="n">${fmtBR(lista.reduce((s2, x) => s2 + x.descontos, 0))}</td><td></td><td class="n"><b>${fmtBR(lista.reduce((s2, x) => s2 + x.totalGeral, 0))}</b></td><td colspan="2"></td></tr></tbody></table></div>
     ${lista.length ? '' : '<p class="muted">Nenhum médico da V3: inclua em Bases → Prestadores → Médicos V3 (ou importe a planilha de controle).</p>'}
     ${cartaoDescontosFech(f, 'curitiba')}${cartaoNF(f, 'curitiba')}
@@ -286,6 +288,22 @@ function registrarEvidenciaEnvio(f, aviso = true) {
  * «Verificar» manual fica no fechamento da competência; envio e NF gravam no controle documental do
  * Fluxo mensal (o dono desses dados), e a situação calculada passa a refletir isso. */
 const GRUPO_DOC = { usg: 'usg', img: 'img', curitiba: 'curitiba' };
+/* v3.0.0-alpha.20 (simplificação): e-mail, NF recebida e NF ao Financeiro marcados na própria linha do prestador.
+ * Grava no controle documental das Etapas do mês (o mesmo de antes); clicar de novo desfaz. */
+const ROT_ENVIO = { relatorio: 'E-mail', nfRecebida: 'NF recebida', nfFinanceiro: 'NF ao Financeiro' };
+function envioFech(modo, x) {
+  if (!x.temValores && !x.doc) return '';
+  const d = x.doc || {};
+  return `<div class="fh-envio">${Object.entries(ROT_ENVIO).map(([k, t]) => `<button type="button" class="fh-env${d[k] ? ' on' : ''}" data-envio="${esc(modo)}|${esc(x.cod)}|${k}" title="${d[k] ? `${esc(t)} em ${fmtData(paraData(d[k]))} · clique para desfazer` : `Marcar ${esc(t)} (grava a data de hoje)`}" aria-pressed="${!!d[k]}">${d[k] ? '✓' : '○'} ${t}${d[k] ? ` <small>${fmtCurta(paraData(d[k]))}</small>` : ''}</button>`).join('')}</div>`;
+}
+function ligarEnvioFech(el, f) {
+  el.querySelectorAll('[data-envio]').forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    if (compFechada()) return avisar('Competência fechada: somente leitura.', 'warn');
+    const [modo, cod, ac] = b.dataset.envio.split('|'), x = listaFech(f, modo).find(y => y.cod === cod);
+    if (x) await acaoSituacao(ac, modo, x);
+  });
+}
 const ACOES_DOC = [['relatorio', 'E-mail enviado (relatório e prévia)'], ['nfRecebida', 'NF recebida'], ['nfFinanceiro', 'NF encaminhada ao Financeiro']];
 function fecharMenuSituacao() { const m = $('menuSit'); if (m) m.remove(); }
 document.addEventListener('click', e => { if (!e.target.closest('#menuSit')) fecharMenuSituacao(); });
@@ -341,11 +359,11 @@ async function acaoSituacao(ac, modo, x) {
     avisar(`Marca «Verificar» retirada de ${x.nome}.`, 'ok');
   } else {
     const comp = S.fluxo.competencias[S.comp], g = comp?.grupos?.[GRUPO_DOC[modo]];
-    if (!comp) return avisar(`Inicie o checklist da competência ${rotuloCompetencia(S.comp)} no Fluxo mensal para registrar envio e NF.`, 'warn');
+    if (!comp) return avisar(`Inicie as Etapas do mês da competência ${rotuloCompetencia(S.comp)} (Fechamento e envio › Etapas do mês) para registrar envio e NF.`, 'warn');
     if (!g?.documental) return avisar('O grupo deste repasse no Fluxo mensal não tem controle documental.', 'warn');
     const d = g.documental[x.cod] = g.documental[x.cod] || novoDocumental({ cod: x.cod, nome: x.nome });
     d[ac] = d[ac] ? '' : isoDia(new Date());
-    salvarFluxo(); avisar(`${x.nome}: ${ACOES_DOC.find(a => a[0] === ac)[1]} ${d[ac] ? `registrado em ${fmtData(paraData(d[ac]))}` : 'desfeito'} (controle documental do Fluxo).`, 'ok');
+    salvarFluxo(); avisar(`${x.nome}: ${ACOES_DOC.find(a => a[0] === ac)[1]} ${d[ac] ? `registrado em ${fmtData(paraData(d[ac]))}` : 'desfeito'} (Etapas do mês).`, 'ok');
   }
   RENDER.fechamento();
 }
@@ -381,3 +399,19 @@ function desenharQuadro(corpo, f) {
   $('qdTipo').onchange = e => { FH.qTipo = e.target.value; desenharQuadro(corpo, f); };
   corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
 }
+
+/* v3.0.0-alpha.20 (simplificação): uma linha só de subabas no topo — Etapas do mês (antes «Fluxo mensal») e os repasses. */
+function itensSubnavFechamento(pag) {
+  let mk = {}; try { mk = marcosFech(S.comp); } catch (e) { }
+  const pg = k => mk[k] ? ` <em>pagto ${fmtCurta(mk[k])}</em>` : '';
+  const ativo = k => pag === 'fechamento' && FH.sub === k;
+  const vencidas = (() => { const c = S.fluxo?.competencias[S.comp]; return c ? indicadoresFluxo(c).vencidas.length : 0; })();
+  return [`<a href="#fluxo" class="${pag === 'fluxo' ? 'on' : ''}">Etapas do mês${vencidas ? ` <span class="pill">${vencidas}</span>` : ''}</a>`,
+    ...[['usg', 'Repasse USG', 'pagUSG'], ['img', 'Repasse IMG', 'pagIMG'], ['curitiba', 'Repasse Curitiba (V3)', 'pagCuritiba'], ['producao', 'Produção USG e classe'], ['indicadores', 'Indicadores'], ...(FH.sub === 'quadro' ? [['quadro', 'Quadro']] : [])]
+      .map(([k, t, m]) => `<a href="#fechamento" data-fsub="${k}" class="${ativo(k) ? 'on' : ''}">${t}${m ? pg(m) : ''}</a>`)].join('');
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('#subnav [data-fsub]'); if (!a) return;
+  e.preventDefault(); FH.sub = a.dataset.fsub; FH.fSit = null;
+  if (location.hash === '#fechamento') { RENDER.fechamento(); desenharSubnav('fechamento'); } else location.hash = 'fechamento';
+});

@@ -49,12 +49,12 @@ async function usuario(nome, { semEspacoNoLocalStorage = false } = {}) {
   await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
   return p;
 }
-const conectar = p => p.evaluate(() => window.__RM.t.definirPastaSync(window.__pastaRaiz()));
+// Desde a alpha.19, conectar a pasta já lê os PDFs (e pode abrir o aviso do PDF de outra produção): não espera a leitura.
+const conectar = p => p.evaluate(() => { window.__fim = false; window.__RM.t.definirPastaSync(window.__pastaRaiz()).then(() => { window.__fim = true; }); });
 const atualizar = p => p.evaluate(() => { window.__fim = false; window.__RM.t.atualizarDaPasta().then(() => { window.__fim = true; }); });
 const ana = await usuario('Ana Teste');
-await conectar(ana);
 await ana.evaluate(() => { window.__avisos = []; new MutationObserver(() => window.__avisos.push(document.getElementById('aviso').textContent)).observe(document.getElementById('aviso'), { childList: true, characterData: true, subtree: true }); });
-await atualizar(ana);
+await conectar(ana);
 await ana.waitForSelector('#dlg[open]', { timeout: 20000 }).catch(async () => console.log('DEBUG', await ana.evaluate(() => [document.getElementById('aviso').textContent, window.__avisos, window.__fim]), erros));
 const txt = await ana.textContent('#dlgCorpo');
 ok(/produção\s*02\/2026/.test(txt) && /Comp_11-2026 › Relatórios para conferência › USG › Unidade 1/.test(txt), `o aviso mostra a produção e onde o arquivo está (${txt.replace(/\s+/g, ' ').match(/Onde está:[^.]*/)?.[0]})`);
@@ -62,7 +62,7 @@ await ana.click('#dlgBotoes button[value="ignorar"]'); await ana.waitForFunction
 ok(await ana.evaluate(() => !window.__RM.S.relatorios.length), 'ignorado: o PDF não entra na sessão');
 // Recarregar: lê a pasta de novo e não pergunta.
 await ana.reload(); await ana.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
-await conectar(ana); await atualizar(ana); await ana.waitForFunction(() => window.__fim, null, { timeout: 20000 });
+await conectar(ana); await ana.waitForFunction(() => window.__fim, null, { timeout: 20000 });
 ok(!(await ana.isVisible('#dlg[open]')) && /1 ignorado/.test(await ana.textContent('#aviso')), `depois de recarregar, não pergunta de novo (${(await ana.textContent('#aviso')).slice(0, 90)})`);
 // O arquivo muda (nova versão do PDF): volta a perguntar.
 fs.utimesSync(dirPDF + '7873.pdf', new Date(), new Date('2026-11-17T12:00:00'));
