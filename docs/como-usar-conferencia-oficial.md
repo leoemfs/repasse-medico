@@ -26,9 +26,11 @@ Depois de «Executar conferência», o resultado tem abas no topo. Elas ficam pr
 | **O que falta decidir** | As pendências agrupadas pela decisão que resolve mais linhas de uma vez (como antes) |
 | **NCs e correções no MV** | O que devia ter saído do MV e continua no relatório; situação de cada NC; «Resolvidos no MV»; HM a excluir; candidatos a NC |
 | **Aceite do relatório** | Encerra a conferência do relatório, com o resumo por classe. Com pendências ou alertas, pede observação |
-| **Detalhes e equivalências** | Detalhes da rodada, comparação com a anterior e equivalências desta rodada |
+| **Histórico e detalhes** | Rodadas deste relatório (desde a alpha.20), detalhes da rodada, comparação com a anterior e equivalências desta rodada |
 
 ## 3. Filtros e decisões em lote
+> Desde a v3.0.0-alpha.20, os filtros ficam no botão «Filtros» e as ações em lote aparecem quando você marca linhas ou escolhe um filtro. Veja `como-usar-navegacao.md`.
+
 - **Filtros:**
   - procedimento (código do MV, com a quantidade de linhas);
   - data;

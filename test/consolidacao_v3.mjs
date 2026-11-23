@@ -182,12 +182,13 @@ ok(JSON.parse(fs.readFileSync(arqCfg, 'utf8')).cfg.modelosExportacao.some(m => m
 for (const k of ['geral', 'conferencia', 'pastas', 'backup', 'sobre']) { await ana.locator(`[data-cfsub=\"${k}\"]:visible`).click(); await ana.waitForTimeout(120); }
 await ana.locator('[data-cfsub=\"geral\"]:visible').click(); await ana.check('[name="acento"][value="petroleo"]', { force: true }); await ana.waitForTimeout(150);
 ok((await ana.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--accent').trim())) === '#0e6670', 'cor de destaque «Petróleo» aplicada (--accent)');
-await ana.locator('[data-cfsub=\"bases\"]:visible').click(); await ana.waitForFunction(() => location.hash === '#bases');
-await ana.waitForSelector('#pag-bases .cfg-abas', { timeout: 5000 }).catch(() => {});
+ok(!(await ana.$('[data-cfsub=\"bases\"]')), 'Configurações sem a aba «Bases e regras» (alpha.20: uma porta só, pelo menu)');
+await ana.click('.nav a[data-pag="bases"]'); await ana.waitForFunction(() => location.hash === '#bases');
+await ana.waitForSelector('#cfgSync', { timeout: 5000 }).catch(() => {});
 const bInfo = await ana.evaluate(() => [location.hash, document.getElementById('pag-bases').hidden, !!document.querySelector('#pag-bases .cfg-abas'), !!document.getElementById('cfgSync'), document.getElementById('cfgSync')?.closest('section')?.id]);
-ok(bInfo.join() === '#bases,false,true,true,pag-bases', `Bases e regras abre como categoria das Configurações, com a barra de sincronização da configuração (${bInfo})`);
+ok(bInfo.join() === '#bases,false,false,true,pag-bases', `Bases e regras abre pelo menu, com a barra de sincronização da configuração (${bInfo})`);
 await ana.screenshot({ path: out + 'v3_configuracoes_bases.png' });
-await ana.locator('[data-cfsub=\"pastas\"]:visible').click(); await ana.waitForSelector('#cardEstrutura');
+await ana.evaluate(() => window.__RM.irPara('configuracoes')); await ana.locator('[data-cfsub=\"pastas\"]:visible').click(); await ana.waitForSelector('#cardEstrutura');
 ok(/01 - Sistema/.test(await ana.textContent('#cardEstrutura')) && /05 - Relatórios de repasse MV/.test(await ana.textContent('#cardEstrutura')), 'Configurações → Pastas mostra a estrutura padronizada (01 - Sistema, ano, competência)');
 await ana.screenshot({ path: out + 'v3_configuracoes_pastas.png' });
 

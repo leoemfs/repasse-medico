@@ -9,7 +9,7 @@ Os dois usuários dividem a mesma **pasta raiz na rede** (Fluxo mensal, equival�
 | Pasta | Conteúdo |
 | --- | --- |
 | `src/engine/` | Motor sem interface: leitura do MV, xlsx, Apolo/Power BI, configuração (e mescla da configuração compartilhada), equivalências e títulos do Apolo, conferência, correção de prestador, rodadas, relatórios, modelos de exportação e backup |
-| `src/ui/` | Telas: início, fluxo mensal, conferência, correção, não conformidades, fechamento, equivalências (títulos do Apolo, base, o que mais destrava), bases e regras, rodadas, configurações em categorias, sincronização pela pasta e aviso de versão |
+| `src/ui/` | Telas (menu com 7 itens desde a alpha.20, ver `docs/como-usar-navegacao.md`): início (painel do dia), conferência (com correção de prestador e histórico de rodadas), equivalências (títulos do Apolo, base, o que mais destrava), não conformidades, fechamento e envio (com as etapas do mês), bases e regras, configurações em categorias, sincronização pela pasta e aviso de versão |
 | `src/index.html`, `src/styles.css` | Modelo da página |
 | `lib/` | pdf.js 4 (legacy) e JSZip 3.10.1, embutidos em base64 no build |
 | `tools/build.mjs` | Gera `dist/Repasse_Medico_v<versão>.html` |
