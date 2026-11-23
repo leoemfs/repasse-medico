@@ -419,8 +419,8 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 
 .prev-pede li{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.prev-pede li>span:first-child{min-width:28px;text-align:center}
 .badge.neutro{background:var(--line);color:var(--text)}
-.prev-selbar[hidden],.prev-gaveta[hidden]{display:none!important}
-.prev-param{padding:12px 16px}.prev-param-linha{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;font-size:13px}
+.prev-selbar[hidden],.prev-gaveta[hidden],.prev-escolher[hidden]{display:none!important}
+.prev-param{padding:12px 16px}.prev-escolher{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.prev-param-linha{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;font-size:13px}
 .prev-res-topo{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.prev-pagar{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
 .prev-cls{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.prev-cl{display:grid;grid-template-columns:10px auto;column-gap:6px;align-items:center;text-align:left;background:var(--card);color:var(--text);border:1px solid var(--line);font-weight:400;padding:6px 10px}
 .prev-cl>span{width:10px;height:10px;border-radius:3px;grid-row:span 3}.prev-cl b{font-variant-numeric:tabular-nums}.prev-cl small{color:var(--muted);font-size:11px}.prev-cl.sel{box-shadow:0 0 0 2px var(--accent) inset}
@@ -514,11 +514,30 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 
 <details class="card prev-feito"><summary><b>Feito nesta competência</b> <span class="small muted">— 31 rodadas · 18 aceites · 12 NCs registradas · 4 alterações nas bases</span></summary>
  <div class="painel-comp" style="padding:0;border:0;box-shadow:none;margin-top:8px"><div class="l"><div>Ana validou 6 equivalências <small>«USG DE MAMAS COM DOPPLER», «ULTRASSONOGRAFIA DE TIREOIDE»…</small></div><span class="v small">ontem 17:40</span></div><div class="l"><div>Leo cadastrou o alias «Marcelo Yuiti Miyazaki» → 15 <small>Bases e regras</small></div><span class="v small">22/11 10:05</span></div></div></details>
-</section><section class="pag" id="prev-conferencia" hidden><div class="prev-nota"><b>O que muda:</b> <b>uma tela para conferir e corrigir prestador</b> (seletor no topo). Depois de executar, os parâmetros viram uma linha. Os 8 cartões de situação somem: a <b>classe</b> (Devido, Aceito, Pendente, NC, Excluído) é a única faixa de totais, e a situação aparece na própria linha. Os 8 filtros ficam atrás de «Filtros» (os ativos aparecem como etiquetas). Os 7 botões de lote só aparecem quando você marca linhas. A linha aberta mostra MV × laudo lado a lado, com a diferença destacada, e «Decidir e ir para a próxima». «Prestadores por unidade» vai para o Início («Pede você» e «Relatórios do mês»). «Rodadas» vira a aba «Histórico».</div>
+</section><section class="pag" id="prev-conferencia" hidden><div class="prev-nota"><b>O que muda:</b> <b>uma tela para conferir e corrigir prestador</b> (seletor no topo). Depois de executar, os parâmetros viram uma linha; <b>«Trocar relatório ou parâmetros» abre a escolha</b> (relatório da lista por unidade e grupo; a unidade dos laudos vem do relatório). Os 8 cartões de situação somem: a <b>classe</b> (Devido, Aceito, Pendente, NC, Excluído) é a única faixa de totais, e a situação aparece na própria linha. Os 8 filtros ficam atrás de «Filtros» (os ativos aparecem como etiquetas). Os 7 botões de lote só aparecem quando você marca linhas. A linha aberta mostra MV × laudo lado a lado, com a diferença destacada, e «Decidir e ir para a próxima». «Prestadores por unidade» vai para o Início («Pede você» e «Relatórios do mês»). «Rodadas» vira a aba «Histórico».</div>
 <div class="card prev-param">
  <div class="prev-modo" role="tablist"><button class="on">Conferência cruzada</button><button>Correção de prestador</button></div>
  <div class="prev-param-linha"><b>15 - DR X</b> · unidade 17 - AlphaSonic Londrina (Palhano) · USG · repasse 25022 <span class="small muted">· médico do laudo: do prestador · tolerância 7 dias · rodada 3, hoje 10:42</span>
-  <span class="sy-esp"></span><button class="sec mini">Trocar relatório ou parâmetros</button><button class="mini">Reler o PDF e conferir de novo</button><button class="sec mini">Exportar Excel</button></div></div>
+  <span class="sy-esp"></span><button class="sec mini" data-abre="prev-escolher">Trocar relatório ou parâmetros</button><button class="mini">Reler o PDF e conferir de novo</button><button class="sec mini">Exportar Excel</button></div>
+ <div class="prev-escolher" id="prev-escolher" hidden>
+  <p class="small" style="margin:10px 0 8px"><b>Como se escolhe o que conferir.</b> Há três caminhos: <b>(1)</b> no Início, em «Relatórios do mês», o botão «Conferir» da linha abre esta tela já com tudo preenchido; <b>(2)</b> aqui, escolhendo o relatório na lista abaixo; <b>(3)</b> «Conferir os N da unidade», que confere todos de uma vez. A <b>unidade dos laudos vem do relatório</b> (o PDF do MV já diz a unidade) e só muda em «Mais opções».</p>
+  <div class="prev-barra-filtros">
+   <label class="campo" style="margin:0">Unidade<select><option>17 - AlphaSonic Londrina (Palhano)</option><option>Todas</option><option>1 - Unidade Centro</option></select></label>
+   <label class="campo" style="margin:0">Grupo<select><option>USG</option><option>IMG</option><option>Curitiba</option><option>Todos</option></select></label>
+   <div class="marcadores" style="margin:0;align-self:end"><button class="marc">Falta conferir · 3</button><button class="marc">Em andamento · 1</button><button class="marc">Aceitos · 0</button><button class="marc sel">Todos · 4</button></div>
+   <label class="small" style="align-self:end"><input type="checkbox" checked> só a minha parte</label>
+   <span class="sy-esp"></span><input type="search" placeholder="Buscar prestador…" style="align-self:end;max-width:200px"></div>
+  <div class="tw" style="margin-top:8px"><table class="prev-tab"><thead><tr><th></th><th>Prestador</th><th>Unidade</th><th>Grupo</th><th>Repasse</th><th>Situação</th><th class="n">Total no MV</th></tr></thead><tbody>
+   <tr class="prev-aberta"><td><input type="radio" name="prev-rel" checked></td><td><b>15 - DR X</b></td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge warn">em andamento · rodada 3</span></td><td class="n">150,00</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>7873 - Gabriel Bianchini</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">2.480,00</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>412 - Dra. Helena Prado</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">1.915,50</td></tr>
+   <tr><td><input type="radio" name="prev-rel"></td><td>88 - Dr. Ivo Campos</td><td>17 - Palhano</td><td>USG</td><td>25022</td><td><span class="badge neutro">falta conferir</span></td><td class="n">740,00</td></tr></tbody></table></div>
+  <details class="small" style="margin-top:8px"><summary>Mais opções (raramente mudam)</summary><div class="grid4" style="margin-top:8px">
+   <label class="campo">Unidade dos laudos<select><option>17 - AlphaSonic Londrina (Palhano) · a do relatório</option><option>Todas as unidades (não recomendado)</option></select></label>
+   <label class="campo">Médico do laudo («Só no laudo»)<select><option>Do prestador (Dr. X)</option><option>Todos</option></select></label>
+   <label class="campo">Tolerância de data (dias)<input type="number" value="7"></label>
+   <label class="campo">Relatório do MV<select><option>mv_15.pdf · da pasta (hoje 09:12)</option><option>Carregar outro PDF…</option></select></label></div></details>
+  <div class="acoes"><button>Conferir 15 - DR X</button><button class="sec">Conferir os 4 da unidade 17 · USG</button><button class="sec">Excel único: USG · unidade 17</button><button class="sec" data-abre="prev-escolher">Cancelar</button></div></div></div>
 
 <div class="card cf-frase" style="padding-bottom:10px">
  <div class="prev-res-topo"><div><span class="eyebrow">PARA PAGAMENTO</span><div class="prev-pagar">R$ 75,00 <span class="small muted">de R$ 150,00 no MV</span></div></div>
