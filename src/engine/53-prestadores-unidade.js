@@ -1,7 +1,8 @@
 /* ============================================================
  * SOL-F35 — Controle por unidade: quem laudou (planilha de laudos) × quem já tem repasse.
  * Grupos: USG (US, com o Doppler) e IMG (demais modalidades) nas unidades fora da V3; Curitiba (unidade V3)
- * num grupo só, só com médicos V3 e só os exames que a regra V3 de cada um cobre.
+ * num grupo só, com os médicos V3 (só os exames que a regra V3 de cada um cobre) e os médicos de Londrina que laudam
+ * na V3 por produção (só os laudos que não são de USG; regras de 23/11/2026). Na V3 a modalidade vem do TITLE.
  * Situação calculada: gerar no MV · relatório sem conferência · conferido · aceito · relatório sem laudo (aviso)
  * · sem cadastro · fora do repasse. Só médico, unidade e contagens: nenhum dado de paciente.
  * ============================================================ */
@@ -44,12 +45,21 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
     const cod = mapaUn.get(norm(l.unidade));
     if (!cod) { semUnidade.set(l.unidade, (semUnidade.get(l.unidade) || 0) + 1); continue; }
     const u = un(cod), g = grupoDoLaudo(cfg, cod, l.modalidade), G = grp(u, g), r = prestadorDoMedico(idx, l.medico);
+    // V3: a modalidade vem do TITLE do laudo (regra de 23/11/2026).
+    const modalidade = g === 'curitiba' ? (modalidadeDoTituloV3(l.titulo) || l.modalidade) : l.modalidade;
     if (r.estado === 'ok') {
       const p = r.prestador;
+      // Médicos de Londrina que laudam na V3 por produção: contam os laudos que não são de USG (pagos pelo relatório do MV).
+      if (g === 'curitiba' && !p.regras?.v3 && laudaV3Producao(p)) {
+        const it = item(G, `${g}|${cod}|${p.cod}`, { cod: String(p.cod), nome: p.nomeMV, p });
+        it.producao = true; it.medicos.add(l.medico);
+        if (modalidade === 'US') it.foraRegra.set('Ultrassonografia', (it.foraRegra.get('Ultrassonografia') || 0) + 1); else it.laudos++;
+        continue;
+      }
       if (g === 'curitiba' && !p.regras?.v3) { const o = u.outros.get('p' + p.cod) || u.outros.set('p' + p.cod, { nome: p.nomeMV, cod: p.cod, laudos: 0, motivo: 'sem regra V3 no cadastro' }).get('p' + p.cod); o.laudos++; continue; }
       const it = item(G, `${g}|${cod}|${p.cod}`, { cod: String(p.cod), nome: p.nomeMV, p });
       it.medicos.add(l.medico);
-      if (g === 'curitiba' && !laudoNaRegraV3(p.regras?.v3regra, l.modalidade)) { const n = NOME_MODALIDADE[l.modalidade] || l.modalidade || 'sem modalidade'; it.foraRegra.set(n, (it.foraRegra.get(n) || 0) + 1); }
+      if (g === 'curitiba' && !laudoNaRegraV3(p.regras?.v3regra, modalidade)) { const n = NOME_MODALIDADE[modalidade] || modalidade || 'sem modalidade'; it.foraRegra.set(n, (it.foraRegra.get(n) || 0) + 1); }
       else it.laudos++;
     } else {
       const mn = norm(l.medico);
@@ -86,7 +96,7 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
         const disp = marcas.dispensado?.[it.k];
         if (disp && (sit === 'sem-laudo' || sit === 'gerar')) sit = sit === 'sem-laudo' ? 'verificado' : 'fora';
         return { k: it.k, cod: it.cod, nome: it.nome, mn: it.mn || '', medicos: [...it.medicos], laudos: it.laudos, foraRegra: [...it.foraRegra].map(([n, q]) => ({ n, q })),
-          linhasMV: linhas, rodadaId: it.rodada?.id || '', relId: it.rodada?.relId || '', aceite: it.rodada?.aceite || null, regraV3: G.grupo === 'curitiba' ? it.p?.regras?.v3regra || null : null,
+          linhasMV: linhas, rodadaId: it.rodada?.id || '', relId: it.rodada?.relId || '', aceite: it.rodada?.aceite || null, regraV3: G.grupo === 'curitiba' ? it.p?.regras?.v3regra || null : null, producao: !!it.producao,
           situacao: sit, gerado: marcas.gerado?.[it.k] || null, dispensado: disp || null, conflito: it.conflito };
       }).sort((a, b) => (FALTA_CONTROLE.has(b.situacao) - FALTA_CONTROLE.has(a.situacao)) || b.laudos - a.laudos || a.nome.localeCompare(b.nome));
       const c = s => itens.filter(x => x.situacao === s).length;

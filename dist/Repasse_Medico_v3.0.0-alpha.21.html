@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.20</title>
+<title>Repasse Médico v3.0.0-alpha.21</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -379,6 +379,10 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cf-selinfo{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--infobg)}
 .aviso-mv{border:1px solid var(--err);background:var(--errbg);border-radius:10px;padding:10px 12px;margin:6px 0 10px}
 .aviso-mv b{color:var(--err)}
+.v3-avisos{border:1px solid var(--warn);background:var(--warnbg);border-radius:10px;padding:8px 12px;margin:8px 0 0}
+.v3-avisos ul{margin:4px 0 0;padding-left:18px}
+.v3-avisos li{margin:3px 0}
+.v3-avisos .v3-exc{color:var(--err)}
 .obs-i{color:var(--accent);font-weight:700}
 .cf-obs{width:100%;min-height:52px}
 .st.dec-resolvido,.marc.dec-resolvido{background:var(--warnbg);color:var(--warn)}
@@ -470,12 +474,21 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .bs-abas{align-items:center}.bs-grupo{white-space:nowrap;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0 8px 0 2px}
 .bs-grupo.bs-av{margin-left:14px;padding-left:14px;border-left:1px solid var(--line)}.bs-abas .bs-avb{font-weight:500}
 
+/* Regra da V3: exceções por convênio (SOL-F46) */
+.v3-exc{min-width:260px}
+.v3-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--infobg);color:var(--text);border-radius:999px;padding:2px 4px 2px 10px;margin:2px 4px 2px 0;font-size:12px}
+.v3-chip b{font-weight:600}
+.v3-chip button{border:0;background:transparent;color:var(--err);cursor:pointer;font-size:13px;padding:0 6px;min-height:0}
+.v3-exc-form{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.v3-exc-form input[type=text]{width:190px}.v3-exc-form input[type=number]{width:100px}
+.v3-exc-nota{border-left:3px solid var(--info);padding-left:8px;margin:6px 0 0}
+
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.20 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.21 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -520,7 +533,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.20';
+const MOTOR_VERSAO = '3.0.0-alpha.21';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1405,6 +1418,7 @@ function migrarRegras(c) {
   if (!c.fechamento) { c.fechamento = clone(FECHAMENTO_PADRAO); mudou = true; }
   if (!Array.isArray(c.fechamento.categoriasNF)) { c.fechamento.categoriasNF = clone(CATEGORIAS_NF_PADRAO); mudou = true; }
   for (const p of c.prestadores || []) if (p.regras === undefined) { p.regras = regrasPrestadorVazias(); mudou = true; }
+  if (aplicarCadastroV3Padrao(c)) mudou = true;   // médicos V3 com as regras de 11/2026 (SOL-F46)
   return mudou;
 }
 const regrasPrestadorVazias = () => ({ tipo: 'medico', faixaUSG: '', pctUSGUnidade: {}, board: 0, participaIMG: false, v3: false, v3regra: null, classeFixa: '', tabelaIMG: 'padrao', excecoesIMG: [], obs: '' });
@@ -1634,8 +1648,9 @@ function aplicarAtualizacaoPowerBI(cfg, eq, pbi, escolhas = { faturistas: true, 
  * Na V3 o repasse é calculado fora do MV. A ferramenta calcula pela regra cadastrada do médico,
  * mostra a memória de cálculo e gera o texto do e-mail no formato usado hoje.
  * - Doppler é sempre parte do grupo de USG (conta no volume e no faturamento de USG).
- * - HM: só se paga HM de USG/Doppler do convênio Unimed (mesmo sem laudo). Os demais HM não são
- *   pagos e ficam sinalizados para exclusão (não viram NC sozinhos).
+ * - HM: só se paga HM de USG/Doppler do convênio Unimed, sem laudo próprio: basta o exame base no relatório, e o valor é o
+ *   mesmo da USG do médico. Os demais HM (raio-X, mamografia, ressonância, e o que não é USG no 78 PF) não são pagos a ninguém e ficam sinalizados para exclusão.
+ * - Pacote de ressonância e mamografia: considerado pelo valor do MV e notificado (substitui o base Bradesco a 100%).
  * - Arredonda só no final (assim o exemplo do Dr. Ian dá R$ 73.608,69).
  * ============================================================ */
 const FORMAS_V3 = { 'faixa-liquido': '% do líquido por faixa de volume', 'pct-liquido': '% do líquido', 'pct-bruto': '% do bruto', 'por-laudo': 'valor por laudo', 'nao-paga': 'não paga' };
@@ -1647,7 +1662,7 @@ const FAIXAS_V3_PADRAO = [{ de: 0, pct: 65 }, { de: 800, pct: 68 }, { de: 1000, 
 const MODOS_V3 = { fixo: 'Valor fixo por laudo, por grupo do MV', percentual: 'Percentual do faturamento por faixa de volume (como o Dr. Ian)' };
 const GRUPO_USG_V3 = '*USG*';   // grupo especial: todos os procedimentos de USG e Doppler
 const rotuloGrupoV3 = g => g === GRUPO_USG_V3 ? 'USG (inclui Doppler)' : g;
-const regraV3Fixa = () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 0, valorHM: 0 }] });
+const regraV3Fixa = () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 0 }] });
 const regraV3Padrao = () => ({
   modo: 'percentual',
   impostos: 9.15,
@@ -1660,10 +1675,33 @@ const ehUnidadeV3 = (cfg, cod) => { const u = unidadePorCod(cfg, cod); return u?
 const ehUSGouDoppler = (grupo, desc) => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(`${grupo || ''} ${desc || ''}`));
 const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm(l.grupo || '')) || /(^|\s)HM$/.test(norm(l.desc || '')));
 /* HM de uma linha da unidade V3: devido ou a excluir. P3 (v3.0.0-alpha.12): configurável em Bases e regras →
- * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed. */
-const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED' };
-let _hmV3Ativa = { proc: trechosPadrao(HM_V3_PADRAO.procedimentos), conv: trechosPadrao(HM_V3_PADRAO.convenios) };
-const hmV3Devido = (grupo, desc, convenio) => casaTrechos(_hmV3Ativa.proc, `${grupo || ''} ${desc || ''}`) && casaTrechos(_hmV3Ativa.conv, convenio || '');
+ * «Modalidades e HM V3» (cfg.hmV3): trechos do grupo/descrição e do convênio, separados por «|». Padrão: USG/Doppler Unimed.
+ * v3.0.0-alpha.21 (regras de Curitiba de 23/11/2026):
+ * - gruposExcluir: grupos de HM que NUNCA são pagos a ninguém (77 - Honorario Medico Raio X, 81 - Honorario Medico Mamografia).
+ *   Valem antes de tudo e entram no aviso «HM a excluir do MV». O «78 - HONORARIOS MEDICOS PF» NÃO entra em bloco: nos PDFs
+ *   reais de 11/2026 é nele que o MV lança o HM de USG Unimed (pago) junto com HM de ressonância etc. (não pagos); dentro
+ *   dele vale a regra geral (só USG/Doppler Unimed é devido).
+ * - pacotes / pacoteConvenios: pacote de ressonância e mamografia é considerado (valor do MV) e notificado; o exame base do
+ *   mesmo paciente e dia, do convênio Bradesco e lançado a 100% (erro do MV), é substituído pelo pacote. */
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
+// Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA»).
+const compilarGruposHM = p => String(p || '').split('|').map(x => norm(x).split(/[^A-Z0-9]+/).filter(Boolean)).filter(x => x.length);
+const casaGrupoHM = (padroes, grupo) => { const ws = norm(grupo || '').split(/[^A-Z0-9]+/).filter(Boolean); return padroes.some(pd => pd.every(w => ws.some(g => g.startsWith(w)))); };
+const compilarHMV3 = hm => ({ proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios), gruposExcluir: compilarGruposHM(hm.gruposExcluir), pacotes: trechosPadrao(hm.pacotes), pacoteConv: trechosPadrao(hm.pacoteConvenios) });
+let _hmV3Ativa = compilarHMV3(HM_V3_PADRAO);
+// Situação do HM na V3: {devido, motivo: 'grupo' (grupo que nunca é pago) | 'procedimento' | 'convenio' | ''}.
+function hmV3Situacao(grupo, desc, convenio) {
+  // seriaDevido: HM de USG/Doppler Unimed lançado num grupo que nunca é pago — fica excluído, mas com destaque no aviso.
+  if (casaGrupoHM(_hmV3Ativa.gruposExcluir, grupo)) return { devido: false, motivo: 'grupo', seriaDevido: casaTrechos(_hmV3Ativa.proc, `${grupo || ''} ${desc || ''}`) && casaTrechos(_hmV3Ativa.conv, convenio || '') };
+  if (!casaTrechos(_hmV3Ativa.proc, `${grupo || ''} ${desc || ''}`)) return { devido: false, motivo: 'procedimento' };
+  if (!casaTrechos(_hmV3Ativa.conv, convenio || '')) return { devido: false, motivo: 'convenio' };
+  return { devido: true, motivo: '' };
+}
+const hmV3Devido = (grupo, desc, convenio) => hmV3Situacao(grupo, desc, convenio).devido;
+const MOTIVO_HM_V3 = { grupo: 'grupo de HM que nunca é pago na V3', procedimento: 'HM que não é de USG/Doppler', convenio: 'HM de USG fora do convênio Unimed' };
+// Pacote de ressonância ou mamografia na V3: considerado pelo valor do MV e notificado.
+const ehPacoteV3 = l => (l.tipoItem || l.tipo) === 'pacote' && casaTrechos(_hmV3Ativa.pacotes, `${l.grupo || l.grupoNome || ''} ${l.desc || l.procDesc || ''}`);
+const convenioPacoteV3 = conv => casaTrechos(_hmV3Ativa.pacoteConv, conv || '');
 /* Aplica as regras configuráveis de uma configuração (chamado pela conferência, correção e fechamento, e pela tela ao
  * carregar ou gravar a configuração). Sem nada configurado, valem os padrões. */
 let _regrasCfgChave = '';
@@ -1671,8 +1709,41 @@ function aplicarRegrasConfig(cfg) {
   const mod = cfg?.modalidadesGrupo?.length ? cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(cfg?.hmV3 || {}) };
   const chave = JSON.stringify([mod, hm]); if (chave === _regrasCfgChave) return;
   _regrasCfgChave = chave; _modalidadesAtivas = compilarModalidades(mod); _cacheModGrupo = new Map();
-  _hmV3Ativa = { proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios) };
+  _hmV3Ativa = compilarHMV3(hm);
 }
+
+/* Modalidade pelo TITLE do Apolo na V3 (23/11/2026: «em Curitiba a conferência e a correção de prestador sempre levam em
+ * consideração a coluna title»). A V3 só faz mamografia, ultrassonografia (com Doppler), raio-X, densitometria e ressonância;
+ * ainda não faz tomografia. Título que aponta uma só modalidade vale no lugar da MODALITY; senão fica a MODALITY. */
+const MODALIDADES_TITULO_V3 = [
+  { mod: 'US', re: /ULTRAS+ONOGRAF|ULTRASS|ECOGRAF|DOPPLER|\bUSG?\b/ },
+  { mod: 'MG', re: /MAMOGRAF|\bMAMO\b|TOMOSSINTESE/ },
+  { mod: 'MR', re: /RES+N?ONANCIA|\bRMN?\b|\bRNM\b/ },
+  { mod: 'OT', re: /DENSITOMETRIA|\bDMO\b/ },
+  { mod: 'CR', re: /\bRX\b|RAIO[ -]?X|RADIOGRAF/ },
+  { mod: 'CT', re: /TOMOGRAFIA|\bTC\b/ }
+];
+function modalidadeDoTituloV3(titulo) {
+  const t = norm(titulo || ''), achou = MODALIDADES_TITULO_V3.filter(x => x.re.test(t)).map(x => x.mod);
+  return achou.length === 1 ? achou[0] : '';
+}
+// Modalidades que a V3 faz hoje; outra (ex.: tomografia) aparece com aviso na conferência.
+const MODALIDADES_V3 = new Set(['US', 'MG', 'MR', 'OT', 'CR', 'DX']);
+/* Médicos de Londrina que laudam na V3 por produção (23/11/2026): laudos que não são de USG, pagos pelo relatório do MV
+ * (fechamento do IMG, coluna da unidade 5). Lista padrão do usuário; pode mudar no cadastro (regras.v3producao). */
+const MEDICOS_PRODUCAO_V3_PADRAO = [['7873', 'Amanda Souza de Assis'], ['5', 'Gustavo Andrade De Margalho'], ['8049', 'Heloisa Martins Cardoso'], ['10175', 'Henrique Pini Sonomiya'],
+  ['11718', 'Lucas Franklin Amarante'], ['9033', 'Lucas Yamada'], ['8873', 'Lucca Maricato de Las Villas Rodrigues'], ['7', 'Marcelo Garcia Marini'], ['15', 'Marcelo Miyazaki Yoshida'],
+  ['10264', 'Melanie Eiko'], ['12', 'Nilton Paccola Lovato'], ['14', 'Paulo Asshaias Felipe'], ['3', 'Rafael Ogasawara Ferreira'], ['9', 'Roberto Brazao Farinha'], ['13', 'Thales Cavallini Rossi'],
+  ['10285', 'Wesley Americo Bergamin']].map(([cod, nome]) => ({ cod, nome }));
+const COD_PRODUCAO_V3 = new Set(MEDICOS_PRODUCAO_V3_PADRAO.map(x => x.cod));
+// Lista para a tela: os padrões (mesmo sem cadastro) e quem foi incluído à mão.
+function medicosProducaoV3(cfg) {
+  const porCod = new Map(cfg.prestadores.map(p => [String(p.cod), p])), out = [];
+  for (const x of MEDICOS_PRODUCAO_V3_PADRAO) { const p = porCod.get(x.cod); out.push({ cod: x.cod, nome: p?.nomeMV || x.nome, p: p || null, padrao: true, ativo: p ? laudaV3Producao(p) : true, v3: !!p?.regras?.v3 }); }
+  for (const p of cfg.prestadores) if (!COD_PRODUCAO_V3.has(String(p.cod)) && p.regras?.v3producao) out.push({ cod: String(p.cod), nome: p.nomeMV, p, padrao: false, ativo: laudaV3Producao(p), v3: !!p.regras?.v3 });
+  return out;
+}
+const laudaV3Producao = p => !!p && !p.regras?.v3 && (p.regras?.v3producao !== undefined && p.regras?.v3producao !== null ? !!p.regras.v3producao : COD_PRODUCAO_V3.has(String(p.cod)));
 // Grupo do MV escolhido na regra: casa pelo nome do grupo (ou parte dele); «|» separa alternativas.
 const casaGrupoV3 = (padrao, l) => { const t = norm(`${l.grupo || ''} ${l.desc || ''}`); return String(padrao || '').split('|').map(norm).filter(Boolean).some(x => t.includes(x)); };
 // Entrada da regra por valor fixo para uma linha: grupo exato primeiro, depois o grupo especial de USG.
@@ -1682,6 +1753,13 @@ function grupoFixoV3(regra, l) {
     || (ehUSGouDoppler(l.grupo, l.desc) ? gs.find(g => g.grupo === GRUPO_USG_V3) : null)
     || gs.find(g => g.grupo !== GRUPO_USG_V3 && casaGrupoV3(g.grupo, l)) || null;
 }
+
+// Valor por laudo de um grupo da regra fixa para um convênio: a exceção do convênio (trecho do nome) ou o valor do grupo.
+function valorFixoV3(g, convenio) {
+  const ex = (g.excecoes || []).find(x => x.convenio && casaTrechos(trechosPadrao(x.convenio), convenio || ''));
+  return ex ? { valor: +ex.valorLaudo || 0, convenio: ex.convenio } : { valor: +g.valorLaudo || 0, convenio: '' };
+}
+const textoExcecoesV3 = g => (g.excecoes || []).filter(x => x.convenio).map(x => `${x.convenio} R$ ${fmtBR(x.valorLaudo)}`).join(', ');
 
 function faixaV3(faixas, exames) {
   const l = [...(faixas || [])].filter(f => f.pct !== '' && f.pct !== null && f.pct !== undefined).sort((a, b) => (+a.de || 0) - (+b.de || 0));
@@ -1693,7 +1771,7 @@ function faixaV3(faixas, exames) {
 const rotuloFaixaV3 = f => !f ? '' : f.ate === null ? `${f.de}+ exames` : f.de ? `${f.de}–${f.ate}` : `até ${f.ate}`;
 function resumoRegraV3(regra) {
   if (!regra) return '';
-  if (regra.modo === 'fixo') return 'Valor fixo por laudo — ' + (regra.grupos || []).map(g => `${rotuloGrupoV3(g.grupo)}: R$ ${fmtBR(g.valorLaudo)}${+g.valorHM ? ` (HM Unimed R$ ${fmtBR(g.valorHM)})` : ''}`).join(' · ');
+  if (regra.modo === 'fixo') return 'Valor fixo por laudo — ' + (regra.grupos || []).map(g => `${rotuloGrupoV3(g.grupo)}: R$ ${fmtBR(g.valorLaudo)}${textoExcecoesV3(g) ? ` (${textoExcecoesV3(g)})` : ''}${g.grupo === GRUPO_USG_V3 ? ' (HM Unimed pelo mesmo valor)' : ''}`).join(' · ');
   const u = regra.usg || {}, p = [];
   const usg = u.forma === 'faixa-liquido' ? `${(u.faixas || []).map(f => +f.pct).join(' / ')}% do líquido por volume`
     : u.forma === 'pct-liquido' ? `${u.pct}% do líquido` : u.forma === 'pct-bruto' ? `${u.pct}% do bruto` : u.forma === 'por-laudo' ? `R$ ${fmtBR(u.valor)} por laudo` : 'não paga';
@@ -1710,7 +1788,8 @@ function validarRegraV3(regra) {
   if (regra.modo === 'fixo') {
     const gs = regra.grupos || [];
     if (!gs.length) e.push('cadastre ao menos um grupo com valor por laudo');
-    if (gs.some(g => !(+g.valorLaudo > 0) && !(+g.valorHM > 0))) e.push('cada grupo precisa de valor por laudo (ou de HM)');
+    if (gs.some(g => !(+g.valorLaudo > 0))) e.push('cada grupo precisa de valor por laudo');
+    if (gs.some(g => (g.excecoes || []).some(x => !String(x.convenio || '').trim() || !(+x.valorLaudo >= 0)))) e.push('cada exceção por convênio precisa do convênio e do valor');
     const vistos = new Set(); for (const g of gs) { const k = norm(g.grupo); if (vistos.has(k)) e.push(`grupo repetido: ${rotuloGrupoV3(g.grupo)}`); vistos.add(k); }
     return e;
   }
@@ -1729,7 +1808,7 @@ function validarRegraV3(regra) {
 function calcularV3(regra, linhas) {
   if (regra.modo === 'fixo') return calcularV3Fixo(regra, linhas);
   const imp = (+regra.impostos || 0) / 100, u = regra.usg || {};
-  const r = { exames: 0, brutoUSG: 0, hm: { qtd: 0, valor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: (regra.outros || []).map(o => ({ ...o, valorLaudo: +o.valor || 0, qtd: 0, bruto: 0, valor: 0 })), semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, valorMV: 0 };
+  const r = { exames: 0, brutoUSG: 0, hm: { qtd: 0, valor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: (regra.outros || []).map(o => ({ ...o, valorLaudo: +o.valor || 0, qtd: 0, bruto: 0, valor: 0 })), semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0 };
   for (const l of linhas) {
     const q = +l.quant || 1, v = +l.vlTotal || 0;
     r.valorMV += +l.vlRepasse || 0;
@@ -1738,6 +1817,7 @@ function calcularV3(regra, linhas) {
       else { r.hmExcluir.qtd += q; r.hmExcluir.valor += v; const k = `${l.desc || l.grupo} · ${l.convenio || 'sem convênio'}`; r.hmExcluir.itens.set(k, (r.hmExcluir.itens.get(k) || 0) + q); }
       continue;
     }
+    if (ehPacoteV3(l)) { r.pacotes.qtd += q; r.pacotes.valor += +l.vlRepasse || 0; continue; }
     if (l.tipoItem && l.tipoItem !== 'procedimento') { r.naoProcedimental.qtd += q; r.naoProcedimental.valor += v; continue; }
     if (ehUSGouDoppler(l.grupo, l.desc)) { r.exames += q; r.brutoUSG += v; continue; }
     const o = r.outros.find(x => casaGrupoV3(x.padrao, l));
@@ -1757,7 +1837,8 @@ function calcularV3(regra, linhas) {
   else if (u.forma === 'por-laudo') { r.valorLaudo = +u.valor || 0; r.laudosPagos = r.exames + (regra.hm === 'valor-laudo' ? r.hm.qtd : 0); usg = r.laudosPagos * r.valorLaudo; }
   r.valorUSGExato = usg;
   for (const o of r.outros) o.valor = o.forma === 'pct-bruto' ? o.bruto * (+o.pct || 0) / 100 : o.forma === 'pct-liquido' ? o.bruto * (1 - imp) * (+o.pct || 0) / 100 : o.forma === 'por-laudo' ? o.qtd * o.valorLaudo : 0;
-  r.total = r2(usg + r.outros.reduce((s, o) => s + o.valor, 0));
+  r.pacotes.valor = r2(r.pacotes.valor);
+  r.total = r2(usg + r.outros.reduce((s, o) => s + o.valor, 0) + r.pacotes.valor);
   r.valorUSG = r2(usg);
   for (const k of ['brutoUSG', 'base', 'liquido', 'valorMV']) r[k] = r2(r[k]);
   r.hm.valor = r2(r.hm.valor); r.hmExcluir.valor = r2(r.hmExcluir.valor);
@@ -1768,33 +1849,56 @@ function calcularV3(regra, linhas) {
 
 /* Valor fixo por laudo, por grupo do MV. HM de USG/Doppler Unimed paga o valor de HM do grupo de USG. */
 function calcularV3Fixo(regra, linhas) {
-  const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
-    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0 })) };
+  const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
+    itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0, porValor: new Map(), hmPorValor: new Map() })) };
+  // HM de USG/Doppler Unimed vale o mesmo que o laudo de USG do médico (regra de 23/11/2026, para qualquer médico da V3).
+  const gsR = regra.grupos || [], gUSG = gsR.find(x => x.grupo === GRUPO_USG_V3) || gsR.find(x => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(x.grupo)));
+  for (const it of r.itens) it.valorHM = it.grupo === gUSG?.grupo ? (+gUSG.valorLaudo || 0) : 0;
   const itemDe = g => r.itens.find(i => i.grupo === g.grupo);
   for (const l of linhas) {
     const q = +l.quant || 1, v = +l.vlTotal || 0;
     r.valorMV += +l.vlRepasse || 0;
     if (ehLinhaHM(l)) {
-      // HM de USG/Doppler paga o valor de HM do grupo de USG da regra.
-      const gs = regra.grupos || [], g = gs.find(x => x.grupo === GRUPO_USG_V3) || gs.find(x => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(x.grupo)));
+      // HM de USG/Doppler Unimed (regra para todos na V3, 23/11/2026): vale SEMPRE o mesmo que o exame base correspondente —
+      // o valor da USG do médico para o convênio do exame base (com a exceção por convênio, se houver).
+      const g = gUSG;
       if (hmV3Devido(l.grupo, l.desc, l.convenio)) {
-        if (g && +g.valorHM > 0) { const it = itemDe(g); it.hmQtd += q; it.hmValor += q * +g.valorHM; r.hm.qtd += q; r.hm.valor += q * +g.valorHM; }
+        const vh = g ? valorFixoV3(g, l.baseConvenio || l.convenio).valor : 0;
+        if (vh > 0) { const it = itemDe(g); it.hmQtd += q; it.hmValor += q * vh; r.hm.qtd += q; r.hm.valor += q * vh; it.hmPorValor.set(vh, (it.hmPorValor.get(vh) || 0) + q); }
         else r.hm.semValor += q;
       } else { r.hmExcluir.qtd += q; r.hmExcluir.valor += v; const k = `${l.desc || l.grupo} · ${l.convenio || 'sem convênio'}`; r.hmExcluir.itens.set(k, (r.hmExcluir.itens.get(k) || 0) + q); }
       continue;
     }
+    if (ehPacoteV3(l)) { r.pacotes.qtd += q; r.pacotes.valor += +l.vlRepasse || 0; continue; }
     if (l.tipoItem && l.tipoItem !== 'procedimento') { r.naoProcedimental.qtd += q; r.naoProcedimental.valor += v; continue; }
     const usg = ehUSGouDoppler(l.grupo, l.desc);
     if (usg) { r.exames += q; r.brutoUSG += v; }
     const g = grupoFixoV3(regra, l);
-    if (g) { const it = itemDe(g); it.qtd += q; it.valor += q * (+g.valorLaudo || 0); continue; }
+    if (g) {
+      // Exceção por convênio (ex.: Dra. Elen, mamografia R$ 15,00 e R$ 10,00 no HOSPITAL UNIVERSITARIO).
+      const ex = valorFixoV3(g, l.convenio), it = itemDe(g);
+      it.qtd += q; it.valor += q * ex.valor;
+      const kv = `${ex.valor}|${ex.convenio}`, pv = it.porValor.get(kv) || it.porValor.set(kv, { valor: ex.valor, convenio: ex.convenio, qtd: 0 }).get(kv); pv.qtd += q;
+      continue;
+    }
     const k = l.grupo || l.desc || 'sem grupo', e = r.semRegra.get(k) || { qtd: 0, valor: 0 };
     e.qtd += q; e.valor += v; r.semRegra.set(k, e);
   }
-  for (const it of r.itens) { it.valor = r2(it.valor); it.hmValor = r2(it.hmValor); }
+  for (const it of r.itens) {
+    it.valor = r2(it.valor); it.hmValor = r2(it.hmValor);
+    // HM: «9 × R$ 35,00 = R$ 315,00» (ou a soma por valor, quando o exame base tem valor de exceção).
+    const hv = [...it.hmPorValor].sort((a, b) => b[1] - a[1]);
+    if (hv.length === 1) it.valorHM = hv[0][0];
+    it.contaHM = hv.length > 1 ? `${hv.map(([v, n]) => `${n} × R$ ${fmtBR(v)}`).join(' + ')} = R$ ${fmtBR(it.hmValor)}` : `${it.hmQtd} × R$ ${fmtBR(it.valorHM)} = R$ ${fmtBR(it.hmValor)}`;
+    // Conta do grupo para o e-mail e a memória: «276 laudo(s) = 220 × R$ 15,00 + 56 × R$ 10,00 (HOSPITAL UNIVERSITARIO) = R$ 3.860,00».
+    const pv = [...it.porValor.values()].sort((a, b) => b.qtd - a.qtd);
+    it.conta = pv.length > 1 || pv[0]?.convenio ? `${it.qtd} laudo(s) = ${pv.map(x => `${x.qtd} × R$ ${fmtBR(x.valor)}${x.convenio ? ` (${x.convenio})` : ''}`).join(' + ')} = R$ ${fmtBR(it.valor)}`
+      : `${it.qtd} laudo(s) × R$ ${fmtBR(it.valorLaudo)} = R$ ${fmtBR(it.valor)}`;
+  }
   r.valorUSG = r2(r.itens.filter(i => i.grupo === GRUPO_USG_V3 || /ULTRASS/.test(norm(i.grupo))).reduce((s, i) => s + i.valor, 0));
   r.outrosValor = r2(r.itens.filter(i => !(i.grupo === GRUPO_USG_V3 || /ULTRASS/.test(norm(i.grupo)))).reduce((s, i) => s + i.valor, 0));
-  r.total = r2(r.itens.reduce((s, i) => s + i.valor + i.hmValor, 0));
+  r.pacotes.valor = r2(r.pacotes.valor);
+  r.total = r2(r.itens.reduce((s, i) => s + i.valor + i.hmValor, 0) + r.pacotes.valor);
   r.brutoUSG = r2(r.brutoUSG); r.valorMV = r2(r.valorMV); r.hm.valor = r2(r.hm.valor); r.hmExcluir.valor = r2(r.hmExcluir.valor);
   return r;
 }
@@ -1805,7 +1909,8 @@ function avisosV3(c) {
   if (c.hmExcluir.qtd) a.push(`${c.hmExcluir.qtd} HM a excluir (não pago na V3: R$ ${fmtBR(c.hmExcluir.valor)})`);
   for (const [g, e] of c.semRegra) a.push(`${e.qtd} exame(s) de «${g}» sem regra na V3 (R$ ${fmtBR(e.valor)} bruto, fora do cálculo)`);
   if (c.forma === 'faixa-liquido' && !c.faixa && c.exames) a.push('volume abaixo da primeira faixa da regra');
-  if (c.hm?.semValor) a.push(`${c.hm.semValor} HM de USG/Doppler Unimed sem valor de HM na regra (não pago)`);
+  if (c.hm?.semValor) a.push(`${c.hm.semValor} HM de USG/Doppler Unimed sem valor do laudo de USG na regra (não pago)`);
+  if (c.pacotes?.qtd) a.push(`${c.pacotes.qtd} pacote(s) de ressonância/mamografia considerados pelo valor do MV (R$ ${fmtBR(c.pacotes.valor)}): conferir se substituem o exame base Bradesco a 100%`);
   return a;
 }
 
@@ -1814,9 +1919,10 @@ function textoEmailV3(c) {
   if (c.modo === 'fixo') {
     const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', ''];
     for (const i of c.itens) {
-      L.push(i.qtd ? `${i.rotulo}: ${i.qtd} laudo(s) × ${R(i.valorLaudo)} = ${R(i.valor)}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
-      if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.hmQtd} × ${R(i.valorHM)} = ${R(i.hmValor)}`);
+      L.push(i.qtd ? `${i.rotulo}: ${i.conta}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
+      if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.contaHM}`);
     }
+    if (c.pacotes?.qtd) L.push(`Pacotes (ressonância/mamografia): ${c.pacotes.qtd} = ${R(c.pacotes.valor)}`);
     L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
     return L.join('\n');
   }
@@ -1839,8 +1945,60 @@ function textoEmailV3(c) {
     if (c.forma === 'pct-bruto') L.push(`* ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
     else L.push(`menos os impostos (${pctTxt(fmtBR(c.impostos))}) = ${R(c.liquido)} * ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
   }
+  if (c.pacotes?.qtd) L.push(`Pacotes (ressonância/mamografia): ${c.pacotes.qtd} = ${R(c.pacotes.valor)}`);
   L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
   return L.join('\n');
+}
+
+/* Avisos de Curitiba de uma conferência da unidade V3 (23/11/2026): o que o usuário precisa ver para agir no MV.
+ * hmExcluir: HM que nunca é pago (excluir do MV), por grupo; hmSemBase: HM de USG Unimed sem o exame base;
+ * pacotes: pacotes de ressonância/mamografia considerados; substituidos: base Bradesco a 100% trocada pelo pacote;
+ * foraEscopo: linhas de modalidade que a V3 não faz (ex.: tomografia). */
+function avisosConferenciaV3(res) {
+  const mv = (res?.linhas || []).filter(x => x.r), soma = l => r2(l.reduce((s, x) => s + (+x.r.vlRepasse || 0), 0));
+  const hmExcluir = mv.filter(x => x.marcadores.has('hm-v3-excluir')), porGrupo = new Map();
+  for (const x of hmExcluir) { const k = x.r.grupoNome || 'sem grupo', e = porGrupo.get(k) || porGrupo.set(k, { grupo: k, motivo: x.motivoHMV3 || '', linhas: [] }).get(k); e.linhas.push(x); }
+  const grupos = [...porGrupo.values()].map(g => ({ ...g, n: g.linhas.length, valor: soma(g.linhas), rotuloMotivo: MOTIVO_HM_V3[g.motivo] || '' })).sort((a, b) => b.n - a.n);
+  const pega = m => { const l = mv.filter(x => x.marcadores.has(m)); return { n: l.length, valor: soma(l), linhas: l }; };
+  const out = { hmExcluir: { n: hmExcluir.length, valor: soma(hmExcluir), grupos }, hmSemBase: pega('hm-v3-sem-base'), pacotes: pega('pacote-v3'), substituidos: pega('base-pacote-v3'), foraEscopo: pega('fora-escopo-v3') };
+  // HM de USG Unimed que caiu num grupo excluído (ex.: mamografia): conferir se o grupo está certo no MV.
+  const usgNoGrupo = hmExcluir.filter(x => x.hmV3SeriaDevido);
+  out.hmExcluir.usgUnimed = { n: usgNoGrupo.length, valor: soma(usgNoGrupo) };
+  out.total = out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
+  return out;
+}
+
+
+/* Cadastro padrão dos médicos V3 (23/11/2026), com as regras lidas dos relatórios do MV de 11/2026 (produção 10/2026):
+ * - 10490 Ian: percentual por faixa de volume (65/68/70% do líquido, 9,15% de impostos) + densitometria 10% do bruto;
+ * - 11467 Gilson: USG R$ 30,00 · ressonância R$ 45,00;
+ * - 6703 Alexandre: USG R$ 33,00 · raio-X R$ 6,00 · ressonância R$ 45,00;
+ * - 8016 Elen: mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO);
+ * - 17771 Matheus: USG R$ 35,00 · mamografia R$ 15,00 (R$ 10,00 no HOSPITAL UNIVERSITARIO).
+ * HM de USG Unimed = valor da USG; pacote de ressonância/mamografia pelo valor do MV (regras gerais da V3).
+ * Aplicado uma vez por prestador (regras.v3padrao): não sobrescreve regra já cadastrada, e apagar a regra depois não a traz
+ * de volta. Data e autor fixos, para os dois computadores gravarem o mesmo (configuração compartilhada). */
+const V3_PADRAO_VERSAO = '2026-11-23';
+const CADASTRO_V3_PADRAO = [
+  { cod: '10490', nome: 'IAN SARAIVA DE OLANDA BRAGA', regra: () => regraV3Padrao() },
+  { cod: '11467', nome: 'GILSON YOITI OGASSAWARA', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 30 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
+  { cod: '6703', nome: 'ALEXANDRE ROMANUS', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 33 }, { grupo: 'RADIOLOGIA DIAGNOSTICA', valorLaudo: 6 }, { grupo: 'RESSONANCIA MAGNETICA DIAGNOSTICA', valorLaudo: 45 }] }) },
+  { cod: '17771', nome: 'MATHEUS LEITE RAMOS DE SOUZA', regra: () => ({ modo: 'fixo', grupos: [{ grupo: GRUPO_USG_V3, valorLaudo: 35 }, { grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL UNIVERSITARIO', valorLaudo: 10 }] }] }) },
+  { cod: '8016', nome: 'ELEN AKIKO NAKANO', regra: () => ({ modo: 'fixo', grupos: [{ grupo: 'MAMOGRAFIA DIAGNOSTICA', valorLaudo: 15, excecoes: [{ convenio: 'HOSPITAL UNIVERSITARIO', valorLaudo: 10 }] }] }) }
+];
+function aplicarCadastroV3Padrao(c) {
+  if (!Array.isArray(c.prestadores)) return false;
+  let mudou = false;
+  for (const x of CADASTRO_V3_PADRAO) {
+    let p = c.prestadores.find(y => String(y.cod) === x.cod);
+    if (!p) { p = { cod: x.cod, nomeMV: x.nome, aliases: [], naoRealizaRepasse: false, origem: 'cadastro padrão da V3', em: V3_PADRAO_VERSAO + 'T00:00:00.000Z', regras: regrasPrestadorVazias() }; c.prestadores.push(p); mudou = true; }
+    const r = p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}) };
+    if (r.v3padrao) continue;
+    r.v3padrao = V3_PADRAO_VERSAO;
+    if (!r.v3regra) { r.v3 = true; r.v3regra = x.regra(); r.alteradoPor = 'Cadastro padrão da V3 (relatórios de 11/2026)'; r.alteradoEm = V3_PADRAO_VERSAO + 'T00:00:00.000Z'; }
+    mudou = true;
+  }
+  return mudou;
 }
 
 /* ---- src/engine/50-equivalencias.js ---- */
@@ -2310,7 +2468,8 @@ function efetividadeCompostas(rodadas, chave) {
 /* ============================================================
  * SOL-F35 — Controle por unidade: quem laudou (planilha de laudos) × quem já tem repasse.
  * Grupos: USG (US, com o Doppler) e IMG (demais modalidades) nas unidades fora da V3; Curitiba (unidade V3)
- * num grupo só, só com médicos V3 e só os exames que a regra V3 de cada um cobre.
+ * num grupo só, com os médicos V3 (só os exames que a regra V3 de cada um cobre) e os médicos de Londrina que laudam
+ * na V3 por produção (só os laudos que não são de USG; regras de 23/11/2026). Na V3 a modalidade vem do TITLE.
  * Situação calculada: gerar no MV · relatório sem conferência · conferido · aceito · relatório sem laudo (aviso)
  * · sem cadastro · fora do repasse. Só médico, unidade e contagens: nenhum dado de paciente.
  * ============================================================ */
@@ -2353,12 +2512,21 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
     const cod = mapaUn.get(norm(l.unidade));
     if (!cod) { semUnidade.set(l.unidade, (semUnidade.get(l.unidade) || 0) + 1); continue; }
     const u = un(cod), g = grupoDoLaudo(cfg, cod, l.modalidade), G = grp(u, g), r = prestadorDoMedico(idx, l.medico);
+    // V3: a modalidade vem do TITLE do laudo (regra de 23/11/2026).
+    const modalidade = g === 'curitiba' ? (modalidadeDoTituloV3(l.titulo) || l.modalidade) : l.modalidade;
     if (r.estado === 'ok') {
       const p = r.prestador;
+      // Médicos de Londrina que laudam na V3 por produção: contam os laudos que não são de USG (pagos pelo relatório do MV).
+      if (g === 'curitiba' && !p.regras?.v3 && laudaV3Producao(p)) {
+        const it = item(G, `${g}|${cod}|${p.cod}`, { cod: String(p.cod), nome: p.nomeMV, p });
+        it.producao = true; it.medicos.add(l.medico);
+        if (modalidade === 'US') it.foraRegra.set('Ultrassonografia', (it.foraRegra.get('Ultrassonografia') || 0) + 1); else it.laudos++;
+        continue;
+      }
       if (g === 'curitiba' && !p.regras?.v3) { const o = u.outros.get('p' + p.cod) || u.outros.set('p' + p.cod, { nome: p.nomeMV, cod: p.cod, laudos: 0, motivo: 'sem regra V3 no cadastro' }).get('p' + p.cod); o.laudos++; continue; }
       const it = item(G, `${g}|${cod}|${p.cod}`, { cod: String(p.cod), nome: p.nomeMV, p });
       it.medicos.add(l.medico);
-      if (g === 'curitiba' && !laudoNaRegraV3(p.regras?.v3regra, l.modalidade)) { const n = NOME_MODALIDADE[l.modalidade] || l.modalidade || 'sem modalidade'; it.foraRegra.set(n, (it.foraRegra.get(n) || 0) + 1); }
+      if (g === 'curitiba' && !laudoNaRegraV3(p.regras?.v3regra, modalidade)) { const n = NOME_MODALIDADE[modalidade] || modalidade || 'sem modalidade'; it.foraRegra.set(n, (it.foraRegra.get(n) || 0) + 1); }
       else it.laudos++;
     } else {
       const mn = norm(l.medico);
@@ -2395,7 +2563,7 @@ function controlePrestadoresUnidade({ laudos, cfg, rodadas, chave, sessao = [], 
         const disp = marcas.dispensado?.[it.k];
         if (disp && (sit === 'sem-laudo' || sit === 'gerar')) sit = sit === 'sem-laudo' ? 'verificado' : 'fora';
         return { k: it.k, cod: it.cod, nome: it.nome, mn: it.mn || '', medicos: [...it.medicos], laudos: it.laudos, foraRegra: [...it.foraRegra].map(([n, q]) => ({ n, q })),
-          linhasMV: linhas, rodadaId: it.rodada?.id || '', relId: it.rodada?.relId || '', aceite: it.rodada?.aceite || null, regraV3: G.grupo === 'curitiba' ? it.p?.regras?.v3regra || null : null,
+          linhasMV: linhas, rodadaId: it.rodada?.id || '', relId: it.rodada?.relId || '', aceite: it.rodada?.aceite || null, regraV3: G.grupo === 'curitiba' ? it.p?.regras?.v3regra || null : null, producao: !!it.producao,
           situacao: sit, gerado: marcas.gerado?.[it.k] || null, dispensado: disp || null, conflito: it.conflito };
       }).sort((a, b) => (FALTA_CONTROLE.has(b.situacao) - FALTA_CONTROLE.has(a.situacao)) || b.laudos - a.laudos || a.nome.localeCompare(b.nome));
       const c = s => itens.filter(x => x.situacao === s).length;
@@ -2748,6 +2916,8 @@ const STATUS_CONF = {
   'so-faturamento': { nome: 'Só no faturamento', cor: 'FFC7CE', ordem: 4 },
   'so-laudo': { nome: 'Só no laudo', cor: 'F8CBAD', ordem: 5 },
   'hm-pendente': { nome: 'HM — regra pendente', cor: 'D9E1F2', ordem: 6 },
+  'hm-sem-base': { nome: 'HM sem exame base', cor: 'FFEB9C', ordem: 6 },
+  'substituido-pacote': { nome: 'Substituído pelo pacote', cor: 'E4E4E4', ordem: 7 },
   'nao-procedimental': { nome: 'Item não procedimental', cor: 'E2EFDA', ordem: 7 },
   'classificacao-pendente': { nome: 'Classificação pendente', cor: 'D9D9D9', ordem: 8 }
 };
@@ -2772,7 +2942,11 @@ const MARCADORES = {
   'composta': 'Regra composta',
   'composta-falta': 'Composição incompleta',
   'hm-v3-devido': 'HM V3 devido',
-  'hm-v3-excluir': 'HM V3 a excluir'
+  'hm-v3-excluir': 'HM V3 a excluir',
+  'hm-v3-sem-base': 'HM V3 sem exame base',
+  'pacote-v3': 'Pacote V3 considerado',
+  'base-pacote-v3': 'Base substituída pelo pacote',
+  'fora-escopo-v3': 'Modalidade que a V3 não faz'
 };
 
 // Período de produção coberto pelo relatório: do 1º dia do mês da menor data ao último dia do mês da maior.
@@ -2785,8 +2959,10 @@ function periodoDoRelatorio(regs) {
 
 function laudosDaUnidade(apolo, cfg, unidadeCod) {
   if (!unidadeCod || unidadeCod === '*') return apolo.laudos;
-  const nomes = nomesApoloDaUnidade(cfg, unidadeCod);
-  return apolo.laudos.filter(l => nomes.has(norm(l.unidade)));
+  const nomes = nomesApoloDaUnidade(cfg, unidadeCod), L = apolo.laudos.filter(l => nomes.has(norm(l.unidade)));
+  if (!ehUnidadeV3(cfg, unidadeCod)) return L;
+  // V3 (Curitiba): a modalidade vem do TITLE do laudo; a MODALITY do Apolo fica guardada em modalidadeApolo.
+  return L.map(l => { const m = modalidadeDoTituloV3(l.titulo); return m && m !== l.modalidade ? { ...l, modalidade: m, modalidadeApolo: l.modalidade } : l; });
 }
 
 function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
@@ -2800,6 +2976,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
+    // V3: pacote lançado dentro do grupo do exame (descrição «PACOTE …») também é pacote.
+    if (unidadeV3 && cls.tipo === 'procedimento' && /\bPACOTE\b/.test(norm(r.procDesc || ''))) return { r, tipo: 'pacote', regraTipo: 'pacote-v3', pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
     return { r, tipo: cls.tipo, regraTipo: cls.regra, pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
   });
   const procs = B.filter(b => b.tipo === 'procedimento');
@@ -2861,6 +3039,28 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     }
   }
 
+  // V3 (Curitiba), regras de 23/11/2026:
+  // - exame base do HM: linha de USG/Doppler do mesmo atendimento, ou do mesmo paciente e dia, no relatório;
+  // - pacote de ressonância/mamografia substitui o exame base do mesmo paciente e dia, do convênio Bradesco, lançado a 100%.
+  const baseDoHM = new Map(), substituidoPor = new Map();
+  if (unidadeV3) {
+    const usgs = procs.filter(b => ehUSGouDoppler(b.r.grupoNome, b.r.procDesc));
+    for (const b of B) if (b.tipo === 'hm') {
+      const x = usgs.find(u => (b.r.atendimento && u.r.atendimento === b.r.atendimento && (!b.pn || u.pn === b.pn)) || (b.pn && u.pn === b.pn && u.dia === b.dia));
+      if (x) baseDoHM.set(b, x);
+    }
+    for (const b of B) {
+      if (b.tipo !== 'pacote' || !ehPacoteV3({ tipo: 'pacote', grupoNome: b.r.grupoNome, procDesc: b.r.procDesc })) continue;
+      const mp = modalidadeDoTituloV3(`${b.r.grupoNome || ''} ${b.r.procDesc || ''}`);
+      for (const u of procs) {
+        if (substituidoPor.has(u) || !b.pn || u.pn !== b.pn || u.dia !== b.dia || !convenioPacoteV3(u.r.convenio)) continue;
+        if (!(+u.r.vlTotal > 0) || Math.abs((+u.r.vlRepasse || 0) - (+u.r.vlTotal || 0)) > 0.01) continue;
+        if (mp && !(u.mods || []).includes(mp)) continue;
+        substituidoPor.set(u, b);
+      }
+    }
+  }
+
   // 3) Categoria principal + marcadores de cada linha do MV.
   const linhas = [];
   const chaveExame = l => `${chaveTitulo(l.titulo)}|${l.mn}|${l.dia}`;
@@ -2869,15 +3069,31 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
-    // V3 (Curitiba): HM de USG/Doppler Unimed é devido mesmo sem laudo; os demais HM não são pagos (SOL-F30).
+    // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
+    // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (b.tipo === 'hm' && unidadeV3) {
-      if (hmV3Devido(r.grupoNome, r.procDesc, r.convenio)) {
-        marc.add('hm-v3-devido'); out.status = 'conferido';
-        motivos.push('HM V3 devido: HM de USG/Doppler do convênio Unimed entra no repasse da V3, mesmo sem laudo (regra da unidade).');
+      const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
+      if (sit.devido) {
+        const base = baseDoHM.get(b);
+        if (base) {
+          marc.add('hm-v3-devido'); out.status = 'conferido'; out.baseHM = base.r.seq; out.baseConvenio = base.r.convenio || '';
+          motivos.push(`HM V3 devido: HM de USG/Doppler Unimed entra no repasse da V3 sem precisar de laudo; exame base no relatório: ${base.r.codigo} - ${base.r.procDesc} (${fmtData(base.r.data)}).`);
+        } else {
+          marc.add('hm-v3-sem-base'); out.status = 'hm-sem-base';
+          motivos.push('HM V3 sem exame base: HM de USG/Doppler Unimed só é pago com o exame de USG do mesmo atendimento (ou do mesmo paciente e dia) no relatório. Verificar no MV ou aceitar com justificativa.');
+        }
       } else {
-        marc.add('hm-v3-excluir'); out.status = 'hm-pendente';
-        motivos.push(`HM V3 a excluir: na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», convênio «${r.convenio || '—'}»). Sinalizar para exclusão; não é NC por si só.`);
+        marc.add('hm-v3-excluir'); out.status = 'hm-pendente'; out.motivoHMV3 = sit.motivo; out.hmV3SeriaDevido = !!sit.seriaDevido;
+        if (sit.seriaDevido) motivos.push('Atenção: é HM de USG/Doppler do convênio Unimed, mas está num grupo que nunca é pago. Confira se o grupo do MV está certo.');
+        motivos.push(`HM V3 a excluir (${MOTIVO_HM_V3[sit.motivo]}): na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», grupo «${r.grupoNome || '—'}», convênio «${r.convenio || '—'}»). Excluir do MV; não é NC por si só.`);
       }
+      linhas.push(out); continue;
+    }
+    // V3: pacote de ressonância/mamografia é considerado pelo valor do MV e notificado.
+    if (b.tipo === 'pacote' && unidadeV3 && ehPacoteV3({ tipo: 'pacote', grupoNome: r.grupoNome, procDesc: r.procDesc })) {
+      const subs = [...substituidoPor].filter(([, pk]) => pk === b).map(([u]) => u);
+      marc.add('pacote-v3'); out.status = 'conferido';
+      motivos.push(`Pacote V3 considerado pelo valor do MV (R$ ${fmtBR(r.vlRepasse)})${subs.length ? `: substitui ${subs.map(u => `${u.r.codigo} - ${u.r.procDesc} (${u.r.convenio}, lançado a 100%)`).join('; ')}` : '; nenhum exame base Bradesco a 100% do mesmo paciente e dia no relatório: conferir'}.`);
       linhas.push(out); continue;
     }
     if (b.tipo !== 'procedimento') {
@@ -2888,6 +3104,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       linhas.push(out); continue;
     }
     if (!b.mods) marc.add('modalidade-desconhecida');
+    if (unidadeV3 && b.mods && !b.mods.some(m => MODALIDADES_V3.has(m))) { marc.add('fora-escopo-v3'); motivos.push(`A V3 não faz ${b.mods.map(m => NOME_MODALIDADE[m] || m).join('/').toLowerCase()} hoje: verificar o lançamento (e cadastrar a regra do médico se passar a fazer).`); }
     const p = b.par;
     if (p) {
       out.l = p.l; out.par = p;
@@ -2924,6 +3141,11 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (irmao) { marc.add('possivel-bilateral'); motivos.push(`Há laudo compatível («${irmao.l.titulo}») já associado a outra linha do mesmo código: verificar cobrança por lado ou duplicidade.`); }
       else if (b.cands && b.cands.length) motivos.push(`Laudos do paciente existem, mas já estão associados a outras linhas (${b.cands.length} candidato(s)).`);
       else motivos.push(b.pn ? `Nenhum laudo do paciente na unidade em ±${tol} dia(s) com modalidade compatível.` : 'Linha do MV sem nome de paciente.');
+    }
+    const pk = substituidoPor.get(b);
+    if (pk) {
+      out.statusAntesPacote = out.status; out.status = 'substituido-pacote'; marc.add('base-pacote-v3');
+      motivos.unshift(`Substituído pelo pacote: exame base do convênio ${r.convenio} lançado a 100% (erro do MV); vale o pacote «${pk.r.procDesc}» (R$ ${fmtBR(pk.r.vlRepasse)}) do mesmo paciente e dia. Não compõe repasse.`);
     }
     linhas.push(out);
   }
@@ -3015,6 +3237,7 @@ const CAUSAS = {
   'sl-nc': { acao: 'Registrar NC (natureza sugerida pelo Power BI)', titulo: c => `Só no laudo — ${SITUACAO_PBI[c.sit]?.nome || c.sit}` },
   'sl-outro-relatorio': { acao: 'Conferir no relatório do médico do laudo; NC só se não estiver lá', titulo: () => 'Lançados no relatório do médico do laudo (outro relatório)' },
   hm: { acao: 'Cadastrar a regra de HM em Bases', titulo: () => 'Itens HM — regra pendente' },
+  'hm-sem-base': { acao: 'Achar o exame de USG no MV (outro relatório ou lançamento errado) ou aceitar para pagamento com justificativa', titulo: () => 'HM de USG Unimed (V3) sem o exame base no relatório' },
   classificacao: { acao: 'Cadastrar a regra de classificação do item', titulo: () => 'Itens com classificação pendente' },
   repetida: { acao: 'Decidir qual lançamento vale; o outro vira NC (ou as duas estão certas)', titulo: () => 'Linha repetida no MV' },
   'nome-semelhante': { acao: 'Confirmar se é o mesmo paciente', titulo: () => 'Nome apenas semelhante' },
@@ -3042,6 +3265,7 @@ function causasDaConferencia(res, compostas = []) {
       return add('so-laudo', { tipo: 'so-laudo' }, i);
     }
     if (x.status === 'hm-pendente') return add('hm', { tipo: 'hm' }, i);
+    if (x.status === 'hm-sem-base') return add('hm-sem-base', { tipo: 'hm-sem-base' }, i);
     if (x.status === 'classificacao-pendente') return add('classificacao', { tipo: 'classificacao' }, i);
     if (x.status === 'so-faturamento') return uma.push({ k: 'sf|' + i, tipo: 'so-faturamento', linhas: [i] });
     if (p && m.has('eq-pendente')) return add(`eq|${r.codigo}|${chaveTitulo(l.titulo)}`, { tipo: 'eq-pendente', ...base, ambigua: !!p.proc.relacao?.ambiguo, relacaoId: p.proc.relacao?.id || '' }, i);
@@ -3076,7 +3300,8 @@ function causasDaConferencia(res, compostas = []) {
  *                 HM só quando a regra do prestador o inclui (hoje: V3, HM de USG/Doppler Unimed → conferido).
  *   Aceito      → decisão «Aceito para pagamento» (antes «Considerado no repasse»), com justificativa, quem e quando.
  *   NC          → NC registrada (menos «não procede»). Fora do fechamento.
- *   Excluído    → taxa, material e medicamento (nunca compõem repasse) e HM sem regra do prestador (excluir do MV).
+ *   Excluído    → taxa, material e medicamento (nunca compõem repasse), HM sem regra do prestador (excluir do MV) e,
+ *                 na V3, o exame base Bradesco a 100% substituído pelo pacote de ressonância/mamografia.
  *   Pendente    → todo o resto: ressalva sem aceite, ambíguo, só no faturamento, equivalência não validada,
  *                 composição incompleta, pacote, desconhecido e «Resolvido no MV» ainda não reconferido.
  * Valor para pagamento = Devido + Aceito. Devido + Aceito + Pendente + NC + Excluído = total do relatório do MV.
@@ -3098,8 +3323,15 @@ const REGRA_VALOR_F43 = 'f43';
 function classeDaLinha(tipo, estado, decisao) {
   if (TIPOS_NUNCA_REPASSE.has(tipo)) return 'excluido';
   if (decisao === 'nc') return 'nc';
-  if (tipo === 'hm') return estado === 'conferido' ? 'devido' : 'excluido';
+  if (tipo === 'hm') {
+    if (estado === 'conferido') return 'devido';
+    // V3: HM de USG Unimed sem o exame base no relatório espera decisão (pode ser aceito); os demais HM são excluídos.
+    if (estado === 'hm-sem-base') return decisao === 'considerar' ? 'aceito' : 'pend';
+    return 'excluido';
+  }
   if (decisao === 'considerar') return 'aceito';
+  // V3: exame base Bradesco a 100% substituído pelo pacote de ressonância/mamografia não compõe repasse.
+  if (estado === 'substituido-pacote') return 'excluido';
   if (decisao === 'resolvido') return 'pend';
   return estado === 'conferido' ? 'devido' : 'pend';
 }
@@ -3296,7 +3528,7 @@ function registroRodada(res, ctx) {
     contagens: res.tipo === 'conferencia' ? Object.fromEntries(Object.entries(res.porStatus).map(([k, v]) => [k, v.n])) : Object.fromEntries(Object.entries(res.porEstado).map(([k, v]) => [k, v.n])),
     // Por linha, sem nome de paciente: estado, valores e o que o fechamento precisa (grupo, descrição, convênio, tipo de item).
     linhas: linhasMV.map(x => ({ chave: x.r.chave, estado: x.status || x.estado, medico: x.medico || '', codigo: x.r.codigo, vlRepasse: x.r.vlRepasse,
-      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '',
+      vlTotal: x.r.vlTotal, quant: x.r.quant, grupo: x.r.grupoNome, desc: x.r.procDesc, convenio: x.r.convenio, tipoItem: x.tipo || '', ...(x.baseConvenio !== undefined ? { baseConvenio: x.baseConvenio } : {}),
       kd: chaveMVDecisao(x.r), kl: chaveLaudoDecisao(x.l || x.laudo), decisao: x.decisao?.tipo || '', ...infoEquivalencia(x) })),
     regraValor: res.tipo === 'conferencia' ? REGRA_VALOR_F43 : undefined,
     chavesV: 2,   // v3.0.0-alpha.9: kd com a ordem da linha repetida (ver normalizarChavesRodada)   // SOL-F43: só Devido + Aceito compõem o fechamento
@@ -6745,7 +6977,8 @@ function desenharConferencia() {
     <div class="cf-barra cf-barra-cl">${barra}</div>
     <p class="small" style="margin:6px 0">${CZ.conferidas} de ${CZ.totalMV} linhas do MV conferidas${CZ.ressalvasDecididas ? ' (contando as já decididas)' : ''} · ${CZ.totalMV ? Math.round(CZ.conferidas / CZ.totalMV * 100) : 0}%. ${CZ.faltam ? `Faltam <b>${CZ.faltam} decisão(ões)</b>${nLote ? `: ${CZ.grupos.filter(g => !ehSL(g)).length} resolvem ${nLote} linha(s) de uma vez` : ''}.` : 'Nada falta decidir: é só registrar o aceite.'}${alertas ? ` <b style="color:var(--err)">${alertas} item(ns) que deviam ter saído do MV continuam no relatório.</b>` : ''} <span class="muted">Clique numa classe para filtrar.</span></p>
     <div class="acoes">${CZ.faltam ? '<button id="cfIrCausas">Começar pelas decisões</button>' : '<button id="cfIrAceite">Ir para o aceite</button>'}<button class="sec" id="cfVerTodas">Ver todas as linhas</button><button class="sec" id="cfExcel" data-cfexcel>Exportar Excel</button>${botaoReconferir(ctx)}</div>
-    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : ''}</div>
+    ${ctx.pbiResumo ? `<div class="pbi-resumo" id="cfPBI"><b>Power BI</b> <span class="small muted">(${esc(ctx.pbiNome || '')})</span> — laudos «Só no laudo»: ${Object.entries(ctx.pbiResumo).filter(([, n]) => n).map(([k, n]) => `<span class="marc">${esc(SITUACAO_PBI[k].nome)} · ${n}</span>`).join(' ') || '<span class="small muted">nenhum</span>'}<p class="small muted" style="margin:4px 0 0">A natureza e o responsável (quem fechou a conta) já vêm sugeridos nos candidatos a NC; abra a linha para ver a conta e o atendimento.</p></div>` : ''}
+    ${ehUnidadeV3(S.cfg, ctx.unidadeCod) ? cartaoAvisosV3(avisosConferenciaV3(res)) : ''}</div>
     <nav class="cf-abas" id="cfAbas" role="tablist" aria-label="Áreas da conferência">${ABAS_CONF.map(([k, t]) => { const n = k === 'decidir' ? CZ.faltam : k === 'nc' ? alertas : 0; return `<button role="tab" id="cfAba-${k}" data-cfaba="${k}" aria-selected="${aba === k}" class="${aba === k ? 'on' : ''}">${t}${n ? `<span class="n${k === 'nc' ? ' alerta' : ''}">${n}</span>` : ''}</button>`; }).join('')}</nav>
     ${secao('previa', `<div class="card"><h2 class="sr-only">Linhas do relatório</h2>
       <div class="cf-rapido"><input type="search" id="cfBusca" aria-label="Buscar" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}">
@@ -6781,6 +7014,7 @@ function desenharConferencia() {
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.conf.filtroStatus; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharConferencia(); });
   c.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => { const k = b.dataset.tirar; S.conf[k] = k === 'fObs' ? '' : k === 'filtroClasse' ? null : '*'; desenharConferencia(); });
   $('cfFiltrosBt').onclick = () => { S.conf.verFiltros = !S.conf.verFiltros; $('cfGaveta').hidden = !S.conf.verFiltros; $('cfFiltrosBt').setAttribute('aria-expanded', String(S.conf.verFiltros)); };
+  c.querySelectorAll('[data-m-v3]').forEach(b => b.onclick = () => { S.conf.filtroMarc = new Set([b.dataset.mV3]); S.conf.soFalta = false; S.conf.aba = 'previa'; desenharConferencia(); $('cfTab')?.scrollIntoView({ block: 'start' }); });
   c.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { const s = S.conf.filtroMarc; s.has(b.dataset.m) ? s.delete(b.dataset.m) : s.add(b.dataset.m); desenharConferencia(); });
   // Os dois botões de Excel (topo e tabela) exportam tudo; «só o filtrado» fica na faixa do filtro. Com «Processando…» (P1).
   c.querySelectorAll('[data-cfexcel]').forEach(bt => bt.onclick = () => exportarExcelConf(bt, res, ctx));
@@ -6980,6 +7214,18 @@ async function reconferir(arquivo) {
   RENDER.conferencia();
   avisar(x.hash === hashAntes ? 'Conferido de novo com o mesmo PDF (o arquivo não mudou). As decisões e equivalências atuais já valem.' : 'PDF novo lido e conferido de novo: veja a aba «NCs e correções no MV» para a reconferência.', x.hash === hashAntes ? 'info' : 'ok');
 }
+// Curitiba (V3): avisos para agir no MV — HM a excluir, HM sem exame base, pacotes e exames fora do que a V3 faz.
+function cartaoAvisosV3(a) {
+  if (!a.total) return '<div class="v3-avisos small muted"><b>Curitiba (V3):</b> nenhum HM a excluir, pacote ou exame fora do que a V3 faz neste relatório.</div>';
+  const R = v => `R$ ${fmtBR(v)}`, filtro = (m, t) => `<button class="sec mini" data-m-v3="${m}">${t}</button>`;
+  const itens = [];
+  if (a.hmExcluir.n) itens.push(`<li><b class="v3-exc">⚠ ${a.hmExcluir.n} HM a excluir do MV (${R(a.hmExcluir.valor)})</b> — não são pagos a ninguém: ${a.hmExcluir.grupos.map(g => `${esc(g.grupo)} · ${g.n}${g.rotuloMotivo ? ` <span class="muted">(${esc(g.rotuloMotivo)})</span>` : ''}`).join('; ')}. Peça a exclusão no MV e reconfira. ${filtro('hm-v3-excluir', 'Ver linhas')}${a.hmExcluir.usgUnimed.n ? `<br><b>Atenção:</b> ${a.hmExcluir.usgUnimed.n} deles (${R(a.hmExcluir.usgUnimed.valor)}) são HM de USG/Doppler Unimed lançados num desses grupos: confira se o grupo do MV está certo antes de excluir.` : ''}</li>`);
+  if (a.hmSemBase.n) itens.push(`<li><b>${a.hmSemBase.n} HM de USG Unimed sem o exame base no relatório (${R(a.hmSemBase.valor)})</b> — ficam pendentes: ache o exame de USG ou aceite com justificativa. ${filtro('hm-v3-sem-base', 'Ver linhas')}</li>`);
+  if (a.pacotes.n) itens.push(`<li><b>${a.pacotes.n} pacote(s) de ressonância/mamografia considerados (${R(a.pacotes.valor)})</b> pelo valor de repasse do MV${a.substituidos.n ? `; ${a.substituidos.n} exame(s) base Bradesco a 100% substituídos (${R(a.substituidos.valor)}, fora do fechamento)` : ''}. Confira se cada pacote corresponde ao exame base. ${filtro('pacote-v3', 'Ver pacotes')}${a.substituidos.n ? ' ' + filtro('base-pacote-v3', 'Ver bases') : ''}</li>`);
+  else if (a.substituidos.n) itens.push(`<li><b>${a.substituidos.n} exame(s) base substituídos pelo pacote</b>. ${filtro('base-pacote-v3', 'Ver linhas')}</li>`);
+  if (a.foraEscopo.n) itens.push(`<li><b>${a.foraEscopo.n} linha(s) de modalidade que a V3 não faz</b> (ex.: tomografia): verifique o lançamento. ${filtro('fora-escopo-v3', 'Ver linhas')}</li>`);
+  return `<div class="v3-avisos" id="cfAvisosV3" role="status"><b>Curitiba (V3) — avisos para o MV</b><ul class="small">${itens.join('')}</ul></div>`;
+}
 // Aba «NCs e correções no MV»: o que devia ter saído do MV e o que já saiu (reconferência, SOL-F42).
 function cartaoCorrecoesMV(corr) {
   const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
@@ -6989,7 +7235,7 @@ function cartaoCorrecoesMV(corr) {
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
     <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
     <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
-    <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">O prestador não tem regra que inclua HM: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
+    <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">${corr.hm.some(x => x.linha.marcadores?.has('hm-v3-excluir')) ? 'Curitiba (V3): HM de raio-X, de mamografia e qualquer HM que não seja de USG Unimed (inclusive no 78 PF) não é pago a ninguém.' : 'O prestador não tem regra que inclua HM'}: esses itens não compõem o repasse.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.linha.r.grupoNome ? ` · <span class="muted">${esc(x.linha.r.grupoNome)} · ${esc(x.linha.r.convenio || '')}</span>` : ''}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
 
 function resumoComparacao({ ant, grupos }) {
@@ -7422,7 +7668,7 @@ async function desenharControleUnidadeBase() {
     <div class="fx-topo"><h3>Unidade ${esc(u.cod)} - ${esc(u.nome)} · ${GRUPOS_CONTROLE[G.grupo]}</h3><button class="sec mini" data-cuunica title="Todos os prestadores desta unidade e grupo num Excel só, gravado em ${esc(PASTA_PLAN_CONF.nome)}">Excel único da unidade (${relatoriosPara('cf').filter(x => unDoRel(x) === u.cod && grDoRel(x) === G.grupo).length} relatório(s))</button></div>
     <div class="cu-res">${k(r.laudaram, cur ? 'médicos V3 laudaram' : 'laudaram')}${k(r.aceitos, 'aceitos', 'ok')}${k(r.conferidos, 'conferindo (sem aceite)', 'info')}${r.semConferencia ? k(r.semConferencia, 'relatório sem conferência', 'warn') : ''}${k(r.gerar, 'a gerar no MV', 'err')}${r.semLaudo ? k(r.semLaudo, 'relatório sem laudo', 'warn') : ''}${r.semCadastro ? k(r.semCadastro, 'sem cadastro', 'warn') : ''}${r.fora + r.verificados ? k(r.fora + r.verificados, 'fora do repasse / verificados') : ''}</div>
     <div class="tw"><table class="cu-tab"><thead><tr><th>Cód.</th><th>Prestador</th>${cur ? '<th>Regra V3</th>' : ''}<th class="num">${cur ? 'Laudos que a SRA paga' : 'Laudos no Apolo'}</th>${cur ? '<th class="num">Fora da regra</th>' : ''}<th class="num">Linhas no MV</th><th>Situação</th><th></th></tr></thead><tbody>
-    ${itens.map(x => `<tr class="${FALTA_CONTROLE.has(x.situacao) ? 'cu-falta' : ''}"><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}${x.cod ? '' : ' <span class="muted small">(Apolo)</span>'}</td>${cur ? `<td class="small">${esc(regraTxt(x.regraV3))}</td>` : ''}<td class="num">${fmtN(x.laudos)}</td>${cur ? `<td class="num">${x.foraRegra.length ? `${fmtN(x.foraRegra.reduce((s, f) => s + f.q, 0))}<div class="small muted">${x.foraRegra.map(f => esc(`${f.n}: ${f.q}`)).join(' · ')} (fora da regra)</div>` : '—'}</td>` : ''}<td class="num">${x.rodadaId ? fmtN(x.linhasMV) : '—'}</td><td>${sit(x)}</td><td>${acao(x)}</td></tr>`).join('') || `<tr><td colspan="8" class="muted">Nada faltando neste grupo.${CU.soFalta ? ' Desmarque «só o que falta» para ver todos.' : ''}</td></tr>`}
+    ${itens.map(x => `<tr class="${FALTA_CONTROLE.has(x.situacao) ? 'cu-falta' : ''}"><td>${esc(x.cod || '—')}</td><td>${esc(x.nome)}${x.cod ? '' : ' <span class="muted small">(Apolo)</span>'}</td>${cur ? `<td class="small">${x.producao ? 'Por produção (Londrina): laudos que não são de USG, pelo relatório do MV' : esc(regraTxt(x.regraV3))}</td>` : ''}<td class="num">${fmtN(x.laudos)}</td>${cur ? `<td class="num">${x.foraRegra.length ? `${fmtN(x.foraRegra.reduce((s, f) => s + f.q, 0))}<div class="small muted">${x.foraRegra.map(f => esc(`${f.n}: ${f.q}`)).join(' · ')} (fora da regra)</div>` : '—'}</td>` : ''}<td class="num">${x.rodadaId ? fmtN(x.linhasMV) : '—'}</td><td>${sit(x)}</td><td>${acao(x)}</td></tr>`).join('') || `<tr><td colspan="8" class="muted">Nada faltando neste grupo.${CU.soFalta ? ' Desmarque «só o que falta» para ver todos.' : ''}</td></tr>`}
     </tbody></table></div>
     <p class="small muted">«Linhas no MV» vem da última rodada de conferência e serve só de referência rápida; a conferência diz o que bate. «Relatório sem laudo» é aviso, não NC.</p>
     ${cur && u.outros.length ? `<details class="cu-outros"><summary>Outros médicos na unidade ${esc(u.cod)} — não pagos pela SRA (${u.outros.length} médico(s) · ${fmtN(u.outros.reduce((s, o) => s + o.laudos, 0))} laudos) · só consulta</summary>
@@ -9537,10 +9783,12 @@ function desenharCuritiba(corpo, f, mk) {
 async function memoriaV3(x) {
   const c = x.v3, texto = textoEmailV3(c);
   const exc = [...c.hmExcluir.itens].sort((a, b) => b[1] - a[1]);
+  const pacV3 = c.pacotes?.qtd ? `<li><b>Pacotes de ressonância/mamografia:</b> ${c.pacotes.qtd} pelo valor de repasse do MV (R$ ${fmtBR(c.pacotes.valor)}); o exame base Bradesco a 100% que cada um substitui ficou fora.</li>` : '';
   const origem = c.modo === 'fixo' ? `<li><b>Regra:</b> valor fixo por laudo, por grupo do MV.</li>
-      ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${i.qtd} laudo(s) × R$ ${fmtBR(i.valorLaudo)} = R$ ${fmtBR(i.valor)}${i.hmQtd ? ` · HM Unimed ${i.hmQtd} × R$ ${fmtBR(i.valorHM)} = R$ ${fmtBR(i.hmValor)}` : ''}.</li>`).join('')}
+      ${c.itens.map(i => `<li><b>${esc(i.rotulo)}:</b> ${esc(i.conta)}${i.hmQtd ? ` · HM Unimed ${esc(i.contaHM)} (mesmo valor do exame base)` : ''}.</li>`).join('')}
       <li>Exames de USG e Doppler no mês: ${c.exames} (USG bruto no MV: R$ ${fmtBR(c.brutoUSG)}, só referência).</li>
-      ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor de HM na regra: não pagos.</li>` : ''}
+      ${c.hm.semValor ? `<li>${c.hm.semValor} HM de USG/Doppler Unimed sem valor do laudo de USG na regra: não pagos.</li>` : ''}
+      ${pacV3}
       <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>` : null;
   const r = await dialogo(`Memória de cálculo — ${x.cod} - ${x.nome}`, `<span class="dlg-largo" hidden></span><div class="grid2"><div><h4 style="margin:0 0 4px">Texto do e-mail</h4><pre class="memoria-v3">${esc(texto)}</pre></div>
     <div><h4 style="margin:0 0 4px">De onde vem cada número</h4><ul class="small">${origem || `
@@ -9549,6 +9797,7 @@ async function memoriaV3(x) {
       <li><b>HM Unimed:</b> ${c.hm.qtd} HM de USG/Doppler do convênio Unimed (R$ ${fmtBR(c.hm.valor)})${c.hmNaBase ? ', somados ao faturamento da USG' : c.forma === 'por-laudo' && x.p?.regras?.v3regra?.hm === 'valor-laudo' ? ', pagos como laudo de USG' : ', não pagos pela regra'}.</li>
       ${c.forma === 'faixa-liquido' ? `<li><b>Faixa:</b> ${c.exames} exames → ${c.faixa ? `${fmtBR(c.pct).replace(',00', '')}% (${esc(rotuloFaixaV3(c.faixa))})` : 'abaixo da primeira faixa'}.</li>` : ''}
       ${c.outros.map(o => `<li><b>${esc(o.nome)}:</b> ${o.qtd} exame(s), R$ ${fmtBR(o.bruto)} bruto → R$ ${fmtBR(o.valor)}.</li>`).join('')}
+      ${pacV3}
       <li>Calculado sem arredondar no meio; arredonda só no final.</li>
       <li class="muted">Vl Repasse que o MV trouxe para a V3: R$ ${fmtBR(c.valorMV)} (só referência).</li>`}</ul>
       ${exc.length ? `<h4 style="margin:8px 0 4px">HM a excluir (${c.hmExcluir.qtd} · R$ ${fmtBR(c.hmExcluir.valor)})</h4><ul class="small">${exc.slice(0, 12).map(([k, n]) => `<li>${esc(k)} — ${n}</li>`).join('')}${exc.length > 12 ? `<li>… e mais ${exc.length - 12}</li>` : ''}</ul>` : ''}
@@ -10678,22 +10927,28 @@ function cardModalidadesHM() {
   const mod = S.cfg.modalidadesGrupo?.length ? S.cfg.modalidadesGrupo : MODALIDADES_GRUPO_PADRAO, hm = { ...HM_V3_PADRAO, ...(S.cfg.hmV3 || {}) };
   const grupos = [...new Set((S.relatorios || []).flatMap(x => x.rel.regs.map(r => r.grupoNome)).filter(Boolean))].sort();
   return `<div class="card" data-sub="modalidades" id="cardModHM"><h2>Modalidade do Apolo por grupo do MV</h2>
+    <p class="small muted">Na unidade de Curitiba (V3), a modalidade do laudo vem da coluna TITLE do Apolo (ex.: «ULTRASSONOGRAFIA…» → US, «MAMOGRAFIA…» → MG), na conferência, na correção de prestador e em Prestadores por unidade.</p>
     <p class="lead">A conferência só procura laudos da modalidade do grupo de procedimento (ex.: ULTRASSONOGRAFIA → US). Em cada linha, os trechos do nome do grupo separados por «|» e as modalidades do Apolo separadas por vírgula. A primeira linha que casar vale; grupo sem linha não restringe a modalidade.</p>
     <div class="tw"><table><thead><tr><th>Trechos do grupo do MV</th><th>Modalidades do Apolo</th><th></th></tr></thead><tbody>${mod.map((x, i) => `<tr>
       <td><input type="text" data-mg="${i}" data-c="padrao" value="${esc(x.padrao)}" style="width:100%"></td><td><input type="text" data-mg="${i}" data-c="modalidades" value="${esc(x.modalidades)}" style="width:110px"></td>
       <td><button class="perigo mini" data-mgrm="${i}" aria-label="Remover">✕</button></td></tr>`).join('')}</tbody></table></div>
     ${grupos.length ? `<p class="small muted">Grupos dos PDFs carregados: ${grupos.map(g => `${esc(g)} → <b>${esc((modalidadesDoGrupo(g) || ['sem restrição']).join(', '))}</b>`).join(' · ')}</p>` : ''}
     <h2 style="margin-top:18px">HM na V3 (Curitiba)</h2>
-    <p class="lead">O HM de uma linha da V3 é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio. Os demais HM não compõem o repasse (excluir do MV).</p>
+    <p class="lead">Os grupos de HM que nunca são pagos valem antes de tudo. Fora deles, o HM é devido quando o grupo ou a descrição tem um dos trechos de procedimento <b>e</b> o convênio tem um dos trechos de convênio, e o exame base está no relatório (não precisa de laudo). O valor é o mesmo da USG do médico. Os demais HM não compõem o repasse e aparecem em «HM a excluir do MV».</p>
+    <label class="campo">Grupos de HM que nunca são pagos (a ninguém), separados por «|»<input type="text" id="hmExc" value="${esc(hm.gruposExcluir)}"><span class="small muted">Cada palavra precisa começar uma palavra do grupo do MV: «HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA». Não inclua o «78 - HONORARIOS MEDICOS PF»: é nele que o MV lança o HM de USG Unimed.</span></label>
     <div class="grid2"><label class="campo">Trechos do procedimento (grupo ou descrição)<input type="text" id="hmProc" value="${esc(hm.procedimentos)}"></label>
       <label class="campo">Trechos do convênio<input type="text" id="hmConv" value="${esc(hm.convenios)}"></label></div>
+    <h2 style="margin-top:18px">Pacotes na V3</h2>
+    <p class="lead">Pacote da V3 com um destes trechos é considerado pelo valor de repasse do MV e notificado. O exame base do mesmo paciente e dia, do convênio indicado e lançado a 100% (erro do MV), sai do fechamento, substituído pelo pacote.</p>
+    <div class="grid2"><label class="campo">Trechos do pacote (grupo ou descrição)<input type="text" id="hmPac" value="${esc(hm.pacotes)}"></label>
+      <label class="campo">Convênio do exame base substituído<input type="text" id="hmPacConv" value="${esc(hm.pacoteConvenios)}"></label></div>
     <div class="acoes"><button id="mhSalvar">Salvar</button><button id="mgAdd" class="sec">+ Grupo</button><button id="mhPad" class="sec">Restaurar padrão</button></div>
     <p class="small muted">Valem a partir da próxima conferência. Rodadas já feitas não mudam: execute a conferência de novo.</p></div>`;
 }
 function lerModalidadesHM() {
   const linhas = [], pg = $('cardModHM');
   pg.querySelectorAll('[data-mg][data-c="padrao"]').forEach(inp => { const i = inp.dataset.mg, m = pg.querySelector(`[data-mg="${i}"][data-c="modalidades"]`).value.trim(); if (inp.value.trim() || m) linhas.push({ padrao: inp.value.trim(), modalidades: m.toUpperCase() }); });
-  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim() } };
+  return { linhas, hm: { procedimentos: $('hmProc').value.trim(), convenios: $('hmConv').value.trim(), gruposExcluir: $('hmExc').value.trim(), pacotes: $('hmPac').value.trim(), pacoteConvenios: $('hmPacConv').value.trim() } };
 }
 document.addEventListener('click', async e => {
   const c = $('cardModHM'); if (!c || !c.contains(e.target)) return;
@@ -10910,14 +11165,21 @@ function gruposMVConhecidos() {
 function cardMedicosV3() {
   const v3 = S.cfg.prestadores.map((p, i) => [p, i]).filter(([p]) => p.regras?.v3);
   return `<div class="card" data-sub="prestadores" id="cardV3"><h2>Médicos V3 (Curitiba) <span class="muted small">${v3.length} médico(s)</span></h2>
-    <p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago (mesmo sem laudo).</p>
+    <p class="lead">Na V3 o repasse é calculado fora do MV. Cada médico tem a sua regra: valor fixo por laudo, cadastrado por grupo de procedimento do MV, ou percentual do faturamento por faixa de volume (como o Dr. Ian). Doppler conta como USG. HM: só USG/Doppler do convênio Unimed é pago, pelo mesmo valor da USG do médico, sem precisar de laudo (basta o exame base no relatório); HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e aparece como «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Na V3 a modalidade do laudo vem da coluna TITLE do Apolo.</p>
     <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico V3</th><th>Aliases do Apolo</th><th>Atua em</th><th>Regra</th><th></th></tr></thead><tbody>
     ${v3.map(([p, i]) => `<tr><td>${esc(p.cod)}</td><td>${esc(p.nomeMV)}</td>
       <td>${(p.aliases || []).map(a => `<span class="badge ${a.status === 'validado' ? 'ok' : 'warn'}">${esc(a.nome)}</span>`).join(' ') || '<span class="muted small">—</span>'}</td>
       <td class="small">${soV3(p) ? 'só V3' : '<span title="Também está na lista geral de prestadores">V3 e outras unidades</span>'}</td>
       <td class="small">${p.regras.v3regra ? esc(resumoRegraV3(p.regras.v3regra)) : '<span class="badge warn">sem regra cadastrada</span>'}</td>
       <td style="white-space:nowrap"><button class="sec mini" data-v3regra="${i}">Regra da V3…</button> <button class="sec mini" data-alias="${i}">+ Alias</button> <button class="perigo mini" data-v3rm="${i}" aria-label="Tirar da V3" title="Tirar da V3">✕</button></td></tr>`).join('') || '<tr><td colspan="6" class="muted">Nenhum médico da V3. Use «+ Médico V3», o atalho «+ Cadastrar» dos médicos do Apolo, ou importe a planilha de controle.</td></tr>'}</tbody></table></div>
-    <div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div></div>`;
+    <div class="acoes"><button class="sec" id="v3Add">+ Médico V3</button></div>
+    <h3 style="margin-top:18px">Médicos de Londrina que laudam na V3 por produção <span class="muted small">${medicosProducaoV3(S.cfg).filter(x => x.ativo).length} médico(s)</span></h3>
+    <p class="small muted" style="margin-top:0">Laudos que não são de USG feitos para a unidade de Curitiba, pagos pelo relatório do MV (Fechamento do IMG, coluna da unidade 5). Contam em Conferência → Prestadores por unidade, no grupo Curitiba. A lista padrão raramente muda; tire ou inclua só quando mudar.</p>
+    <div class="tw"><table><thead><tr><th>Cód.</th><th>Médico</th><th>Situação</th><th></th></tr></thead><tbody>
+    ${medicosProducaoV3(S.cfg).map(x => `<tr${x.ativo ? '' : ' class="muted"'}><td>${esc(x.cod)}</td><td>${esc(x.nome)}</td>
+      <td class="small">${x.v3 ? '<span class="badge warn">médico V3: vale a regra da V3</span>' : !x.p ? '<span class="badge warn">sem cadastro com este código</span>' : x.ativo ? `<span class="badge ok">por produção</span>${x.padrao ? '' : ' <span class="muted">(incluído)</span>'}` : '<span class="badge">fora da lista</span>'}</td>
+      <td>${x.p && !x.v3 ? (x.ativo ? `<button class="perigo mini" data-v3prod-rm="${esc(x.cod)}">Tirar</button>` : `<button class="sec mini" data-v3prod-add="${esc(x.cod)}">Voltar à lista</button>`) : ''}</td></tr>`).join('')}</tbody></table></div>
+    <div class="acoes"><button class="sec" id="v3ProdAdd">+ Médico por produção</button></div></div>`;
 }
 function ligarMedicosV3(pg) {
   pg.querySelectorAll('[data-v3regra]').forEach(b => b.onclick = () => editarRegraV3(S.cfg.prestadores[+b.dataset.v3regra]));
@@ -10927,6 +11189,19 @@ function ligarMedicosV3(pg) {
     p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3: false };
     salvarCfg(`${p.cod} - ${p.nomeMV} deixou de ser médico V3.`, 'prestadores'); RENDER.bases();
   });
+  const marcarProd = (cod, v) => { const p = S.cfg.prestadores.find(x => String(x.cod) === String(cod)); if (!p) return;
+    p.regras = { ...regrasPrestadorVazias(), ...(p.regras || {}), v3producao: v };
+    salvarCfg(`${p.cod} - ${p.nomeMV} ${v ? 'incluído entre os' : 'retirado dos'} médicos que laudam na V3 por produção.`, 'prestadores'); RENDER.bases(); };
+  pg.querySelectorAll('[data-v3prod-rm]').forEach(b => b.onclick = async () => { if (await confirmar('Tirar da lista por produção?', 'Os laudos dele na unidade de Curitiba deixam de contar em Prestadores por unidade. Dá para voltar depois.', 'Tirar')) marcarProd(b.dataset.v3prodRm, false); });
+  pg.querySelectorAll('[data-v3prod-add]').forEach(b => b.onclick = () => marcarProd(b.dataset.v3prodAdd, true));
+  if ($('v3ProdAdd')) $('v3ProdAdd').onclick = async () => {
+    const r = await dialogo('Médico que lauda na V3 por produção', campoBusca({ nome: 'prestador', rotulo: 'Prestador (busca no cadastro)', fonte: 'prestador', preencheCod: 'cod', obrigatorio: true }) + '<input type="hidden" name="cod">', [['', 'Cancelar', 'sec'], ['ok', 'Incluir']]);
+    if (r.botao !== 'ok') return;
+    const cod = (r.campos.cod || r.campos.prestadorCod || '').trim(), p = S.cfg.prestadores.find(x => String(x.cod) === cod);
+    if (!p) return avisar('Escolha um prestador do cadastro (com código).', 'warn');
+    if (p.regras?.v3) return avisar(`${p.nomeMV} é médico V3: vale a regra da V3.`, 'warn');
+    marcarProd(p.cod, true);
+  };
   if ($('v3Add')) $('v3Add').onclick = async () => {
     const r = await dialogo('Incluir médico V3', campoBusca({ nome: 'prestador', rotulo: 'Prestador (busca no cadastro)', fonte: 'prestador', preencheCod: 'cod', obrigatorio: true }) + '<input type="hidden" name="cod">', [['', 'Cancelar', 'sec'], ['ok', 'Incluir e cadastrar a regra']]);
     if (r.botao !== 'ok') return;
@@ -10945,23 +11220,27 @@ async function editarRegraV3(p) {
   const gFixo = JSON.parse(JSON.stringify(atual && modo === 'fixo' ? atual : regraV3Fixa()));
   const outrosV3 = S.cfg.prestadores.filter(x => x !== p && x.regras?.v3 && x.regras.v3regra);
   const grupos = gruposMVConhecidos();
-  const linhasFixo = [...gFixo.grupos]; while (linhasFixo.length < 8) linhasFixo.push({ grupo: '', valorLaudo: '', valorHM: '' });
+  const linhasFixo = [...gFixo.grupos]; while (linhasFixo.length < 8) linhasFixo.push({ grupo: '', valorLaudo: '' });
+  // Exceções por convênio de cada linha (prévia aprovada em 23/11/2026: docs/prototipos/v3-excecao-convenio.html).
+  const excs = linhasFixo.slice(0, 8).map(g => (g.excecoes || []).map(x => ({ ...x })));
+  const convs = [...new Set([...(S.cfg.convenios || []).map(c => c.nome), ...(S.relatorios || []).flatMap(x => x.rel.regs.map(r => String(r.convenio || '').replace(/\s*-\s*$/, '')))].filter(Boolean))].sort();
   const faixas = [...gPerc.usg.faixas || []]; while (faixas.length < 5) faixas.push({ de: '', pct: '' });
   const outros = [...gPerc.outros || []]; while (outros.length < 4) outros.push({ nome: '', padrao: '', forma: 'pct-bruto', pct: '', valor: '' });
   const valGrupo = g => g === GRUPO_USG_V3 ? rotuloGrupoV3(g) : g;
   const pr = dialogo(`Regra da V3 — ${p.cod} - ${p.nomeMV}`, `<span class="dlg-largo" hidden></span>
     ${outrosV3.length ? `<label class="campo">Copiar a regra de<select name="copiar"><option value="">— não, usar os campos abaixo —</option>${opcoes(outrosV3.map(x => [String(x.cod), `${x.cod} - ${x.nomeMV} (${x.regras.v3regra.modo === 'fixo' ? 'valor fixo' : 'percentual'})`]), '')}</select></label>` : ''}
     <div class="opcoes-check" role="radiogroup" aria-label="Como o médico recebe na V3">
-      <label><input type="radio" name="modo" value="fixo"${modo === 'fixo' ? ' checked' : ''}><span><b>Valor fixo por laudo</b><small>Valor por grupo de procedimento do MV, como está no MV. Ex.: USG R$ 33,00 o laudo e R$ 33,00 o HM Unimed; ressonância R$ 45,00.</small></span></label>
+      <label><input type="radio" name="modo" value="fixo"${modo === 'fixo' ? ' checked' : ''}><span><b>Valor fixo por laudo</b><small>Valor por grupo de procedimento do MV, como está no MV. Ex.: USG R$ 33,00 o laudo (o HM Unimed paga o mesmo); ressonância R$ 45,00.</small></span></label>
       <label><input type="radio" name="modo" value="percentual"${modo === 'percentual' ? ' checked' : ''}><span><b>Percentual do faturamento (como o Dr. Ian)</b><small>USG + HM Unimed menos impostos, com % por faixa de volume; outros grupos por % ou valor.</small></span></label></div>
 
     <div data-modo="fixo"${modo === 'fixo' ? '' : ' hidden'}>
       <h4 style="margin:10px 0 4px">Valor por grupo de procedimento <span class="muted small">(escolha o grupo na lista; «USG (inclui Doppler)» pega todos os procedimentos de ultrassom)</span></h4>
-      <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th><th>R$ por HM Unimed</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
+      <div class="tw"><table><thead><tr><th>Grupo do procedimento (MV)</th><th>R$ por laudo</th><th>Exceções por convênio</th></tr></thead><tbody>${linhasFixo.slice(0, 8).map((g, k) => `<tr>
         <td><input type="text" name="fxGrupo${k}" list="dlGruposV3" value="${esc(valGrupo(g.grupo))}" placeholder="${k === 0 ? 'USG (inclui Doppler)' : k === 1 ? 'ex.: RESSONANCIA MAGNETICA' : ''}" style="min-width:300px"></td>
-        <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td>
-        <td><input type="number" step="0.01" min="0" name="fxHM${k}" value="${g.valorHM || ''}" style="width:110px"></td></tr>`).join('')}</tbody></table></div>
-      <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, pelo valor de HM do grupo de USG. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
+        <td><input type="number" step="0.01" min="0" name="fxLaudo${k}" value="${g.valorLaudo || ''}" style="width:110px"></td><td class="v3-exc" data-fxexc="${k}"></td></tr>`).join('')}</tbody></table></div>
+      <datalist id="dlConvV3">${convs.map(c => `<option value="${esc(c)}"></option>`).join('')}</datalist>
+      <p class="small muted v3-exc-nota"><b>Exceção por convênio:</b> um grupo pode ter valor diferente em um convênio (ex.: mamografia R$ 15,00, mas R$ 10,00 no HOSPITAL UNIVERSITARIO). O convênio é procurado pelo trecho do nome, como no MV. A conta aparece separada no e-mail e na memória de cálculo.</p>
+      <p class="small muted">HM: só o HM de USG/Doppler do convênio Unimed é pago, <b>pelo mesmo valor do laudo de USG</b> deste médico, sem precisar de laudo (basta o exame base no relatório). HM de raio-X e de mamografia nunca é pago (no 78 PF, só o de USG Unimed) e fica no aviso «HM a excluir do MV». Pacote de ressonância e mamografia entra pelo valor do MV, com aviso. Grupos sem valor ficam fora do cálculo, com aviso no Fechamento.</p></div>
 
     <div data-modo="percentual"${modo === 'percentual' ? '' : ' hidden'}>
       <div class="grid4" style="margin-top:8px"><label class="campo">Impostos sobre o faturamento (%)<input type="number" step="0.01" min="0" name="impostos" value="${gPerc.impostos}"><span class="small muted">líquido = bruto − impostos</span></label>
@@ -10970,7 +11249,7 @@ async function editarRegraV3(p) {
         <label class="campo">Valor por laudo de USG (R$)<input type="number" step="0.01" min="0" name="usgValor" value="${gPerc.usg.valor || ''}"></label></div>
       <h4 style="margin:8px 0 4px">Faixas de volume <span class="muted small">(volume = quantidade de exames de USG e Doppler no mês)</span></h4>
       <div class="grid4">${faixas.slice(0, 5).map((f, k) => `<label class="campo">A partir de (exames)<input type="number" step="1" min="0" name="fxDe${k}" value="${f.de === '' ? '' : f.de}"></label><label class="campo">% do líquido<input type="number" step="0.01" min="0" name="fxPct${k}" value="${f.pct === '' ? '' : f.pct}"></label>`).join('')}</div>
-      <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), gPerc.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, outros convênios) nunca são pagos na V3 e ficam sinalizados para exclusão.</span></label>
+      <label class="campo">HM de USG/Doppler Unimed<select name="hm">${opcoes(Object.entries(FORMAS_HM_V3), gPerc.hm)}</select><span class="small muted">Os outros HM (raio-X, mamografia, ressonância e o que não é USG no 78 PF, outros convênios) nunca são pagos na V3 e ficam no aviso «HM a excluir do MV».</span></label>
       <h4 style="margin:8px 0 4px">Outros grupos <span class="muted small">(escolha o grupo do procedimento na lista)</span></h4>
       <div class="tw"><table><thead><tr><th>Nome</th><th>Grupo do procedimento (MV)</th><th>Como paga</th><th>%</th><th>R$ por laudo</th></tr></thead><tbody>${outros.slice(0, 4).map((o, k) => `<tr>
         <td><input type="text" name="oNome${k}" value="${esc(o.nome)}"></td><td><input type="text" name="oPad${k}" list="dlGruposV3" value="${esc(o.padrao)}" style="min-width:200px"></td>
@@ -10979,6 +11258,31 @@ async function editarRegraV3(p) {
     <datalist id="dlGruposV3"><option value="USG (inclui Doppler)"></option>${grupos.map(g => `<option value="${esc(g)}"></option>`).join('')}</datalist>
     ${grupos.length ? '' : '<p class="small muted">A lista de grupos vem dos relatórios do MV, das rodadas e do Power BI carregados. Sem eles, digite o nome do grupo como aparece no MV.</p>'}`,
     [['', 'Cancelar', 'sec'], ...(atual ? [['limpar', 'Apagar regra', 'perigo']] : []), ['ok', 'Salvar regra']]);
+  const corpo = $('dlgCorpo'), tdExc = k => corpo.querySelector(`[data-fxexc="${k}"]`);
+  // Redesenha só a linha que mudou (as outras podem ter um convênio sendo digitado).
+  const desenharExc = so => corpo.querySelectorAll(so === undefined ? '[data-fxexc]' : `[data-fxexc="${so}"]`).forEach(td => {
+    const k = +td.dataset.fxexc, grupo = corpo.querySelector(`[name="fxGrupo${k}"]`).value.trim();
+    if (!grupo && !excs[k].length) { td.innerHTML = '<span class="small muted">—</span>'; return; }
+    td.innerHTML = excs[k].map((x, i) => `<span class="v3-chip"><b>${esc(x.convenio)}</b> R$ ${fmtBR(x.valorLaudo)} por laudo<button type="button" title="Tirar a exceção" aria-label="Tirar a exceção de ${esc(x.convenio)}" data-excrm="${k}:${i}">✕</button></span>`).join('')
+      + (td.dataset.form ? `<div class="v3-exc-form"><input type="text" list="dlConvV3" placeholder="Convênio (trecho do nome)" aria-label="Convênio" data-excconv="${k}"><input type="number" step="0.01" min="0" placeholder="R$ por laudo" aria-label="R$ por laudo no convênio" data-excval="${k}"><button type="button" class="mini" data-excok="${k}">Incluir</button><button type="button" class="sec mini" data-excnao="${k}">Cancelar</button></div>`
+        : `<button type="button" class="sec mini" data-excadd="${k}">+ Convênio</button>`);
+  });
+  const incluirExc = k => {
+    const c = corpo.querySelector(`[data-excconv="${k}"]`), v = corpo.querySelector(`[data-excval="${k}"]`);
+    if (!c || !c.value.trim() || v.value === '') return false;
+    excs[k].push({ convenio: c.value.trim().toUpperCase(), valorLaudo: +v.value }); delete tdExc(k).dataset.form; return true;
+  };
+  // onclick (e não addEventListener): o #dlgCorpo é o mesmo em todos os diálogos e não pode acumular ouvintes.
+  corpo.onclick = e => {
+    const b = e.target.closest('[data-excadd],[data-excnao],[data-excok],[data-excrm]'); if (!b) return;
+    e.preventDefault();
+    if (b.dataset.excadd !== undefined) { tdExc(b.dataset.excadd).dataset.form = '1'; desenharExc(b.dataset.excadd); corpo.querySelector(`[data-excconv="${b.dataset.excadd}"]`).focus(); return; }
+    if (b.dataset.excnao !== undefined) { delete tdExc(b.dataset.excnao).dataset.form; return desenharExc(b.dataset.excnao); }
+    if (b.dataset.excok !== undefined) { if (!incluirExc(+b.dataset.excok)) return avisar('Informe o convênio e o valor por laudo.', 'warn'); return desenharExc(b.dataset.excok); }
+    const [k, i] = b.dataset.excrm.split(':'); excs[+k].splice(+i, 1); desenharExc(k);
+  };
+  corpo.querySelectorAll('[name^="fxGrupo"]').forEach(i => i.addEventListener('input', () => { const k = i.name.slice(7); if (!tdExc(k).dataset.form) desenharExc(k); }));
+  desenharExc();
   $('dlgCorpo').querySelectorAll('[name="modo"]').forEach(r => r.onchange = () => $('dlgCorpo').querySelectorAll('[data-modo]').forEach(d => { d.hidden = d.dataset.modo !== r.value; }));
   const d = await pr;
   if (d.botao === 'limpar') {
@@ -10991,7 +11295,9 @@ async function editarRegraV3(p) {
   if (c.copiar) regra = JSON.parse(JSON.stringify(S.cfg.prestadores.find(x => String(x.cod) === c.copiar).regras.v3regra));
   else if (c.modo === 'fixo') {
     const lerGrupo = t => { const v = String(t || '').trim(); return norm(v) === norm(rotuloGrupoV3(GRUPO_USG_V3)) ? GRUPO_USG_V3 : v; };
-    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => ({ grupo: lerGrupo(c['fxGrupo' + k]), valorLaudo: +c['fxLaudo' + k] || 0, valorHM: +c['fxHM' + k] || 0 })).filter(g => g.grupo) };
+    // Exceções por convênio de cada linha; um convênio preenchido e não incluído entra também.
+    for (let k = 0; k < 8; k++) incluirExc(k);
+    regra = { modo: 'fixo', grupos: [0, 1, 2, 3, 4, 5, 6, 7].map(k => { const grupo = lerGrupo(c['fxGrupo' + k]); return { grupo, valorLaudo: +c['fxLaudo' + k] || 0, ...(excs[k].length ? { excecoes: excs[k] } : {}) }; }).filter(g => g.grupo) };
   } else {
     regra = {
       modo: 'percentual', impostos: +c.impostos || 0,
@@ -11630,7 +11936,7 @@ function iniciarVerificacaoAtualizacao() {
     const st = $('stInit'); st.className = 'badge err'; st.textContent = 'Erro ao carregar componentes';
     avisar(`Não foi possível carregar os componentes de leitura de PDF/Excel (${e.message}). Políticas do navegador podem bloquear scripts em arquivos locais.`, 'err');
   }
-  window.__RM = { S, irPara, t: { calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
+  window.__RM = { S, irPara, t: { aplicarCadastroV3Padrao, migrarConfig, hmV3Situacao, avisosConferenciaV3, modalidadeDoTituloV3, laudaV3Producao, medicosProducaoV3, calcularV3, textoEmailV3, regraV3Padrao, conferirCruzado, dbGravar, parcelaDoMes, ultimaCompetenciaDesconto, historicoDesconto, coberturaCompetencia, fechamentoAtual: () => fechamentoAtual(), regraV3Fixa, diaSerial, novaComposta, alterarStatusComposta, avaliarProcedimento, indiceEquivalencias, conciliarLaudo, valorEsperadoIMG, regraComposta, simularComposta, efetividadeCompostas, controlePrestadoresUnidade, laudoNaRegraV3, mesclarFluxo, aplicarEscolhasFluxo, novaRelacao, alterarStatusEq, causasDaConferencia, corrigirPrestador, mesclarEq, sincronizarEq, atualizarDaPasta, criarEstrutura: c => criarEstrutura(c), verificarEstrutura, syncEqEstado: () => ({ status: SYQ.status, erro: SYQ.erro }), definirPastaSync, sincronizarFluxo, salvarFluxo: m => salvarFluxo(m), mudarStatusTarefa, marcarDivisao, syncEstado: () => ({ status: SY.status, erro: SY.erro, conflitos: SY.conflitos, pasta: !!SY.handle }),
     sincronizarCfg, salvarCfg: m => salvarCfg(m), salvarEq: m => salvarEq(m), syncCfgEstado: () => ({ status: SYC.status, erro: SYC.erro, conflitos: SYC.conflitos }), mesclarCfg, classeDaLinhaConf, totaisPorClasse, candidatoDaLinhaConferencia, dadosDoCandidato, registrarNCs, indiceDecisoes, estadoCompetencia, classeDaLinhaRodada, chaveMVDecisao, chaveMVBase, decisaoDaLinha, normalizarChavesRodada, escopoCandidatosNC, compactarCandidatosNC, verificarEstrutura: c => verificarEstrutura(c), criarEstruturaAno: a => criarEstruturaAno(a), entregarArquivo: (...a) => entregarArquivo(...a), aplicarRetencaoObservacoes, estadoCompetenciaObs: c => estadoCompetencia(window.__RM.S.compReg, c).observacoes, modalidadesDoGrupo, hmV3Devido, unidadeDoArquivoCorrecao: (n, p) => unidadeDoArquivoCorrecao(n, p), estruturaCompetencia: c => estruturaCompetencia(c), expandirCandidatoNC, resultadoFiltrado, xlsxConferencia, dbTodas: () => dbTodas(), dbRodadasJanela: (c, s) => dbRodadasJanela(c, s), mudarCompetencia: c => mudarCompetencia(c), situacaoCorrecoesMV, montarBackup, validarBackup, partesAtuaisBackup, restaurarBackup, gravarBackupPasta, listarBackupsPasta, versaoMaior, colunasDoModelo, xlsxConferencia, indiceNomes, titulosDoApolo: (...a) => titulosDoApolo(...a), retrospectivaDe: c => retrospectivaDe(c), backlogDaCompetencia, diasUteisEntre, sugerirCodigos: (...a) => sugerirCodigos(...a), KV } };   // usado pelos testes automatizados
 })();
 

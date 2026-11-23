@@ -23,7 +23,7 @@ const okDlg = async (botao = 'ok') => { await p.waitForSelector('#dlg[open]'); a
 const LINHAS_IAN = [
   { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG ABDOME TOTAL', convenio: 'UNIMED CURITIBA', quant: 1500, vlTotal: 90000, vlRepasse: 0, tipoItem: 'procedimento' },
   { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'DOPPLER COLORIDO VENOSO DE MEMBRO INFERIOR - UNILAT', convenio: 'PARTICULAR', quant: 39, vlTotal: 3838.16, vlRepasse: 0, tipoItem: 'procedimento' },
-  { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 300, vlTotal: 21907.88, vlRepasse: 0, tipoItem: 'hm' },
+  { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 300, vlTotal: 21907.88, vlRepasse: 0, tipoItem: 'hm' },
   { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - 2 INCIDENCIAS-HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 50, vlRepasse: 0, tipoItem: 'hm' },
   { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'PARTICULAR', quant: 1, vlTotal: 80, vlRepasse: 0, tipoItem: 'hm' }
 ];
@@ -39,7 +39,7 @@ const m = await S(([L]) => {
   const densito = calcularV3(regraV3Padrao(), [...L, { grupo: 'DENSITOMETRIA', desc: 'DENSITOMETRIA OSSEA - ROTINA', quant: 40, vlTotal: 12000, tipoItem: 'procedimento' }]);
   const alex = calcularV3({ impostos: 9.15, usg: { forma: 'por-laudo', valor: 20, faixas: [] }, hm: 'valor-laudo', outros: [{ nome: 'Raio-X', padrao: 'RX|RADIOLOG', forma: 'por-laudo', valor: 8 }] }, [
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG TIREOIDE', quant: 100, vlTotal: 9000, tipoItem: 'procedimento' },
-    { grupo: 'HONORARIOS MEDICOS PF', desc: 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
     { grupo: 'RADIOLOGIA', desc: 'RX TORAX', quant: 5, vlTotal: 300, tipoItem: 'procedimento' },
     { grupo: 'MAMOGRAFIA', desc: 'MAMOGRAFIA DIGITAL', quant: 2, vlTotal: 400, tipoItem: 'procedimento' }]);
   return { c: { total: c.total, exames: c.exames, base: c.base, liquido: c.liquido, pct: c.pct, hm: c.hm.valor, exc: c.hmExcluir.qtd }, texto: textoEmailV3(c),
@@ -55,11 +55,11 @@ function r2(x) { return Math.round(x * 100) / 100; }
 // Valor fixo por grupo (Dr. Alexandre): USG R$ 33 o laudo e R$ 33 o HM Unimed; ressonância R$ 45.
 const fx = await S(() => {
   const { calcularV3, textoEmailV3 } = window.__RM.t;
-  const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, valorHM: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45, valorHM: 0 }] };
+  const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45 }] };
   const c = calcularV3(regra, [
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG TIREOIDE', quant: 90, vlTotal: 9000, tipoItem: 'procedimento' },
     { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'DOPPLER COLORIDO VENOSO', quant: 10, vlTotal: 2000, tipoItem: 'procedimento' },
-    { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA', quant: 10, vlTotal: 700, tipoItem: 'hm' },
     { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 40, tipoItem: 'hm' },
     { grupo: 'RESSONANCIA MAGNETICA', desc: 'RMN JOELHO', quant: 3, vlTotal: 1500, tipoItem: 'procedimento' },
     { grupo: 'MAMOGRAFIA', desc: 'MAMOGRAFIA DIGITAL', quant: 2, vlTotal: 400, tipoItem: 'procedimento' }]);
@@ -89,13 +89,13 @@ await p.click('#v3Add'); await p.waitForSelector('#dlg[open]');
 await p.fill('#dlgCorpo [name="prestador"]', 'roberto'); await p.waitForSelector('#dlgCorpo .busca-lista:not([hidden])'); await p.press('#dlgCorpo [name="prestador"]', 'Enter');
 await p.click('#dlgBotoes button[value="ok"]'); await p.waitForFunction(() => document.getElementById('dlg').open && /Regra da V3/.test(document.getElementById('dlgTitulo').textContent));
 ok((await p.$$eval('#dlGruposV3 option', o => o.map(x => x.value))).includes('USG (inclui Doppler)'), 'lista de grupos do MV com «USG (inclui Doppler)»');
-await p.fill('#dlgCorpo [name="fxGrupo0"]', 'USG (inclui Doppler)'); await p.fill('#dlgCorpo [name="fxLaudo0"]', '33'); await p.fill('#dlgCorpo [name="fxHM0"]', '33');
+await p.fill('#dlgCorpo [name="fxGrupo0"]', 'USG (inclui Doppler)'); await p.fill('#dlgCorpo [name="fxLaudo0"]', '33');
 await p.fill('#dlgCorpo [name="fxGrupo1"]', 'RESSONANCIA MAGNETICA'); await p.fill('#dlgCorpo [name="fxLaudo1"]', '45');
 await p.screenshot({ path: out + 'v3_regra_fixa.png' });
 await okDlg();
 const r9 = await S(() => window.__RM.S.cfg.prestadores.find(x => x.cod === '9').regras);
-ok(r9.v3 && r9.v3regra.modo === 'fixo' && JSON.stringify(r9.v3regra.grupos) === JSON.stringify([{ grupo: '*USG*', valorLaudo: 33, valorHM: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45, valorHM: 0 }]), '+ Médico V3: valor fixo por grupo (USG R$ 33 + HM R$ 33; ressonância R$ 45)');
-ok(/Valor fixo por laudo — USG \(inclui Doppler\): R\$ 33,00 \(HM Unimed R\$ 33,00\)/.test(await p.textContent('#cardV3')), 'resumo da regra fixa no cartão');
+ok(r9.v3 && r9.v3regra.modo === 'fixo' && JSON.stringify(r9.v3regra.grupos) === JSON.stringify([{ grupo: '*USG*', valorLaudo: 33 }, { grupo: 'RESSONANCIA MAGNETICA', valorLaudo: 45 }]), '+ Médico V3: valor fixo por grupo (USG R$ 33, HM pelo mesmo valor; ressonância R$ 45)');
+ok(/Valor fixo por laudo — USG \(inclui Doppler\): R\$ 33,00 \(HM Unimed pelo mesmo valor\)/.test(await p.textContent('#cardV3')), 'resumo da regra fixa no cartão');
 // Médico só da V3 sai da lista geral; quem atua também nas outras unidades fica nas duas.
 await p.click('#prAdd'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="nome"]', 'ALEXANDRE ROMANUS'); await p.press('#dlgCorpo [name="nome"]', 'Escape'); await p.fill('#dlgCorpo [name="cod"]', '6703'); await okDlg();
 const linhaGeral = cod => p.locator(`#pag-bases .card:has(#prAdd) tbody tr:has(td:text-is("${cod}"))`);
@@ -147,9 +147,10 @@ ok(rows.some(r => r[1] === 'Total para emissão da nota fiscal: R$ 73.608,69') &
 const conf = await S(() => {
   const { S: E, t } = window.__RM;
   const reg = (seq, desc, grupo, conv) => ({ seq, chave: 'c' + seq, codigo: '1' + seq, procDesc: desc, grupoNome: grupo, convenio: conv, paciente: 'PACIENTE FICTICIO', data: new Date(Date.UTC(2026, 8, 10)), vlTotal: 70, vlRepasse: 0, quant: 1 });
-  const rel = { regs: [reg(1, 'USG MAMAS - HM', 'HONORARIOS MEDICOS PF', 'UNIMED CURITIBA'), reg(2, 'RX TORAX - 2 INCIDENCIAS-HM', 'HONORARIO MEDICO RAIO X', 'UNIMED CURITIBA'), reg(3, 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', 'HONORARIOS MEDICOS PF', 'PARTICULAR')], cab: {} };
+  // O HM de USG Unimed é pago com o exame base (USG do mesmo paciente e dia) no relatório (regra de 23/11/2026).
+  const rel = { regs: [reg(0, 'USG MAMAS', 'ULTRASSONOGRAFIA', 'UNIMED CURITIBA'), reg(1, 'USG MAMAS - HM', '78 - HONORARIOS MEDICOS PF', 'UNIMED CURITIBA'), reg(2, 'RX TORAX - 2 INCIDENCIAS-HM', 'HONORARIO MEDICO RAIO X', 'UNIMED CURITIBA'), reg(3, 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - HM', 'HONORARIOS MEDICOS PF', 'PARTICULAR')], cab: {} };
   const eq = { itens: [], revisao: 1 }, apolo = { laudos: [] };
-  const em = un => t.conferirCruzado(rel, apolo, E.cfg, eq, { tol: 0, unidadeCod: un, medicos: [] }).linhas.map(x => `${x.status}:${[...x.marcadores].join('+')}`);
+  const em = un => t.conferirCruzado(rel, apolo, E.cfg, eq, { tol: 0, unidadeCod: un, medicos: [] }).linhas.filter(x => x.tipo === 'hm').map(x => `${x.status}:${[...x.marcadores].join('+')}`);
   return { v3: em('5'), sra: em('1') };
 });
 ok(conf.v3.join() === 'conferido:hm-v3-devido,hm-pendente:hm-v3-excluir,hm-pendente:hm-v3-excluir', `unidade 5: HM USG Unimed «devido» (conferido); RX e outro convênio «a excluir» (${conf.v3.join(' · ')})`);

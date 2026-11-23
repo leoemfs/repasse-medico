@@ -12,6 +12,8 @@ const STATUS_CONF = {
   'so-faturamento': { nome: 'Só no faturamento', cor: 'FFC7CE', ordem: 4 },
   'so-laudo': { nome: 'Só no laudo', cor: 'F8CBAD', ordem: 5 },
   'hm-pendente': { nome: 'HM — regra pendente', cor: 'D9E1F2', ordem: 6 },
+  'hm-sem-base': { nome: 'HM sem exame base', cor: 'FFEB9C', ordem: 6 },
+  'substituido-pacote': { nome: 'Substituído pelo pacote', cor: 'E4E4E4', ordem: 7 },
   'nao-procedimental': { nome: 'Item não procedimental', cor: 'E2EFDA', ordem: 7 },
   'classificacao-pendente': { nome: 'Classificação pendente', cor: 'D9D9D9', ordem: 8 }
 };
@@ -36,7 +38,11 @@ const MARCADORES = {
   'composta': 'Regra composta',
   'composta-falta': 'Composição incompleta',
   'hm-v3-devido': 'HM V3 devido',
-  'hm-v3-excluir': 'HM V3 a excluir'
+  'hm-v3-excluir': 'HM V3 a excluir',
+  'hm-v3-sem-base': 'HM V3 sem exame base',
+  'pacote-v3': 'Pacote V3 considerado',
+  'base-pacote-v3': 'Base substituída pelo pacote',
+  'fora-escopo-v3': 'Modalidade que a V3 não faz'
 };
 
 // Período de produção coberto pelo relatório: do 1º dia do mês da menor data ao último dia do mês da maior.
@@ -49,8 +55,10 @@ function periodoDoRelatorio(regs) {
 
 function laudosDaUnidade(apolo, cfg, unidadeCod) {
   if (!unidadeCod || unidadeCod === '*') return apolo.laudos;
-  const nomes = nomesApoloDaUnidade(cfg, unidadeCod);
-  return apolo.laudos.filter(l => nomes.has(norm(l.unidade)));
+  const nomes = nomesApoloDaUnidade(cfg, unidadeCod), L = apolo.laudos.filter(l => nomes.has(norm(l.unidade)));
+  if (!ehUnidadeV3(cfg, unidadeCod)) return L;
+  // V3 (Curitiba): a modalidade vem do TITLE do laudo; a MODALITY do Apolo fica guardada em modalidadeApolo.
+  return L.map(l => { const m = modalidadeDoTituloV3(l.titulo); return m && m !== l.modalidade ? { ...l, modalidade: m, modalidadeApolo: l.modalidade } : l; });
 }
 
 function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
@@ -64,6 +72,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
 
   const B = relatorio.regs.map(r => {
     const cls = classificarItem(r, cfg.classificacao);
+    // V3: pacote lançado dentro do grupo do exame (descrição «PACOTE …») também é pacote.
+    if (unidadeV3 && cls.tipo === 'procedimento' && /\bPACOTE\b/.test(norm(r.procDesc || ''))) return { r, tipo: 'pacote', regraTipo: 'pacote-v3', pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
     return { r, tipo: cls.tipo, regraTipo: cls.regra, pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
   });
   const procs = B.filter(b => b.tipo === 'procedimento');
@@ -125,6 +135,28 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     }
   }
 
+  // V3 (Curitiba), regras de 23/11/2026:
+  // - exame base do HM: linha de USG/Doppler do mesmo atendimento, ou do mesmo paciente e dia, no relatório;
+  // - pacote de ressonância/mamografia substitui o exame base do mesmo paciente e dia, do convênio Bradesco, lançado a 100%.
+  const baseDoHM = new Map(), substituidoPor = new Map();
+  if (unidadeV3) {
+    const usgs = procs.filter(b => ehUSGouDoppler(b.r.grupoNome, b.r.procDesc));
+    for (const b of B) if (b.tipo === 'hm') {
+      const x = usgs.find(u => (b.r.atendimento && u.r.atendimento === b.r.atendimento && (!b.pn || u.pn === b.pn)) || (b.pn && u.pn === b.pn && u.dia === b.dia));
+      if (x) baseDoHM.set(b, x);
+    }
+    for (const b of B) {
+      if (b.tipo !== 'pacote' || !ehPacoteV3({ tipo: 'pacote', grupoNome: b.r.grupoNome, procDesc: b.r.procDesc })) continue;
+      const mp = modalidadeDoTituloV3(`${b.r.grupoNome || ''} ${b.r.procDesc || ''}`);
+      for (const u of procs) {
+        if (substituidoPor.has(u) || !b.pn || u.pn !== b.pn || u.dia !== b.dia || !convenioPacoteV3(u.r.convenio)) continue;
+        if (!(+u.r.vlTotal > 0) || Math.abs((+u.r.vlRepasse || 0) - (+u.r.vlTotal || 0)) > 0.01) continue;
+        if (mp && !(u.mods || []).includes(mp)) continue;
+        substituidoPor.set(u, b);
+      }
+    }
+  }
+
   // 3) Categoria principal + marcadores de cada linha do MV.
   const linhas = [];
   const chaveExame = l => `${chaveTitulo(l.titulo)}|${l.mn}|${l.dia}`;
@@ -133,15 +165,31 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
-    // V3 (Curitiba): HM de USG/Doppler Unimed é devido mesmo sem laudo; os demais HM não são pagos (SOL-F30).
+    // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
+    // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (b.tipo === 'hm' && unidadeV3) {
-      if (hmV3Devido(r.grupoNome, r.procDesc, r.convenio)) {
-        marc.add('hm-v3-devido'); out.status = 'conferido';
-        motivos.push('HM V3 devido: HM de USG/Doppler do convênio Unimed entra no repasse da V3, mesmo sem laudo (regra da unidade).');
+      const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
+      if (sit.devido) {
+        const base = baseDoHM.get(b);
+        if (base) {
+          marc.add('hm-v3-devido'); out.status = 'conferido'; out.baseHM = base.r.seq; out.baseConvenio = base.r.convenio || '';
+          motivos.push(`HM V3 devido: HM de USG/Doppler Unimed entra no repasse da V3 sem precisar de laudo; exame base no relatório: ${base.r.codigo} - ${base.r.procDesc} (${fmtData(base.r.data)}).`);
+        } else {
+          marc.add('hm-v3-sem-base'); out.status = 'hm-sem-base';
+          motivos.push('HM V3 sem exame base: HM de USG/Doppler Unimed só é pago com o exame de USG do mesmo atendimento (ou do mesmo paciente e dia) no relatório. Verificar no MV ou aceitar com justificativa.');
+        }
       } else {
-        marc.add('hm-v3-excluir'); out.status = 'hm-pendente';
-        motivos.push(`HM V3 a excluir: na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», convênio «${r.convenio || '—'}»). Sinalizar para exclusão; não é NC por si só.`);
+        marc.add('hm-v3-excluir'); out.status = 'hm-pendente'; out.motivoHMV3 = sit.motivo; out.hmV3SeriaDevido = !!sit.seriaDevido;
+        if (sit.seriaDevido) motivos.push('Atenção: é HM de USG/Doppler do convênio Unimed, mas está num grupo que nunca é pago. Confira se o grupo do MV está certo.');
+        motivos.push(`HM V3 a excluir (${MOTIVO_HM_V3[sit.motivo]}): na V3 só se paga HM de USG/Doppler do convênio Unimed (este é «${r.procDesc || r.grupoNome}», grupo «${r.grupoNome || '—'}», convênio «${r.convenio || '—'}»). Excluir do MV; não é NC por si só.`);
       }
+      linhas.push(out); continue;
+    }
+    // V3: pacote de ressonância/mamografia é considerado pelo valor do MV e notificado.
+    if (b.tipo === 'pacote' && unidadeV3 && ehPacoteV3({ tipo: 'pacote', grupoNome: r.grupoNome, procDesc: r.procDesc })) {
+      const subs = [...substituidoPor].filter(([, pk]) => pk === b).map(([u]) => u);
+      marc.add('pacote-v3'); out.status = 'conferido';
+      motivos.push(`Pacote V3 considerado pelo valor do MV (R$ ${fmtBR(r.vlRepasse)})${subs.length ? `: substitui ${subs.map(u => `${u.r.codigo} - ${u.r.procDesc} (${u.r.convenio}, lançado a 100%)`).join('; ')}` : '; nenhum exame base Bradesco a 100% do mesmo paciente e dia no relatório: conferir'}.`);
       linhas.push(out); continue;
     }
     if (b.tipo !== 'procedimento') {
@@ -152,6 +200,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       linhas.push(out); continue;
     }
     if (!b.mods) marc.add('modalidade-desconhecida');
+    if (unidadeV3 && b.mods && !b.mods.some(m => MODALIDADES_V3.has(m))) { marc.add('fora-escopo-v3'); motivos.push(`A V3 não faz ${b.mods.map(m => NOME_MODALIDADE[m] || m).join('/').toLowerCase()} hoje: verificar o lançamento (e cadastrar a regra do médico se passar a fazer).`); }
     const p = b.par;
     if (p) {
       out.l = p.l; out.par = p;
@@ -188,6 +237,11 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (irmao) { marc.add('possivel-bilateral'); motivos.push(`Há laudo compatível («${irmao.l.titulo}») já associado a outra linha do mesmo código: verificar cobrança por lado ou duplicidade.`); }
       else if (b.cands && b.cands.length) motivos.push(`Laudos do paciente existem, mas já estão associados a outras linhas (${b.cands.length} candidato(s)).`);
       else motivos.push(b.pn ? `Nenhum laudo do paciente na unidade em ±${tol} dia(s) com modalidade compatível.` : 'Linha do MV sem nome de paciente.');
+    }
+    const pk = substituidoPor.get(b);
+    if (pk) {
+      out.statusAntesPacote = out.status; out.status = 'substituido-pacote'; marc.add('base-pacote-v3');
+      motivos.unshift(`Substituído pelo pacote: exame base do convênio ${r.convenio} lançado a 100% (erro do MV); vale o pacote «${pk.r.procDesc}» (R$ ${fmtBR(pk.r.vlRepasse)}) do mesmo paciente e dia. Não compõe repasse.`);
     }
     linhas.push(out);
   }
