@@ -1,6 +1,6 @@
 # Próximas funções — requisitos registrados
 
-**SOL-F46 implementada na v3.0.0-alpha.21** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes na seção da SOL-F46.
+**SOL-F47 implementada na v3.0.0-alpha.21** (descontos que mudam todo mês e lembrete do reajuste anual). **SOL-F46 implementada na v3.0.0-alpha.21** (vários USG do mesmo paciente no mesmo dia: o título do laudo desempata). Detalhes na seção da SOL-F46.
 
 **SOL-F20 implementada na v3.0.0-alpha.18** (23/11/2026): Retrospectiva mensal (PDCA) como subaba do Fluxo mensal. Detalhes na seção da SOL-F20.
 
@@ -81,7 +81,19 @@ Ele pediu também: não mexer nas pastas da equipe (20%, 25%, anestesistas), «c
 
 Situação: SOL-F1 e SOL-F2 implementadas (v2.0.0-alpha.2); SOL-F3 implementada (v2.0.0-alpha.3); SOL-F4 implementada (v2.0.0-alpha.4); SOL-F6, SOL-F7 e SOL-F8 implementadas (v2.0.0-alpha.5).
 
-## SOL-F47 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **PRÉVIA ENVIADA, aguardando aprovação** (pedido de 23/11/2026; prévia: `docs/prototipos/descontos-do-mes.html`)
+## SOL-F47 — Descontos que mudam todo mês (lembrete) e lembrete do reajuste anual — **IMPLEMENTADA na v3.0.0-alpha.21** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/descontos-do-mes.html`; guia em `como-usar-fechamento.md`; teste: `test/descontos_variaveis.mjs`)
+
+**Implementação (prévia aprovada em 23/11/2026, sem resposta às perguntas em aberto; adotados os padrões abaixo, todos editáveis na tela):**
+- **Motor (`86-descontos.js`):** o desconto tem `variavel` e `onde`, e os valores do mês ficam em `lancamentos` (`{AAAA-MM: {valor, semDesconto, por, em}}`).
+  - Sem lançamento, a parcela do mês é «a conferir» e entra como zero.
+  - No Fechamento (`88-fechamento.js`), o prestador com desconto a conferir fica em **Verificar**, com aviso, até alguém lançar.
+- **Reajuste anual:** `cfg.reajusteAnual = {mes, desde, feitos}`. O padrão é janeiro, a partir de 2027, porque o reajuste de 2026 é o cadastro de USG atualizado em 23/11/2026. A configuração compartilhada mescla esse campo item a item (mês, ano inicial, feitos).
+- **Telas:**
+  - Bases: «Descontos do prestador» com o valor «Fixo» ou «Muda todo mês», e o cartão «Reajuste anual».
+  - Fechamento: cartão «Descontos do mês», com Lançar, «Sem desconto este mês» e Corrigir.
+  - Início: «Pede você».
+  - Menu: contagem em «Fechamento e envio».
+- **Padrões adotados:** «Aplica em» começa em IMG (último dia útil); a pensão continua com valor fixo.
 
 **Pedido do usuário:**
 - Lembrete de descontos para três prestadores:

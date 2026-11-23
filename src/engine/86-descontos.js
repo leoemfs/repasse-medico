@@ -4,7 +4,9 @@
  *   {id, cod, nome, motivo, valorParcela, parcelas (0 = recorrente, ex.: pensão), inicio 'AAAA-MM'
  *    (competência da 1ª parcela), tipo 'usg'|'img'|'curitiba' (em qual fechamento entra),
  *    adiadas ['AAAA-MM'] (meses em que a parcela não foi descontada e passou para o seguinte),
- *    encerradoEm 'AAAA-MM' (opcional), obs, por, em}
+ *    encerradoEm 'AAAA-MM' (opcional), obs, por, em,
+ *    variavel (SOL-F47: o valor muda todo mês e é conferido em «onde», ex.: portal da Unimed),
+ *    lancamentos {'AAAA-MM': {valor, semDesconto, por, em}} (valor do mês lançado por alguém; só nos variáveis)}
  * No Fechamento, a parcela do mês entra sozinha em DESCONTOS com a observação «parcela 7/10».
  * ============================================================ */
 const TIPOS_DESCONTO = { usg: 'USG', img: 'IMG (último dia útil)', curitiba: 'Curitiba (V3)' };
@@ -18,8 +20,33 @@ function parcelaDoMes(d, chave) {
   const n = mesesEntre(d.inicio, chave) + 1 - (d.adiadas || []).filter(c => c < chave && c >= d.inicio).length;
   const total = +d.parcelas || 0;
   if (total && n > total) return null;
-  return { n, total, recorrente: !total, ultima: !!total && n === total, valor: r2(+d.valorParcela || 0) };
+  if (!d.variavel) return { n, total, recorrente: !total, ultima: !!total && n === total, valor: r2(+d.valorParcela || 0) };
+  // SOL-F47: valor do mês conferido no portal. Até alguém lançar, fica «a conferir» e entra como zero.
+  const l = (d.lancamentos || {})[chave];
+  return { n, total, recorrente: !total, ultima: !!total && n === total, valor: l ? r2(+l.valor || 0) : 0, variavel: true, conferir: !l, semDesconto: !!l?.semDesconto, lancamento: l || null };
 }
+/* SOL-F47 — lança o valor do mês de um desconto variável (valor null = «sem desconto este mês»); valor undefined desfaz. */
+function lancarDescontoMes(d, chave, valor, por) {
+  d.lancamentos = d.lancamentos || {};
+  if (valor === undefined) { delete d.lancamentos[chave]; return null; }
+  const semDesconto = valor === null || +valor === 0;
+  return (d.lancamentos[chave] = { valor: semDesconto ? 0 : r2(+valor), semDesconto, por: por || '', em: agoraISO() });
+}
+// Descontos variáveis do mês ainda sem valor lançado (Início, menu e Fechamento).
+const descontosAConferir = (cfg, chave) => (cfg.descontos || []).filter(d => d.variavel && parcelaDoMes(d, chave)?.conferir);
+const textoValorDesconto = d => d.variavel ? `muda todo mês${d.onde ? ` · conferir em ${d.onde}` : ''}` : `R$ ${fmtBR(d.valorParcela)}`;
+
+/* SOL-F47 — Reajuste anual do cadastro: no mês escolhido (e depois, até alguém marcar como feito), o Início lembra.
+ * cfg.reajusteAnual = {mes 1–12, desde AAAA (1º ano com lembrete), feitos {AAAA: {por, em}}} */
+const ITENS_REAJUSTE = ['Percentuais de USG das unidades e das faixas (geral, +2%, residentes, fixos)', 'BOARD fixo mensal de cada médico', 'Valores do IMG por classe (A/B/C/D, SUS e convênio) e cortes de produção', 'Descontos de valor fixo (ex.: pensão)', 'Regras da V3 (Curitiba)'];
+const reajustePadrao = (hoje = new Date()) => ({ mes: 1, desde: hoje.getFullYear() + 1, feitos: {} });
+function lembreteReajuste(cfg, hoje = new Date()) {
+  const r = cfg.reajusteAnual; if (!r || !+r.mes) return null;
+  const ano = hoje.getFullYear(), mes = hoje.getMonth() + 1;
+  if (ano < +r.desde || mes < +r.mes || (r.feitos || {})[ano]) return null;
+  return { ano, mes: +r.mes };
+}
+function marcarReajusteFeito(cfg, ano, por) { cfg.reajusteAnual.feitos = { ...(cfg.reajusteAnual.feitos || {}), [ano]: { por: por || '', em: agoraISO() } }; }
 // Situação do desconto na competência (para a lista em Bases).
 function situacaoDesconto(d, chave) {
   const p = parcelaDoMes(d, chave);
@@ -55,7 +82,8 @@ function validarDesconto(d) {
   const e = [];
   if (!String(d.cod || '').trim()) e.push('escolha o prestador do cadastro');
   if (!String(d.motivo || '').trim()) e.push('informe o motivo');
-  if (!(+d.valorParcela > 0)) e.push('informe o valor da parcela');
+  if (d.variavel) { if (!String(d.onde || '').trim()) e.push('informe onde conferir o valor (ex.: portal da Unimed)'); }
+  else if (!(+d.valorParcela > 0)) e.push('informe o valor da parcela');
   if (!/^\d{4}-\d{2}$/.test(d.inicio || '')) e.push('informe a competência da 1ª parcela');
   if (!TIPOS_DESCONTO[d.tipo]) e.push('escolha em qual fechamento entra');
   if (d.parcelas !== '' && d.parcelas !== undefined && +d.parcelas < 0) e.push('número de parcelas inválido');
@@ -73,6 +101,7 @@ function aplicarDescontosParcelados(todos, descontos, chave) {
     if (!x) { alertas.push({ k: 'sem-linha', id: d.id, cod: String(d.cod), tipo: d.tipo, texto: `${rotulo} — o prestador não está no fechamento de ${TIPOS_DESCONTO[d.tipo]} deste mês. Levar para o próximo mês?`, adiar: true }); continue; }
     x.parcelas = x.parcelas || [];
     x.parcelas.push({ id: d.id, motivo: d.motivo, ...p, obs: obsDesconto(d, p) });
+    if (p.conferir && x.temValores) { x.descontoAConferir = [...(x.descontoAConferir || []), d.motivo]; alertas.push({ k: 'conferir', id: d.id, cod: x.cod, tipo: x.tipo, texto: `${rotulo}: valor do mês a conferir${d.onde ? ` em ${d.onde}` : ''} antes do pagamento.` }); }
     if (!x.temValores) { alertas.push({ k: 'sem-valores', id: d.id, cod: x.cod, tipo: x.tipo, texto: `${x.nome}: desconto ativo, mas sem valores neste mês. A ${p.recorrente ? 'parcela' : `parcela ${p.n}/${p.total}`} (R$ ${fmtBR(p.valor)}) não foi descontada. Levar para o próximo mês?`, adiar: true }); continue; }
     if (p.ultima) alertas.push({ k: 'ultima', id: d.id, cod: x.cod, tipo: x.tipo, texto: `${x.nome}: última parcela do desconto «${d.motivo}» (${p.n}/${p.total}) neste mês.` });
   }

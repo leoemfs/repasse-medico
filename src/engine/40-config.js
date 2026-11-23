@@ -54,7 +54,7 @@ function configPadrao() {
     unidades: UNIDADES_PADRAO.map(u => ({ ...clone(u), cnpj: UNIDADES_REGRAS[u.cod]?.cnpj || '', pctUSG: UNIDADES_REGRAS[u.cod]?.pctUSG ? { ...UNIDADES_REGRAS[u.cod].pctUSG } : null })),
     prestadores: [],
     faturistas: clone(FATURISTAS_PADRAO),
-    faixasUSG: clone(FAIXAS_USG_PADRAO), classes: classesPadrao(), convenios: [], fechamento: { ...FECHAMENTO_PADRAO },
+    faixasUSG: clone(FAIXAS_USG_PADRAO), classes: classesPadrao(), convenios: [], fechamento: { ...FECHAMENTO_PADRAO }, reajusteAnual: reajustePadrao(),
     classificacao: clone(CLASSIFICACAO_PADRAO)
   };
 }
@@ -93,6 +93,7 @@ function migrarConfig(c) {
   if (u17 && !(c.unidades || []).some(u => (u.apolo || []).some(a => norm(a) === 'MEDICALSHARE'))) { u17.apolo = [...(u17.apolo || []), 'MedicalShare']; mudou = true; }
   if (migrarRegras(c)) mudou = true;
   if (!Array.isArray(c.descontos)) { c.descontos = []; mudou = true; }   // descontos parcelados (SOL-F31)
+  if (!c.reajusteAnual) { c.reajusteAnual = reajustePadrao(); mudou = true; }   // SOL-F47: lembrete do reajuste anual (janeiro, a partir do ano seguinte)
   // v3.0: nomes das pastas e modelos de exportação da equipe (vão com a configuração compartilhada).
   if (!c.pastas || typeof c.pastas !== 'object' || Array.isArray(c.pastas)) { c.pastas = {}; mudou = true; }
   if (!Array.isArray(c.modelosExportacao)) { c.modelosExportacao = []; mudou = true; }
