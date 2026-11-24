@@ -13,12 +13,13 @@ permissions:
 concurrency:
   group: pages
   cancel-in-progress: false
+# Duas etapas (forma recomendada pelo GitHub): «montar» envia o pacote do site; «publicar» só começa depois que a
+# primeira termina. Com tudo numa etapa só, o deploy procurava o pacote menos de 1 s depois do envio e às vezes não o
+# achava («No artifacts named github-pages»), e a versão não chegava ao site (alpha.28, 30 e 31, em 24/11/2026).
+# Se mesmo assim falhar, o deploy tenta de novo uma vez, 30 s depois.
 jobs:
-  publicar:
+  montar:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,5 +30,19 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+  publicar:
+    needs: montar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy2.outputs.page_url || steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Esperar antes de tentar de novo
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 30
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
