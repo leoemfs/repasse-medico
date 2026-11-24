@@ -1,0 +1,50 @@
+<title>Selecionar todos e copiar nome</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="base/app.css">
+<style>
+.cp{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px;margin-left:4px;border-radius:6px;vertical-align:middle;line-height:0}
+.cp:hover{background:var(--infobg);color:var(--accent)}.cp svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.cp.ok{color:var(--ok)}
+.pac{white-space:nowrap}
+th .cf-sel{margin:0}
+</style>
+<template id="conteudo">
+<div class="card">
+  <h2>Prévia da conferência (dados fictícios)</h2>
+  <p class="small muted">Teste: marque a caixa do cabeçalho para selecionar todas as linhas do filtro; clique no ícone ao lado do paciente para copiar o nome.</p>
+  <div class="cf-selinfo" id="pvInfo"></div>
+  <div class="tw"><table><thead><tr><th><input type="checkbox" class="cf-sel" id="pvTodos" aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"></th><th>Classe · situação</th><th>Paciente</th><th>Data</th><th>Procedimento no MV</th><th>Laudo (Apolo)</th><th class="n">Vl Repasse</th></tr></thead><tbody id="pvCorpo"></tbody></table></div>
+</div>
+</template>
+<script src="base/shell.js"></script>
+<script>
+montarPrevia({ ativo: 'conferencia', titulo: 'Conferência cruzada', nota: 'Caixa «selecionar todos» no cabeçalho e botão de copiar o nome do paciente. Dados fictícios.' });
+const L = [
+  ['MARIA APARECIDA LOPES','05/10/2026','40901386 · DOPPLER COLORIDO DE ORGAO','ULTRASSONOGRAFIA DE TIREÓIDE COM DOPPLER',112.4],
+  ['JOAO BATISTA FERREIRA','21/10/2026','40901386 · DOPPLER COLORIDO DE ORGAO','ULTRASSONOGRAFIA OBSTÉTRICA COM DOPPLER',112.4],
+  ['ANA CLARA MOREIRA','07/10/2026','40901389 · DOPPLER DE BOLSA ESCROTAL','ULTRASSONOGRAFIA DA BOLSA ESCROTAL',98.1],
+  ['PEDRO HENRIQUE SALES','02/10/2026','40901394 · DOPPLER DE AORTA','ECODOPPLER DE AORTA E ARTÉRIAS RENAIS',140.0],
+  ['LUCIA HELENA PRADO','20/10/2026','40901483 · DOPPLER VENOSO MMII','DOPPLER VENOSO PROFUNDO DIREITO',125.7],
+  ['CARLOS EDUARDO NUNES','08/10/2026','40901483 · DOPPLER VENOSO MMII','DOPPLER VENOSO PROFUNDO ESQUERDO',125.7]
+];
+const sel = new Set(), $ = i => document.getElementById(i), br = v => v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+const ic = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+$('pvCorpo').innerHTML = L.map((l, i) => `<tr class="clicavel"><td><input type="checkbox" class="cf-sel" data-i="${i}" aria-label="Marcar a linha"></td><td><span class="st cl-pend">Pendente</span></td><td class="pac">${l[0]}<button type="button" class="cp" data-cp="${i}" title="Copiar o nome" aria-label="Copiar o nome de ${l[0]}">${ic}</button></td><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}</td><td class="n">${br(l[4])}</td></tr>`).join('');
+function info() {
+  const n = sel.size, soma = [...sel].reduce((s, i) => s + L[i][4], 0), el = $('pvInfo'), t = $('pvTodos');
+  el.classList.toggle('cf-selbar', !!n);
+  el.innerHTML = n ? `<b>${n} marcada(s) · R$ ${br(soma)}</b> <button class="sec mini" id="pvDes">Desmarcar</button><span class="sy-esp"></span><button class="mini">Aceitar para pagamento as ${n} pendente(s)…</button>` : `<b>${L.length} linha(s)</b><span class="sy-esp"></span><span class="muted">Marque linhas (ou a caixa do cabeçalho) para decidir em lote.</span>`;
+  t.checked = n === L.length; t.indeterminate = n > 0 && n < L.length;
+  document.querySelectorAll('[data-i]').forEach(c => c.checked = sel.has(+c.dataset.i));
+  if ($('pvDes')) $('pvDes').onclick = () => { sel.clear(); info(); };
+}
+$('pvTodos').onchange = e => { sel.clear(); if (e.target.checked) L.forEach((_, i) => sel.add(i)); info(); };
+$('pvCorpo').addEventListener('change', e => { const i = +e.target.dataset.i; e.target.checked ? sel.add(i) : sel.delete(i); info(); });
+$('pvCorpo').addEventListener('click', async e => {
+  const b = e.target.closest('[data-cp]'); if (!b) return;
+  const nome = L[+b.dataset.cp][0];
+  try { await navigator.clipboard.writeText(nome); } catch (_) { const r = document.createRange(); r.selectNodeContents(b.parentNode.firstChild.parentNode); getSelection().removeAllRanges(); getSelection().addRange(r); }
+  b.classList.add('ok'); b.title = 'Copiado'; setTimeout(() => { b.classList.remove('ok'); b.title = 'Copiar o nome'; }, 1200);
+});
+info();
+</script>

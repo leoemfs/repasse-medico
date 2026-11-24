@@ -505,3 +505,10 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
   .main .card code,.main .card .small{overflow-wrap:anywhere;word-break:break-word}
 }
 @media (max-width:640px){.rot-passos{grid-template-columns:1fr 1fr}.rot-agora .acoes{width:100%}}
+
+/* Conferência: copiar o nome do paciente com um clique (24/11/2026) */
+.pac{white-space:nowrap}
+.cp-nome{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px;margin-left:4px;border-radius:6px;vertical-align:middle;line-height:0}
+.cp-nome:hover{background:var(--infobg);color:var(--accent)}.cp-nome svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.cp-nome.ok{color:var(--ok)}
+th .cf-sel{margin:0}

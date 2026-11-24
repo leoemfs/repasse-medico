@@ -44,6 +44,11 @@ Com a base rev65 eram 809 linhas conferidas; com a rev66 e o motor da alpha.31, 
 - As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
 - Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
 
+## Conferência: rolagem, selecionar todos e copiar nome — **IMPLEMENTADA na v3.0.0-alpha.32** (pedido de 24/11/2026; prévia aprovada: `docs/prototipos/selecao-copiar-nome/` e https://claude.ai/artifact/K2GJK7qKJtxH1e6aemBqrZ)
+- Abrir ou fechar uma linha da tabela não leva mais a lista de volta ao topo (vale para todas as tabelas).
+- Caixa no cabeçalho marca/desmarca todas as linhas do filtro (com traço quando só algumas estão marcadas).
+- Ícone ao lado do nome do paciente copia o nome com um clique, sem abrir a linha.
+
 ## Correção da v3.0.0-alpha.27 — tela estreita / celular (pedido de 24/11/2026)
 - No celular, o menu lateral (232 px) deixava uns 260 px para a tela, e o quadro da competência empurrava a página para o lado (cartões cortados).
 - Agora, em tela de até 900 px, o menu começa **recolhido** (só ícones); o ☰ abre. O topo e os textos longos quebram de linha. Teste: `test/menu.mjs`.
@@ -1619,7 +1624,7 @@ As regras foram lidas dos relatórios do MV de 11/2026 e entram sozinhas na conf
   - O resumo da regra no cartão mostra as exceções.
   - Teste: `test/v3_curitiba.mjs`.
 
-### Dr. Ian: nova extração e e-mail no formato do usuário (24/11/2026, v3.0.0-alpha.32)
+### Dr. Ian: nova extração e e-mail no formato do usuário (24/11/2026, v3.0.0-alpha.33)
 O usuário mandou o e-mail de 10/2026 do Dr. Ian, a regra dele e uma nova extração do relatório de 11/2026 (`dados/comp_11-2026_curitiba/10490_v2.pdf`, emitido em 24/11/2026).
 - **Regra:** já estava no cadastro padrão (65/68/70% do líquido por faixa, 9,15% de impostos, densitometria 10% do bruto). Nada a acrescentar.
 - **E-mail:** passou a sair igual ao do usuário.
