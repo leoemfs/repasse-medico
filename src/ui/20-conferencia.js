@@ -306,9 +306,11 @@ function desenharConferencia() {
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
-      { t: '', html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
+      { t: '', th: ls => { const n = ls.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length;
+        return `<input type="checkbox" class="cf-sel" data-seltodos aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"${ls.length && n === ls.length ? ' checked' : ''}>`; },
+        html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
       { t: 'Classe · situação', html: x => `${pillClasse(classeDaLinhaConf(x))}<div class="cf-sit">${chipStatus(x.status, STATUS_CONF[x.status].nome)}${chipDecisao(x.decisao)}${observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : ''}</div>` },
-      { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
+      { t: 'Paciente', html: x => { const nome = x.r?.paciente || x.l?.paciente || ''; return `<span class="pac">${esc(nome)}${nome ? `<button type="button" class="cp-nome" data-copiar="${esc(nome)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>`; } }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
       { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
       { t: 'O que falta / por quê', v: x => x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo] || ''}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : classeDaLinhaConf(x) === 'excluido' ? (x.tipo === 'hm' ? 'HM a excluir do MV: não compõe repasse (fora da V3 nenhum HM é pago)' : `${TIPOS_ITEM[x.tipo] || x.tipo}: não compõe repasse`) : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
       { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
@@ -321,13 +323,26 @@ function desenharConferencia() {
       ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]}) · título ${Math.round((cd.af || 0) * 100)}%${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
   });
-  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); };
-  infoSel(filtrar());
+  // Caixa do cabeçalho (pedido de 24/11/2026): marca ou desmarca todas as linhas do filtro.
+  const caixaTodos = v => { const cb = $('cfTab').querySelector('[data-seltodos]'); if (!cb) return; const n = v.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length; cb.checked = !!v.length && n === v.length; cb.indeterminate = n > 0 && n < v.length; };
+  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); caixaTodos(v); };
+  infoSel(filtrar()); caixaTodos(filtrar());
   // «Decidir e ir para a próxima»: depois de uma decisão na linha aberta, abre a linha que ficou na mesma posição.
   if (S.conf.abrirPos != null) { const v = filtrar(); if (v.length) t.abrir(Math.min(S.conf.abrirPos, v.length - 1)); S.conf.abrirPos = null; }
   $('cfTab').addEventListener('change', e => {
-    const cb = e.target.closest('[data-sel]'); if (!cb) return;
-    const i = +cb.dataset.sel; cb.checked ? S.conf.sel.add(i) : S.conf.sel.delete(i); infoSel(filtrar());
+    const v = filtrar();
+    if (e.target.closest('[data-seltodos]')) {
+      if (e.target.checked) v.forEach(x => S.conf.sel.add(res.linhas.indexOf(x))); else S.conf.sel.clear();
+      $('cfTab').querySelectorAll('[data-sel]').forEach(c => c.checked = S.conf.sel.has(+c.dataset.sel));
+    } else { const cb = e.target.closest('[data-sel]'); if (!cb) return; const i = +cb.dataset.sel; cb.checked ? S.conf.sel.add(i) : S.conf.sel.delete(i); }
+    infoSel(v); caixaTodos(v);
+  });
+  // Copiar o nome do paciente com um clique (sem abrir a linha).
+  $('cfTab').addEventListener('click', async e => {
+    const b = e.target.closest('[data-copiar]'); if (!b) return;
+    e.stopPropagation();
+    try { await navigator.clipboard.writeText(b.dataset.copiar); b.classList.add('ok'); b.title = 'Copiado'; setTimeout(() => { b.classList.remove('ok'); b.title = 'Copiar o nome'; }, 1200); }
+    catch (_) { avisar('Não foi possível copiar: selecione o nome e use Ctrl+C.', 'warn'); }
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; refiltrar(); };
   $('cfFProc').onchange = e => { S.conf.fProc = e.target.value; S.conf.soFalta = false; desenharConferencia(); };
