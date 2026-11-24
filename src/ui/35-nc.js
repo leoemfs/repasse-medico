@@ -19,11 +19,8 @@ function carregarNC() {
   // SOL-F41: observações das linhas seguem a mesma retenção (texto livre pode ter dado de paciente).
   if (S.compReg && aplicarRetencaoObservacoes(S.compReg, retencaoNC())) salvarCompReg();
 }
-function salvarNC(msg = '') {
-  if (!gravarLocal(CHAVES.nc, S.nc)) avisar('Não foi possível gravar as não conformidades neste navegador. Exporte a planilha para não perder o trabalho.', 'err');
-  else if (msg) avisar(msg, 'ok');
-  atualizarNavNC();
-}
+// SOL-F18: salvar = gravar neste navegador + agendar a sincronização com a pasta da rede (29d-nc-sync.js).
+function salvarNC(msg = '') { gravarNCLocal(msg); agendarSincronizacao('nc'); }
 function atualizarNavNC() {
   const b = $('navNC'); if (!b || !S.nc) return;
   const n = S.nc.itens.filter(x => x.situacao === 'aberta').length;
@@ -92,7 +89,8 @@ function rotuloPrazo(d) {
 }
 
 /* ---------- Página ---------- */
-RENDER.nc = () => {
+RENDER.nc = () => { desenharNC(); const p = $('pag-nc'); if (p && !$('ncSync')) { p.insertAdjacentHTML('afterbegin', barraNC()); ligarBarraNC(); } };   // barra das NCs compartilhadas (SOL-F18)
+function desenharNC() {
   NCV.chave = S.comp;
   const fechada = compFechada(NCV.chave);
   const p = $('pag-nc'), itens = S.nc.itens.filter(x => x.competencia === NCV.chave), ind = indicadoresNC(itens);

@@ -51,7 +51,8 @@ function infoEquivalencia(x) {
   if (!x.par || !x.r) return comp;
   const est = x.par.proc?.estado || '', m = x.marcadores || new Set();
   const outros = ['ambiguo', 'outro-medico', 'data-divergente', 'nome-semelhante', 'convenio-divergente', 'id-duplo'].some(k => m.has(k));
-  return { ...comp, titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
+  // SOL-F50: id da relação que sustentou a linha (uso das equivalências nas conferências).
+  return { ...comp, ...(x.par.proc?.relacao?.id ? { eqId: x.par.proc.relacao.id } : {}), titulo: x.par.l?.titulo || '', eq: est, eqTrava: EQ_TRAVA.includes(est) && x.par.nm >= 2 && !x.par.dd && !outros, data: isoDia(x.r.data) };
 }
 
 /* Aceite (SOL-F11): o mesmo registro feito em Rodadas ou na Conferência. Desfazer guarda o histórico. */

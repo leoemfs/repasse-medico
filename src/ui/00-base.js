@@ -31,7 +31,7 @@ const S = {
 
 /* ---------- Armazenamento local ---------- */
 const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias',
-  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar', pdfsIgnorados: 'rm2.pdfsIgnorados' };
+  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar', pdfsIgnorados: 'rm2.pdfsIgnorados', usoEq: 'rm2.usoEquivalencias' };
 // Preferências de cada pessoa (ficam neste navegador e não vão para a pasta compartilhada).
 const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta'];
 // Modelo de exportação escolhido por esta pessoa (Configurações → Exportação).
@@ -171,6 +171,7 @@ async function guardarRodada(r, { reter = true } = {}) {
   const i = S.rodadas.findIndex(x => x.id === r.id);
   if (i >= 0) S.rodadas[i] = r; else S.rodadas.push(r);
   const ok = await dbGravar(r);
+  if (r.tipo === 'conferencia' && typeof registrarUsoDaRodada === 'function') registrarUsoDaRodada(r);   // SOL-F50, antes da retenção
   if (reter) await reterRodadas(new Set([grupoRodada(r)]));
   return ok;
 }
@@ -196,7 +197,18 @@ function dialogo(titulo, corpoHtml, botoes = [['ok', 'OK']]) {
       const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { if (el.type === 'radio') { if (el.checked) campos[el.name] = el.value; else if (!(el.name in campos)) campos[el.name] = ''; } else campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
       res({ botao: d.returnValue, campos });
     };
+    // v3.0.0-alpha.28: Enter confirma. Antes o Enter acionava o primeiro botão (quase sempre «Cancelar»), e o foco
+    // inicial também caía nele. Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»),
+    // e, sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha;
+    // com o foco num botão, o Enter aciona aquele botão.
+    const principal = () => { const bs = [...$('dlgBotoes').querySelectorAll('button')]; return bs.filter(b => b.value !== '').pop() || bs.pop(); };
+    d.onkeydown = e => {
+      if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey || e.isComposing) return;
+      const t = e.target; if (['TEXTAREA', 'BUTTON', 'SELECT', 'A'].includes(t.tagName)) return;
+      const b = principal(); if (b) { e.preventDefault(); b.click(); }
+    };
     d.returnValue = ''; d.showModal();
+    if (!$('dlgCorpo').querySelector('input:not([type=hidden]),select,textarea')) principal()?.focus();
   });
 }
 async function confirmar(titulo, texto, ok = 'Confirmar') { return (await dialogo(titulo, `<p>${texto}</p>`, [['', 'Cancelar', 'sec'], ['ok', ok]])).botao === 'ok'; }
@@ -246,6 +258,7 @@ function carregarCompetencia() {
 function mudarCompetencia(chave) {
   if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
   S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  agendarSincronizacao('nc');   // SOL-F18: NCs da competência nova vêm da pasta
   // P1: as telas usam as rodadas da competência aberta e das vizinhas; recarrega e redesenha.
   if (typeof DB !== 'undefined' && DB.ok) dbRodadasJanela(chave).then(r => { if (S.comp !== chave) return; S.rodadas = r; irPara(paginaAtual, true); });
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
@@ -331,8 +344,12 @@ function alternarMenu() {
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
+// v3.0.0-alpha.27: em tela estreita (celular ou janela pequena, até 900 px) o menu começa recolhido, só com ícones,
+// para o conteúdo caber. O ☰ continua abrindo. No computador, vale a escolha guardada.
+const telaEstreita = () => !!window.matchMedia?.('(max-width: 900px)').matches;
 function iniciarMenu() {
-  aplicarMenu(lerLocal(CHAVES.menu) === true);
+  aplicarMenu(lerLocal(CHAVES.menu) === true || telaEstreita());
+  try { window.matchMedia('(max-width: 900px)').addEventListener('change', e => { if (e.matches) aplicarMenu(true); else aplicarMenu(lerLocal(CHAVES.menu) === true); }); } catch (e) { }
   $('btnMenu').onclick = alternarMenu;
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }

@@ -50,7 +50,7 @@ function seletoresAnalise(prefixo, tolPadrao) {
     <label class="campo">Unidade dos laudos<select id="${prefixo}Un"><option value="">— escolher —</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), unSel)}<option value="*"${unSel === '*' ? ' selected' : ''}>Todas as unidades (não recomendado)</option></select>
       <span class="small muted" id="${prefixo}UnDica">${sugerida && !ultimo ? (rel?.unidadePasta ? 'Pela pasta da unidade: confirme.' : 'Sugerida pelo nome do arquivo: confirme.') : 'O PDF não informa a unidade: a escolha é da sessão.'}</span></label>
     <label class="campo">Tolerância de data (dias)<input id="${prefixo}Tol" type="number" min="0" max="60" value="${ultimo?.parametros?.tol ?? tolPadrao}"></label>
-    <div id="${prefixo}Extra"></div></div>`;
+    <div id="${prefixo}Extra"></div></div>${prefixo === 'cf' ? '<div class="rot-rel" id="cfRotRels"></div>' : ''}`;
 }
 // Decisões da competência do topo: NCs registradas (pelas chaves da linha) e linhas consideradas no repasse.
 const indiceDecisoesComp = (chave = S.comp) => indiceDecisoes(S.nc.itens.filter(x => x.competencia === chave), estadoCompetencia(S.compReg, chave).decisoes);
@@ -88,6 +88,7 @@ function desenharPaginaConferencia() {
   if (!relatoriosPara('cf').length) { p.innerHTML = semRelatorioPara('cf'); return; }
   p.innerHTML = `${cartaoAvisoProducao()}<div class="card cf-param"><h2>O que conferir</h2>${seletoresAnalise('cf', S.cfg.parametros.tolConferencia)}
     <div class="acoes"><button id="cfRodar">${S.conf && S.conf.ctx.chaveCompetencia === S.comp ? 'Conferir' : 'Executar conferência'}</button>${botaoSyncPasta('cf')}<span class="muted small" title="Cada execução vira uma rodada registrada, com versões das bases e parâmetros. O histórico fica na aba «Histórico e detalhes».">A unidade dos laudos vem do relatório (pasta ou nome do arquivo); o médico do laudo, do cadastro do prestador.</span></div></div>
+    <div id="cfRoteiro"></div>
     <div id="cfRes">${cartaoOutraCompetencia(S.conf, 'conferência')}</div>`;
   const extra = () => {
     const rel = relSelecionado('cf'), un = $('cfUn').value;
@@ -117,6 +118,8 @@ function desenharPaginaConferencia() {
   };
   if (!$('cfRel')) { $('cfRodar').disabled = true; return; }
   $('cfRel').onchange = extra; $('cfUn').onchange = extra; extra();
+  const relRot = $('cfRel'); if (relRot) { const f = relRot.onchange; relRot.onchange = e => { f(e); desenharRoteiroConf(); }; const fu = $('cfUn').onchange; $('cfUn').onchange = e => { fu(e); desenharRoteiroConf(); }; }
+  desenharRoteiroConf();
   $('cfRodar').onclick = () => comProcessando($('cfRodar'), executarConferencia, 'a conferência');
   if (S.conf && S.conf.ctx.chaveCompetencia === S.comp) desenharConferencia();
 };
@@ -349,6 +352,7 @@ function desenharConferencia() {
       aplicarDecisoes(res, indiceDecisoesComp()); desenharConferencia(); }
   });
   painelEqRodada($('cfEq'), paresDaConferencia(res), executarConferencia);
+  desenharRoteiroConf();
 }
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
 function comparacaoMVLaudo(x) {
@@ -692,3 +696,81 @@ document.addEventListener('click', e => {
   const F = FILTRO_REL.cf; if (F.un === '*' || F.gr === '*') return avisar('Escolha a unidade e o grupo no filtro dos relatórios.', 'warn');
   gerarPlanilhaUnidade(bt, F.un, F.gr);
 });
+
+/* SOL-F51 (v3.0.0-alpha.26) — Roteiro deste relatório: em que passo ele está e o botão do próximo passo.
+ * O passo vem do motor (roteiroDoRelatorio, 64-roteiro.js), pelo que já existe; nada a preencher. */
+function rodadasDoRelatorio(cod, un) {
+  return (S.rodadas || []).filter(r => r.tipo === 'conferencia' && competenciaDaRodada(r) === S.comp && String(r.prestadorCod) === String(cod) && String(r.unidadeCod) === String(un));
+}
+function enviadoDoRelatorio(x) {
+  const g = grDoRel(x), d = S.fluxo?.competencias?.[S.comp]?.grupos?.[g]?.documental?.[x.rel.cab.prestadorCod];
+  return d?.relatorio || '';
+}
+function roteiroDe(x, un) {
+  const rods = rodadasDoRelatorio(x.rel.cab.prestadorCod, un);
+  return roteiroDoRelatorio({ pdf: { nome: x.nome, hash: x.hash }, rodadas: rods, idx: indiceDecisoesComp(), enviado: enviadoDoRelatorio(x) });
+}
+// Unidade do relatório para o roteiro: a escolhida (se for o selecionado), a da pasta/nome, ou a da última rodada.
+function unidadeParaRoteiro(x) {
+  if ($('cfRel') && $('cfRel').value === x.id && $('cfUn')?.value) return $('cfUn').value;
+  const u = unDoRel(x); if (u) return u;
+  const r = (S.rodadas || []).filter(y => y.tipo === 'conferencia' && competenciaDaRodada(y) === S.comp && String(y.prestadorCod) === String(x.rel.cab.prestadorCod)).sort((a, b) => b.em.localeCompare(a.em))[0];
+  return r?.unidadeCod || '';
+}
+function desenharRoteiroConf() {
+  const c = $('cfRoteiro'); if (!c) return;
+  const x = $('cfRel') ? relSelecionado('cf') : null, un = $('cfUn')?.value || '';
+  if (!x || !un) { c.innerHTML = ''; return; }
+  const rt = roteiroDe(x, un), mesmo = S.conf && S.conf.ctx.chaveCompetencia === S.comp && S.conf.ctx.relId === x.id && String(S.conf.ctx.unidadeCod) === String(un);
+  const ult = rt.rodada, sub = `${esc(x.rel.cab.prestadorCod)} - ${esc(x.rel.cab.prestadorNome)}${ult ? ` · ${rodadasDoRelatorio(x.rel.cab.prestadorCod, un).length} rodada(s), última ${new Date(ult.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}` : ' · nenhuma rodada nesta competência'}`;
+  const bt = (k, t, sec = false) => `<button type="button"${sec ? ' class="sec"' : ''} data-rot="${k}">${t}</button>`;
+  const rodar = mesmo ? '' : bt('rodar', ult ? 'Abrir a última conferência' : 'Executar conferência');
+  const texto = [
+    () => [`<b>Passo 1:</b> gere no MV a <b>versão hospitalar</b> (com o valor total) e salve na pasta da competência, em «Relatórios para conferência». ${pastaConectadaConf() ? 'Depois, sincronize a pasta.' : 'Ou carregue o PDF no Início.'}`, pastaConectadaConf() ? botaoSyncPasta('cf') : bt('inicio', 'Ir para o Início')],
+    () => [ult ? `<b>Passo 2:</b> faltam <b>${rt.pendentes} decisão(ões)</b>. Em «O que falta decidir», aceite para pagamento, registre NC ou marque «Resolvido no MV» o que você vai corrigir lá.` : '<b>Passo 2:</b> execute a conferência deste relatório e decida o que ficar pendente.', ult ? (mesmo ? bt('decidir', 'Começar pelas decisões') : rodar) : bt('rodar', 'Executar conferência')],
+    () => [`<b>Passo 3:</b> ${rt.alerta ? '<b style="color:var(--err)">o PDF novo ainda traz</b>' : 'você marcou'} ${[rt.resolvidos && `<b>${rt.resolvidos} linha(s) «Resolvido no MV»</b>`, rt.ncs && `<b>${rt.ncs} NC</b>`].filter(Boolean).join(' e ')} ${rt.alerta ? '— corrija no MV antes de seguir.' : 'para corrigir.'} Depois de corrigir no MV, gere a versão hospitalar de novo, substitua o PDF na pasta e confira de novo: as decisões já tomadas continuam valendo.`, mesmo ? `${bt('nc', 'Ver o que corrigir', true)}${botaoReconferir(S.conf.ctx)}` : rodar],
+    () => ['<b>Passo 4:</b> há um <b>PDF novo</b> deste relatório. Confira de novo: a ferramenta reaplica as decisões e mostra se as correções saíram do MV.', bt('rodar', 'Conferir o PDF novo')],
+    () => ['<b>Passo 5:</b> nada falta decidir nem corrigir. Registre o aceite: o valor desta rodada passa a ser o do Fechamento.', mesmo ? bt('aceite', 'Ir para o aceite') : rodar],
+    () => ['<b>Passo 6:</b> o relatório está aceito. Tire no MV a <b>versão final</b> (sem o valor total e sem a %), salve e envie por e-mail com a prévia de todas as unidades. Depois, marque <b>E-mail</b> na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento')],
+    () => ['<b>Concluído:</b> aceito e e-mail marcado. Depois vêm NF recebida e NF ao Financeiro, na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento', true)]
+  ][rt.passo]();
+  c.innerHTML = `<section class="card roteiro" aria-labelledby="cfRotTit"><div class="rot-cab"><h2 id="cfRotTit">Roteiro deste relatório</h2><span class="small muted">${sub}</span></div>
+    <ol class="rot-passos">${PASSOS_ROTEIRO.map((ps, i) => { const cls = i < rt.passo ? 'feito' : i === rt.passo ? `atual${rt.alerta ? ' alerta' : ''}` : '';
+      return `<li class="rot-passo ${cls}"${i === rt.passo ? ' aria-current="step"' : ''}><span class="n">${i < rt.passo ? '✓' : i + 1}</span><b>${esc(ps.nome)}</b><small>${esc(rt.detalhes[i] || ps.dica)}</small></li>`; }).join('')}</ol>
+    <div class="rot-agora"><p>${texto[0]}</p><div class="acoes">${texto[1]}</div></div></section>`;
+  c.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => {
+    const k = b.dataset.rot;
+    if (k === 'rodar') return $('cfRodar')?.click();
+    if (k === 'inicio') { location.hash = 'inicio'; return; }
+    if (k === 'fechamento') { FH.sub = ['usg', 'img', 'curitiba'].includes(grDoRel(x)) ? grDoRel(x) : 'usg'; FH.fSit = null; location.hash = 'fechamento'; return; }
+    irAbaConf(k);
+  });
+  if (mesmo) ligarReconferir(c);
+  desenharRoteiroRelatorios();
+}
+// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir». Pedido de 24/11/2026: com dezenas de
+// relatórios os botões ocupavam a tela toda; agora é uma linha com a contagem por passo e uma lista recolhível, com rolagem
+// e busca (prévia em docs/prototipos/roteiro-relatorios-compacto.html). Clicar numa linha escolhe o relatório.
+const RR = { aberto: null, passo: null, q: '' };
+function desenharRoteiroRelatorios() {
+  const alvo = $('cfRotRels'); if (!alvo || !$('cfRel')) return;
+  const ids = [...$('cfRel').options].map(o => o.value), lista = ids.map(id => S.relatorios.find(r => r.id === id)).filter(Boolean);
+  if (lista.length < 2) { alvo.innerHTML = ''; return; }
+  const itens = lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
+    const k = !rt ? 'sem' : rt.passo >= 6 ? 'env' : 'p' + (rt.passo + 1);
+    return { x, un, k, rot: !rt ? 'sem unidade' : rt.passo >= 6 ? '✓ enviado' : `passo ${rt.passo + 1}` }; });
+  const cont = {}; itens.forEach(i => { cont[i.k] = cont[i.k] || { n: 0, rot: i.rot }; cont[i.k].n++; });
+  const ordem = Object.keys(cont).sort((a, b) => (a === 'sem' ? -1 : b === 'sem' ? 1 : a === 'env' ? 1 : b === 'env' ? -1 : a.localeCompare(b, 'pt', { numeric: true })));
+  if (RR.passo && !cont[RR.passo]) RR.passo = null;
+  const aberto = RR.aberto ?? lista.length <= 8, sel = $('cfRel').value, q = norm(RR.q);
+  const vis = itens.filter(i => (!RR.passo || i.k === RR.passo) && (!q || norm(`${i.x.rel.cab.prestadorCod} ${i.x.rel.cab.prestadorNome} UN ${i.un} ${rotGr(grDoRel(i.x))}`).includes(q)));
+  alvo.innerHTML = `<div class="rr-topo"><span class="small muted">Em que passo está cada relatório:</span>${ordem.map(k => `<button type="button" class="marc${RR.passo === k ? ' sel' : ''}" data-rrpasso="${k}">${esc(cont[k].rot)} <i>${cont[k].n}</i></button>`).join('')}
+    <button type="button" class="sec mini" data-rrabrir aria-expanded="${aberto}">${aberto ? 'Recolher ▴' : 'Ver lista ▾'}</button></div>
+    ${aberto ? `<div class="rr-lista"><div class="rr-busca"><input id="rrBusca" placeholder="Buscar prestador ou unidade…" value="${esc(RR.q)}"><span class="small muted">${vis.length} de ${lista.length}${RR.passo ? ' · ' + esc(cont[RR.passo].rot) : ''}</span></div>
+      <div class="rr-rolar"><table><thead><tr><th>Prestador</th><th>Un.</th><th>Grupo</th><th>Passo</th></tr></thead><tbody>${vis.map(i => `<tr data-rotrel="${esc(i.x.id)}"${i.x.id === sel ? ' class="sel"' : ''}><td>${esc(i.x.rel.cab.prestadorCod)} - ${esc(i.x.rel.cab.prestadorNome)}</td><td>${esc(i.un || '—')}</td><td>${esc(rotGr(grDoRel(i.x)))}</td><td>${esc(i.rot)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}`;
+  alvo.querySelectorAll('[data-rrpasso]').forEach(b => b.onclick = () => { const k = b.dataset.rrpasso; RR.passo = RR.passo === k ? null : k; if (RR.passo) RR.aberto = true; desenharRoteiroRelatorios(); });
+  alvo.querySelector('[data-rrabrir]').onclick = () => { RR.aberto = !aberto; desenharRoteiroRelatorios(); };
+  const bu = $('rrBusca'); if (bu) bu.oninput = () => { RR.q = bu.value; const pos = bu.selectionStart; desenharRoteiroRelatorios(); const n = $('rrBusca'); n.focus(); n.setSelectionRange(pos, pos); };
+  alvo.querySelectorAll('[data-rotrel]').forEach(t => t.onclick = () => { $('cfRel').value = t.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+  const linhaSel = alvo.querySelector('tr.sel'), rolar = alvo.querySelector('.rr-rolar'); if (linhaSel && rolar) rolar.scrollTop = Math.max(0, linhaSel.offsetTop - 60);
+}

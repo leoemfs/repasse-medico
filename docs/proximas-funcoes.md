@@ -21,6 +21,73 @@
 
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
+
+## Correção da v3.0.0-alpha.28 — Enter nas confirmações (pedido de 24/11/2026)
+- As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
+- Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
+
+## Correção da v3.0.0-alpha.27 — tela estreita / celular (pedido de 24/11/2026)
+- No celular, o menu lateral (232 px) deixava uns 260 px para a tela, e o quadro da competência empurrava a página para o lado (cartões cortados).
+- Agora, em tela de até 900 px, o menu começa **recolhido** (só ícones); o ☰ abre. O topo e os textos longos quebram de linha. Teste: `test/menu.mjs`.
+- Corrigido junto: o cartão «Roteiro deste relatório» sumia com o menu recolhido (a classe do cartão era a mesma do nome dos itens do menu).
+
+## SOL-F51 — Roteiro da conferência por relatório — **IMPLEMENTADA na v3.0.0-alpha.26** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/roteiro-conferencia/` e https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB; teste: `test/roteiro.mjs`)
+Base reaproveitável das prévias (CSS, menu e ícones do app): https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE.
+
+**Como ficou:** o passo vem do motor (`roteiroDoRelatorio`, em `src/engine/64-roteiro.js`). Na Conferência, o cartão «Roteiro deste relatório» fica entre «O que conferir» e o resultado, com o botão do próximo passo; abaixo dos parâmetros, cada relatório da lista mostra o passo em que está (clicar escolhe o relatório). Um PDF novo (outro arquivo) depois da última rodada leva ao passo 4. «Resolvido no MV» ou NC em linhas que continuam no PDF conferido mantêm o passo 3 (com alerta, se o PDF novo ainda traz as linhas). O aceite com pendências justificadas segue para o envio.
+
+O usuário se perde no ciclo «confiro na ferramenta, corrijo no MV, tiro o relatório de novo… e agora, rodo de novo?». Pedido: mostrar na Conferência o roteiro de cada relatório e o passo em que ele está.
+- Seis passos:
+  1. versão hospitalar no MV (PDF com valor total);
+  2. conferir e decidir;
+  3. corrigir no MV;
+  4. gerar de novo e reconferir («Reler o PDF e conferir de novo»);
+  5. aceite do relatório;
+  6. versão final e envio.
+- O passo é **calculado pelo que já existe**: PDF lido, rodadas, decisões, «Resolvido no MV» e NCs a corrigir, aceite, e-mail marcado no Fechamento. Nada a preencher a mais.
+- Cada relatório da unidade mostra o passo («passo 4 de 6», «✓ enviado») em «O que conferir».
+- **Versão final do MV** (sem a coluna de valor total e sem a %): o usuário tira, salva e envia por e-mail com a prévia de todas as unidades. A ferramenta **não precisa ler** esse PDF; o passo 6 só lembra de enviar e de marcar o e-mail. (Ainda não há exemplo do PDF final; se um dia for preciso lê-lo, pedir um exemplo.)
+- Regras de negócio que mudam: nenhuma.
+## Correções da v3.0.0-alpha.25 — achadas com os arquivos reais de 11/2026 (23/11/2026)
+Arquivos enviados nesta sessão: relatórios do MV de 17771 (Matheus) e 6703 (Alexandre), da V3, e a planilha de laudos de 11/2026 (38.276 laudos). Os PDFs foram lidos com o total igual ao impresso (R$ 15.087,16 e R$ 12.059,00).
+- **HM:** os números batem com a SOL-F46.
+  - Alexandre: 30 HM de USG Unimed devidos (R$ 990,00) e 5 HM de raio-X a excluir (R$ 95,00).
+  - Matheus: 9 HM de USG Unimed devidos (R$ 315,00), 85 HM de mamografia a excluir (R$ 5.168,00) e 4 exames base Bradesco substituídos pelos 5 pacotes.
+- **Corrigido — instalação nova sem os médicos da V3:** num navegador novo, a configuração de fábrica não recebia as migrações, e o cadastro padrão da V3 (SOL-F46) não entrava. Os médicos caíam no Fechamento do IMG. Agora a instalação nova também passa pelas migrações.
+- **Corrigido — Fechamento não avisava o HM a excluir do médico V3:** o cálculo da V3 só vê o que entra no pagamento, e o HM excluído não aparece lá. Agora o aviso sai para todos, com a regra certa da unidade:
+  - unidade 5: «85 HM a excluir do MV (R$ 5.168,00), fora do valor: na V3 só o HM de USG Unimed é pago»;
+  - demais unidades: «… fora da V3 nenhum HM é pago».
+- **Não deu para validar com estes arquivos:** HM fora da V3 (os dois relatórios são da V3) e uso das equivalências (as equivalências validadas ficam no navegador e na pasta do usuário, não nos arquivos).
+
+## SOL-F50 — Uso das equivalências nas conferências (trazer para a 3.0) — **IMPLEMENTADA na v3.0.0-alpha.24** (pedido de 23/11/2026; prévia e os 3 pontos aprovados; teste: `test/eq_uso.mjs`)
+Função feita em 09/11/2026 na v2.1.0-alpha.20 (ramo `claude/determined-einstein-agz3lv`, «SOL-F41» na numeração antiga). Ela nunca entrou na `main`: a 3.0 começou da alpha.19. Precisa ser refeita sobre a 3.0.
+
+**Prévia sem código:** `docs/prototipos/uso-equivalencias.html` (CSS, menu e ícones do app; dados fictícios).
+- **Equivalências TUSS → nova subaba «Uso nas conferências»:**
+  - quadros: em uso · paradas · nunca usadas · linhas confirmadas na competência;
+  - filtros: relações ou regras compostas, **grupo USG/IMG** (novo), janela de «em uso» e busca;
+  - tabela com linhas confirmadas, mini gráfico 08 → 11, última competência com uso, prestadores, Vl Repasse e quem validou; o detalhe mostra a conta por competência, os prestadores e as unidades.
+- **Tirar a validação com o impacto à vista:** «Voltar a pendente» e «Desativar» mostram quantas linhas a equivalência confirmou (no total e na competência). Com uso, a justificativa é obrigatória e vai para o histórico.
+- **Base de equivalências:** coluna «Uso nas conferências».
+- **Motor:** cada linha da rodada guarda o id da equivalência. Nas rodadas antigas, ela é achada pelo par código × título. A conferência e o fechamento não mudam.
+
+**Decisões aprovadas (23/11/2026) e como ficou:**
+1. **Os dois computadores veem o mesmo uso.** Cada conferência registrada vira um **resumo por relatório** (competência × prestador × unidade × repasse), sem paciente, com as contagens por relação (chave código × título × escopo, igual nos dois navegadores) e por regra composta.
+   - O resumo fica no navegador (`rm2.usoEquivalencias`) e na pasta da rede, em `01 - Sistema › Equivalências TUSS › uso_equivalencias.json`.
+   - A junção é por relatório e vale o resumo mais recente, então não há conflito para escolher.
+   - A sincronização roda depois de cada conferência e junto com a das equivalências.
+2. **A retenção não apaga o histórico.** O resumo é guardado à parte. Ao abrir a ferramenta, o uso é tirado de todas as rodadas **antes** de a retenção resumir as antigas.
+3. **«Em uso»** = usada nas últimas 3 competências (padrão; muda no filtro).
+
+**Na tela:** Equivalências TUSS → **«Uso nas conferências»**:
+- quadros clicáveis (em uso · paradas · nunca usadas · linhas confirmadas no mês, com o valor);
+- filtros: relações ou regras compostas, **grupo USG/IMG** (relatórios de Curitiba entram nos dois), janela e busca;
+- tabela com mini gráfico das últimas competências e detalhe por competência, prestadores e unidades;
+- «Voltar a pendente» e «Desativar» com o impacto à vista; com uso, a justificativa é obrigatória e o histórico guarda «uso: N linha(s) nas conferências»;
+- **Exportar uso (.xlsx)**: Leia-me, Relações (com a coluna Grupo) e Regras compostas.
+
+Na **Base de equivalências** entram a coluna «Uso nas conferências», o uso no detalhe e o mesmo quadro de impacto. Cada linha de rodada nova guarda o id da relação (`eqId`); nas rodadas antigas, a relação é achada pelo par código × título.
+
 ## SOL-F45 — Estrutura padronizada das pastas na rede — **IMPLEMENTADA na v3.0.0-alpha.14** (pedido de 17/11/2026; guia em `como-usar-pastas.md`; teste: `test/estrutura_pastas.mjs`)
 
 **Pedido do usuário:** padronizar a pasta raiz `App repasse médico`:
@@ -697,7 +764,24 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - **Proposta:** guardar os candidatos (e os dispensados) na competência, com a mesma retenção de 60 dias das NCs para os dados de pacientes.
 - **Aceite:** depois de recarregar, a revisão continua de onde parou.
 
-## SOL-F18 — Base compartilhada para a equipe — PLANEJADO
+## SOL-F18 — Base compartilhada para a equipe — **IMPLEMENTADA**: configuração, equivalências e Fluxo já iam pela pasta da rede (SOL-F36, F37 e v3.0); as **NCs** na v3.0.0-alpha.30 (pedido de 24/11/2026; teste: `test/nc_sync.mjs`)
+
+**Como ficou (NCs, v3.0.0-alpha.30):**
+- **Arquivo:** um por competência, `AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json`, ao lado da planilha de NCs. Leva as NCs e os candidatos dispensados daquela competência. Os candidatos continuam só no navegador.
+- **Mescla de três vias,** como nas outras bases:
+  - o que mudou de um lado só, vale;
+  - a mesma NC alterada pelos dois vira conflito: a pessoa escolhe a versão, e o histórico das duas fica;
+  - a exclusão feita por um sai também do outro;
+  - a mesma NC registrada pelos dois antes de sincronizar fica uma só, a mais antiga.
+- **Quando sincroniza:**
+  - toda gravação de NC agenda a sincronização;
+  - um relógio confere a cada 30 s se a outra pessoa mudou o arquivo;
+  - trocar a competência sincroniza a nova;
+  - abrir a aba de NCs também sincroniza.
+- **Barra «NCs sincronizadas»** no topo da aba Não conformidades, com quem mudou por último e «Sincronizar agora».
+- **Dados de pacientes:** as NCs ficam só na pasta da rede, como a planilha de NCs, e seguem a retenção. Quando a retenção apaga o nome, a mudança também vai para a pasta.
+
+**Proposta original:**
 - **Hoje:** cada navegador tem a sua configuração, equivalências, NCs e fluxo. A equipe de dois troca backup à mão, com risco de retrabalho e divergência.
 - **Proposta:** na pasta de rede (junto com a SOL-F10), um arquivo por base (configuração, equivalências, NCs, fluxo, competências), com revisão e «quem alterou».
   - Ao abrir, a ferramenta carrega a versão mais nova.

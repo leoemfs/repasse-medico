@@ -2,8 +2,43 @@
   "_leia": "Versões lançadas publicadas no GitHub Pages (a primeira é a atual). Lançar = acrescentar a nova versão no topo e enviar à main; o workflow «Publicar versão no GitHub Pages» publica.",
   "versoes": [
     {
+      "versao": "3.0.0-alpha.30",
+      "commit": "ab7c4412fdd94eda0f58d8912beccad651fa8718",
+      "data": "2026-11-24"
+    },
+    {
+      "versao": "3.0.0-alpha.29",
+      "commit": "fb1cf1fd9e3bac8881167e5a0a2067ce3404a8f6",
+      "data": "2026-11-24"
+    },
+    {
+      "versao": "3.0.0-alpha.28",
+      "commit": "d1c573857c8935f52a49d25bd250039b2fff8b86",
+      "data": "2026-11-24"
+    },
+    {
+      "versao": "3.0.0-alpha.27",
+      "commit": "97a8ceecc07161bf899a9b1621fdcab04a5ecaf6",
+      "data": "2026-11-24"
+    },
+    {
+      "versao": "3.0.0-alpha.26",
+      "commit": "9bf0fc9415ca1697774886f7c9b77fc1a9301590",
+      "data": "2026-11-24"
+    },
+    {
+      "versao": "3.0.0-alpha.25",
+      "commit": "c79366299b8d38b998f0c20af6dcb1fcfacd47a0",
+      "data": "2026-11-23"
+    },
+    {
+      "versao": "3.0.0-alpha.24",
+      "commit": "6c68a7044f74e811b2ba98d80468fb2700eefa1b",
+      "data": "2026-11-23"
+    },
+    {
       "versao": "3.0.0-alpha.23",
-      "commit": "0aac2c200ba23933ae28d9c11eacc3b00908a147",
+      "commit": "848cf5e7bf508ac26f7c8458993ac14184f231b5",
       "data": "2026-11-23"
     },
     {

@@ -71,6 +71,10 @@ const classes = () => p.evaluate(() => window.__RM.S.conf.res.linhas.filter(x =>
 const totais = () => p.evaluate(() => window.__RM.t.totaisPorClasse(window.__RM.S.conf.res.linhas, window.__RM.t.classeDaLinhaConf));
 ok(await classes() === 'ANA:devido BRUNA:devido CARLA:pend DORA:pend ELIS:pend', `classes da conferência: ${await classes()}`);
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.some(x => !x.r && x.status === 'so-laudo' && x.l.paciente === 'FABIO NUNES LEAL')), 'laudo sem lançamento aparece «Só no laudo»');
+ok(/Conferir e decidir/.test(await p.textContent('#cfRoteiro .rot-passo.atual')) && /decisão\(ões\) faltam/.test(await p.textContent('#cfRoteiro')), `SOL-F51: roteiro no passo 2 (${(await p.textContent('#cfRoteiro .rot-passo.atual')).trim()})`);
+await p.click('#btnMenu'); await p.waitForTimeout(150);
+ok(await p.isVisible('#cfRoteiro .roteiro'), 'roteiro continua visível com o menu recolhido (alpha.27: a classe do cartão não colide com o nome dos itens do menu)');
+await p.click('#btnMenu'); await p.waitForTimeout(150);
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
 await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
@@ -78,7 +82,9 @@ await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
 await abrirF(); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
-await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito'); await okDlg();
+await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito');
+// v3.0.0-alpha.28: Enter no campo confirma (antes acionava «Cancelar»).
+await p.press('#dlgCorpo [name="just"]', 'Enter'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(200);
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // NC na linha sem laudo, pelo detalhe da linha.
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
@@ -101,11 +107,20 @@ const ncX = await baixar('#ncExp', 'ncs.xlsx'); await p.waitForTimeout(300); if 
 const ncAbas = abas(ncX);
 ok(Object.values(ncAbas).flat().flat().some(c => String(c).includes('FABIO NUNES LEAL')) && Object.values(ncAbas).flat().flat().some(c => String(c).includes('DORA NUNES PIRES')), `Excel das NCs com as duas linhas (abas: ${Object.keys(ncAbas).join(', ')})`);
 
+// Confirmação sem campos: o foco começa no botão principal e o Enter confirma; Esc cancela.
+const conf1 = p.evaluate(() => window.__RM.t.confirmar('Teste', 'Confirma?', 'Confirmar')); await p.waitForSelector('#dlg[open]');
+ok(await p.evaluate(() => document.activeElement?.value) === 'ok', 'confirmação abre com o foco no botão principal (não no «Cancelar»)');
+await p.keyboard.press('Enter'); ok(await conf1 === true, 'Enter confirma');
+const conf2 = p.evaluate(() => window.__RM.t.confirmar('Teste', 'Confirma?', 'Confirmar')); await p.waitForSelector('#dlg[open]');
+await p.keyboard.press('Escape'); ok(await conf2 === false, 'Esc cancela');
 // ---------- 3. Aceite do relatório e Excel da conferência ----------
 await p.goto(html + '#conferencia'); await p.waitForSelector('#cfAbas');
 await p.click('#cfAba-aceite'); await p.waitForTimeout(100);
 await p.fill('#cfAceiteObs', 'ELIS: título sem equivalência, fica pendente'); await p.click('#cfAceitar'); await p.waitForTimeout(300); if (await p.isVisible('#dlg[open]')) await okDlg();
 ok(await p.evaluate(() => { const { S } = window.__RM; return !!S.rodadas.find(r => r.id === S.conf.ctx.rodadaId)?.aceite; }), 'aceite do relatório registrado com observação');
+await p.waitForTimeout(200);
+ok(/Versão final e envio/.test(await p.textContent('#cfRoteiro .rot-passo.atual')) && (await p.$$('#cfRoteiro .rot-passo.feito')).length === 5, `SOL-F51: depois do aceite, roteiro no passo 6 (${(await p.textContent('#cfRoteiro .rot-passo.atual')).trim()})`);
+await p.screenshot({ path: out + 'roteiro.png', fullPage: true });
 const cfX = await baixar('#cfExcel', 'conferencia.xlsx'), cfAbas = abas(cfX);
 const resumo = (cfAbas['Resumo'] || []).find(r => String(r[0]).startsWith('VALOR PARA PAGAMENTO'));
 ok(resumo && +resumo[2] === 60, `Excel da conferência: Resumo com o valor para pagamento R$ ${resumo?.[2]}`);
