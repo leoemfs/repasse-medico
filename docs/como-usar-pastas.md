@@ -23,7 +23,7 @@ Cada competência tem:
 | Pasta | O que a ferramenta faz |
 |---|---|
 | `01 - Correção de prestador` | Lê os PDFs, sem subpastas. A unidade vem do nome do arquivo, no formato `nome_unidade` (ex.: `generico_17.pdf`, `generico_Cambe.pdf`). Grava o Excel da correção |
-| `02 - Não conformidades` | Grava a planilha de NCs (todas as unidades) |
+| `02 - Não conformidades` | Grava a planilha de NCs (todas as unidades) e o `nao_conformidades.json`, com as NCs compartilhadas entre os dois (SOL-F18) |
 | `03 - NFS para pagamento` › `Pagamento 15` \| `Pagamento 30` | Só cria as pastas |
 | `04 - Planilhas de conferência` | Lê a planilha de laudos do Apolo e a do Power BI (a mais recente de cada) |
 | `05 - Relatórios de repasse MV` › `USG` \| `IMG` › unidade; `Curitiba` › `Prestadores Unidade` \| `Prestadores SRA` | Lê os PDFs. Grava o Excel da conferência ao lado do PDF. Outras pastas aqui (Repasse 20%, 25%, anestesistas…) são da equipe e **não são lidas** |

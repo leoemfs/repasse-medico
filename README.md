@@ -63,6 +63,7 @@ node test/curitiba_real_11-2026.mjs # v3.0: regras de Curitiba com os relatório
 node test/v3_curitiba.mjs        # v3.0: regras de Curitiba (HM que nunca é pago, HM Unimed com exame base, TITLE, pacote, médicos por produção)
 node test/pdf_ignorado.mjs     # v3.0: PDF de outra produção na pasta: mostra onde está e «Ignorar este arquivo» é lembrado
 node test/p0_decisoes.mjs      # v3.0: NC do «Só no laudo» não passa para o lançamento posterior; NC na linha repetida tira só a duplicata
+node test/nc_sync.mjs           # v3.0: SOL-F18 — NCs compartilhadas pela pasta da rede (duas pessoas, conflito, exclusão, registro em dobro)
 node test/quadro_fechamento.mjs # v3.0: SOL-F19 — quadro por prestador no Fechamento (colunas pelos dados, «Aguardando terceiros», aba no Excel de indicadores)
 node test/estrutura_pastas.mjs  # v3.0: estrutura padronizada (01 - Sistema, um ano por pasta, 12 competências), leitura da nova e da antiga, nada sobrescrito
 node test/planilha_unidade.mjs   # v3.0: Excel único da unidade × grupo (IMG/USG/Curitiba), gravado em «09 - Planilhas de repasse conferidos»

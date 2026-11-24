@@ -47,3 +47,13 @@ Ficam em **Bases → Faturistas**: cadastro à mão, importação de uma planilh
 ## Privacidade
 
 Tudo fica só neste navegador. Nome e ID/atendimento do paciente são apagados **60 dias após o registro** (ajuste em Configurações → Parâmetros). A aba avisa quando há dados que vencem em até 7 dias. Natureza, unidade, responsável e situação continuam para os indicadores. «Apagar agora os dados de pacientes desta competência» antecipa a limpeza. O backup só inclui as NCs se você marcar a opção.
+
+## NCs compartilhadas pela pasta da rede (desde a v3.0.0-alpha.30)
+
+Com a pasta raiz conectada, as NCs de cada competência vão para `AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json`, e as duas pessoas veem as mesmas NCs.
+
+- **O que sincroniza:** registrar, editar, mudar a situação ou excluir uma NC. A ferramenta sincroniza sozinha logo depois e confere a cada 30 s se a outra pessoa mudou alguma coisa.
+- **A barra no topo da aba** mostra a situação («NCs sincronizadas», «acesso precisa ser liberado»…), quem mudou por último e o botão «Sincronizar agora».
+- **Se os dois mudarem a mesma NC,** a ferramenta não escolhe sozinha: na aba de NCs aparece «N NC(s) alteradas pelos dois». Você escolhe qual versão fica, e o histórico das duas é guardado.
+- **A mesma NC registrada pelos dois** antes de sincronizar fica uma só.
+- **Os candidatos a NC** (o que as conferências separam) continuam só no seu navegador.

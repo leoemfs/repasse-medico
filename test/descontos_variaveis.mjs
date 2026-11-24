@@ -49,6 +49,8 @@ ok(l0 && l0.sit === 'conferido', `com aceite e sem desconto: «Conferido · a en
 // Cadastro pela tela: «Muda todo mês» mostra «Onde conferir» no lugar do valor.
 await p.evaluate(() => window.__RM.irPara('bases')); await p.waitForSelector('[data-bsub="prestadores"]'); await p.click('[data-bsub="prestadores"]');
 await p.click('#cardDesc [data-desc-novo]'); await p.waitForSelector('#dlg[open]');
+// O estado inicial (fixo/variável) é ligado num setTimeout depois de abrir: espera ele, em vez de ler cedo demais.
+await p.waitForFunction(() => document.getElementById('dcOnde')?.hidden === true, null, { timeout: 3000 }).catch(() => {});
 const vis0 = await p.evaluate(() => [!document.getElementById('dcFixo').hidden, !document.getElementById('dcOnde').hidden].join());
 await p.check('#dlgCorpo [name="tipoValor"][value="variavel"]');
 const vis1 = await p.evaluate(() => [!document.getElementById('dcFixo').hidden, !document.getElementById('dcOnde').hidden].join());
