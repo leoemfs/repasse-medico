@@ -13,6 +13,7 @@ const STATUS_CONF = {
   'so-laudo': { nome: 'Só no laudo', cor: 'F8CBAD', ordem: 5 },
   'hm-pendente': { nome: 'HM — regra pendente', cor: 'D9E1F2', ordem: 6 },
   'hm-sem-base': { nome: 'HM sem exame base', cor: 'FFEB9C', ordem: 6 },
+  'convenio-excluir': { nome: 'Convênio fora do repasse', cor: 'E4E4E4', ordem: 7 },
   'substituido-pacote': { nome: 'Substituído pelo pacote', cor: 'E4E4E4', ordem: 7 },
   'nao-procedimental': { nome: 'Item não procedimental', cor: 'E2EFDA', ordem: 7 },
   'classificacao-pendente': { nome: 'Classificação pendente', cor: 'D9D9D9', ordem: 8 }
@@ -44,7 +45,8 @@ const MARCADORES = {
   'hm-v3-sem-base': 'HM V3 sem exame base',
   'pacote-v3': 'Pacote V3 considerado',
   'base-pacote-v3': 'Base substituída pelo pacote',
-  'fora-escopo-v3': 'Modalidade que a V3 não faz'
+  'fora-escopo-v3': 'Modalidade que a V3 não faz',
+  'conv-excluir-v3': 'Convênio que não compõe (excluir do MV)'
 };
 
 /* Vários exames do mesmo paciente no mesmo dia (ex.: USG de abdome, transvaginal e tireoide no mesmo atendimento):
@@ -85,7 +87,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (unidadeV3 && cls.tipo === 'procedimento' && /\bPACOTE\b/.test(norm(r.procDesc || ''))) return { r, tipo: 'pacote', regraTipo: 'pacote-v3', pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
     return { r, tipo: cls.tipo, regraTipo: cls.regra, pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
   });
-  const procs = B.filter(b => b.tipo === 'procedimento');
+  // V3: linha de convênio que não compõe o repasse (CURSO CETRUS) não disputa laudo (24/11/2026).
+  const foraV3 = b => unidadeV3 && convenioForaV3(b.r.convenio);
+  const procs = B.filter(b => b.tipo === 'procedimento' && !foraV3(b));
   const modsRelatorio = new Set(procs.flatMap(b => b.mods || []));
   const modsDesconhecidas = procs.some(b => !b.mods);
   const periodo = periodoDoRelatorio(procs.map(b => b.r));
@@ -183,6 +187,11 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
     // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
+    if (foraV3(b)) {
+      marc.add('conv-excluir-v3'); out.status = 'convenio-excluir';
+      motivos.push(`Convênio «${r.convenio}» não compõe o repasse da V3: excluir do MV (fora da contagem de exames e do cálculo).`);
+      linhas.push(out); continue;
+    }
     if (b.tipo === 'hm' && unidadeV3) {
       const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
       if (sit.devido) {

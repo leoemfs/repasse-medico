@@ -1619,22 +1619,26 @@ As regras foram lidas dos relatórios do MV de 11/2026 e entram sozinhas na conf
   - O resumo da regra no cartão mostra as exceções.
   - Teste: `test/v3_curitiba.mjs`.
 
-### Dr. Ian: nova extração e e-mail no formato do usuário (24/11/2026, v3.0.0-alpha.28)
+### Dr. Ian: nova extração e e-mail no formato do usuário (24/11/2026, v3.0.0-alpha.32)
 O usuário mandou o e-mail de 10/2026 do Dr. Ian, a regra dele e uma nova extração do relatório de 11/2026 (`dados/comp_11-2026_curitiba/10490_v2.pdf`, emitido em 24/11/2026).
 - **Regra:** já estava no cadastro padrão (65/68/70% do líquido por faixa, 9,15% de impostos, densitometria 10% do bruto). Nada a acrescentar.
 - **E-mail:** passou a sair igual ao do usuário.
   - Começa com «Boa tarde a todos, segue relatório de produção para conferência.».
   - A conta da USG fica numa linha só: «Ultrassom: … mais HM … = … menos os impostos (9,15%) = … * 70% = …».
   - O exemplo de 10/2026 dá R$ 73.608,69 (teste em `test/v3_curitiba.mjs`).
-- **Nova extração:**
+- **CURSO CETRUS não compõe** (pedido de 24/11/2026: «CURSO CETRUS não compõe e deve ser sinalizado para exclusão»):
+  - Na conferência da V3, a linha do convênio CURSO CETRUS vira «Convênio fora do repasse» (classe Excluído) e não disputa laudo.
+  - Ela aparece no quadro «Curitiba (V3) — avisos para o MV» para excluir do MV e fica fora da contagem de exames e do cálculo.
+  - Padrão em `HM_V3_PADRAO.conveniosExcluir = 'CETRUS'` (motor).
+- **Nova extração** (com a regra do CETRUS):
   - Os 6 HM que a ferramenta mandou excluir na extração anterior (3 particulares no 78 PF, «2º VIA IMAGEM», 2 de mamografia e 1 de densitometria, R$ 287,40) saíram do MV.
-  - Resultado: 1.738 exames.
-  - Conta: USG R$ 101.265,79 + HM R$ 27.612,12 = R$ 128.877,91 − 9,15% = R$ 117.085,58 × 70% = **NF R$ 81.959,91**.
+  - **64 linhas de CURSO CETRUS** (R$ 0,01 cada) ficam de fora. 60 delas tinham laudo pareado, por isso não apareciam como «sem laudo».
+  - Resultado: 1.674 exames. USG R$ 101.265,15 + HM R$ 27.612,12 = R$ 128.877,27 − 9,15% = R$ 117.085,00 × 70% = **NF R$ 81.959,50**.
   - Os 538 HM de USG Unimed acharam o exame base.
 - **Para conferir com o manual:**
-  - 4 linhas de CURSO CETRUS a R$ 0,01 contam como exame no volume (não mudam a faixa).
-  - 13 USG ficaram sem laudo pareado.
+  - 9 USG ficaram sem laudo pareado.
   - 49 laudos «ULTRASSONOGRAFIA DA AXILA ESQUERDA» ficaram «só no laudo» (provável segunda página da USG de mamas; resolve com equivalência ou regra composta).
+  - O usuário viu valores diferentes na conferência manual; os números dele ainda não vieram.
 
 ### A confirmar com o usuário
 - O «Honorario Medico PF» pedido como «nunca pago» é o 78 PF dos relatórios? Nele está o HM de USG Unimed. Por isso a ferramenta paga só o de USG Unimed dele e exclui o resto. Se existir outro grupo «77 … PF», basta acrescentá-lo em «Modalidades e HM V3».

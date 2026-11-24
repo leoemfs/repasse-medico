@@ -1731,12 +1731,16 @@ const ehLinhaHM = l => l.tipoItem ? l.tipoItem === 'hm' : (/HONORARIO/.test(norm
  *   reais de 11/2026 é nele que o MV lança o HM de USG Unimed (pago) junto com HM de ressonância etc. (não pagos); dentro
  *   dele vale a regra geral (só USG/Doppler Unimed é devido).
  * - pacotes / pacoteConvenios: pacote de ressonância e mamografia é considerado (valor do MV) e notificado; o exame base do
- *   mesmo paciente e dia, do convênio Bradesco e lançado a 100% (erro do MV), é substituído pelo pacote. */
-const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO' };
+ *   mesmo paciente e dia, do convênio Bradesco e lançado a 100% (erro do MV), é substituído pelo pacote.
+ * - conveniosExcluir (24/11/2026): convênio que não compõe o repasse da V3 (CURSO CETRUS). A linha é excluída, sinalizada para
+ *   exclusão no MV e fica fora da contagem de exames e do cálculo. */
+const HM_V3_PADRAO = { procedimentos: 'ULTRASS|DOPPLER|USG', convenios: 'UNIMED', gruposExcluir: 'HONORARIO MEDICO RAIO X|HONORARIO MEDICO MAMOGRAFIA', pacotes: 'RESSON|MAMOG', pacoteConvenios: 'BRADESCO', conveniosExcluir: 'CETRUS' };
 // Grupo de HM: cada palavra do padrão precisa começar uma palavra do grupo («HONORARIO MEDICO MAMOGRAFIA» casa «81 - HONORARIOS MEDICOS MAMOGRAFIA»).
 const compilarGruposHM = p => String(p || '').split('|').map(x => norm(x).split(/[^A-Z0-9]+/).filter(Boolean)).filter(x => x.length);
 const casaGrupoHM = (padroes, grupo) => { const ws = norm(grupo || '').split(/[^A-Z0-9]+/).filter(Boolean); return padroes.some(pd => pd.every(w => ws.some(g => g.startsWith(w)))); };
-const compilarHMV3 = hm => ({ proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios), gruposExcluir: compilarGruposHM(hm.gruposExcluir), pacotes: trechosPadrao(hm.pacotes), pacoteConv: trechosPadrao(hm.pacoteConvenios) });
+const compilarHMV3 = hm => ({ proc: trechosPadrao(hm.procedimentos), conv: trechosPadrao(hm.convenios), gruposExcluir: compilarGruposHM(hm.gruposExcluir), pacotes: trechosPadrao(hm.pacotes), pacoteConv: trechosPadrao(hm.pacoteConvenios), convExcluir: trechosPadrao(hm.conveniosExcluir) });
+// Convênio que não compõe o repasse da V3 (ex.: CURSO CETRUS).
+const convenioForaV3 = conv => casaTrechos(_hmV3Ativa.convExcluir, conv || '');
 let _hmV3Ativa = compilarHMV3(HM_V3_PADRAO);
 // Situação do HM na V3: {devido, motivo: 'grupo' (grupo que nunca é pago) | 'procedimento' | 'convenio' | ''}.
 function hmV3Situacao(grupo, desc, convenio) {
@@ -1857,9 +1861,10 @@ function validarRegraV3(regra) {
 function calcularV3(regra, linhas) {
   if (regra.modo === 'fixo') return calcularV3Fixo(regra, linhas);
   const imp = (+regra.impostos || 0) / 100, u = regra.usg || {};
-  const r = { exames: 0, brutoUSG: 0, hm: { qtd: 0, valor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: (regra.outros || []).map(o => ({ ...o, valorLaudo: +o.valor || 0, qtd: 0, bruto: 0, valor: 0 })), semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0 };
+  const r = { exames: 0, brutoUSG: 0, hm: { qtd: 0, valor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: (regra.outros || []).map(o => ({ ...o, valorLaudo: +o.valor || 0, qtd: 0, bruto: 0, valor: 0 })), semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, convExcluir: { qtd: 0, valor: 0 }, valorMV: 0 };
   for (const l of linhas) {
     const q = +l.quant || 1, v = +l.vlTotal || 0;
+    if (convenioForaV3(l.convenio)) { r.convExcluir.qtd += q; r.convExcluir.valor += +l.vlRepasse || 0; continue; }   // CURSO CETRUS: não compõe
     r.valorMV += +l.vlRepasse || 0;
     if (ehLinhaHM(l)) {
       if (hmV3Devido(l.grupo, l.desc, l.convenio)) { r.hm.qtd += q; r.hm.valor += v; }
@@ -1898,7 +1903,7 @@ function calcularV3(regra, linhas) {
 
 /* Valor fixo por laudo, por grupo do MV. HM de USG/Doppler Unimed paga o valor de HM do grupo de USG. */
 function calcularV3Fixo(regra, linhas) {
-  const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
+  const r = { modo: 'fixo', forma: 'fixo', exames: 0, brutoUSG: 0, valorUSG: 0, hm: { qtd: 0, valor: 0, semValor: 0 }, hmExcluir: { qtd: 0, valor: 0, itens: new Map() }, outros: [], semRegra: new Map(), naoProcedimental: { qtd: 0, valor: 0 }, pacotes: { qtd: 0, valor: 0 }, convExcluir: { qtd: 0, valor: 0 }, valorMV: 0, pct: 0, base: 0, liquido: 0, impostos: 0,
     itens: (regra.grupos || []).map(g => ({ ...g, rotulo: rotuloGrupoV3(g.grupo), qtd: 0, valor: 0, hmQtd: 0, hmValor: 0, porValor: new Map(), hmPorValor: new Map() })) };
   // HM de USG/Doppler Unimed vale o mesmo que o laudo de USG do médico (regra de 23/11/2026, para qualquer médico da V3).
   const gsR = regra.grupos || [], gUSG = gsR.find(x => x.grupo === GRUPO_USG_V3) || gsR.find(x => /ULTRASS|DOPPLER|\bUSG\b/.test(norm(x.grupo)));
@@ -1906,6 +1911,7 @@ function calcularV3Fixo(regra, linhas) {
   const itemDe = g => r.itens.find(i => i.grupo === g.grupo);
   for (const l of linhas) {
     const q = +l.quant || 1, v = +l.vlTotal || 0;
+    if (convenioForaV3(l.convenio)) { r.convExcluir.qtd += q; r.convExcluir.valor += +l.vlRepasse || 0; continue; }   // CURSO CETRUS: não compõe
     r.valorMV += +l.vlRepasse || 0;
     if (ehLinhaHM(l)) {
       // HM de USG/Doppler Unimed (regra para todos na V3, 23/11/2026): vale SEMPRE o mesmo que o exame base correspondente —
@@ -1959,6 +1965,7 @@ function avisosV3(c) {
   for (const [g, e] of c.semRegra) a.push(`${e.qtd} exame(s) de «${g}» sem regra na V3 (R$ ${fmtBR(e.valor)} bruto, fora do cálculo)`);
   if (c.forma === 'faixa-liquido' && !c.faixa && c.exames) a.push('volume abaixo da primeira faixa da regra');
   if (c.hm?.semValor) a.push(`${c.hm.semValor} HM de USG/Doppler Unimed sem valor do laudo de USG na regra (não pago)`);
+  if (c.convExcluir?.qtd) a.push(`${c.convExcluir.qtd} linha(s) de convênio que não compõe o repasse (ex.: CURSO CETRUS), fora do cálculo: excluir do MV`);
   if (c.pacotes?.qtd) a.push(`${c.pacotes.qtd} pacote(s) de ressonância/mamografia considerados pelo valor do MV (R$ ${fmtBR(c.pacotes.valor)}): conferir se substituem o exame base Bradesco a 100%`);
   return a;
 }
@@ -2009,11 +2016,12 @@ function avisosConferenciaV3(res) {
   for (const x of hmExcluir) { const k = x.r.grupoNome || 'sem grupo', e = porGrupo.get(k) || porGrupo.set(k, { grupo: k, motivo: x.motivoHMV3 || '', linhas: [] }).get(k); e.linhas.push(x); }
   const grupos = [...porGrupo.values()].map(g => ({ ...g, n: g.linhas.length, valor: soma(g.linhas), rotuloMotivo: MOTIVO_HM_V3[g.motivo] || '' })).sort((a, b) => b.n - a.n);
   const pega = m => { const l = mv.filter(x => x.marcadores.has(m)); return { n: l.length, valor: soma(l), linhas: l }; };
-  const out = { hmExcluir: { n: hmExcluir.length, valor: soma(hmExcluir), grupos }, hmSemBase: pega('hm-v3-sem-base'), pacotes: pega('pacote-v3'), substituidos: pega('base-pacote-v3'), foraEscopo: pega('fora-escopo-v3') };
+  const out = { hmExcluir: { n: hmExcluir.length, valor: soma(hmExcluir), grupos }, hmSemBase: pega('hm-v3-sem-base'), pacotes: pega('pacote-v3'), substituidos: pega('base-pacote-v3'), foraEscopo: pega('fora-escopo-v3'), convExcluir: pega('conv-excluir-v3') };
   // HM de USG Unimed que caiu num grupo excluído (ex.: mamografia): conferir se o grupo está certo no MV.
   const usgNoGrupo = hmExcluir.filter(x => x.hmV3SeriaDevido);
   out.hmExcluir.usgUnimed = { n: usgNoGrupo.length, valor: soma(usgNoGrupo) };
-  out.total = out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
+  out.convExcluir.convenios = [...new Set(out.convExcluir.linhas.map(x => String(x.r.convenio || '').replace(/\s*-\s*$/, '')))];
+  out.total = out.convExcluir.n + out.hmExcluir.n + out.hmSemBase.n + out.pacotes.n + out.substituidos.n + out.foraEscopo.n;
   return out;
 }
 
@@ -3136,6 +3144,7 @@ const STATUS_CONF = {
   'so-laudo': { nome: 'Só no laudo', cor: 'F8CBAD', ordem: 5 },
   'hm-pendente': { nome: 'HM — regra pendente', cor: 'D9E1F2', ordem: 6 },
   'hm-sem-base': { nome: 'HM sem exame base', cor: 'FFEB9C', ordem: 6 },
+  'convenio-excluir': { nome: 'Convênio fora do repasse', cor: 'E4E4E4', ordem: 7 },
   'substituido-pacote': { nome: 'Substituído pelo pacote', cor: 'E4E4E4', ordem: 7 },
   'nao-procedimental': { nome: 'Item não procedimental', cor: 'E2EFDA', ordem: 7 },
   'classificacao-pendente': { nome: 'Classificação pendente', cor: 'D9D9D9', ordem: 8 }
@@ -3167,7 +3176,8 @@ const MARCADORES = {
   'hm-v3-sem-base': 'HM V3 sem exame base',
   'pacote-v3': 'Pacote V3 considerado',
   'base-pacote-v3': 'Base substituída pelo pacote',
-  'fora-escopo-v3': 'Modalidade que a V3 não faz'
+  'fora-escopo-v3': 'Modalidade que a V3 não faz',
+  'conv-excluir-v3': 'Convênio que não compõe (excluir do MV)'
 };
 
 /* Vários exames do mesmo paciente no mesmo dia (ex.: USG de abdome, transvaginal e tireoide no mesmo atendimento):
@@ -3208,7 +3218,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (unidadeV3 && cls.tipo === 'procedimento' && /\bPACOTE\b/.test(norm(r.procDesc || ''))) return { r, tipo: 'pacote', regraTipo: 'pacote-v3', pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
     return { r, tipo: cls.tipo, regraTipo: cls.regra, pn: norm(r.paciente), dia: diaSerial(r.data), mods: modalidadesDoGrupo(r.grupoNome) };
   });
-  const procs = B.filter(b => b.tipo === 'procedimento');
+  // V3: linha de convênio que não compõe o repasse (CURSO CETRUS) não disputa laudo (24/11/2026).
+  const foraV3 = b => unidadeV3 && convenioForaV3(b.r.convenio);
+  const procs = B.filter(b => b.tipo === 'procedimento' && !foraV3(b));
   const modsRelatorio = new Set(procs.flatMap(b => b.mods || []));
   const modsDesconhecidas = procs.some(b => !b.mods);
   const periodo = periodoDoRelatorio(procs.map(b => b.r));
@@ -3306,6 +3318,11 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
     // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
+    if (foraV3(b)) {
+      marc.add('conv-excluir-v3'); out.status = 'convenio-excluir';
+      motivos.push(`Convênio «${r.convenio}» não compõe o repasse da V3: excluir do MV (fora da contagem de exames e do cálculo).`);
+      linhas.push(out); continue;
+    }
     if (b.tipo === 'hm' && unidadeV3) {
       const sit = hmV3Situacao(r.grupoNome, r.procDesc, r.convenio);
       if (sit.devido) {
@@ -3576,6 +3593,8 @@ const REGRA_VALOR_F43 = 'f43';
 function classeDaLinha(tipo, estado, decisao) {
   if (TIPOS_NUNCA_REPASSE.has(tipo)) return 'excluido';
   if (decisao === 'nc') return 'nc';
+  // V3: convênio que não compõe o repasse (CURSO CETRUS) — excluir do MV, sem decisão.
+  if (estado === 'convenio-excluir') return 'excluido';
   if (tipo === 'hm') {
     if (estado === 'conferido') return 'devido';
     // V3: HM de USG Unimed sem o exame base no relatório espera decisão (pode ser aceito); os demais HM são excluídos.
@@ -7711,6 +7730,7 @@ function cartaoAvisosV3(a) {
   if (!a.total) return '<div class="v3-avisos small muted"><b>Curitiba (V3):</b> nenhum HM a excluir, pacote ou exame fora do que a V3 faz neste relatório.</div>';
   const R = v => `R$ ${fmtBR(v)}`, filtro = (m, t) => `<button class="sec mini" data-m-v3="${m}">${t}</button>`;
   const itens = [];
+  if (a.convExcluir.n) itens.push(`<li><b class="v3-exc">⚠ ${a.convExcluir.n} linha(s) de convênio que não compõe o repasse (${R(a.convExcluir.valor)})</b> — ${esc(a.convExcluir.convenios.join(', '))}: fora da contagem de exames e do cálculo. Peça a exclusão no MV e reconfira. ${filtro('conv-excluir-v3', 'Ver linhas')}</li>`);
   if (a.hmExcluir.n) itens.push(`<li><b class="v3-exc">⚠ ${a.hmExcluir.n} HM a excluir do MV (${R(a.hmExcluir.valor)})</b> — não são pagos a ninguém: ${a.hmExcluir.grupos.map(g => `${esc(g.grupo)} · ${g.n}${g.rotuloMotivo ? ` <span class="muted">(${esc(g.rotuloMotivo)})</span>` : ''}`).join('; ')}. Peça a exclusão no MV e reconfira. ${filtro('hm-v3-excluir', 'Ver linhas')}${a.hmExcluir.usgUnimed.n ? `<br><b>Atenção:</b> ${a.hmExcluir.usgUnimed.n} deles (${R(a.hmExcluir.usgUnimed.valor)}) são HM de USG/Doppler Unimed lançados num desses grupos: confira se o grupo do MV está certo antes de excluir.` : ''}</li>`);
   if (a.hmSemBase.n) itens.push(`<li><b>${a.hmSemBase.n} HM de USG Unimed sem o exame base no relatório (${R(a.hmSemBase.valor)})</b> — ficam pendentes: ache o exame de USG ou aceite com justificativa. ${filtro('hm-v3-sem-base', 'Ver linhas')}</li>`);
   if (a.pacotes.n) itens.push(`<li><b>${a.pacotes.n} pacote(s) de ressonância/mamografia considerados (${R(a.pacotes.valor)})</b> pelo valor de repasse do MV${a.substituidos.n ? `; ${a.substituidos.n} exame(s) base Bradesco a 100% substituídos (${R(a.substituidos.valor)}, fora do fechamento)` : ''}. Confira se cada pacote corresponde ao exame base. ${filtro('pacote-v3', 'Ver pacotes')}${a.substituidos.n ? ' ' + filtro('base-pacote-v3', 'Ver bases') : ''}</li>`);
