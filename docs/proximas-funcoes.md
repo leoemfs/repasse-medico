@@ -40,6 +40,10 @@ Achado nos testes com 12 relatórios de USG reais de 11/2026 (1.077 linhas, base
 
 Com a base rev65 eram 809 linhas conferidas; com a rev66 e o motor da alpha.31, são 892.
 
+## Correção da v3.0.0-alpha.34 — convênio com nome cortado no MV (pedido de 24/11/2026)
+- Na linha aberta da Conferência (MV × laudo), «CISMEPAR - ULTRAMED» (MV) × «CISMEPAR - ULTRAMED CAMBE» (Apolo) aparecia como «diferente».
+- O motor já tratava como o mesmo convênio (o MV corta o nome: um é o começo do outro); só a comparação da tela exigia o nome idêntico. Agora a tela usa a mesma regra e mostra «mesmo convênio (nome cortado no MV)».
+
 ## Correção da v3.0.0-alpha.28 — Enter nas confirmações (pedido de 24/11/2026)
 - As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
 - Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
