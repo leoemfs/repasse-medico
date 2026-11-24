@@ -517,3 +517,25 @@ th .cf-sel{margin:0}
 .cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;border-radius:5px;line-height:0}
 .cpv button:hover{color:var(--accent)}.cpv button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
 .cpv.ok{background:var(--okbg)}.cpv.ok button{color:var(--ok)}
+/* v3.0.0-alpha.36 — Equivalências simplificadas (prévia aprovada em 24/11/2026) */
+.eq-topo{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.eq-kpis{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.eq-kpi{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--text);font-weight:600;font-size:13px}
+.eq-kpi.on{border-color:var(--accent);background:var(--infobg);color:var(--accent)}.eq-kpi b{margin-right:2px}
+.eq-acoes-topo{display:flex;gap:8px;align-items:flex-start}
+.eq-arq{position:relative}.eq-arq>summary{list-style:none;cursor:pointer;display:inline-block;padding:7px 14px;border-radius:8px;border:1px solid var(--accent);color:var(--accent);font-weight:600;background:var(--card)}
+.eq-arq>summary::-webkit-details-marker{display:none}
+.eq-arq .lista{position:absolute;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:290px;z-index:20;padding:6px}
+.eq-arq .lista h5{margin:6px 8px 2px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.eq-arq .lista button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:7px 10px;border-radius:6px;font-weight:500}
+.eq-arq .lista button:hover{background:var(--infobg)}.eq-arq .lista small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.eq-alerta{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;margin:12px 0}.eq-alerta.err{border-color:var(--err);background:var(--errbg)}
+.eq-alerta summary{cursor:pointer}.eq-alerta summary u{color:var(--accent);margin-left:4px}
+.eq-seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.eq-seg button{background:var(--card);border:0;border-radius:0;color:var(--muted);padding:6px 14px;font-weight:600}
+.eq-seg button.on{background:var(--accent);color:var(--on-accent)}
+.eq-filtros{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin:12px 0}.eq-filtros input[type=search]{flex:1;min-width:220px}
+.eq-mais{flex-basis:auto}.eq-mais[open]{flex-basis:100%}.eq-mais>summary{list-style:none;cursor:pointer;display:inline-block}.eq-mais>summary::-webkit-details-marker{display:none}.eq-mais .grid3{margin-top:8px}
+.eq-cod{font-family:ui-monospace,monospace;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+#eqTab tr.sel td,#cardCompostas tr.sel td{background:var(--infobg)}
+.eq-lote{position:sticky;bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--side);color:#fff;border-radius:12px;padding:10px 14px;margin-top:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:5}
+.eq-lote[hidden]{display:none}.eq-lote b{margin-right:auto}.eq-lote button.sec{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}

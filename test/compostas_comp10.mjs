@@ -53,12 +53,12 @@ await S(() => {
 });
 
 // Simulação pela tela, regra por regra.
-await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
+await p.goto(html + '#equivalencias'); await p.click('[data-eqvb="reg"]'); await p.waitForSelector('#cardCompostas');
 const sim = {};
 for (const nome of ['TC abdome total', 'RM abdome total', 'USG mamas + Doppler', 'Tireoide com Doppler', 'USG articular + Doppler']) {
   const linha = p.locator(`#cardCompostas tbody tr:has-text("${nome}")`).first();
-  await linha.locator('[data-cmpsim]').click(); await p.waitForFunction(n => [...document.querySelectorAll('#cardCompostas tbody tr')].some(tr => tr.textContent.includes(n) && /simulação/.test(tr.textContent)), nome, { timeout: 300000 });
-  sim[nome] = (await p.locator(`#cardCompostas tbody tr:has-text("${nome}")`).first().locator('td').nth(4).textContent()).trim();
+  await linha.locator('[data-cmpsim]').click(); await p.waitForFunction(n => [...document.querySelectorAll('#cardCompostas tbody tr:not(.detalhe)')].some(tr => tr.textContent.includes(n) && /simulação/.test(tr.textContent)), nome, { timeout: 300000 });
+  sim[nome] = (await p.locator(`#cardCompostas tbody tr:has-text("${nome}")`).first().locator('td').nth(2).textContent()).trim();
   info(`simulação — ${nome}: ${sim[nome]}`);
 }
 await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_comp10_simulacao.png' });
@@ -70,8 +70,8 @@ await S(() => { for (const c of window.__RM.S.eq.compostas) { c.status = 'valida
 await conferirTudo();
 const depois = await cobertura();
 info(`com as 5 regras validadas: cobertura ${depois.pct}% (${depois.conferidas} de ${depois.total} linhas)`);
-await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
-const ef = await p.$$eval('#cardCompostas tbody tr', trs => trs.map(tr => `${tr.cells[0].textContent.trim()}: ${tr.cells[4].textContent.replace(/exemplos/, '').trim()}`));
+await p.goto(html + '#equivalencias'); await p.click('[data-eqvb="reg"]'); await p.waitForSelector('#cardCompostas');
+const ef = await p.$$eval('#cardCompostas tbody tr:not(.detalhe)', trs => trs.map(tr => `${tr.cells[0].textContent.trim()}: ${tr.cells[2].textContent.replace(/exemplos/, '').trim()}`));
 for (const e of ef) info(`efetividade — ${e}`);
 await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_comp10.png' });
 ok(depois.conferidas > antes.conferidas, `com as regras validadas, mais linhas conferidas (${antes.conferidas} → ${depois.conferidas})`);

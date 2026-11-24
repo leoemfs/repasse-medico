@@ -20,7 +20,11 @@ const okDlg = async (botao = 'ok') => { await p.waitForSelector('#dlg[open]'); a
 const MAMAS = '40901114', DOP = '40901386', ART = '40901220', ORG = '40901203', TCS = '41001109', TCP = '41001117';
 
 // 1) Cadastro pela tela, em 4 perguntas: USG mamas + Doppler ×2 (UNIMED ×1), dois títulos.
-await p.waitForSelector('#cmpNova'); await p.click('#cmpNova'); await p.waitForSelector('#dlg[open] #cpPassos');
+// v3.0.0-alpha.36: Base → «Regras compostas» e «+ Nova»; a regra abre na própria linha.
+const regras = async () => { await p.waitForSelector('[data-eqvb="reg"]'); await p.click('[data-eqvb="reg"]'); await p.waitForSelector('#cardCompostas'); };
+const relacoes = async () => { await p.waitForSelector('[data-eqvb="rel"]'); await p.click('[data-eqvb="rel"]'); await p.waitForSelector('#eqBusca'); };
+const abrirRegra = async nome => { const tr = p.locator(`#cardCompostas tbody tr:has(td > b:text-is("${nome}"))`).first(); if (!(await tr.evaluate(e => e.classList.contains('sel')))) await tr.click(); await p.waitForSelector('#cardCompostas tr.detalhe'); };
+await regras(); await p.click('#eqNova'); await p.waitForSelector('#dlg[open] #cpPassos');
 const escolher = async (nome, valor) => { await p.fill(`#dlgCorpo [name="${nome}"]`, valor); await p.waitForTimeout(150); await p.press(`#dlgCorpo [name="${nome}"]`, 'Enter'); await p.waitForTimeout(200); };
 await escolher('cpTitulo', 'ULTRASSONOGRAFIA DAS MAMAS COM DOPPLER'); await escolher('cpTitulo', 'USG DE MAMAS COM DOPPLER');
 await escolher('cpProc', MAMAS); await escolher('cpProc', DOP);
@@ -114,16 +118,17 @@ await p.goto(html + '#bases'); await p.waitForSelector('[data-bsub]'); await p.c
 ok(await p.isVisible('[data-eqv][data-c="pct"]') && await p.$eval('tr:has([value="Fusão de imagem"]) [data-c="pctUnidade"]', i => i.checked), 'Bases → Classes: colunas «Ou % do valor faturado» e «Ou % da unidade» (fusão marcada)');
 
 // 4) Lista: as regras aparecem com composição e exceções.
-await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
-const lista = await p.textContent('#cardCompostas');
-ok(/USG mamas \+ Doppler/.test(lista) && /×2/.test(lista) && /não exigido/.test(lista) && /contém DOPPLER e um de PUNHO · OMBRO · JOELHO/.test(lista), 'lista mostra títulos, palavras, quantidade e excludente por convênio');
+await p.goto(html + '#equivalencias'); await regras();
+let lista = await p.textContent('#cardCompostas');
+for (let k = 0; k < await p.locator('#cardCompostas tbody tr.clicavel').count(); k++) { await p.locator('#cardCompostas tbody tr.clicavel').nth(k).click(); await p.waitForSelector('#cardCompostas tr.detalhe'); lista += await p.textContent('#cardCompostas tr.detalhe'); }
+ok(/USG mamas \+ Doppler/.test(lista) && /×2/.test(lista) && /não exigido/.test(lista) && /contém DOPPLER e uma de PUNHO, OMBRO, JOELHO/.test(lista), 'lista mostra títulos, palavras, quantidade e excludente por convênio');
 await p.locator('#cardCompostas').screenshot({ path: out + 'compostas_lista.png' });
 // 5) Conflito (título validado para dois códigos) → «um ou outro» vira regra composta e o conflito deixa de travar.
 await p.evaluate(() => { const { S: E, t } = window.__RM;
   const mk = (codigo, descMV, titulo) => { const e = t.novaRelacao({ codigo, titulo, descMV, escopo: { unidade: '*', modalidade: '*' }, origem: 'teste' }); E.eq.itens.push(e); t.alterarStatusEq(E.eq, [e.id], 'validada', 'Teste', 'teste', '2026-10'); };
   mk('40901204', 'USG BOLSA ESCROTAL - OP', 'ULTRASSONOGRAFIA DO ESCROTO'); mk('40901203', 'USG ORGAOS SUPERF. (TIREOIDE OU ESCROTO OU PENIS OU CRANIO)', 'ULTRASSONOGRAFIA DO ESCROTO');
   mk('40901204', 'USG BOLSA ESCROTAL - OP', 'USG DOPPLER DE BOLSA ESCROTAL'); mk('40901386', 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - OP', 'USG DOPPLER DE BOLSA ESCROTAL'); });
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('[data-confou]');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('.eq-alerta.err summary'); await p.click('.eq-alerta.err summary'); await p.waitForSelector('[data-confou]');
 const cf = await p.textContent('ul.conflitos');
 ok(/ULTRASSONOGRAFIA DO ESCROTO[\s\S]*um ou outro/.test(cf) && /USG DOPPLER DE BOLSA ESCROTAL[\s\S]*juntos/.test(cf), 'conflito indica possível regra composta: escroto = um ou outro; título com Doppler = juntos');
 await p.locator('ul.conflitos li:has-text("ULTRASSONOGRAFIA DO ESCROTO") [data-confou]').click(); await p.waitForSelector('#dlg[open]');
@@ -140,8 +145,9 @@ await p.evaluate(() => { const { S: E, t } = window.__RM;
   mk('40808041', 'MAMOGRAFIA DIGITAL BILATERAL - OP', 'MAMOGRAFIA DIGITAL'); mk('28850308', 'MAMOGRAFIA DIGITAL UNILATERAL - OP', 'MAMOGRAFIA DIGITAL');
   mk('40901286', 'USG PARTES MOLES', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO'); mk('40901220', 'USG ARTICULAR (POR ARTICULACAO) - OP', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO'); mk('40901211', 'USG EST. SUPERFICIAIS', 'ULTRASSONOGRAFIA DO BRAÇO ESQUERDO');
   mk('40901114', 'USG MAMAS - OP', 'DOPPLER MAMAS'); mk('40901386', 'DOPPLER COLORIDO DE ORGAO OU ESTRUTURA ISOLADA - OP', 'DOPPLER MAMAS'); });
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqVis');
-await p.selectOption('#eqSt', 'pendente'); await p.selectOption('#eqVis', 'titulo'); await p.waitForSelector('table.eq-grupos');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await relacoes(); await p.click('[data-eqst="pendente"]'); await p.waitForSelector('.eq-mais');
+if (!(await p.isVisible('#eqVis'))) await p.click('.eq-mais summary');
+ await p.selectOption('#eqVis', 'titulo'); await p.waitForSelector('table.eq-grupos');
 const gr = await p.$$eval('table.eq-grupos tbody tr', trs => trs.map(tr => tr.cells[0].textContent.trim()));
 ok(!(await p.isVisible('#eqVal')) && gr.includes('MAMOGRAFIA DIGITAL') && gr.includes('ULTRASSONOGRAFIA DO BRAÇO ESQUERDO') && gr.includes('DOPPLER MAMAS'), `«Agrupar por título»: títulos com 2+ códigos pendentes (${gr.join(' · ')})`);
 await p.screenshot({ path: out + 'compostas_lista_titulo.png', fullPage: true });
@@ -160,7 +166,7 @@ ok((await p.$$eval('#dlgCorpo .cp-proc > span:first-child > b', e => e.map(x => 
 await okDlg('');
 // Regra desativada: as relações cobertas voltam a pendente.
 await p.evaluate(() => { const { S: E, t } = window.__RM, r = E.eq.compostas.find(c => /MAMOGRAFIA DIGITAL/.test(c.nome)); t.alterarStatusComposta(E.eq, r.id, 'desativada', 'Teste', 'teste'); t.salvarEq('Regra desativada.'); });   // como a tela: desativar e gravar (v3.0.0-alpha.11: a cobertura é aplicada ao gravar, não ao abrir a tela)
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqVis');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await relacoes();
 ok(await p.evaluate(() => window.__RM.S.eq.itens.filter(e => e.titulo === 'MAMOGRAFIA DIGITAL').every(e => e.status === 'pendente')), 'regra desativada: as relações cobertas voltam a pendente');
 // Botão na barra: regra composta com as selecionadas.
 await p.selectOption('#eqVis', 'lista'); await p.waitForSelector('#eqTab input[data-id]'); await p.fill('#eqBusca', 'DOPPLER MAMAS'); await p.waitForTimeout(300);
@@ -168,10 +174,10 @@ await p.check('#eqTodos'); await p.click('#eqCmp'); await p.waitForSelector('#dl
 ok(/DOPPLER MAMAS/.test((await p.$$eval('#dlgCorpo .cp-chip', e => e.map(x => x.textContent))).join('|')) && /40901114/.test((await p.$$eval('#dlgCorpo .cp-proc > span:first-child > b', e => e.map(x => x.textContent))).join(',')) && /40901386/.test((await p.$$eval('#dlgCorpo .cp-proc > span:first-child > b', e => e.map(x => x.textContent))).join(',')), '«Criar regra composta com as selecionadas» abre o cadastro com títulos e códigos marcados');
 await okDlg('');
 // 7) Planilha de equivalências linha a linha e leitura em português das regras.
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#eqXlsx');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await regras();
 const leit = await p.$$eval('#cardCompostas .cp-leitura', e => e.map(x => x.textContent));
 ok(leit.some(t => /^Espera na conta: 1× 40901114.*e 2× 40901386.*No convênio UNIMED.*esperado 1×/.test(t)), `cada regra mostra como funciona, em português (${(leit.find(t => /MAMAS/.test(t)) || '').slice(0, 140)}…)`);
-const ctxDl = p.context(); const [dlx] = await Promise.all([p.waitForEvent('download'), p.click('#eqXlsx')]); const xe = out + 'equivalencias.xlsx'; await dlx.saveAs(xe);
+const ctxDl = p.context(); const [dlx] = await Promise.all([p.waitForEvent('download'), (async () => { await p.click('.eq-arq summary'); await p.click('#eqXlsx'); })()]); const xe = out + 'equivalencias.xlsx'; await dlx.saveAs(xe);
 const xq = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys
 wb=openpyxl.load_workbook(sys.argv[1]); r=wb['Regras compostas']; it=wb['Itens das regras']; rel=wb['Relações']
 print(json.dumps({'abas':wb.sheetnames,'leit':[x[2] for x in r.iter_rows(min_row=2,values_only=True)],'itens':it.max_row-1,'rel':rel.max_row-1}))`, xe]).toString());
@@ -185,16 +191,15 @@ const escroto = async () => p.evaluate(() => { const { S: E, t } = window.__RM, 
   const res = t.conferirCruzado({ regs, cab: {} }, { laudos }, E.cfg, E.eq, { tol: 0, unidadeCod: '*', medicos: null });
   return res.linhas.filter(x => x.r).map(x => x.status + ([...x.marcadores].includes('composta-falta') ? '+falta' : '')).join(); });
 ok(await escroto() === 'ressalva+falta', 'regra «juntos» do escroto: só um dos códigos na conta vira composição incompleta');
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
-const linhaEsc = p.locator('#cardCompostas tbody tr:has(td > b:text-is("Bolsa escrotal"))').first();
-await linhaEsc.locator('[data-cmpmodo]').click(); await p.waitForSelector('#dlg[open]');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await regras();
+await abrirRegra('Bolsa escrotal'); await p.click('#cardCompostas [data-cmpmodo]'); await p.waitForSelector('#dlg[open]');
 ok(/Fica:.*qualquer um destes códigos: 40901204.* ou 40901203/.test(await p.textContent('#dlgCorpo')), 'trocar para «um ou outro» mostra como fica, em português');
 await p.fill('#dlgCorpo [name="just"]', 'escroto: bolsa escrotal ou órgãos superficiais'); await okDlg('ok');
 const esc3 = await p.evaluate(() => { const c = window.__RM.S.eq.compostas.find(x => x.nome === 'Bolsa escrotal'); return { n: c.itens.length, cods: c.itens[0].codigos.join(','), st: c.status, h: c.historico.at(-1).motivo }; });
 ok(esc3.n === 1 && esc3.cods === '40901204,40901203' && esc3.st === 'validada' && /um ou outro/.test(esc3.h), `regra agora é «um ou outro» (um item com 40901204 ou 40901203), continua validada e a troca fica no histórico`);
 ok(await escroto() === 'conferido', 'com «um ou outro», só um dos códigos na conta confere o laudo');
-await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await p.waitForSelector('#cardCompostas');
-await p.locator('#cardCompostas tbody tr:has(td > b:text-is("Bolsa escrotal")) [data-cmped]').first().click(); await p.waitForSelector('#dlg[open]');
+await p.goto(html + '#inicio'); await p.goto(html + '#equivalencias'); await regras();
+await abrirRegra('Bolsa escrotal'); await p.click('#cardCompostas [data-cmped]'); await p.waitForSelector('#dlg[open]');
 ok(/Um destes procedimentos/.test(await p.textContent('#dlgCorpo .cp-modo button.on')) && /qualquer um destes códigos/.test(await p.textContent('#cpComo')), 'o cadastro da regra mostra «Um destes procedimentos» marcado e a frase «Como vai funcionar»');
 await okDlg('');
 // Desativada não vale.

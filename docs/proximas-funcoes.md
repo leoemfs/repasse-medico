@@ -23,6 +23,25 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+
+## Equivalências TUSS simplificadas — **IMPLEMENTADA na v3.0.0-alpha.36** (pedido de 24/11/2026; prévia aprovada: https://claude.ai/artifact/Pz54KXDqMFps4d4a48iuCT e `docs/prototipos/equivalencias-simplificadas.html`; teste: `test/eq_tela.mjs`)
+
+**Pedido:**
+- A edição era complicada, havia botões demais (5 de importar e exportar) e a lista de conflitos ocupava a tela toda.
+- Manter as abas atuais, com uma distribuição mais limpa e direta, que outra pessoa entenda.
+
+**Na aba Base** (as 4 abas continuam):
+- **Contadores no topo:** pendentes, validadas, desativadas, cobertas e todas. Clicar filtra a lista; substituem o filtro «Status».
+- **«Arquivos ▾»:** um menu com «Trazer» (importar planilha, juntar com outra base, substituir a base) e «Levar» (exportar planilha, exportar base), com uma linha explicando cada opção.
+- **«+ Nova»:** cria uma relação ou uma regra composta, conforme a vista aberta.
+- **Conflitos:** uma linha de aviso, recolhida, com «Resolver». Quando não há conflito: «✓ Sem conflitos».
+- **Seletor Relações | Regras compostas:** as duas listas não ficam mais empilhadas.
+- **Relações:** busca e «Mais filtros ▾» (confiança, ambíguas, agrupar por título). Clicar na linha abre, logo abaixo, os dados, o histórico e as ações (Validar, Voltar a pendente, Desativar, Criar regra composta). Não há botões na tabela.
+- **Barra de lote:** só aparece com linhas marcadas.
+- **Regras compostas:** lista compacta (regra, o que espera na conta, uso no mês, situação). Clicar abre a leitura completa e as ações: Validar, «Editar (4 perguntas)», trocar entre «todos juntos» e «um ou outro», Desativar.
+
+A prévia mostrava a edição no painel lateral; por pedido do usuário, ela foi para a própria linha.
+
 ## Exames compostos repetidos no mesmo dia — **IMPLEMENTADA na v3.0.0-alpha.31** (24/11/2026; teste: `test/exames_repetidos.mjs`)
 
 Achado nos testes com 12 relatórios de USG reais de 11/2026 (1.077 linhas, base de equivalências rev65 → rev66):
