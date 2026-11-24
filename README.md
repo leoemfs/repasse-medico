@@ -74,6 +74,7 @@ node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do fil
 node test/ponta_a_ponta_ficticio.mjs # v3.0: Início → conferência → decisões → NCs → aceite → correção → fechamento → Excel, com arquivos fictícios
 node test/pasta_por_aba.mjs    # v3.0: «Sincronizar pasta» por aba, Correção de prestador sem subpastas (unidade pelo nome) e avisos do Fechamento recolhíveis
 node test/retrospectiva.mjs    # v3.0: SOL-F20 — Retrospectiva (PDCA) no Fluxo mensal: lead time, rodadas até o aceite, terceiros, NCs com reincidência, antecedência, comparação entre meses, melhorias e backlog
+node test/roteiro.mjs          # v3.0: SOL-F51 — roteiro da conferência por relatório (passo lido de PDF, rodadas, decisões, aceite e e-mail; Node puro)
 node test/bench_pior_caso.mjs  # desempenho: 3.000 linhas × 30 mil laudos com homônimos; resultado idêntico (assinatura) e limite de tempo (precisa do --harness)
 node test/usg_mesmo_dia.mjs      # v3.0: vários USG do mesmo paciente no mesmo dia — o título do laudo desempata (dados fictícios)
 node test/cadastro_usg.mjs       # v3.0: cadastro de USG pela planilha de controle — faixa 42%, migração das faixas, residente que muda de faixa e % por unidade

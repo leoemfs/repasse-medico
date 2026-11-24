@@ -22,6 +22,23 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+## SOL-F51 — Roteiro da conferência por relatório — **IMPLEMENTADA na v3.0.0-alpha.26** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/roteiro-conferencia/` e https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB; teste: `test/roteiro.mjs`)
+Base reaproveitável das prévias (CSS, menu e ícones do app): https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE.
+
+**Como ficou:** o passo vem do motor (`roteiroDoRelatorio`, em `src/engine/64-roteiro.js`). Na Conferência, o cartão «Roteiro deste relatório» fica entre «O que conferir» e o resultado, com o botão do próximo passo; abaixo dos parâmetros, cada relatório da lista mostra o passo em que está (clicar escolhe o relatório). Um PDF novo (outro arquivo) depois da última rodada leva ao passo 4. «Resolvido no MV» ou NC em linhas que continuam no PDF conferido mantêm o passo 3 (com alerta, se o PDF novo ainda traz as linhas). O aceite com pendências justificadas segue para o envio.
+
+O usuário se perde no ciclo «confiro na ferramenta, corrijo no MV, tiro o relatório de novo… e agora, rodo de novo?». Pedido: mostrar na Conferência o roteiro de cada relatório e o passo em que ele está.
+- Seis passos:
+  1. versão hospitalar no MV (PDF com valor total);
+  2. conferir e decidir;
+  3. corrigir no MV;
+  4. gerar de novo e reconferir («Reler o PDF e conferir de novo»);
+  5. aceite do relatório;
+  6. versão final e envio.
+- O passo é **calculado pelo que já existe**: PDF lido, rodadas, decisões, «Resolvido no MV» e NCs a corrigir, aceite, e-mail marcado no Fechamento. Nada a preencher a mais.
+- Cada relatório da unidade mostra o passo («passo 4 de 6», «✓ enviado») em «O que conferir».
+- **Versão final do MV** (sem a coluna de valor total e sem a %): o usuário tira, salva e envia por e-mail com a prévia de todas as unidades. A ferramenta **não precisa ler** esse PDF; o passo 6 só lembra de enviar e de marcar o e-mail. (Ainda não há exemplo do PDF final; se um dia for preciso lê-lo, pedir um exemplo.)
+- Regras de negócio que mudam: nenhuma.
 ## Correções da v3.0.0-alpha.25 — achadas com os arquivos reais de 11/2026 (23/11/2026)
 Arquivos enviados nesta sessão: relatórios do MV de 17771 (Matheus) e 6703 (Alexandre), da V3, e a planilha de laudos de 11/2026 (38.276 laudos). Os PDFs foram lidos com o total igual ao impresso (R$ 15.087,16 e R$ 12.059,00).
 - **HM:** os números batem com a SOL-F46.

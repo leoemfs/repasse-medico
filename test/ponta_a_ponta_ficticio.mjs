@@ -71,6 +71,7 @@ const classes = () => p.evaluate(() => window.__RM.S.conf.res.linhas.filter(x =>
 const totais = () => p.evaluate(() => window.__RM.t.totaisPorClasse(window.__RM.S.conf.res.linhas, window.__RM.t.classeDaLinhaConf));
 ok(await classes() === 'ANA:devido BRUNA:devido CARLA:pend DORA:pend ELIS:pend', `classes da conferência: ${await classes()}`);
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.some(x => !x.r && x.status === 'so-laudo' && x.l.paciente === 'FABIO NUNES LEAL')), 'laudo sem lançamento aparece «Só no laudo»');
+ok(/Conferir e decidir/.test(await p.textContent('#cfRoteiro .rot-passo.atual')) && /decisão\(ões\) faltam/.test(await p.textContent('#cfRoteiro')), `SOL-F51: roteiro no passo 2 (${(await p.textContent('#cfRoteiro .rot-passo.atual')).trim()})`);
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
 await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
@@ -106,6 +107,9 @@ await p.goto(html + '#conferencia'); await p.waitForSelector('#cfAbas');
 await p.click('#cfAba-aceite'); await p.waitForTimeout(100);
 await p.fill('#cfAceiteObs', 'ELIS: título sem equivalência, fica pendente'); await p.click('#cfAceitar'); await p.waitForTimeout(300); if (await p.isVisible('#dlg[open]')) await okDlg();
 ok(await p.evaluate(() => { const { S } = window.__RM; return !!S.rodadas.find(r => r.id === S.conf.ctx.rodadaId)?.aceite; }), 'aceite do relatório registrado com observação');
+await p.waitForTimeout(200);
+ok(/Versão final e envio/.test(await p.textContent('#cfRoteiro .rot-passo.atual')) && (await p.$$('#cfRoteiro .rot-passo.feito')).length === 5, `SOL-F51: depois do aceite, roteiro no passo 6 (${(await p.textContent('#cfRoteiro .rot-passo.atual')).trim()})`);
+await p.screenshot({ path: out + 'roteiro.png', fullPage: true });
 const cfX = await baixar('#cfExcel', 'conferencia.xlsx'), cfAbas = abas(cfX);
 const resumo = (cfAbas['Resumo'] || []).find(r => String(r[0]).startsWith('VALOR PARA PAGAMENTO'));
 ok(resumo && +resumo[2] === 60, `Excel da conferência: Resumo com o valor para pagamento R$ ${resumo?.[2]}`);
