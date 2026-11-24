@@ -48,6 +48,10 @@ Com a base rev65 eram 809 linhas conferidas; com a rev66 e o motor da alpha.31, 
 - As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
 - Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
 
+## Conferência: atendimento e ID do Apolo copiáveis — **IMPLEMENTADA na v3.0.0-alpha.35** (pedido de 24/11/2026; prévia: `docs/prototipos/atendimento-id-copiavel/` e https://claude.ai/artifact/2BzUnDxLEDWjcxe69iwPfJ)
+- Na linha aberta da Conferência, o atendimento (em «Motivo / evidências» e na «Linha do MV») copia com um clique.
+- O bloco «Laudo» sempre começa com o «ID Apolo» (coluna ID da planilha de laudos), também copiável. Conta e acesso ficam de fora (decisão do usuário).
+
 ## Conferência: rolagem, selecionar todos e copiar nome — **IMPLEMENTADA na v3.0.0-alpha.32** (pedido de 24/11/2026; prévia aprovada: `docs/prototipos/selecao-copiar-nome/` e https://claude.ai/artifact/K2GJK7qKJtxH1e6aemBqrZ)
 - Abrir ou fechar uma linha da tabela não leva mais a lista de volta ao topo (vale para todas as tabelas).
 - Caixa no cabeçalho marca/desmarca todas as linhas do filtro (com traço quando só algumas estão marcadas).

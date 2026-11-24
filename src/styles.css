@@ -512,3 +512,8 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cp-nome:hover{background:var(--infobg);color:var(--accent)}.cp-nome svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
 .cp-nome.ok{color:var(--ok)}
 th .cf-sel{margin:0}
+/* Atendimento e ID do laudo no Apolo copiáveis (24/11/2026) */
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--infobg);border-radius:6px;padding:0 2px 0 6px;white-space:nowrap}
+.cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;border-radius:5px;line-height:0}
+.cpv button:hover{color:var(--accent)}.cpv button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.cpv.ok{background:var(--okbg)}.cpv.ok button{color:var(--ok)}
