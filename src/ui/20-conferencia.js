@@ -380,7 +380,9 @@ function comparacaoMVLaudo(x) {
     ${linha('Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), cd && cd.nm < 3)}
     ${linha('Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia)}
     ${linha('Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, ROTULO_EQ[cd.proc.estado] || cd.proc.estado) : '', cd && !eqOk)}
-    ${linha('Convênio', x.r.convenio, x.l.convenio, b(igual(x.r.convenio, x.l.convenio), igual(x.r.convenio, x.l.convenio) ? 'igual' : 'diferente'), !igual(x.r.convenio, x.l.convenio))}
+    ${(() => { // v3.0.0-alpha.29: a mesma regra do motor — o MV corta o nome do convênio; se um é o começo do outro, é o mesmo.
+      const cv = convenioCompativel(x.r.convenio, x.l.convenio);
+      return linha('Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false); })()}
     ${linha('Médico', '', x.l.medico, '', false)}</div>`;
 }
 /* Histórico deste relatório (antes só na tela «Rodadas»): cada rodada, o valor para pagamento e o aceite. */
