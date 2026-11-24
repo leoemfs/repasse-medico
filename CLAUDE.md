@@ -4,6 +4,7 @@
   - **A prévia é um artefato do claude.ai** (ferramenta Artifact), não um arquivo no repositório. Decisão do usuário de 23/11/2026, para gastar menos.
   - **Base reaproveitável:** um artefato com o CSS, o menu e os ícones do app, publicado como arquivos (`files`). Cada prévia nova traz só o conteúdo da tela e referencia esses arquivos. Republicar a base só quando `src/styles.css` ou o menu mudar.
     - Base atual: https://claude.ai/artifact/1C13Rg6D9EMoN3JJYe4TEP (arquivos `app.css` e `app-menu.js`). Na prévia: `files: {"app.css": {artifact: <base>, path: "app.css"}, "app-menu.js": {artifact: <base>, path: "app-menu.js"}}`, `<link rel="stylesheet" href="app.css">`, `<div class="shell" data-pag="…"><main class="main">…</main></div>` e `<script src="app-menu.js"></script>`.
+    - **No celular, a prévia abre em modo computador** (pedido de 24/11/2026): o `app-menu.js` da base monta a página na largura de 1280 px e reduz para caber na tela. Não fazer layout de celular nas prévias.
   - **Sem ciclos de captura de tela:** conferir só que a página abre sem erro de script; quem avalia o visual é o usuário, no link.
   - **Nada de commit ou PR por prévia.** Só a versão **aprovada** vai para `docs/prototipos/`, no mesmo commit da implementação. A solicitação é registrada em `docs/proximas-funcoes.md` com o link do artefato.
 - Pedidos de «só registre / documente» não mexem no código: vão para `docs/proximas-funcoes.md`.
