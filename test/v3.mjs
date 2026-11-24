@@ -27,9 +27,9 @@ const LINHAS_IAN = [
   { grupo: 'HONORARIO MEDICO RAIO X', desc: 'RX TORAX - 2 INCIDENCIAS-HM', convenio: 'UNIMED CURITIBA', quant: 1, vlTotal: 50, vlRepasse: 0, tipoItem: 'hm' },
   { grupo: 'HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'PARTICULAR', quant: 1, vlTotal: 80, vlRepasse: 0, tipoItem: 'hm' }
 ];
-const EMAIL_IAN = ['Boa tarde, segue relatório de produção para conferência.', '', 'Foram realizados 1539 exames de ultrassom.', '',
+const EMAIL_IAN = ['Boa tarde a todos, segue relatório de produção para conferência.', '', 'Foram realizados 1539 exames de ultrassom.', '',
   'Densitometria: R$ 0,00 (SEM PRODUÇÃO)', 'Honorários USG UNIMED: R$ 21.907,88', 'USG: R$ 93.838,16', '',
-  'Ultrassom: R$ 93.838,16 mais HM R$ 21.907,88 = R$ 115.746,04', 'menos os impostos (9,15%) = R$ 105.155,28 * 70% = R$ 73.608,69', '',
+  'Ultrassom: R$ 93.838,16 mais HM R$ 21.907,88 = R$ 115.746,04 menos os impostos (9,15%) = R$ 105.155,28 * 70% = R$ 73.608,69', '',
   'Total para emissão da nota fiscal: R$ 73.608,69'].join('\n');
 
 // 1) Motor: cálculo e texto do e-mail.

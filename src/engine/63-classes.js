@@ -28,6 +28,8 @@ const REGRA_VALOR_F43 = 'f43';
 function classeDaLinha(tipo, estado, decisao) {
   if (TIPOS_NUNCA_REPASSE.has(tipo)) return 'excluido';
   if (decisao === 'nc') return 'nc';
+  // V3: convênio que não compõe o repasse (CURSO CETRUS) — excluir do MV, sem decisão.
+  if (estado === 'convenio-excluir') return 'excluido';
   if (tipo === 'hm') {
     if (estado === 'conferido') return 'devido';
     // V3: HM de USG Unimed sem o exame base no relatório espera decisão (pode ser aceito); os demais HM são excluídos.

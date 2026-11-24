@@ -42,7 +42,8 @@ const conf = await p.evaluate(() => {
     R('DORA NUNES', 6, '40901114', 'USG MAMAS - HM', '81 - HONORARIO MEDICO MAMOGRAFIA', 'UNIMED CURITIBA', 12, 25),
     R('ELIS PRADO', 7, '99000001', 'PACOTE RESSONANCIA DO CRANIO', 'PACOTE', 'BRADESCO SAUDE', 45, 450),
     R('ELIS PRADO', 7, '41101014', 'RM CRANIO', 'RESSONANCIA MAGNETICA', 'BRADESCO SAUDE', 300, 300),
-    R('FABIO RAMOS', 8, '41001010', 'TC CRANIO', 'TOMOGRAFIA COMPUTADORIZADA', 'UNIMED CURITIBA', 30, 300)
+    R('FABIO RAMOS', 8, '41001010', 'TC CRANIO', 'TOMOGRAFIA COMPUTADORIZADA', 'UNIMED CURITIBA', 30, 300),
+    R('GABI LOPES', 9, '40901114', 'USG MAMAS - OP', 'ULTRASSONOGRAFIA - OUTROS', 'CURSO CETRUS', 0.01, 0.01)
   ];
   const L = (i, paciente, dia, titulo, modalidade) => ({ i, paciente, pn: t.norm ? t.norm(paciente) : paciente, data: d(dia), dia: t.diaSerial(d(dia)), titulo, tn: titulo, modalidade, medico: 'ALEXANDRE ROMANUS', mn: 'ALEXANDRE ROMANUS', unidade: 'AlphaSonic Curitiba', convenio: 'UNIMED CURITIBA' });
   // Laudo de USG com MODALITY errada no Apolo («OT»): na V3 vale o TITLE.
@@ -51,7 +52,7 @@ const conf = await p.evaluate(() => {
   const mv = res.linhas.filter(x => x.r);
   const av = t.avisosConferenciaV3(res), cz = t.causasDaConferencia(res, []);
   return { linhas: mv.map(x => `${x.r.seq}:${x.status}:${t.classeDaLinhaConf(x)}`), parAna: mv[0].l ? `${mv[0].l.modalidade}/${mv[0].l.modalidadeApolo}` : '',
-    av: { exc: av.hmExcluir.n, grupos: av.hmExcluir.grupos.map(g => g.grupo).join('|'), semBase: av.hmSemBase.n, pac: av.pacotes.n, sub: av.substituidos.n, fora: av.foraEscopo.n, usgNoPF: av.hmExcluir.usgUnimed.n },
+    av: { exc: av.hmExcluir.n, grupos: av.hmExcluir.grupos.map(g => g.grupo).join('|'), semBase: av.hmSemBase.n, pac: av.pacotes.n, sub: av.substituidos.n, fora: av.foraEscopo.n, usgNoPF: av.hmExcluir.usgUnimed.n, cetrus: av.convExcluir.n },
     causaSemBase: cz.grupos.some(g => g.tipo === 'hm-sem-base') };
 });
 const L = Object.fromEntries(conf.linhas.map(x => { const [s, st, cl] = x.split(':'); return [s, `${st}:${cl}`]; }));
@@ -61,6 +62,7 @@ ok(L[3] === 'hm-sem-base:pend' && conf.causaSemBase, `HM de USG Unimed sem exame
 ok(L[4] === 'hm-pendente:excluido' && L[5] === 'hm-pendente:excluido' && L[6] === 'hm-pendente:excluido' && L[7] === 'hm-pendente:excluido', `HM raio-X, RMN no 78 PF, mamografia e USG lançado no grupo de mamografia = Excluído (${L[4]} ${L[5]} ${L[6]} ${L[7]})`);
 ok(L[8] === 'conferido:devido', `pacote de ressonância = Devido pelo valor do MV (${L[8]})`);
 ok(L[9] === 'substituido-pacote:excluido', `ressonância Bradesco a 100% do mesmo paciente e dia = substituída pelo pacote, fora do fechamento (${L[9]})`);
+ok(L[11] === 'convenio-excluir:excluido' && conf.av.cetrus === 1, `CURSO CETRUS = Excluído, sinalizado para excluir do MV (${L[11]})`);
 ok(conf.av.usgNoPF === 1, `HM de USG Unimed lançado no grupo de mamografia: excluído, mas com destaque no aviso (${conf.av.usgNoPF})`);
 ok(conf.av.exc === 4 && conf.av.semBase === 1 && conf.av.pac === 1 && conf.av.sub === 1 && conf.av.fora === 1, `avisos de Curitiba: 4 HM a excluir, 1 sem base, 1 pacote, 1 base substituída, 1 tomografia (${JSON.stringify(conf.av)})`);
 
@@ -75,6 +77,16 @@ const fx = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.
   return { total: c.total, hm: c.hm.valor, pac: c.pacotes.valor, texto: textoEmailV3(c) }; });
 ok(fx.hm === 132 && fx.pac === 45 && fx.total === 330 + 132 + 90 + 45, `valor fixo: 10 USG × 33 + 4 HM × 33 (o valor de HM antigo, 10, é ignorado) + 2 RM × 45 + pacote 45 = ${fx.total}`);
 ok(/Pacotes \(ressonância\/mamografia\): 1 = R\$ 45,00/.test(fx.texto), 'o e-mail mostra o pacote');
+// E-mail do Dr. Ian de 10/2026, como o usuário envia hoje (24/11/2026); «R$ 0,00» onde o e-mail dele trazia «R$ 00,00».
+const emailIan = await p.evaluate(() => { const { calcularV3, textoEmailV3, regraV3Padrao } = window.__RM.t;
+  return textoEmailV3(calcularV3(regraV3Padrao(), [
+    { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG MAMAS - OP', convenio: 'UNIMED CURITIBA -', quant: 1539, vlTotal: 93838.16, vlRepasse: 93838.16, tipoItem: 'procedimento' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA -', quant: 400, vlTotal: 21907.88, vlRepasse: 21907.88, tipoItem: 'hm' }])); });
+const EMAIL_IAN_10 = ['Boa tarde a todos, segue relatório de produção para conferência.', '', 'Foram realizados 1539 exames de ultrassom.', '',
+  'Densitometria: R$ 0,00 (SEM PRODUÇÃO)', 'Honorários USG UNIMED: R$ 21.907,88', 'USG: R$ 93.838,16', '',
+  'Ultrassom: R$ 93.838,16 mais HM R$ 21.907,88 = R$ 115.746,04 menos os impostos (9,15%) = R$ 105.155,28 * 70% = R$ 73.608,69', '',
+  'Total para emissão da nota fiscal: R$ 73.608,69'].join('\n');
+ok(emailIan === EMAIL_IAN_10, 'e-mail do Dr. Ian igual ao enviado pelo usuário (10/2026: R$ 73.608,69)' + (emailIan === EMAIL_IAN_10 ? '' : '\n' + emailIan));
 // HM de USG Unimed = valor do exame base correspondente, para todos na V3 (23/11/2026): se a USG muda (exceção), o HM muda junto.
 const hmb = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.__RM.t;
   const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, excecoes: [{ convenio: 'UNIMED', valorLaudo: 40 }] }] };
@@ -83,6 +95,10 @@ const hmb = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window
     { grupo: 'ULTRASSONOGRAFIA', desc: 'US TIREOIDE', convenio: 'PARTICULAR', quant: 1, vlTotal: 100, vlRepasse: 33, tipoItem: 'procedimento' },
     { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA -', baseConvenio: 'UNIMED CURITIBA -', quant: 2, vlTotal: 120, vlRepasse: 66, tipoItem: 'hm' }]);
   return { hm: c.hm.valor, total: c.total, texto: textoEmailV3(c) }; });
+const cet = await p.evaluate(() => window.__RM.t.calcularV3(window.__RM.t.regraV3Padrao(), [
+  { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG MAMAS - OP', convenio: 'UNIMED CURITIBA -', quant: 10, vlTotal: 1000, vlRepasse: 1000, tipoItem: 'procedimento' },
+  { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG MAMAS - OP', convenio: 'CURSO CETRUS', quant: 2, vlTotal: 0.02, vlRepasse: 0.02, tipoItem: 'procedimento' }]));
+ok(cet.exames === 10 && cet.brutoUSG === 1000 && cet.convExcluir.qtd === 2, `cálculo da V3: CURSO CETRUS fora da contagem de exames e do bruto (${cet.exames} exames)`);
 ok(hmb.hm === 80 && hmb.total === 80 + 33 + 80 && /Honorários USG UNIMED: 2 × R\$ 40,00 = R\$ 80,00/.test(hmb.texto), `HM segue o exame base: USG Unimed R$ 40 (exceção) → HM R$ 40 (2 HM = R$ ${hmb.hm}); total ${hmb.total}`);
 const bc = await p.evaluate(() => { const { S, t } = window.__RM, d = new Date(Date.UTC(2026, 9, 3));
   const r = (seq, desc, grupoNome, convenio) => ({ seq, pagina: 1, codigo: '40901114', procDesc: desc, grupoNome, conta: 'C', atendimento: 'AT9', paciente: 'GIL SOUZA', convenio, data: d, vlRepasse: 33, vlTotal: 60, pct: .5, quant: 1, prestadorCod: '1', prestadorNome: 'X' });
