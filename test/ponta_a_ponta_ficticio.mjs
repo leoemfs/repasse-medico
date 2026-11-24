@@ -77,6 +77,7 @@ ok(await p.isVisible('#cfRoteiro .roteiro'), 'roteiro continua visível com o me
 await p.click('#btnMenu'); await p.waitForTimeout(150);
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
+ok(/15 - DR X\s*DR X\s*mesmo prestador/.test(await p.textContent('#cfTab .cf-cmp')), 'linha Médico: o prestador do relatório do MV ao lado do médico do laudo (alpha.39)');
 await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).

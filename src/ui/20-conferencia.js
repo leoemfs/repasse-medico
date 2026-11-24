@@ -327,7 +327,7 @@ function desenharConferencia() {
     ],
     classeLinha: x => { const g = grupos.get(x); return g ? `${g.banda ? 'grp-b' : ''}${g.inicio ? ' grp-ini' : ''}` : ''; },
     detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
-      return `${comparacaoMVLaudo(x)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul>
+      return `${comparacaoMVLaudo(x, ctx)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${copiavel(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
       ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">ID Apolo ${copiavel(x.l.idLaudo)} · ${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(x.l.convenio)} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}
       <h4 style="margin-top:8px">Observação</h4><textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
@@ -386,7 +386,7 @@ function desenharConferencia() {
   desenharRoteiroConf();
 }
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
-function comparacaoMVLaudo(x) {
+function comparacaoMVLaudo(x, ctx = null) {
   if (!x.r || !x.l) return '';
   const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
   const linha = (rot, mv, la, estado, dif) => `<div class="${dif ? 'dif' : ''}"><span>${rot}</span><span>${esc(mv || '—')}</span><span>${esc(la || '—')} ${estado}</span></div>`;
@@ -399,7 +399,11 @@ function comparacaoMVLaudo(x) {
     ${(() => { // v3.0.0-alpha.29: a mesma regra do motor — o MV corta o nome do convênio; se um é o começo do outro, é o mesmo.
       const cv = convenioCompativel(x.r.convenio, x.l.convenio);
       return linha('Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false); })()}
-    ${linha('Médico', '', x.l.medico, '', false)}</div>`;
+    ${(() => { // v3.0.0-alpha.39: o médico do MV é o prestador do relatório (cabeçalho do PDF); confere com o cadastro e os aliases.
+      const cab = ctx?.relatorio?.cab, mv = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
+      if (!cab || !x.l.medico) return linha('Médico', mv, x.l.medico, '', false);
+      const mesmo = medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico));
+      return linha('Médico', mv, x.l.medico, b(mesmo, mesmo ? 'mesmo prestador' : 'outro médico'), !mesmo); })()}</div>`;
 }
 /* Histórico deste relatório (antes só na tela «Rodadas»): cada rodada, o valor para pagamento e o aceite. */
 function cartaoHistoricoRelatorio(ctx) {
