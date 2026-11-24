@@ -357,7 +357,10 @@ function iniciarMenu() {
 /* ---------- Tabela paginada com detalhe expansível ---------- */
 function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.' }) {
   let pag = 0, aberto = null;
-  const desenhar = () => {
+  // manter: abrir/fechar uma linha não pode levar a lista de volta ao topo (pedido de 24/11/2026) — guarda a rolagem da
+  // área da tabela (.tw) e da página e devolve depois de redesenhar.
+  const desenhar = (manter = false) => {
+    const tw0 = cont.querySelector('.tw'), rol = manter && tw0 ? [tw0.scrollTop, tw0.scrollLeft] : null, pagY = manter ? window.scrollY : null;
     const total = linhas.length, ini = pag * porPagina, fatia = linhas.slice(ini, ini + porPagina);
     cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
       const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${ini + i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
@@ -365,7 +368,9 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
     }).join('') : `<tr><td colspan="${colunas.length}" class="muted">${esc(vazio)}</td></tr>`}</tbody></table></div>` +
       (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)</span></div>`);
     cont.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pag += +b.dataset.p; aberto = null; desenhar(); });
-    if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(); });
+    if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(true); });
+    if (rol) { const tw = cont.querySelector('.tw'); if (tw) { tw.scrollTop = rol[0]; tw.scrollLeft = rol[1]; } }
+    if (pagY != null && window.scrollY !== pagY) window.scrollTo(window.scrollX, pagY);
   };
   desenhar();
   return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
