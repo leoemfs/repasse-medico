@@ -1,0 +1,38 @@
+<title>Atendimento e ID copiáveis</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="base/app.css">
+<style>
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;font-weight:600;color:var(--text);background:var(--infobg);border-radius:6px;padding:0 2px 0 6px;white-space:nowrap}
+.cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;border-radius:5px;line-height:0}
+.cpv button:hover{color:var(--accent)}.cpv button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.cpv.ok{background:var(--okbg)}.cpv.ok button{color:var(--ok)}
+.det h4{margin:10px 0 4px}.det ul{margin:0;padding-left:18px}.det li{margin:2px 0}
+</style>
+<template id="conteudo">
+<div class="card">
+  <h2>Linha aberta na conferência (dados fictícios)</h2>
+  <p class="small muted">Os números em destaque copiam com um clique no ícone. O ID do laudo no Apolo aparece sempre, logo no começo do bloco «Laudo».</p>
+  <div class="det small">
+    <h4>Motivo / evidências</h4>
+    <ul>
+      <li>Sem lançamento correspondente neste relatório do MV.</li>
+      <li>Power BI: conta <span data-v="2542884"></span> · atendimento <span data-v="2207433"></span> · 41001095 TC ABDOME TOTAL — lançado (remessa 123373): pode ter entrado depois da geração do repasse.</li>
+    </ul>
+    <h4>Linha do MV</h4>
+    <div>40901173 - US TIREOIDE · conta 2531190 · atendimento <span data-v="2198004"></span> · UNIMED · página 3</div>
+    <h4>Laudo</h4>
+    <div>ID Apolo <span data-v="884512"></span> · acesso <span data-v="AC20261007-0331"></span> · TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL · TC DE VIAS URINÁRIAS · Unidade Centro · CT · UNIMED · linha 418 da planilha</div>
+  </div>
+</div>
+</template>
+<script src="base/shell.js"></script>
+<script>
+montarPrevia({ ativo: 'conferencia', titulo: 'Conferência cruzada', nota: 'Atendimento, conta e ID do laudo do Apolo copiáveis com um clique. Dados fictícios.' });
+const ic = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+document.querySelectorAll('[data-v]').forEach(s => { s.className = 'cpv'; s.innerHTML = `${s.dataset.v}<button type="button" title="Copiar ${s.dataset.v}" aria-label="Copiar ${s.dataset.v}">${ic}</button>`; });
+document.addEventListener('click', async e => {
+  const b = e.target.closest('.cpv button'); if (!b) return; const s = b.parentNode, v = s.dataset.v;
+  try { await navigator.clipboard.writeText(v); } catch (_) { const r = document.createRange(); r.selectNodeContents(s.firstChild); getSelection().removeAllRanges(); getSelection().addRange(r); }
+  s.classList.add('ok'); setTimeout(() => s.classList.remove('ok'), 1200);
+});
+</script>
