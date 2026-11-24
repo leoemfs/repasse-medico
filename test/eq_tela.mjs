@@ -1,0 +1,46 @@
+// v3.0.0-alpha.36 — Equivalências simplificadas (prévia aprovada em 24/11/2026): contadores que filtram, «Arquivos ▾»,
+// Relações | Regras compostas, edição na própria linha e barra de lote só com seleção. Dados fictícios.
+import { createRequire } from 'module';
+import fs from 'fs';
+const { chromium } = createRequire(import.meta.url)('playwright');
+const raiz = new URL('..', import.meta.url).pathname;
+const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
+const ok = (cond, msg) => { console.log((cond ? '✔ ' : '✘ ') + msg); if (!cond) process.exitCode = 1; };
+const b = await chromium.launch(), erros = [];
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
+await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Tela')));
+await p.goto(html + '#inicio'); await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
+await p.evaluate(() => {
+  const { S, t } = window.__RM, R = (id, codigo, titulo, status) => ({ ...t.novaRelacao({ codigo, titulo, descMV: 'DESC ' + codigo }), id, status });
+  S.eq.itens.push(R('a', '40901122', 'USG ABDOME TOTAL', 'validada'), R('b', '40901300', 'USG TRANSVAGINAL', 'pendente'), R('c', '40901173', 'USG TIREOIDE', 'pendente'), R('d', '40804011', 'RX BACIA', 'desativada'));
+  window.__RM.irPara('equivalencias');
+});
+await p.waitForSelector('.eq-kpis');
+const kpis = (await p.textContent('.eq-kpis')).replace(/\s+/g, ' ');
+ok(/2 pendentes/.test(kpis) && /1 validadas/.test(kpis) && /1 desativadas/.test(kpis) && /4 todas/.test(kpis), `contadores no topo (${kpis.slice(0, 80)})`);
+const linhas = async () => p.$$eval('#eqTab tbody tr:not(.detalhe)', trs => trs.map(tr => tr.textContent.replace(/\s+/g, ' ').trim()));
+ok((await linhas()).length === 2, 'abre em «pendentes»: 2 linhas');
+await p.click('[data-eqst="validada"]'); await p.waitForTimeout(150);
+ok((await linhas()).length === 1 && /USG ABDOME TOTAL/.test((await linhas())[0]), 'clicar em «validadas» filtra a lista');
+ok(!(await p.isVisible('#eqXlsx')), 'importar/exportar ficam guardados em «Arquivos ▾»');
+await p.click('.eq-arq summary');
+const menu = await p.textContent('.eq-arq .lista');
+ok(await p.isVisible('#eqXlsx') && /Trazer/.test(menu) && /Levar/.test(menu) && /Substituir a base/.test(menu), '«Arquivos ▾» abre as 5 opções em «Trazer» e «Levar»');
+await p.click('.eq-arq summary');
+await p.click('[data-eqst="pendente"]'); await p.waitForTimeout(150);
+ok(!(await p.isVisible('#eqLote')), 'sem seleção, a barra de lote não aparece');
+await p.check('#eqTab input[data-id="b"]');
+ok(await p.isVisible('#eqLote') && /1 selecionada/.test(await p.textContent('#eqLote')), 'marcar uma linha mostra a barra de lote');
+await p.click('#eqLimpa'); await p.waitForTimeout(100);
+await p.locator('#eqTab tbody tr', { hasText: 'USG TIREOIDE' }).first().click(); await p.waitForSelector('#eqTab tr.detalhe');
+const det = await p.textContent('#eqTab tr.detalhe');
+ok(/Validar/.test(det) && /Desativar/.test(det) && /Histórico/.test(det), 'clicar na linha abre, logo abaixo, os dados e as ações da relação');
+await p.click('#eqTab tr.detalhe [data-equm="validada"]'); await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value="ok"]'); await p.waitForTimeout(300);
+ok(await p.evaluate(() => window.__RM.S.eq.itens.find(e => e.id === 'c').status) === 'validada', '«Validar» na própria linha valida só aquela relação');
+await p.click('[data-eqvb="reg"]'); await p.waitForSelector('#cardCompostas');
+ok(!(await p.isVisible('#eqTab')) && /Nenhuma regra composta/.test(await p.textContent('#cardCompostas')), '«Regras compostas» troca a lista (relações e regras não ficam empilhadas)');
+await p.click('#eqNova'); await p.waitForSelector('#dlg[open] #cpPassos');
+ok(true, '«+ Nova» com «Regras compostas» aberto abre o cadastro da regra em 4 perguntas');
+ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
+await b.close();

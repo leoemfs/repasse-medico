@@ -2,7 +2,7 @@
  * Equivalências TUSS: revisão, validação em lote, conflitos, importação e exportação
  * ============================================================ */
 const ORDEM_CONF = { Alta: 0, 'Média': 1, Baixa: 2 };
-const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base', vis: 'lista', gmarcas: new Map() };
+const FE = { busca: '', status: 'pendente', confianca: '*', ambiguo: '*', sel: new Set(), sub: 'base', vis: 'lista', gmarcas: new Map(), vb: 'rel' };
 
 // Barra da base compartilhada no topo, explicitamente (P2; antes em 97-decoracoes.js).
 RENDER.equivalencias = () => { const r = desenharEquivalencias(); const pg = $('pag-equivalencias'); if (pg && !$('eqSync')) { pg.insertAdjacentHTML('afterbegin', barraEq()); ligarBarraEq(); } return r; };
@@ -17,32 +17,43 @@ function desenharEquivalencias() {
   // Sugestão: título com Doppler e um código de Doppler + um código base → «juntos»; senão «um ou outro».
   const sugestaoConf = c => { const dop = c.relacoes.filter(r => /DOPPLER/.test(norm(r.descMV || ''))).length; return /DOPPLER/.test(norm(c.titulo)) && dop && dop < c.codigos.length ? 'juntos' : 'ou'; };
   const descCod = (c, cod) => c.relacoes.find(r => r.codigo === cod)?.descMV || '';
-  $('pag-equivalencias').innerHTML = `
-  <div class="card"><h2>Base de equivalências <span class="muted small">revisão ${S.eq.revisao} · ${S.eq.atualizadoEm ? new Date(S.eq.atualizadoEm).toLocaleString('pt-BR') : ''}</span></h2>
-    <p class="lead">Ordem: confiança da análise e, depois, quantidade de laudos com o título no Apolo carregado. Cada relação liga um código TUSS do MV a um TITLE do Apolo. Só relação <strong>validada</strong>, sem conflito, sustenta confirmação automática. Candidatos importados da planilha de análise entram como pendentes; a pontuação/confiança da planilha ordena a revisão, mas não valida nada.</p>
-    <div class="grid4">
-      <div><span class="badge ok">${cont('validada')}</span> validadas</div><div><span class="badge warn">${cont('pendente')}</span> pendentes (${it.filter(e => e.status === 'pendente' && e.ambiguo).length} ambíguas)</div>
-      <div><span class="badge info">${cont('desativada')}</span> desativadas${cont('coberta') ? ` · <span class="badge info">${cont('coberta')}</span> cobertas por regra composta` : ''}</div><div><span class="badge ${conf.length ? 'err' : 'ok'}">${conf.length}</span> conflitos</div></div>
-    ${S.apolo ? (() => { const n = titulosDoApolo(S.apolo, S.eq, S.cfg).filter(t => ['sem-cadastro', 'pendente', 'conflito'].includes(t.situacao)).length; return n ? `<p class="small"><span class="badge warn">${n}</span> título(s) da planilha do Apolo carregada ainda sem equivalência validada — <button class="mini" data-esub="titulos">Abrir «Títulos do Apolo»</button></p>` : ''; })() : ''}
-    <div class="acoes"><button id="eqImpX" class="sec">Importar planilha de análise (.xlsx)</button><button id="eqImpJM" class="sec">Mesclar base (.json)</button><button id="eqImpJS" class="sec">Substituir base (.json)</button><button id="eqXlsx">Exportar planilha (.xlsx)</button><button id="eqExp" class="sec">Exportar base (.json)</button><button id="eqNova" class="sec">+ Nova relação</button>
-      <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div>${abasEq()}</div>
-  ${conf.length || cobertos.length ? `<div class="card"${conf.length ? ' style="border-color:var(--err)"' : ''}><h2>Conflitos</h2>
-    ${conf.length ? `<p class="lead">O mesmo título está validado para mais de um código. Enquanto houver conflito, esse título não confirma nenhum dos códigos. Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (ex.: escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (ex.: título com Doppler = exame base <i>e</i> Doppler na mesma conta).</p>
-    <ul class="conflitos">${conf.map((c, i) => { const sg = sugestaoConf(c); return `<li><div>«${esc(c.titulo)}» → ${c.codigos.map(k => `<b>${esc(k)}</b> <span class="muted small">${esc(descCod(c, k))}</span>`).join(' · ')}</div>
+  const nCob = cont('coberta'), maisAbertos = FE.confianca !== '*' || FE.ambiguo !== '*' || FE.vis !== 'lista';
+  const kpi = (k, n, t) => `<button class="eq-kpi${FE.status === k ? ' on' : ''}" data-eqst="${k}"><b>${n}</b> ${t}</button>`;
+  const item = (id, t, d) => `<button id="${id}" type="button">${t}<small>${d}</small></button>`;
+  const liConf = (c, i) => { const sg = sugestaoConf(c); return `<li><div>«${esc(c.titulo)}» → ${c.codigos.map(k => `<b>${esc(k)}</b> <span class="muted small">${esc(descCod(c, k))}</span>`).join(' · ')}</div>
       <div class="small muted">Possível regra composta: ${sg === 'juntos' ? '<b>juntos</b> (base + Doppler na mesma conta)' : '<b>um ou outro</b> (qualquer um dos códigos confirma o laudo)'}.</div>
-      <div class="acoes" style="margin-top:4px"><button class="${sg === 'ou' ? '' : 'sec '}mini" data-confou="${i}">Um ou outro</button><button class="${sg === 'juntos' ? '' : 'sec '}mini" data-confjt="${i}">Juntos (composta)…</button><button class="sec mini" data-conf="${i}">Só um código…</button></div></li>`; }).join('')}</ul>
-    <p class="small muted">«Um ou outro» cria uma regra composta validada com os códigos como alternativas (o laudo sustenta uma linha). «Juntos» abre o cadastro da regra composta já preenchido (quantidade e convênio você ajusta). «Só um código» mantém o código escolhido e volta os outros a pendente. As relações validadas continuam no histórico.</p>` : ''}
-    ${cobertos.length ? `<details class="small"><summary>${cobertos.length} título(s) com mais de um código resolvidos por regra composta</summary><ul>${cobertos.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} · regra «${esc(nomeComposta(regraDoConf(c)))}»</li>`).join('')}</ul></details>` : ''}</div>` : ''}
-  ${cardCompostas()}
-  <div class="card"><div class="filtros">
-    <label class="campo">Buscar<input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="código, descrição MV ou TITLE do Apolo"></label>
-    <label class="campo">Status<select id="eqSt">${opcoes([['*', 'Todos'], ['pendente', 'Pendentes'], ['validada', 'Validadas'], ['desativada', 'Desativadas'], ['coberta', 'Cobertas por regra composta']], FE.status)}</select></label>
-    <label class="campo">Visualização<select id="eqVis">${opcoes([['lista', 'Uma relação por linha'], ['titulo', 'Agrupar por título (2+ códigos pendentes)']], FE.vis)}</select></label>
-    <label class="campo">Confiança da análise<select id="eqCf">${opcoes([['*', 'Todas'], ['Alta', 'Alta'], ['Média', 'Média'], ['Baixa', 'Baixa'], ['', 'Sem confiança']], FE.confianca)}</select></label>
-    <label class="campo">Ambíguas<select id="eqAm">${opcoes([['*', 'Todas'], ['sim', 'Só ambíguas'], ['nao', 'Sem ambiguidade']], FE.ambiguo)}</select></label></div>
-    <div class="acoes"><label class="small"><input type="checkbox" id="eqTodos"> selecionar todas do filtro</label>
-      <button id="eqVal" disabled>Validar selecionadas</button><button id="eqPend" class="sec" disabled>Voltar a pendente</button><button id="eqDes" class="perigo" disabled>Desativar</button><button id="eqCmp" class="cp-bt" disabled>Criar regra composta com as selecionadas…</button><span id="eqInfo" class="muted small"></span></div>
-    <div id="eqTab" style="margin-top:10px"></div></div>`;
+      <div class="acoes" style="margin-top:4px"><button class="${sg === 'ou' ? '' : 'sec '}mini" data-confou="${i}">Um ou outro</button><button class="${sg === 'juntos' ? '' : 'sec '}mini" data-confjt="${i}">Juntos (composta)…</button><button class="sec mini" data-conf="${i}">Só um código…</button></div></li>`; };
+  // v3.0.0-alpha.36 (prévia aprovada em 24/11/2026): topo enxuto, conflitos numa linha, relações e regras separadas,
+  // edição na própria linha e ações em lote só com seleção.
+  $('pag-equivalencias').innerHTML = `
+  <div class="card"><div class="eq-topo">
+      <div class="eq-kpis">${kpi('pendente', cont('pendente'), 'pendentes')}${kpi('validada', cont('validada'), 'validadas')}${kpi('desativada', cont('desativada'), 'desativadas')}${nCob ? kpi('coberta', nCob, 'cobertas por regra') : ''}${kpi('*', it.length, 'todas')}
+        <span class="small muted">revisão ${S.eq.revisao}${S.eq.atualizadoEm ? ` · ${new Date(S.eq.atualizadoEm).toLocaleString('pt-BR')}` : ''}</span></div>
+      <div class="eq-acoes-topo"><details class="eq-arq"><summary class="sec" role="button">Arquivos ▾</summary><div class="lista">
+          <h5>Trazer</h5>${item('eqImpX', 'Importar planilha de análise (.xlsx)', 'novos pares entram como pendentes')}${item('eqImpJM', 'Juntar com outra base (.json)', 'acrescenta o que falta; não muda o que existe')}${item('eqImpJS', 'Substituir a base (.json)…', 'troca tudo; a atual fica como cópia de segurança')}
+          <h5>Levar</h5>${item('eqXlsx', 'Exportar planilha para conferir (.xlsx)', 'relações e regras em abas, para ler')}${item('eqExp', 'Exportar base (.json)', 'cópia completa da base')}</div></details>
+        <button id="eqNova">+ Nova</button>
+        <input type="file" id="eqArqX" accept=".xlsx" hidden><input type="file" id="eqArqJM" accept=".json" hidden><input type="file" id="eqArqJS" accept=".json" hidden></div></div>
+    ${S.apolo ? (() => { const n = titulosDoApolo(S.apolo, S.eq, S.cfg).filter(t => ['sem-cadastro', 'pendente', 'conflito'].includes(t.situacao)).length; return n ? `<p class="small" style="margin:10px 0 0"><span class="badge warn">${n}</span> título(s) da planilha do Apolo carregada ainda sem equivalência validada — <button class="mini" data-esub="titulos">Abrir «Títulos do Apolo»</button></p>` : ''; })() : ''}
+    ${abasEq()}
+    ${conf.length ? `<div class="eq-alerta err"><details id="eqConfDet"${FE.confAberto ? ' open' : ''}><summary>⚠ <b>${conf.length} conflito(s):</b> o mesmo título validado para mais de um código não confirma nenhum deles${cobertos.length ? ` · ${cobertos.length} já resolvidos por regra composta` : ''}. <u>Resolver</u></summary>
+      <ul class="conflitos">${conf.map(liConf).join('')}</ul>
+      <p class="small muted">Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (título com Doppler = exame base <i>e</i> Doppler). «Só um código» mantém o escolhido e volta os outros a pendente.</p></details></div>`
+      : `<div class="eq-alerta">${cobertos.length ? `<details><summary>✓ <b>Sem conflitos.</b> ${cobertos.length} título(s) com mais de um código estão resolvidos por regra composta. <u>Ver</u></summary><ul class="small">${cobertos.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} · regra «${esc(nomeComposta(regraDoConf(c)))}»</li>`).join('')}</ul></details>` : '✓ <b>Sem conflitos.</b>'}</div>`}
+    <div class="eq-seg" role="tablist"><button data-eqvb="rel" class="${FE.vb === 'rel' ? 'on' : ''}">Relações</button><button data-eqvb="reg" class="${FE.vb === 'reg' ? 'on' : ''}">Regras compostas (${(S.eq.compostas || []).length})</button></div>
+    ${FE.vb === 'reg' ? cardCompostas() : `<div id="eqRel"><div class="eq-filtros">
+      <input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="Buscar código, descrição do MV ou título do Apolo" aria-label="Buscar">
+      <details class="eq-mais"${maisAbertos ? ' open' : ''}><summary class="sec mini" role="button">Mais filtros ▾</summary><div class="grid3">
+        <label class="campo">Confiança da análise<select id="eqCf">${opcoes([['*', 'Todas'], ['Alta', 'Alta'], ['Média', 'Média'], ['Baixa', 'Baixa'], ['', 'Sem confiança']], FE.confianca)}</select></label>
+        <label class="campo">Ambíguas<select id="eqAm">${opcoes([['*', 'Todas'], ['sim', 'Só ambíguas'], ['nao', 'Sem ambiguidade']], FE.ambiguo)}</select></label>
+        <label class="campo">Mostrar<select id="eqVis">${opcoes([['lista', 'Uma relação por linha'], ['titulo', 'Agrupar por título (2+ códigos pendentes)']], FE.vis)}</select></label></div></details></div>
+      <div id="eqTab"></div>
+      <div class="eq-lote" id="eqLote" hidden><b id="eqInfo"></b><button id="eqVal">Validar</button><button id="eqPend" class="sec">Voltar a pendente</button><button id="eqDes" class="sec">Desativar</button><button id="eqCmp" class="sec">Criar regra composta</button><button id="eqLimpa" class="sec" aria-label="Limpar seleção">✕</button></div></div>`}</div>`;
+  const pg = $('pag-equivalencias');
+  pg.querySelectorAll('[data-eqst]').forEach(b => b.onclick = () => { FE.status = b.dataset.eqst; FE.sel.clear(); if (FE.vb !== 'rel') FE.vb = 'rel'; RENDER.equivalencias(); });
+  pg.querySelectorAll('[data-eqvb]').forEach(b => b.onclick = () => { FE.vb = b.dataset.eqvb; FE.sel.clear(); RENDER.equivalencias(); });
+  const cd = $('eqConfDet'); if (cd) cd.ontoggle = () => { FE.confAberto = cd.open; };
+  const arq = pg.querySelector('.eq-arq'); arq.querySelectorAll('.lista button').forEach(b => b.addEventListener('click', () => arq.removeAttribute('open')));
   ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   $('pag-equivalencias').querySelectorAll('[data-confou]').forEach(b => b.onclick = () => conflitoUmOuOutro(conf[+b.dataset.confou]));
@@ -58,34 +69,43 @@ function desenharEquivalencias() {
       && (FE.ambiguo === '*' || (FE.ambiguo === 'sim') === !!e.ambiguo) && (!q || norm(`${e.codigo} ${e.descMV} ${e.titulo}`).includes(q)))
       .sort((a, b) => (ORDEM_CONF[a.confianca] ?? 3) - (ORDEM_CONF[b.confianca] ?? 3) || (usoTitulo.get(chaveTitulo(b.titulo)) || 0) - (usoTitulo.get(chaveTitulo(a.titulo)) || 0) || a.codigo.localeCompare(b.codigo));
   };
-  const info = () => { const n = FE.sel.size; ['eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => $(id).disabled = !n); $('eqInfo').textContent = n ? `${n} selecionada(s)` : ''; };
+  const info = () => { const n = FE.sel.size; $('eqLote').hidden = !n; $('eqInfo').textContent = `${n} selecionada(s)`; const t = $('eqTodos'); if (t) t.checked = n > 0 && filtrar().every(x => FE.sel.has(x.id)); };
   const ligarBotoesBase = () => {
     $('eqImpX').onclick = () => $('eqArqX').click(); $('eqArqX').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
     $('eqImpJM').onclick = () => $('eqArqJM').click(); $('eqArqJM').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'mesclar');
     $('eqImpJS').onclick = () => $('eqArqJS').click(); $('eqArqJS').onchange = e => e.target.files[0] && importarEquivalenciasArquivo(e.target.files[0], 'substituir');
     $('eqExp').onclick = () => baixarJSON(S.eq, `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.json`);
     $('eqXlsx').onclick = () => baixarZip(xlsxEquivalencias(S.eq, { usoTitulo, operador: S.operador }), `equivalencias_TUSS_rev${S.eq.revisao}_${carimbo()}.xlsx`);
-    $('eqNova').onclick = novaRelacaoManual;
+    $('eqNova').onclick = () => FE.vb === 'reg' ? editarComposta(null) : novaRelacaoManual();
   };
   ligarBotoesBase();
+  if (FE.vb === 'reg') return;
   if (FE.vis === 'titulo') { desenharGruposTitulo(usoTitulo); ligarFiltrosEq(); return; }
   const t = tabela($('eqTab'), {
-    porPagina: 100, linhas: filtrar(), colunas: [
-      { t: '', html: e => `<input type="checkbox" data-id="${e.id}"${FE.sel.has(e.id) ? ' checked' : ''}>` },
-      { t: 'Código', v: e => e.codigo }, { t: 'Descrição MV', v: e => e.descMV }, { t: 'TITLE do Apolo', v: e => e.titulo },
-      { t: 'Status', html: e => `<span class="badge ${e.status === 'validada' ? 'ok' : e.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[e.status])}</span>${e.ambiguo ? ' <span class="badge warn">ambígua</span>' : ''}` },
-      { t: 'Confiança', v: e => e.confianca }, { t: 'Laudos no Apolo', n: true, v: e => S.apolo ? (usoTitulo.get(chaveTitulo(e.titulo)) || 0) : '—' }, { t: 'Uso nas conferências', html: e => textoUsoHtml(usoConf, e) }, { t: 'Escopo', v: e => `${e.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + e.escopo.unidade}${e.escopo.modalidade === '*' ? '' : ' · ' + e.escopo.modalidade}` },
-      { t: 'Responsável', v: e => e.responsavel ? `${e.responsavel} · ${new Date(e.validadoEm).toLocaleDateString('pt-BR')}` : '' }
+    porPagina: 100, linhas: filtrar(), vazio: 'Nada neste filtro.', colunas: [
+      { t: '', th: () => '<input type="checkbox" id="eqTodos" aria-label="Selecionar todas do filtro">', html: e => `<input type="checkbox" data-id="${e.id}"${FE.sel.has(e.id) ? ' checked' : ''} aria-label="Selecionar">` },
+      { t: 'Procedimento no MV', html: e => `<span class="eq-cod">${esc(e.codigo)}</span><small class="nc-det">${esc(e.descMV || '')}</small>` },
+      { t: 'Título do laudo (Apolo)', html: e => `${esc(e.titulo)}${S.apolo ? `<small class="nc-det">${usoTitulo.get(chaveTitulo(e.titulo)) || 0} laudo(s) no Apolo</small>` : ''}` },
+      { t: 'Situação', html: e => `<span class="badge ${e.status === 'validada' ? 'ok' : e.status === 'pendente' ? 'warn' : 'info'}">${esc(STATUS_EQ[e.status])}</span>${e.ambiguo ? ' <span class="badge warn">ambígua</span>' : ''}${e.confianca && e.status === 'pendente' ? `<small class="nc-det">confiança ${esc(e.confianca)}</small>` : ''}` },
+      { t: 'Uso nas conferências', html: e => textoUsoHtml(usoConf, e) }
     ],
-    detalhe: e => `<div class="det"><div><h4>Análise de origem</h4><p class="small">${esc(e.justificativa || '—')}</p><h4>Ponto de atenção</h4><p class="small">${esc(e.atencao || '—')}</p><p class="small muted">Origem: ${esc(e.origem || '—')}</p>${detalheUsoRelacao(usoConf, e)}</div>
-      <div><h4>Histórico</h4>${e.historico.length ? `<ul class="small">${e.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por)}: ${esc(STATUS_EQ[h.de] || h.de)} → ${esc(STATUS_EQ[h.para] || h.para)}${h.motivo ? ` (${esc(h.motivo)})` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Sem alterações.</p>'}</div></div>`
+    detalhe: e => `<div class="det"><div><p class="small" style="margin-top:0"><b>${esc(STATUS_EQ[e.status])}</b>${e.responsavel ? ` · ${esc(e.responsavel)} em ${new Date(e.validadoEm).toLocaleDateString('pt-BR')}` : ''} · ${e.escopo.unidade === '*' ? 'todas as unidades' : 'unidade ' + esc(e.escopo.unidade)}${e.escopo.modalidade === '*' ? '' : ' · ' + esc(e.escopo.modalidade)}</p>
+        <h4>Análise de origem</h4><p class="small">${esc(e.justificativa || '—')}</p>${e.atencao ? `<h4>Ponto de atenção</h4><p class="small">${esc(e.atencao)}</p>` : ''}<p class="small muted">Origem: ${esc(e.origem || '—')}</p>${detalheUsoRelacao(usoConf, e)}</div>
+      <div><h4>Histórico</h4>${e.historico.length ? `<ul class="small">${e.historico.map(h => `<li>${new Date(h.em).toLocaleString('pt-BR')} · ${esc(h.por)}: ${esc(STATUS_EQ[h.de] || h.de)} → ${esc(STATUS_EQ[h.para] || h.para)}${h.motivo ? ` (${esc(h.motivo)})` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Sem alterações.</p>'}</div></div>
+      <div class="acoes">${e.status !== 'validada' ? `<button data-equm="validada" data-eqid="${e.id}">Validar</button>` : `<button class="sec" data-equm="pendente" data-eqid="${e.id}">Voltar a pendente</button>`}${e.status !== 'desativada' ? `<button class="sec" data-equm="desativada" data-eqid="${e.id}">Desativar…</button>` : `<button class="sec" data-equm="pendente" data-eqid="${e.id}">Reativar como pendente</button>`}<button class="sec" data-eqcp1="${e.id}" style="margin-left:auto">Criar regra composta com este título</button></div>`
   });
-  const ligar = () => $('eqTab').querySelectorAll('input[data-id]').forEach(ch => ch.onchange = () => { ch.checked ? FE.sel.add(ch.dataset.id) : FE.sel.delete(ch.dataset.id); info(); });
+  const ligar = () => {
+    $('eqTab').querySelectorAll('input[data-id]').forEach(ch => ch.onchange = () => { ch.checked ? FE.sel.add(ch.dataset.id) : FE.sel.delete(ch.dataset.id); ch.closest('tr').classList.toggle('sel', ch.checked); info(); });
+    const tod = $('eqTodos'); if (tod) tod.onchange = e => { FE.sel.clear(); if (e.target.checked) filtrar().forEach(x => FE.sel.add(x.id)); t.atualizar(filtrar()); info(); };
+    // Ações da própria linha (detalhe aberto): a mesma decisão do lote, para uma relação.
+    $('eqTab').querySelectorAll('[data-equm]').forEach(b => b.onclick = () => { FE.sel = new Set([b.dataset.eqid]); mudar(b.dataset.equm, { validada: 'Validar', pendente: b.textContent.startsWith('Reativar') ? 'Reativar' : 'Voltar a pendente', desativada: 'Desativar' }[b.dataset.equm]); });
+    $('eqTab').querySelectorAll('[data-eqcp1]').forEach(b => b.onclick = () => { FE.sel = new Set([b.dataset.eqcp1]); compostaDasSelecionadas(); });
+  };
   ligar(); new MutationObserver(ligar).observe($('eqTab'), { childList: true });
-  const refiltrar = () => { FE.sel.clear(); $('eqTodos').checked = false; t.atualizar(filtrar()); info(); };
+  const refiltrar = () => { FE.sel.clear(); t.atualizar(filtrar()); info(); };
   ligarFiltrosEq(refiltrar);
   $('eqCmp').onclick = () => compostaDasSelecionadas();
-  $('eqTodos').onchange = e => { FE.sel.clear(); if (e.target.checked) filtrar().forEach(x => FE.sel.add(x.id)); t.atualizar(filtrar()); info(); };
+  $('eqLimpa').onclick = () => { FE.sel.clear(); t.atualizar(filtrar()); info(); };
   const mudar = async (status, rotulo) => {
     const op = await exigirOperador(); if (!op) return;
     const amb = S.eq.itens.filter(e => FE.sel.has(e.id) && e.ambiguo).length;
@@ -157,11 +177,10 @@ async function conflitoUmOuOutro(c) {
 function ligarFiltrosEq(refiltrar) {
   const re = refiltrar || (() => RENDER.equivalencias());
   $('eqBusca').oninput = e => { FE.busca = e.target.value; if (refiltrar) re(); else { clearTimeout(FE.tBusca); FE.tBusca = setTimeout(() => { RENDER.equivalencias(); $('eqBusca').focus(); $('eqBusca').setSelectionRange(FE.busca.length, FE.busca.length); }, 350); } };
-  $('eqSt').onchange = e => { FE.status = e.target.value; re(); };
   $('eqCf').onchange = e => { FE.confianca = e.target.value; re(); };
   $('eqAm').onchange = e => { FE.ambiguo = e.target.value; re(); };
   $('eqVis').onchange = e => { FE.vis = e.target.value; FE.sel.clear(); RENDER.equivalencias(); };
-  if (!refiltrar) ['eqTodos', 'eqVal', 'eqPend', 'eqDes', 'eqCmp'].forEach(id => { const el = $(id); if (el) (el.closest('label') || el).style.display = 'none'; });
+  if (!refiltrar) { const l = $('eqLote'); if (l) l.remove(); }
 }
 const rotuloCurto = d => String(d || '').replace(/\s*-\s*OP$/, '').slice(0, 40);
 // «Criar regra composta com as selecionadas»: abre o cadastro com os títulos e os códigos marcados.

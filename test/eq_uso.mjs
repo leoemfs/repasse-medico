@@ -117,7 +117,7 @@ const lin2 = await p.$$eval('#usoTab tbody tr', trs => trs.map(tr => tr.textCont
 ok(lin2.some(l => /40901114.*Pendente hoje.*4/.test(l)), 'continua na lista (com o uso guardado) como «Pendente hoje», sem caixa de seleção');
 
 // 7) Base de equivalências: coluna «Uso nas conferências» e impacto ao desativar pela lista.
-await p.click('[data-esub="base"]'); await p.waitForSelector('#eqSt'); await p.selectOption('#eqSt', 'validada'); await p.waitForTimeout(150);
+await p.click('[data-esub="base"]'); await p.waitForSelector('[data-eqst="validada"]'); await p.click('[data-eqst="validada"]'); await p.waitForTimeout(150);
 const bl = await p.$$eval('#eqTab tbody tr', trs => trs.map(tr => tr.textContent.replace(/\s+/g, ' ')));
 ok(bl.some(l => /40901300.*2 linha\(s\) · últ\. 07\/2026/.test(l)) && bl.some(l => /40901122.*nunca usada/.test(l)), `coluna «Uso nas conferências» na lista (${bl.map(l => l.slice(-40)).join(' | ')})`);
 await p.check(`#eqTab input[data-id="${ids.tv}"]`); await p.click('#eqDes'); await p.waitForSelector('#dlg[open]');
