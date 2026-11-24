@@ -258,6 +258,7 @@ function carregarCompetencia() {
 function mudarCompetencia(chave) {
   if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
   S.comp = chave; gravarLocal(CHAVES.comp, chave);
+  agendarSincronizacao('nc');   // SOL-F18: NCs da competência nova vêm da pasta
   // P1: as telas usam as rodadas da competência aberta e das vizinhas; recarrega e redesenha.
   if (typeof DB !== 'undefined' && DB.ok) dbRodadasJanela(chave).then(r => { if (S.comp !== chave) return; S.rodadas = r; irPara(paginaAtual, true); });
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }

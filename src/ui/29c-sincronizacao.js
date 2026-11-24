@@ -7,20 +7,20 @@
  *   - agendarSincronizacao(tipo): toda gravação (salvarCfg, salvarEq, salvarFluxo) agenda a da sua base;
  *   - sincronizarTudo, liberarPastaSync, definirPastaSync, restaurarPastaSync e o relógio de checagem.
  * ============================================================ */
-const AGENDA_SYNC = { fluxo: 0, eq: 0, cfg: 0 };
-const SYNC_DE = { fluxo: () => sincronizarFluxo(), eq: () => sincronizarEq(), cfg: () => sincronizarCfg() };
+const AGENDA_SYNC = { fluxo: 0, eq: 0, cfg: 0, nc: 0 };
+const SYNC_DE = { fluxo: () => sincronizarFluxo(), eq: () => sincronizarEq(), cfg: () => sincronizarCfg(), nc: () => sincronizarNC() };
 // Pode agendar: há pasta e acesso; Equivalências e Configuração não vão para a pasta antiga do Fluxo («legado»).
 function podeSincronizar(tipo) {
   if (!SY.handle) return false;
   if (tipo === 'fluxo') return SY.status !== 'permissao';
   if (SY.legado) return false;
-  return (tipo === 'eq' ? SYQ : SYC).status !== 'permissao';
+  return ({ eq: SYQ, cfg: SYC, nc: SYN }[tipo]).status !== 'permissao';
 }
 function agendarSincronizacao(tipo) {
   if (!podeSincronizar(tipo)) return;
   clearTimeout(AGENDA_SYNC[tipo]); AGENDA_SYNC[tipo] = setTimeout(() => SYNC_DE[tipo](), 800);
 }
-async function sincronizarTudo(opc = {}) { await sincronizarFluxo(opc); await sincronizarEq(opc); await sincronizarCfg(opc); }
+async function sincronizarTudo(opc = {}) { await sincronizarFluxo(opc); await sincronizarEq(opc); await sincronizarCfg(opc); await sincronizarNC(opc); }
 // Botões «Liberar acesso» (Início, Fluxo, Configurações): mesma ação nos três lugares.
 async function liberarPastaSync() {
   if (!(await temPermissaoPasta(true))) { avisar('O acesso à pasta não foi liberado.', 'warn'); return false; }
@@ -55,7 +55,7 @@ function iniciarTimerSync() {
   clearInterval(SY.timer); if (!SY.handle) return;
   SY.timer = setInterval(async () => {
     if (document.visibilityState !== 'visible' || SY.ocupado || SY.status === 'permissao') return atualizarBarraSync();
-    checarEqPasta(); checarCfgPasta();
+    checarEqPasta(); checarCfgPasta(); checarNCPasta();
     try { const f = await (await (await dirFluxo()).getFileHandle(arquivoSync(S.comp))).getFile(); if (f.lastModified !== SY.lm) return sincronizarFluxo(); }
     catch (e) { if (e.name === 'NotFoundError' && S.fluxo.competencias[S.comp]) return sincronizarFluxo(); }
     atualizarBarraSync();
