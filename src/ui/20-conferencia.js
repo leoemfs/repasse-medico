@@ -734,7 +734,7 @@ function desenharRoteiroConf() {
     () => ['<b>Passo 6:</b> o relatório está aceito. Tire no MV a <b>versão final</b> (sem o valor total e sem a %), salve e envie por e-mail com a prévia de todas as unidades. Depois, marque <b>E-mail</b> na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento')],
     () => ['<b>Concluído:</b> aceito e e-mail marcado. Depois vêm NF recebida e NF ao Financeiro, na linha do prestador em Fechamento e envio.', bt('fechamento', 'Abrir no Fechamento', true)]
   ][rt.passo]();
-  c.innerHTML = `<section class="card rot" aria-labelledby="cfRotTit"><div class="rot-cab"><h2 id="cfRotTit">Roteiro deste relatório</h2><span class="small muted">${sub}</span></div>
+  c.innerHTML = `<section class="card roteiro" aria-labelledby="cfRotTit"><div class="rot-cab"><h2 id="cfRotTit">Roteiro deste relatório</h2><span class="small muted">${sub}</span></div>
     <ol class="rot-passos">${PASSOS_ROTEIRO.map((ps, i) => { const cls = i < rt.passo ? 'feito' : i === rt.passo ? `atual${rt.alerta ? ' alerta' : ''}` : '';
       return `<li class="rot-passo ${cls}"${i === rt.passo ? ' aria-current="step"' : ''}><span class="n">${i < rt.passo ? '✓' : i + 1}</span><b>${esc(ps.nome)}</b><small>${esc(rt.detalhes[i] || ps.dica)}</small></li>`; }).join('')}</ol>
     <div class="rot-agora"><p>${texto[0]}</p><div class="acoes">${texto[1]}</div></div></section>`;

@@ -332,8 +332,12 @@ function alternarMenu() {
   const recolhido = !document.querySelector('.shell').classList.contains('recolhido');
   aplicarMenu(recolhido); gravarLocal(CHAVES.menu, recolhido);
 }
+// v3.0.0-alpha.27: em tela estreita (celular ou janela pequena, até 900 px) o menu começa recolhido, só com ícones,
+// para o conteúdo caber. O ☰ continua abrindo. No computador, vale a escolha guardada.
+const telaEstreita = () => !!window.matchMedia?.('(max-width: 900px)').matches;
 function iniciarMenu() {
-  aplicarMenu(lerLocal(CHAVES.menu) === true);
+  aplicarMenu(lerLocal(CHAVES.menu) === true || telaEstreita());
+  try { window.matchMedia('(max-width: 900px)').addEventListener('change', e => { if (e.matches) aplicarMenu(true); else aplicarMenu(lerLocal(CHAVES.menu) === true); }); } catch (e) { }
   $('btnMenu').onclick = alternarMenu;
   document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b') { e.preventDefault(); alternarMenu(); } });
 }
