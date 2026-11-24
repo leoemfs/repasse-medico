@@ -82,7 +82,9 @@ await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
 await abrirF(); await p.selectOption('#cfFData', '2026-10-05'); await p.waitForTimeout(150);
-await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito'); await okDlg();
+await p.click('#cfLoteAceitar'); await p.waitForSelector('#dlg[open]'); await p.fill('#dlgCorpo [name="just"]', 'Mesmo convênio escrito de outro jeito');
+// v3.0.0-alpha.28: Enter no campo confirma (antes acionava «Cancelar»).
+await p.press('#dlgCorpo [name="just"]', 'Enter'); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(200);
 await p.click('#cfLimpar'); await p.waitForTimeout(150);
 // NC na linha sem laudo, pelo detalhe da linha.
 await p.evaluate(() => { window.__RM.S.conf.soFalta = false; }); await p.click('#cfVerTodas'); await p.waitForTimeout(150);
@@ -105,6 +107,12 @@ const ncX = await baixar('#ncExp', 'ncs.xlsx'); await p.waitForTimeout(300); if 
 const ncAbas = abas(ncX);
 ok(Object.values(ncAbas).flat().flat().some(c => String(c).includes('FABIO NUNES LEAL')) && Object.values(ncAbas).flat().flat().some(c => String(c).includes('DORA NUNES PIRES')), `Excel das NCs com as duas linhas (abas: ${Object.keys(ncAbas).join(', ')})`);
 
+// Confirmação sem campos: o foco começa no botão principal e o Enter confirma; Esc cancela.
+const conf1 = p.evaluate(() => window.__RM.t.confirmar('Teste', 'Confirma?', 'Confirmar')); await p.waitForSelector('#dlg[open]');
+ok(await p.evaluate(() => document.activeElement?.value) === 'ok', 'confirmação abre com o foco no botão principal (não no «Cancelar»)');
+await p.keyboard.press('Enter'); ok(await conf1 === true, 'Enter confirma');
+const conf2 = p.evaluate(() => window.__RM.t.confirmar('Teste', 'Confirma?', 'Confirmar')); await p.waitForSelector('#dlg[open]');
+await p.keyboard.press('Escape'); ok(await conf2 === false, 'Esc cancela');
 // ---------- 3. Aceite do relatório e Excel da conferência ----------
 await p.goto(html + '#conferencia'); await p.waitForSelector('#cfAbas');
 await p.click('#cfAba-aceite'); await p.waitForTimeout(100);

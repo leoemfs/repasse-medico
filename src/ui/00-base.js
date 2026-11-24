@@ -197,7 +197,18 @@ function dialogo(titulo, corpoHtml, botoes = [['ok', 'OK']]) {
       const campos = {}; $('dlgCorpo').querySelectorAll('[name]').forEach(el => { if (el.type === 'radio') { if (el.checked) campos[el.name] = el.value; else if (!(el.name in campos)) campos[el.name] = ''; } else campos[el.name] = el.type === 'checkbox' ? el.checked : el.value; });
       res({ botao: d.returnValue, campos });
     };
+    // v3.0.0-alpha.28: Enter confirma. Antes o Enter acionava o primeiro botão (quase sempre «Cancelar»), e o foco
+    // inicial também caía nele. Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»),
+    // e, sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha;
+    // com o foco num botão, o Enter aciona aquele botão.
+    const principal = () => { const bs = [...$('dlgBotoes').querySelectorAll('button')]; return bs.filter(b => b.value !== '').pop() || bs.pop(); };
+    d.onkeydown = e => {
+      if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.altKey || e.metaKey || e.isComposing) return;
+      const t = e.target; if (['TEXTAREA', 'BUTTON', 'SELECT', 'A'].includes(t.tagName)) return;
+      const b = principal(); if (b) { e.preventDefault(); b.click(); }
+    };
     d.returnValue = ''; d.showModal();
+    if (!$('dlgCorpo').querySelector('input:not([type=hidden]),select,textarea')) principal()?.focus();
   });
 }
 async function confirmar(titulo, texto, ok = 'Confirmar') { return (await dialogo(titulo, `<p>${texto}</p>`, [['', 'Cancelar', 'sec'], ['ok', ok]])).botao === 'ok'; }
