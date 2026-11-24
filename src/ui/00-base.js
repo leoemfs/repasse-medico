@@ -31,9 +31,9 @@ const S = {
 
 /* ---------- Armazenamento local ---------- */
 const CHAVES = { cfg: 'rm2.configuracao', eq: 'rm2.equivalencias', eqAnterior: 'rm2.equivalencias.anterior', cfgAnterior: 'rm2.configuracao.anterior', operador: 'rm2.operador', tema: 'rm2.tema', menu: 'rm2.menu', fluxo: 'rm2.fluxo', fluxoAnterior: 'rm2.fluxo.anterior', nc: 'rm2.nc', ncAnterior: 'rm2.nc.anterior', comp: 'rm2.competencia', compReg: 'rm2.competencias',
-  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar', pdfsIgnorados: 'rm2.pdfsIgnorados', usoEq: 'rm2.usoEquivalencias' };
+  controleUn: 'rm2.controleUnidades', fluxoSyncBase: 'rm2.fluxoSyncBase', eqSyncBase: 'rm2.eqSyncBase', cfgSyncBase: 'rm2.cfgSyncBase', cfgAnteriorSync: 'rm2.configuracao.anteriorSync', acento: 'rm2.acento', bkPasta: 'rm2.backupPasta', exportModelo: 'rm2.exportacaoModelo', bkAntes: 'rm2.backupAntesDeRestaurar', pdfsIgnorados: 'rm2.pdfsIgnorados', usoEq: 'rm2.usoEquivalencias', ordemConf: 'rm2.ordemConferencia' };
 // Preferências de cada pessoa (ficam neste navegador e não vão para a pasta compartilhada).
-const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta'];
+const CHAVES_INDIVIDUAIS = ['operador', 'tema', 'acento', 'menu', 'comp', 'exportModelo', 'bkPasta', 'ordemConf'];
 // Modelo de exportação escolhido por esta pessoa (Configurações → Exportação).
 const idModeloExportacao = () => (lerLocal(CHAVES.exportModelo) || {}).conferencia || 'padrao';
 const colunasExportacaoAtuais = () => modeloExportacao(S.cfg, idModeloExportacao()).colunas;

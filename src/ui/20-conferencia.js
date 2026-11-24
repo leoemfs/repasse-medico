@@ -223,6 +223,7 @@ function desenharConferencia() {
     ${secao('previa', `<div class="card"><h2 class="sr-only">Linhas do relatório</h2>
       <div class="cf-rapido"><input type="search" id="cfBusca" aria-label="Buscar" placeholder="Buscar paciente, código, título ou médico…" value="${esc(S.conf.busca)}">
         <label class="small cf-sofalta"><input type="checkbox" id="cfSoFalta"${S.conf.soFalta !== false ? ' checked' : ''}> só o que falta decidir</label>
+        <label class="small cf-ordem" for="cfOrdem">Ordenar por <select id="cfOrdem">${opcoes(Object.entries(ORDENS_CONF), ordemConf().k)}</select></label>
         <div class="marcadores" style="margin:0">${ordem.filter(k => res.porStatus[k].n).map(k => `<button class="marc st-chip${S.conf.filtroStatus.has(k) ? ' sel' : ''}" data-st="${k}" title="Situação: ${esc(STATUS_CONF[k].nome)}${res.porStatus[k].vlRepasse ? ` · R$ ${fmtBR(res.porStatus[k].vlRepasse)}` : ''}">${esc(STATUS_CONF[k].nome)} · ${res.porStatus[k].n}</button>`).join('')}${Object.entries(res.porDecisao || {}).filter(([, n]) => n).map(([k, n]) => `<button class="marc dec-${k}${S.conf.filtroMarc.has('dec-' + k) ? ' sel' : ''}" data-m="dec-${k}">${esc(TIPOS_DECISAO[k])} · ${n}</button>`).join('')}${Object.entries(res.porMarcador).filter(([, n]) => n).map(([k, n]) => `<button class="marc${S.conf.filtroMarc.has(k) ? ' sel' : ''}" data-m="${k}">${esc(MARCADORES[k])} · ${n}</button>`).join('')}</div>
         <span class="sy-esp"></span><button type="button" class="sec mini" id="cfFiltrosBt" aria-expanded="${!!S.conf.verFiltros}" aria-controls="cfGaveta">Filtros${nFiltros ? ` (${nFiltros})` : ''}</button></div>
       ${etiquetas ? `<div class="cf-etqs">${etiquetas}</div>` : ''}
@@ -268,7 +269,7 @@ function desenharConferencia() {
   // Um dia, ou de… até… (só «até»: desde o início).
   const naFaixaDeData = d => { const de = S.conf.fData && S.conf.fData !== '*' ? S.conf.fData : '', ate = S.conf.fDataAte && S.conf.fDataAte !== '*' ? S.conf.fDataAte : '';
     if (!de && !ate) return true; if (!ate) return d === de; return (!de || d >= de) && d <= ate; };
-  const filtrar = () => {
+  const filtrarSemOrdem = () => {
     const q = norm(S.conf.busca);
     const fl = S.conf.filtroLinhas ? new Set(S.conf.filtroLinhas.idx) : null, soFalta = S.conf.soFalta !== false && !fl && !S.conf.filtroStatus.size && !S.conf.filtroClasse;
     return res.linhas.filter((x, i) => (!fl || fl.has(i)) && (!soFalta || (x.r ? classeDaLinhaConf(x) === 'pend' && x.decisao?.tipo !== 'resolvido' : !x.decisao && x.status !== 'conferido'))
@@ -283,6 +284,9 @@ function desenharConferencia() {
       && (!fObsAtual() || (observacoesDaLinha(idxObs, x.r, x.l).length > 0) === (fObsAtual() === 'com'))
       && (!q || norm([x.r?.paciente, x.r?.codigo, x.r?.procDesc, x.l?.paciente, x.l?.titulo, x.l?.medico].join(' ')).includes(q)));
   };
+  const filtrar = () => ordenarLinhasConf(filtrarSemOrdem(), ordemConf());   // v3.0.0-alpha.38: ordem escolhida (padrão: a do relatório)
+  let grupos = new Map();
+  const comGrupos = v => { grupos = ordemConf().k === 'pac' ? gruposPorPaciente(v) : new Map(); return v; };
   // Contagem e soma do filtro + ações em lote sobre as linhas pendentes visíveis.
   /* v3.0.0-alpha.20 (simplificação): as ações em lote só aparecem quando há linhas marcadas ou um filtro escolhido.
    * Com linhas marcadas, valem para as marcadas; sem marcação, para as do filtro (como antes). */
@@ -311,16 +315,17 @@ function desenharConferencia() {
     $('cfLoteObs').onclick = async () => { if (await observacaoEmLote(alvo)) { S.conf.sel.clear(); desenharConferencia(); } };
   };
   const t = tabela($('cfTab'), {
-    linhas: filtrar(), colunas: [
+    linhas: comGrupos(filtrar()), colunas: [
       { t: '', th: ls => { const n = ls.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length;
         return `<input type="checkbox" class="cf-sel" data-seltodos aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"${ls.length && n === ls.length ? ' checked' : ''}>`; },
         html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
       { t: 'Classe · situação', html: x => `${pillClasse(classeDaLinhaConf(x))}<div class="cf-sit">${chipStatus(x.status, STATUS_CONF[x.status].nome)}${chipDecisao(x.decisao)}${observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : ''}</div>` },
-      { t: 'Paciente', html: x => { const nome = x.r?.paciente || x.l?.paciente || ''; return `<span class="pac">${esc(nome)}${nome ? `<button type="button" class="cp-nome" data-copiar="${esc(nome)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>`; } }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
-      { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
+      { t: 'Paciente', th: () => thOrdem('pac', 'Paciente'), html: x => { const nome = x.r?.paciente || x.l?.paciente || '', g = grupos.get(x); return `<span class="pac">${esc(nome)}${nome ? `<button type="button" class="cp-nome" data-copiar="${esc(nome)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>${g?.inicio && g.n > 1 ? `<span class="grp-tag">${g.n} linhas</span>` : ''}`; } }, { t: 'Data', th: () => thOrdem('data', 'Data'), v: x => fmtData(x.r?.data || x.l?.data) },
+      { t: 'Procedimento no MV', th: () => thOrdem('proc', 'Procedimento no MV'), v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', th: () => thOrdem('laudo', 'Laudo (Apolo)'), v: x => x.l?.titulo || '—' },
       { t: 'O que falta / por quê', v: x => x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo] || ''}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : classeDaLinhaConf(x) === 'excluido' ? (x.tipo === 'hm' ? 'HM a excluir do MV: não compõe repasse (fora da V3 nenhum HM é pago)' : `${TIPOS_ITEM[x.tipo] || x.tipo}: não compõe repasse`) : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
-      { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
+      { t: 'Vl Repasse', n: true, th: () => thOrdem('vl', 'Vl Repasse'), v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
+    classeLinha: x => { const g = grupos.get(x); return g ? `${g.banda ? 'grp-b' : ''}${g.inicio ? ' grp-ini' : ''}` : ''; },
     detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
       return `${comparacaoMVLaudo(x)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul>
       ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${copiavel(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
@@ -331,7 +336,12 @@ function desenharConferencia() {
   });
   // Caixa do cabeçalho (pedido de 24/11/2026): marca ou desmarca todas as linhas do filtro.
   const caixaTodos = v => { const cb = $('cfTab').querySelector('[data-seltodos]'); if (!cb) return; const n = v.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length; cb.checked = !!v.length && n === v.length; cb.indeterminate = n > 0 && n < v.length; };
-  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); caixaTodos(v); };
+  const refiltrar = () => { const v = comGrupos(filtrar()); t.atualizar(v); infoSel(v); caixaTodos(v); };
+  // Ordem: seletor e títulos clicáveis (clicar de novo no mesmo título inverte). Fica lembrada neste navegador.
+  const mudarOrdem = (k, inv) => { guardarOrdemConf({ k, inv }); $('cfOrdem').value = k; refiltrar(); };
+  $('cfOrdem').onchange = e => mudarOrdem(e.target.value, false);
+  $('cfTab').addEventListener('click', e => { const h = e.target.closest('[data-ordk]'); if (!h) return; const o = ordemConf(); mudarOrdem(h.dataset.ordk, o.k === h.dataset.ordk ? !o.inv : false); });
+  $('cfTab').addEventListener('keydown', e => { const h = e.target.closest('[data-ordk]'); if (!h || (e.key !== 'Enter' && e.key !== ' ')) return; e.preventDefault(); h.click(); });
   infoSel(filtrar()); caixaTodos(filtrar());
   // «Decidir e ir para a próxima»: depois de uma decisão na linha aberta, abre a linha que ficou na mesma posição.
   if (S.conf.abrirPos != null) { const v = filtrar(); if (v.length) t.abrir(Math.min(S.conf.abrirPos, v.length - 1)); S.conf.abrirPos = null; }
@@ -410,9 +420,13 @@ function subpastaDaConferencia(ctx) {
 const fObsAtual = () => S.conf?.fObs === true ? 'com' : (S.conf?.fObs || '');
 /* P1 (auditoria 16/11/2026) — Excel sem congelar a tela sem retorno: o botão mostra «Processando…» enquanto monta e gera.
  * «Exportar só o filtrado» leva só as linhas visíveis (o Resumo e as abas são do filtro, e a aba Informações diz qual). */
+// v3.0.0-alpha.38: ordem da tabela da Conferência — preferência de cada pessoa (fica neste navegador).
+const ordemConf = () => { const o = lerLocal(CHAVES.ordemConf); return o && ORDENS_CONF[o.k] ? o : { k: 'rel', inv: false }; };
+const guardarOrdemConf = o => gravarLocal(CHAVES.ordemConf, o);
+const thOrdem = (k, rot) => { const o = ordemConf(), on = o.k === k; return `<span class="th-ord" data-ordk="${k}" role="button" tabindex="0" aria-sort="${on ? (o.inv ? 'descending' : 'ascending') : 'none'}" title="Ordenar por ${esc(rot)}">${esc(rot)}${on ? `<span class="seta">${o.inv ? '▼' : '▲'}</span>` : ''}</span>`; };
 function exportarExcelConf(bt, res, ctx) {
   const idxObs = indiceObservacoes(estadoCompetencia(S.compReg, ctx.chaveCompetencia || S.comp).observacoes);
-  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais() }),
+  return comProcessando(bt, () => entregarArquivo(xlsxConferencia(res, { ...ctx, idxObs, compostas: S.eq.compostas || [], colunasExportacao: colunasExportacaoAtuais(), ordem: ordemConf() }),
     nomeArquivoAnalise('conferencia', ctx).replace(/\.xlsx$/i, ctx.filtroTexto ? '_filtrado.xlsx' : '.xlsx'), 'conf', ctx.chaveCompetencia || S.comp, subpastaDaConferencia(ctx)), 'a exportação do Excel');
 }
 function textoFiltroConf(vis) {

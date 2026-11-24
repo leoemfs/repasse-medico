@@ -24,6 +24,16 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+
+## Ordem da tabela da Conferência — **IMPLEMENTADA na v3.0.0-alpha.38** (pedido de 24/11/2026; prévia aprovada: https://claude.ai/artifact/3vrHwttWwVnGTuz2deaGPu; teste: `test/ordem_conferencia.mjs`)
+Pedido: «gostaria de um filtro que pudesse deixar em ordem alfabética; o Luciano possui dois procedimentos em linhas diferentes, que correspondem ao mesmo laudo de abdome total».
+- **«Ordenar por»**, ao lado de «só o que falta decidir»: Ordem do relatório (padrão, a de antes) · Paciente (A→Z) · Data · Procedimento · Laudo (Apolo) · Vl Repasse (maior primeiro).
+- **Títulos clicáveis:** Paciente, Data, Procedimento no MV, Laudo (Apolo) e Vl Repasse. Clicar de novo no mesmo título inverte (▲▼). Também funciona pelo teclado (Enter).
+- **Paciente (A→Z):** as linhas do mesmo paciente ficam juntas, com faixa alternada por paciente e a marca «N linhas».
+- A ordem vale também para a aba «Conferência» do Excel e fica lembrada no navegador de cada pessoa. A conferência em si não muda.
+- **O caso do Luciano** não se resolve só com a ordem. «TOMOGRAFIA DE ABDOME TOTAL» na conta são dois códigos (41001109 + 41001117), e isso pede uma regra composta «juntos» com esse título (Equivalências → Títulos do Apolo → «Juntos»).
+- Motor: `ordenarLinhasConf` e `gruposPorPaciente` em `63-classes.js`. Prévia guardada em `docs/prototipos/ordenar-conferencia.html`.
+
 ## Correção da v3.0.0-alpha.37 — subaba da Conferência voltava para a Prévia (pedido de 24/11/2026)
 - Em «O que falta decidir», validar um par ou escolher «Um ou outro» roda a conferência de novo, e o resultado novo voltava para «Prévia de conferência». Agora fica na mesma subaba e no mesmo ponto da tela (mesmo relatório e unidade).
 - Revisadas as outras telas com subabas (Equivalências, Fechamento, Fluxo, NCs, Configurações, Prestadores por unidade): guardam a subaba e não têm o problema.
