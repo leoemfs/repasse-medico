@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.39</title>
+<title>Repasse Médico v3.0.0-alpha.40</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -438,10 +438,6 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cf-filtros.cf-gaveta>label:first-child{grid-column:auto}
 .cf-selinfo.cf-selbar{background:var(--accent);color:var(--on-accent)}.cf-selinfo.cf-selbar .muted{color:inherit}
 .cf-sit{margin-top:3px}
-.cf-cmp{margin:0 0 10px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.cf-cmp>div{display:grid;grid-template-columns:110px minmax(0,1fr) minmax(0,1fr);gap:8px;padding:5px 10px;border-bottom:1px solid var(--line);font-size:12.5px}
-.cf-cmp>div:last-child{border-bottom:0}.cf-cmp>div>span:first-child{color:var(--muted)}.cf-cmp .cf-cmp-cab{background:var(--bg)}
-.cf-cmp .dif{background:var(--warnbg)}
 .cf-hist-atual td{background:var(--infobg)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (max-width:1100px){.cf-cls{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -552,13 +548,28 @@ th .cf-sel{margin:0}
 .cf-ordem{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.cf-ordem select{width:auto;padding:4px 8px}
 .th-ord{cursor:pointer;user-select:none;white-space:nowrap}.th-ord:hover,.th-ord:focus-visible{text-decoration:underline}.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}
 .tw tr.grp-b td{background:var(--infobg)}.tw tr.grp-ini td{border-top:2px solid var(--line)}.grp-tag{display:inline-block;font-size:11px;color:var(--muted);margin-left:6px}
+/* v3.0.0-alpha.40 — quadro da comparação 1 a 1 MV × laudo (prévia aprovada em 24/11/2026) */
+.qd{border:1.5px solid var(--accent);border-radius:10px;overflow:hidden;background:var(--card);box-shadow:0 2px 10px rgba(16,40,70,.10);margin:0 0 12px}
+.qd-tit{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--accent);color:var(--on-accent)}
+.qd-tit b{font-size:12px;letter-spacing:.08em;text-transform:uppercase}.qd-tit span{font-size:12px;opacity:.9}
+.qd-rol{overflow-x:auto}
+.qd-tab{width:100%;border-collapse:collapse;font-size:13px}
+.qd-tab th{position:static;background:var(--bg);color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;text-align:left;padding:7px 12px;border-bottom:1.5px solid var(--accent);font-weight:700}
+.qd-tab td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top;background:var(--card)}
+.qd-tab tr:last-child td{border-bottom:0}
+.qd-tab td:first-child,.qd-tab th:first-child{width:118px;color:var(--muted);font-weight:600}
+.qd-tab td.mv,.qd-tab th.mv{border-right:1.5px solid var(--line)}
+.qd-tab td.res,.qd-tab th.res{width:200px;border-left:1px solid var(--line)}
+.qd-tab tr.dif td{background:var(--warnbg)}.qd-tab tr.dif td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
+.qd-rod{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;border-top:1.5px solid var(--accent);background:var(--bg);font-size:12.5px}
+@media (max-width:760px){.qd-tab td.res,.qd-tab th.res,.qd-tab td:first-child,.qd-tab th:first-child{width:auto}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.39 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.40 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -603,7 +614,7 @@ th .cf-sel{margin:0}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.39';
+const MOTOR_VERSAO = '3.0.0-alpha.40';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -7737,24 +7748,32 @@ function desenharConferencia() {
   desenharRoteiroConf();
 }
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
+/* v3.0.0-alpha.40 (prévia aprovada em 24/11/2026: docs/prototipos/quadro-comparacao/) — Comparação 1 a 1 MV × laudo num
+ * quadro marcado, como planilha: faixa de título, colunas MV | Laudo | Resultado, diferença destacada e resumo no rodapé. */
 function comparacaoMVLaudo(x, ctx = null) {
   if (!x.r || !x.l) return '';
   const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
-  const linha = (rot, mv, la, estado, dif) => `<div class="${dif ? 'dif' : ''}"><span>${rot}</span><span>${esc(mv || '—')}</span><span>${esc(la || '—')} ${estado}</span></div>`;
   const b = (ok, t) => `<span class="badge ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
   const mesmoDia = isoDia(x.r.data) === isoDia(x.l.data), eqOk = cd?.proc?.estado === 'validada';
-  return `<div class="cf-cmp"><div class="cf-cmp-cab"><span></span><b>MV</b><b>Laudo (Apolo)</b></div>
-    ${linha('Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), cd && cd.nm < 3)}
-    ${linha('Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia)}
-    ${linha('Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, ROTULO_EQ[cd.proc.estado] || cd.proc.estado) : '', cd && !eqOk)}
-    ${(() => { // v3.0.0-alpha.29: a mesma regra do motor — o MV corta o nome do convênio; se um é o começo do outro, é o mesmo.
-      const cv = convenioCompativel(x.r.convenio, x.l.convenio);
-      return linha('Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false); })()}
-    ${(() => { // v3.0.0-alpha.39: o médico do MV é o prestador do relatório (cabeçalho do PDF); confere com o cadastro e os aliases.
-      const cab = ctx?.relatorio?.cab, mv = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
-      if (!cab || !x.l.medico) return linha('Médico', mv, x.l.medico, '', false);
-      const mesmo = medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico));
-      return linha('Médico', mv, x.l.medico, b(mesmo, mesmo ? 'mesmo prestador' : 'outro médico'), !mesmo); })()}</div>`;
+  const cv = convenioCompativel(x.r.convenio, x.l.convenio);   // o MV corta o nome do convênio (mesma regra do motor)
+  const cab = ctx?.relatorio?.cab, medMV = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
+  const mesmoMed = cab && x.l.medico ? medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico)) : null;
+  const linhas = [
+    ['Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), !!(cd && cd.nm < 3)],
+    ['Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia],
+    ['Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, eqOk ? 'equivalência validada' : (ROTULO_EQ[cd.proc.estado] || cd.proc.estado)) : '', !!(cd && !eqOk)],
+    ['Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false],
+    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false]
+  ];
+  const difs = linhas.filter(l => l[4]), iguais = linhas.filter(l => !l[4] && l[3]).length;
+  const origem = [x.r.seq ? `linha ${x.r.seq} do relatório` : '', x.l.idLaudo ? `laudo ${x.l.idLaudo}${x.l.linhaPlanilha ? ` (linha ${x.l.linhaPlanilha} da planilha)` : ''}` : ''].filter(Boolean).join(' · ');
+  return `<section class="cf-cmp qd" aria-label="Comparação 1 a 1 MV × laudo">
+    <div class="qd-tit"><b>Comparação 1 a 1 · MV × laudo</b>${origem ? `<span>${esc(origem)}</span>` : ''}</div>
+    <div class="qd-rol"><table class="qd-tab"><thead><tr><th></th><th class="mv">MV (relatório de repasse)</th><th>Laudo (Apolo)</th><th class="res">Resultado</th></tr></thead><tbody>
+    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${esc(mv || '—')}</td><td>${esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="qd-rod"><b>${iguais} igua${iguais === 1 ? 'l' : 'is'} · ${difs.length ? `${difs.length} diferença${difs.length > 1 ? 's' : ''}:` : 'nenhuma diferença'}</b>${difs.length ? ` ${esc(difs.map(l => l[0]).join(', '))} <span class="muted">— decida abaixo</span>` : ''}</div>
+  </section>`;
 }
 /* Histórico deste relatório (antes só na tela «Rodadas»): cada rodada, o valor para pagamento e o aceite. */
 function cartaoHistoricoRelatorio(ctx) {

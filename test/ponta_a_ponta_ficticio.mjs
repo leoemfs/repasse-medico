@@ -78,6 +78,7 @@ await p.click('#btnMenu'); await p.waitForTimeout(150);
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
 ok(/15 - DR X\s*DR X\s*mesmo prestador/.test(await p.textContent('#cfTab .cf-cmp')), 'linha Médico: o prestador do relatório do MV ao lado do médico do laudo (alpha.39)');
+ok(await p.isVisible('#cfTab .qd .qd-tit') && /1 diferença: Convênio/.test(await p.textContent('#cfTab .qd .qd-rod')) && (await p.$$('#cfTab .qd tr.dif')).length === 1, `quadro 1 a 1 (alpha.40): título, linha da diferença destacada e resumo (${(await p.textContent('#cfTab .qd .qd-rod')).trim()})`);
 await p.screenshot({ path: out + 'conferencia.png', fullPage: true });
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 // Aceitar a ressalva de convênio (filtro por data + lote).

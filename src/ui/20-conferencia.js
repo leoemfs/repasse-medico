@@ -386,24 +386,32 @@ function desenharConferencia() {
   desenharRoteiroConf();
 }
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
+/* v3.0.0-alpha.40 (prévia aprovada em 24/11/2026: docs/prototipos/quadro-comparacao/) — Comparação 1 a 1 MV × laudo num
+ * quadro marcado, como planilha: faixa de título, colunas MV | Laudo | Resultado, diferença destacada e resumo no rodapé. */
 function comparacaoMVLaudo(x, ctx = null) {
   if (!x.r || !x.l) return '';
   const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
-  const linha = (rot, mv, la, estado, dif) => `<div class="${dif ? 'dif' : ''}"><span>${rot}</span><span>${esc(mv || '—')}</span><span>${esc(la || '—')} ${estado}</span></div>`;
   const b = (ok, t) => `<span class="badge ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
   const mesmoDia = isoDia(x.r.data) === isoDia(x.l.data), eqOk = cd?.proc?.estado === 'validada';
-  return `<div class="cf-cmp"><div class="cf-cmp-cab"><span></span><b>MV</b><b>Laudo (Apolo)</b></div>
-    ${linha('Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), cd && cd.nm < 3)}
-    ${linha('Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia)}
-    ${linha('Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, ROTULO_EQ[cd.proc.estado] || cd.proc.estado) : '', cd && !eqOk)}
-    ${(() => { // v3.0.0-alpha.29: a mesma regra do motor — o MV corta o nome do convênio; se um é o começo do outro, é o mesmo.
-      const cv = convenioCompativel(x.r.convenio, x.l.convenio);
-      return linha('Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false); })()}
-    ${(() => { // v3.0.0-alpha.39: o médico do MV é o prestador do relatório (cabeçalho do PDF); confere com o cadastro e os aliases.
-      const cab = ctx?.relatorio?.cab, mv = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
-      if (!cab || !x.l.medico) return linha('Médico', mv, x.l.medico, '', false);
-      const mesmo = medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico));
-      return linha('Médico', mv, x.l.medico, b(mesmo, mesmo ? 'mesmo prestador' : 'outro médico'), !mesmo); })()}</div>`;
+  const cv = convenioCompativel(x.r.convenio, x.l.convenio);   // o MV corta o nome do convênio (mesma regra do motor)
+  const cab = ctx?.relatorio?.cab, medMV = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
+  const mesmoMed = cab && x.l.medico ? medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico)) : null;
+  const linhas = [
+    ['Paciente', x.r.paciente, x.l.paciente, b(!cd || cd.nm >= 3, cd ? `nome ${NIVEL_NOME[cd.nm] || '—'}` : 'igual'), !!(cd && cd.nm < 3)],
+    ['Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia],
+    ['Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, eqOk ? 'equivalência validada' : (ROTULO_EQ[cd.proc.estado] || cd.proc.estado)) : '', !!(cd && !eqOk)],
+    ['Convênio', x.r.convenio, x.l.convenio, cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false],
+    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false]
+  ];
+  const difs = linhas.filter(l => l[4]), iguais = linhas.filter(l => !l[4] && l[3]).length;
+  const origem = [x.r.seq ? `linha ${x.r.seq} do relatório` : '', x.l.idLaudo ? `laudo ${x.l.idLaudo}${x.l.linhaPlanilha ? ` (linha ${x.l.linhaPlanilha} da planilha)` : ''}` : ''].filter(Boolean).join(' · ');
+  return `<section class="cf-cmp qd" aria-label="Comparação 1 a 1 MV × laudo">
+    <div class="qd-tit"><b>Comparação 1 a 1 · MV × laudo</b>${origem ? `<span>${esc(origem)}</span>` : ''}</div>
+    <div class="qd-rol"><table class="qd-tab"><thead><tr><th></th><th class="mv">MV (relatório de repasse)</th><th>Laudo (Apolo)</th><th class="res">Resultado</th></tr></thead><tbody>
+    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${esc(mv || '—')}</td><td>${esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="qd-rod"><b>${iguais} igua${iguais === 1 ? 'l' : 'is'} · ${difs.length ? `${difs.length} diferença${difs.length > 1 ? 's' : ''}:` : 'nenhuma diferença'}</b>${difs.length ? ` ${esc(difs.map(l => l[0]).join(', '))} <span class="muted">— decida abaixo</span>` : ''}</div>
+  </section>`;
 }
 /* Histórico deste relatório (antes só na tela «Rodadas»): cada rodada, o valor para pagamento e o aceite. */
 function cartaoHistoricoRelatorio(ctx) {
