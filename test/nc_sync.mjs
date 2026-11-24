@@ -1,4 +1,4 @@
-// v3.0.0-alpha.29 — SOL-F18: não conformidades compartilhadas pela pasta da rede, com duas pessoas (Ana e Leo) e
+// v3.0.0-alpha.30 — SOL-F18: não conformidades compartilhadas pela pasta da rede, com duas pessoas (Ana e Leo) e
 // pasta simulada. Um arquivo por competência na «02 - Não conformidades»; mescla de três vias; conflito com escolha;
 // exclusão e registro em dobro; competências separadas. Dados fictícios.
 import { createRequire } from 'module';

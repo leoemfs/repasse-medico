@@ -1,5 +1,5 @@
 /* ============================================================
- * SOL-F18 (v3.0.0-alpha.29) — Não conformidades compartilhadas pela pasta da rede.
+ * SOL-F18 (v3.0.0-alpha.30) — Não conformidades compartilhadas pela pasta da rede.
  * Um arquivo por competência, na pasta do mês: «AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json»
  * (junto da planilha de NCs). Mescla de três vias, como Fluxo, Equivalências e Configuração:
  *   - NC pelo id (nasce num navegador e viaja pela pasta); dispensa de candidato pela chave do candidato;

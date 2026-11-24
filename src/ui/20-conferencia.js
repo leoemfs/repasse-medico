@@ -748,12 +748,29 @@ function desenharRoteiroConf() {
   if (mesmo) ligarReconferir(c);
   desenharRoteiroRelatorios();
 }
-// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir»: clicar escolhe o relatório.
+// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir». Pedido de 24/11/2026: com dezenas de
+// relatórios os botões ocupavam a tela toda; agora é uma linha com a contagem por passo e uma lista recolhível, com rolagem
+// e busca (prévia em docs/prototipos/roteiro-relatorios-compacto.html). Clicar numa linha escolhe o relatório.
+const RR = { aberto: null, passo: null, q: '' };
 function desenharRoteiroRelatorios() {
   const alvo = $('cfRotRels'); if (!alvo || !$('cfRel')) return;
   const ids = [...$('cfRel').options].map(o => o.value), lista = ids.map(id => S.relatorios.find(r => r.id === id)).filter(Boolean);
   if (lista.length < 2) { alvo.innerHTML = ''; return; }
-  alvo.innerHTML = `<span class="small muted">Em que passo está cada relatório:</span>${lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
-    return `<button type="button" class="marc${x.id === $('cfRel').value ? ' sel' : ''}" data-rotrel="${esc(x.id)}">${esc(x.rel.cab.prestadorCod)} - ${esc(x.rel.cab.prestadorNome)}${un ? ` · un. ${esc(un)}` : ''} <i>${rt ? rotuloPassoRoteiro(rt) : 'sem unidade'}</i></button>`; }).join('')}`;
-  alvo.querySelectorAll('[data-rotrel]').forEach(b => b.onclick = () => { $('cfRel').value = b.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+  const itens = lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
+    const k = !rt ? 'sem' : rt.passo >= 6 ? 'env' : 'p' + (rt.passo + 1);
+    return { x, un, k, rot: !rt ? 'sem unidade' : rt.passo >= 6 ? '✓ enviado' : `passo ${rt.passo + 1}` }; });
+  const cont = {}; itens.forEach(i => { cont[i.k] = cont[i.k] || { n: 0, rot: i.rot }; cont[i.k].n++; });
+  const ordem = Object.keys(cont).sort((a, b) => (a === 'sem' ? -1 : b === 'sem' ? 1 : a === 'env' ? 1 : b === 'env' ? -1 : a.localeCompare(b, 'pt', { numeric: true })));
+  if (RR.passo && !cont[RR.passo]) RR.passo = null;
+  const aberto = RR.aberto ?? lista.length <= 8, sel = $('cfRel').value, q = norm(RR.q);
+  const vis = itens.filter(i => (!RR.passo || i.k === RR.passo) && (!q || norm(`${i.x.rel.cab.prestadorCod} ${i.x.rel.cab.prestadorNome} UN ${i.un} ${rotGr(grDoRel(i.x))}`).includes(q)));
+  alvo.innerHTML = `<div class="rr-topo"><span class="small muted">Em que passo está cada relatório:</span>${ordem.map(k => `<button type="button" class="marc${RR.passo === k ? ' sel' : ''}" data-rrpasso="${k}">${esc(cont[k].rot)} <i>${cont[k].n}</i></button>`).join('')}
+    <button type="button" class="sec mini" data-rrabrir aria-expanded="${aberto}">${aberto ? 'Recolher ▴' : 'Ver lista ▾'}</button></div>
+    ${aberto ? `<div class="rr-lista"><div class="rr-busca"><input id="rrBusca" placeholder="Buscar prestador ou unidade…" value="${esc(RR.q)}"><span class="small muted">${vis.length} de ${lista.length}${RR.passo ? ' · ' + esc(cont[RR.passo].rot) : ''}</span></div>
+      <div class="rr-rolar"><table><thead><tr><th>Prestador</th><th>Un.</th><th>Grupo</th><th>Passo</th></tr></thead><tbody>${vis.map(i => `<tr data-rotrel="${esc(i.x.id)}"${i.x.id === sel ? ' class="sel"' : ''}><td>${esc(i.x.rel.cab.prestadorCod)} - ${esc(i.x.rel.cab.prestadorNome)}</td><td>${esc(i.un || '—')}</td><td>${esc(rotGr(grDoRel(i.x)))}</td><td>${esc(i.rot)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}`;
+  alvo.querySelectorAll('[data-rrpasso]').forEach(b => b.onclick = () => { const k = b.dataset.rrpasso; RR.passo = RR.passo === k ? null : k; if (RR.passo) RR.aberto = true; desenharRoteiroRelatorios(); });
+  alvo.querySelector('[data-rrabrir]').onclick = () => { RR.aberto = !aberto; desenharRoteiroRelatorios(); };
+  const bu = $('rrBusca'); if (bu) bu.oninput = () => { RR.q = bu.value; const pos = bu.selectionStart; desenharRoteiroRelatorios(); const n = $('rrBusca'); n.focus(); n.setSelectionRange(pos, pos); };
+  alvo.querySelectorAll('[data-rotrel]').forEach(t => t.onclick = () => { $('cfRel').value = t.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+  const linhaSel = alvo.querySelector('tr.sel'), rolar = alvo.querySelector('.rr-rolar'); if (linhaSel && rolar) rolar.scrollTop = Math.max(0, linhaSel.offsetTop - 60);
 }

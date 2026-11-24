@@ -48,7 +48,7 @@ Ficam em **Bases → Faturistas**: cadastro à mão, importação de uma planilh
 
 Tudo fica só neste navegador. Nome e ID/atendimento do paciente são apagados **60 dias após o registro** (ajuste em Configurações → Parâmetros). A aba avisa quando há dados que vencem em até 7 dias. Natureza, unidade, responsável e situação continuam para os indicadores. «Apagar agora os dados de pacientes desta competência» antecipa a limpeza. O backup só inclui as NCs se você marcar a opção.
 
-## NCs compartilhadas pela pasta da rede (desde a v3.0.0-alpha.29)
+## NCs compartilhadas pela pasta da rede (desde a v3.0.0-alpha.30)
 
 Com a pasta raiz conectada, as NCs de cada competência vão para `AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json`, e as duas pessoas veem as mesmas NCs.
 

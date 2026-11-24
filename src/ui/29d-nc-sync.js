@@ -1,5 +1,5 @@
 /* ============================================================
- * SOL-F18 (v3.0.0-alpha.29) — Não conformidades compartilhadas pela pasta da rede.
+ * SOL-F18 (v3.0.0-alpha.30) — Não conformidades compartilhadas pela pasta da rede.
  * Arquivo da competência: «AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json» (mescla em 87b-nc-sync.js).
  * Toda gravação das NCs (salvarNC) agenda a sincronização; o relógio de 30 s confere se a outra pessoa mudou o arquivo;
  * trocar a competência sincroniza a nova. Conflito (os dois mudaram a mesma NC) → a pessoa escolhe, com o histórico das duas.
