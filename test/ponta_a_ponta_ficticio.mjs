@@ -72,6 +72,9 @@ const totais = () => p.evaluate(() => window.__RM.t.totaisPorClasse(window.__RM.
 ok(await classes() === 'ANA:devido BRUNA:devido CARLA:pend DORA:pend ELIS:pend', `classes da conferência: ${await classes()}`);
 ok(await p.evaluate(() => window.__RM.S.conf.res.linhas.some(x => !x.r && x.status === 'so-laudo' && x.l.paciente === 'FABIO NUNES LEAL')), 'laudo sem lançamento aparece «Só no laudo»');
 ok(/Conferir e decidir/.test(await p.textContent('#cfRoteiro .rot-passo.atual')) && /decisão\(ões\) faltam/.test(await p.textContent('#cfRoteiro')), `SOL-F51: roteiro no passo 2 (${(await p.textContent('#cfRoteiro .rot-passo.atual')).trim()})`);
+await p.click('#btnMenu'); await p.waitForTimeout(150);
+ok(await p.isVisible('#cfRoteiro .roteiro'), 'roteiro continua visível com o menu recolhido (alpha.27: a classe do cartão não colide com o nome dos itens do menu)');
+await p.click('#btnMenu'); await p.waitForTimeout(150);
 await p.click('#cfTab tbody tr.clicavel'); await p.waitForTimeout(150);
 ok(/MV/.test(await p.textContent('#cfTab .cf-cmp')) && await p.isVisible('#cfTab .cf-cmp'), 'linha aberta mostra MV × laudo lado a lado');
 await p.screenshot({ path: out + 'conferencia.png', fullPage: true });

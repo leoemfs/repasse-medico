@@ -27,13 +27,16 @@ ok(await larg() === 232, 'Ctrl+B expande');
 await p.keyboard.press('Control+b');
 ok(await larg() === 64, 'Ctrl+B recolhe');
 // v3.0.0-alpha.12: sem modo celular (decisão do usuário, P3 da auditoria). Janela estreita no computador: o mesmo menu.
+// v3.0.0-alpha.27 (pedido de 24/11, no celular): em tela estreita o menu começa recolhido (só ícones); o ☰ abre.
 const m = await (await b.newContext({ viewport: { width: 700, height: 800 } })).newPage();
 m.on('pageerror', e => erros.push(e.message));
 await m.goto(html + '#inicio'); await m.waitForFunction(() => window.__RM);
 const estreita = await m.evaluate(() => ({ barra: !!document.querySelector('.barra-cel,#barraCel,#veuGaveta,.gaveta-cab'), larg: Math.round(document.querySelector('.sidebar').getBoundingClientRect().width), abas: [...document.querySelectorAll('.nav a[data-pag]')].filter(a => a.offsetParent).length }));
-ok(!estreita.barra && estreita.larg === 232 && estreita.abas === 7, `janela estreita: mesmo menu lateral com as 7 abas, sem gaveta nem barra inferior (${JSON.stringify(estreita)})`);
+ok(!estreita.barra && estreita.larg === 64 && estreita.abas === 7, `janela estreita: mesmo menu lateral, começa recolhido (só ícones), sem gaveta nem barra inferior (${JSON.stringify(estreita)})`);
+const sobra = await m.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1);
+ok(sobra, 'janela estreita: a página não rola para o lado');
 await m.click('#btnMenu');
-ok(Math.round(await m.evaluate(() => document.querySelector('.sidebar').getBoundingClientRect().width)) === 64, 'na janela estreita, ☰ recolhe o menu');
+ok(Math.round(await m.evaluate(() => document.querySelector('.sidebar').getBoundingClientRect().width)) === 232, 'na janela estreita, ☰ abre o menu');
 await m.screenshot({ path: out + 'menu_estreito.png' });
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

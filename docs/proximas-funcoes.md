@@ -22,6 +22,11 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+## Correção da v3.0.0-alpha.27 — tela estreita / celular (pedido de 24/11/2026)
+- No celular, o menu lateral (232 px) deixava uns 260 px para a tela, e o quadro da competência empurrava a página para o lado (cartões cortados).
+- Agora, em tela de até 900 px, o menu começa **recolhido** (só ícones); o ☰ abre. O topo e os textos longos quebram de linha. Teste: `test/menu.mjs`.
+- Corrigido junto: o cartão «Roteiro deste relatório» sumia com o menu recolhido (a classe do cartão era a mesma do nome dos itens do menu).
+
 ## SOL-F51 — Roteiro da conferência por relatório — **IMPLEMENTADA na v3.0.0-alpha.26** (pedido de 23/11/2026; prévia aprovada: `docs/prototipos/roteiro-conferencia/` e https://claude.ai/artifact/8LEQjhxsQUBSNP2Xgdm1nB; teste: `test/roteiro.mjs`)
 Base reaproveitável das prévias (CSS, menu e ícones do app): https://claude.ai/artifact/UL2uPLRxrDjUquvd5sjEgE.
 

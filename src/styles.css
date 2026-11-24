@@ -475,7 +475,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .v3-exc-form input[type=text]{width:190px}.v3-exc-form input[type=number]{width:100px}
 .v3-exc-nota{border-left:3px solid var(--info);padding-left:8px;margin:6px 0 0}
 /* SOL-F51 — Roteiro deste relatório (alpha.26) */
-.rot{padding:14px 16px}
+.roteiro{padding:14px 16px}
 .rot-cab{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}.rot-cab h2{margin:0;font-size:16px}
 .rot-passos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
 .rot-passo{border:1px solid var(--line);border-radius:10px;padding:9px 10px 10px;background:var(--card);min-width:0}
@@ -490,3 +490,11 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .rot-rel .marc{display:inline-flex;gap:6px;align-items:center}.rot-rel .marc i{font-style:normal;font-weight:700;font-size:11px;padding:0 6px;border-radius:999px;background:var(--bg);color:var(--muted)}
 .rot-rel .marc.sel i{background:var(--card);color:var(--accent)}
 @media (max-width:1100px){.rot-passos{grid-template-columns:repeat(3,minmax(0,1fr))}}
+/* v3.0.0-alpha.27 — tela estreita (celular): nada empurra a página para o lado */
+@media (max-width:900px){
+  .main{padding:16px 12px 32px}
+  .topo-dir{width:100%}.comp-global{flex:1 1 100%;min-width:0;justify-content:space-between}.comp-rot{min-width:0}.comp-rot b{white-space:normal}
+  .main .card{overflow-wrap:anywhere}
+  .main .card code,.main .card .small{overflow-wrap:anywhere;word-break:break-word}
+}
+@media (max-width:640px){.rot-passos{grid-template-columns:1fr 1fr}.rot-agora .acoes{width:100%}}
