@@ -94,8 +94,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // validada, os outros que são parte do mesmo exame (ex.: 2ª página só do Doppler) não disputam as linhas com ele: o exame
   // cumpre a regra, e eles só pegam linha que sobrar (2ª fase do pareamento). Sem disputa, não há «ambíguo» nem
   // «composição incompleta» falsa quando o Doppler vem numa página separada.
-  const unEq = opc.unidadeCod === '*' ? '' : opc.unidadeCod, secundarioDe = new Map(), exames = new Map();
-  for (const l of Lun) if (l.dia !== null && l.pn) { const k = `${l.pn}|${l.dia}|${l.modalidade}|${l.mn}`; (exames.get(k) || exames.set(k, []).get(k)).push(l); }
+  const unEq = opc.unidadeCod === '*' ? '' : opc.unidadeCod, secundarioDe = new Map(), exames = new Map(), grupoExame = new Map();
+  for (const l of Lun) if (l.dia !== null && l.pn) { const k = `${l.pn}|${l.dia}|${l.modalidade}|${l.mn}`; (exames.get(k) || exames.set(k, []).get(k)).push(l); grupoExame.set(l.i, k); }
   for (const g of exames.values()) {
     if (g.length < 2) continue;
     const comRegra = g.map(l => ({ l, c: compostaDoTitulo(idx, l.titulo, unEq, l.modalidade) })).filter(x => x.c);
@@ -233,7 +233,10 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       if (p.conv === false) { marc.add('convenio-divergente'); motivos.push(`Convênio: MV «${r.convenio}» × laudo «${p.l.convenio}»`); }
       if (p.l.idDuplo) marc.add('id-duplo');
       // Ambiguidade: outro laudo da mesma faixa, materialmente diferente, que não está com uma linha do mesmo código.
-      const mesmoExame = c => secundarioDe.get(c.l.i) === p.l.i || secundarioDe.get(p.l.i) === c.l.i;
+      // Página secundária de um exame do mesmo grupo (ex.: 2 Dopplers de tireoide no dia, cada um com a sua página de USG)
+      // não é outro laudo plausível para a linha: ela pertence ao exame, qualquer que seja o laudo principal dele.
+      const mesmoGrupo = c => grupoExame.has(c.l.i) && grupoExame.get(c.l.i) === grupoExame.get(p.l.i);
+      const mesmoExame = c => secundarioDe.get(c.l.i) === p.l.i || secundarioDe.get(p.l.i) === c.l.i || (mesmoGrupo(c) && (secundarioDe.has(c.l.i) || secundarioDe.has(p.l.i)));
       const alt0 = b.cands.filter(c => c.tier === p.tier && c.l !== p.l && chaveExame(c.l) !== chaveExame(p.l) && !mesmoExame(c)
         && !(usado.has(c.l.i) && usado.get(c.l.i).r.codigo === r.codigo && usado.get(c.l.i) !== b));
       // Alternativa claramente de outro exame pelo título (afinidade bem menor) não deixa a linha ambígua.
@@ -280,15 +283,20 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // lançado pela composição — por equivalência validada ou por estar na lista «mesmo estudo» da regra.
   const mesmoEstudo = l => {
     if (l.dia === null) return null;
+    // Vários exames compostos no mesmo dia (ex.: punção e Doppler de tireoide): vale o que reconhece o laudo; sem nenhum,
+    // o primeiro fica como «pode ser o mesmo estudo».
+    let possivel = null;
     for (const [li, u] of compostoUsos) {
       const L = usado.get(li)?.par?.l; if (!L || L === l || L.pn !== l.pn || L.dia !== l.dia) continue;
       const regra = (idx.compostas || []).find(c => c.id === u.id), cods = [...new Set(u.bs.map(b => b.r.codigo))];
       const naRegra = (regra?.titulosMesmoEstudo || []).some(t => chaveTitulo(t) === chaveTitulo(l.titulo));
       const viaEq = !naRegra && cods.some(cd => { const a = avaliarProcedimento(idx, cd, l.titulo, { unidade: opc.unidadeCod === '*' ? '' : opc.unidadeCod, modalidade: l.modalidade }); return a.estado === 'validada' && !a.composta; });
       // Laudo de outro médico no mesmo dia: pode ser parte do exame, mas quem recebe muda — fica para a pessoa decidir.
-      return { L, regra, cods, via: L.mn !== l.mn ? null : naRegra ? 'regra' : viaEq ? 'eq' : null };
+      const r = { L, regra, cods, via: L.mn !== l.mn ? null : naRegra ? 'regra' : viaEq ? 'eq' : null };
+      if (r.via) return r;
+      possivel = possivel || r;
     }
-    return null;
+    return possivel;
   };
   for (const l of [...escopo, ...escopoSemData]) {
     if (usado.has(l.i)) continue;

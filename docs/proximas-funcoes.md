@@ -22,6 +22,24 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+
+## Exames compostos repetidos no mesmo dia — **IMPLEMENTADA na v3.0.0-alpha.31** (24/11/2026; teste: `test/exames_repetidos.mjs`)
+
+Achado nos testes com 12 relatórios de USG reais de 11/2026 (1.077 linhas, base de equivalências rev65 → rev66):
+1. **Falsa ambiguidade.** Dois exames iguais no dia (ex.: dois Dopplers de tireoide, cada um com a sua página de USG): as páginas ficavam ligadas só ao 1º exame, e a 2ª linha virava «Mais de um laudo plausível». Agora, página secundária do mesmo grupo (paciente, dia, modalidade e médico) não conta como alternativa.
+2. **«Mesmo estudo» perdido.** Com duas regras compostas no dia (ex.: punção e Doppler), o motor olhava só a primeira e marcava a página de USG como «pode ser o mesmo estudo». Agora vale a regra que reconhece o laudo.
+
+**Resultado nos relatórios reais** (base rev66):
+- 892 linhas conferidas, contra 871 sem a correção;
+- «pode ser o mesmo estudo»: 2, contra 19.
+
+**Base de equivalências rev66** (ajustes pedidos pelo usuário; a base fica fora do repositório):
+- «DOPPLER DE TIREÓIDE»: o 1º item aceita 40901654 ou 40901203;
+- punções: uma regra «um ou outro» (40809099 ou 40809161) para os 9 títulos;
+- nova regra «DOPPLER DE MAMAS»: 40901114 + 40901386.
+
+Com a base rev65 eram 809 linhas conferidas; com a rev66 e o motor da alpha.31, são 892.
+
 ## Correção da v3.0.0-alpha.28 — Enter nas confirmações (pedido de 24/11/2026)
 - As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
 - Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
