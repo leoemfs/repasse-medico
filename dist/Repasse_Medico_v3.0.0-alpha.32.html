@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.31</title>
+<title>Repasse Médico v3.0.0-alpha.32</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -514,12 +514,19 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 }
 @media (max-width:640px){.rot-passos{grid-template-columns:1fr 1fr}.rot-agora .acoes{width:100%}}
 
+/* Conferência: copiar o nome do paciente com um clique (24/11/2026) */
+.pac{white-space:nowrap}
+.cp-nome{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px;margin-left:4px;border-radius:6px;vertical-align:middle;line-height:0}
+.cp-nome:hover{background:var(--infobg);color:var(--accent)}.cp-nome svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.cp-nome.ok{color:var(--ok)}
+th .cf-sel{margin:0}
+
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.31 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.32 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -564,7 +571,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.31';
+const MOTOR_VERSAO = '3.0.0-alpha.32';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -6676,19 +6683,25 @@ function iniciarMenu() {
 /* ---------- Tabela paginada com detalhe expansível ---------- */
 function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.' }) {
   let pag = 0, aberto = null;
-  const desenhar = () => {
+  // manter: abrir/fechar uma linha não pode levar a lista de volta ao topo (pedido de 24/11/2026) — guarda a rolagem da
+  // área da tabela (.tw) e da página e devolve depois de redesenhar.
+  const desenhar = (manter = false) => {
+    const tw0 = cont.querySelector('.tw'), rol = manter && tw0 ? [tw0.scrollTop, tw0.scrollLeft] : null, pagY = manter ? window.scrollY : null;
     const total = linhas.length, ini = pag * porPagina, fatia = linhas.slice(ini, ini + porPagina);
-    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
+    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${c.th ? c.th(linhas) : esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
       const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${ini + i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
       return linha + (detalhe && aberto === ini + i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
     }).join('') : `<tr><td colspan="${colunas.length}" class="muted">${esc(vazio)}</td></tr>`}</tbody></table></div>` +
       (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)</span></div>`);
     cont.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pag += +b.dataset.p; aberto = null; desenhar(); });
-    if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(); });
+    if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(true); });
+    if (rol) { const tw = cont.querySelector('.tw'); if (tw) { tw.scrollTop = rol[0]; tw.scrollLeft = rol[1]; } }
+    if (pagY != null && window.scrollY !== pagY) window.scrollTo(window.scrollX, pagY);
   };
   desenhar();
   return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
+const ICONE_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');
 
@@ -7563,9 +7576,11 @@ function desenharConferencia() {
   };
   const t = tabela($('cfTab'), {
     linhas: filtrar(), colunas: [
-      { t: '', html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
+      { t: '', th: ls => { const n = ls.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length;
+        return `<input type="checkbox" class="cf-sel" data-seltodos aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"${ls.length && n === ls.length ? ' checked' : ''}>`; },
+        html: x => { const i = res.linhas.indexOf(x); return `<input type="checkbox" class="cf-sel" data-sel="${i}" aria-label="Marcar a linha"${S.conf.sel.has(i) ? ' checked' : ''}>`; } },
       { t: 'Classe · situação', html: x => `${pillClasse(classeDaLinhaConf(x))}<div class="cf-sit">${chipStatus(x.status, STATUS_CONF[x.status].nome)}${chipDecisao(x.decisao)}${observacoesDaLinha(idxObs, x.r, x.l).length ? ' <span class="obs-i" title="tem observação">✎</span>' : ''}</div>` },
-      { t: 'Paciente', v: x => x.r?.paciente || x.l?.paciente }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
+      { t: 'Paciente', html: x => { const nome = x.r?.paciente || x.l?.paciente || ''; return `<span class="pac">${esc(nome)}${nome ? `<button type="button" class="cp-nome" data-copiar="${esc(nome)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>`; } }, { t: 'Data', v: x => fmtData(x.r?.data || x.l?.data) },
       { t: 'Procedimento no MV', v: x => x.r ? `${x.r.codigo} · ${x.r.procDesc || ''}` : '—' }, { t: 'Laudo (Apolo)', v: x => x.l?.titulo || '—' },
       { t: 'O que falta / por quê', v: x => x.decisao ? `${TIPOS_DECISAO[x.decisao.tipo] || ''}${x.decisao.justificativa ? ': ' + x.decisao.justificativa : ''}` : classeDaLinhaConf(x) === 'excluido' ? (x.tipo === 'hm' ? 'HM a excluir do MV: não compõe repasse (fora da V3 nenhum HM é pago)' : `${TIPOS_ITEM[x.tipo] || x.tipo}: não compõe repasse`) : x.status === 'conferido' || x.status === 'nao-procedimental' ? '' : (CZ.porLinha.get(res.linhas.indexOf(x)) || x.motivos[0] || '') },
       { t: 'Vl Repasse', n: true, v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
@@ -7578,13 +7593,26 @@ function desenharConferencia() {
       ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
       <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]}) · título ${Math.round((cd.af || 0) * 100)}%${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
   });
-  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); };
-  infoSel(filtrar());
+  // Caixa do cabeçalho (pedido de 24/11/2026): marca ou desmarca todas as linhas do filtro.
+  const caixaTodos = v => { const cb = $('cfTab').querySelector('[data-seltodos]'); if (!cb) return; const n = v.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length; cb.checked = !!v.length && n === v.length; cb.indeterminate = n > 0 && n < v.length; };
+  const refiltrar = () => { const v = filtrar(); t.atualizar(v); infoSel(v); caixaTodos(v); };
+  infoSel(filtrar()); caixaTodos(filtrar());
   // «Decidir e ir para a próxima»: depois de uma decisão na linha aberta, abre a linha que ficou na mesma posição.
   if (S.conf.abrirPos != null) { const v = filtrar(); if (v.length) t.abrir(Math.min(S.conf.abrirPos, v.length - 1)); S.conf.abrirPos = null; }
   $('cfTab').addEventListener('change', e => {
-    const cb = e.target.closest('[data-sel]'); if (!cb) return;
-    const i = +cb.dataset.sel; cb.checked ? S.conf.sel.add(i) : S.conf.sel.delete(i); infoSel(filtrar());
+    const v = filtrar();
+    if (e.target.closest('[data-seltodos]')) {
+      if (e.target.checked) v.forEach(x => S.conf.sel.add(res.linhas.indexOf(x))); else S.conf.sel.clear();
+      $('cfTab').querySelectorAll('[data-sel]').forEach(c => c.checked = S.conf.sel.has(+c.dataset.sel));
+    } else { const cb = e.target.closest('[data-sel]'); if (!cb) return; const i = +cb.dataset.sel; cb.checked ? S.conf.sel.add(i) : S.conf.sel.delete(i); }
+    infoSel(v); caixaTodos(v);
+  });
+  // Copiar o nome do paciente com um clique (sem abrir a linha).
+  $('cfTab').addEventListener('click', async e => {
+    const b = e.target.closest('[data-copiar]'); if (!b) return;
+    e.stopPropagation();
+    try { await navigator.clipboard.writeText(b.dataset.copiar); b.classList.add('ok'); b.title = 'Copiado'; setTimeout(() => { b.classList.remove('ok'); b.title = 'Copiar o nome'; }, 1200); }
+    catch (_) { avisar('Não foi possível copiar: selecione o nome e use Ctrl+C.', 'warn'); }
   });
   $('cfBusca').oninput = e => { S.conf.busca = e.target.value; refiltrar(); };
   $('cfFProc').onchange = e => { S.conf.fProc = e.target.value; S.conf.soFalta = false; desenharConferencia(); };

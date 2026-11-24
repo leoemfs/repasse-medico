@@ -362,7 +362,7 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
   const desenhar = (manter = false) => {
     const tw0 = cont.querySelector('.tw'), rol = manter && tw0 ? [tw0.scrollTop, tw0.scrollLeft] : null, pagY = manter ? window.scrollY : null;
     const total = linhas.length, ini = pag * porPagina, fatia = linhas.slice(ini, ini + porPagina);
-    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
+    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${c.th ? c.th(linhas) : esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
       const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${ini + i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
       return linha + (detalhe && aberto === ini + i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
     }).join('') : `<tr><td colspan="${colunas.length}" class="muted">${esc(vazio)}</td></tr>`}</tbody></table></div>` +
@@ -375,6 +375,7 @@ function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classe
   desenhar();
   return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
+const ICONE_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
 const chipStatus = (cls, nome) => `<span class="st st-${esc(cls)}">${esc(nome)}</span>`;
 const opcoes = (lista, sel) => lista.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(sel) ? ' selected' : ''}>${esc(t)}</option>`).join('');
 
