@@ -24,6 +24,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.37 — subaba da Conferência voltava para a Prévia (pedido de 24/11/2026)
+- Em «O que falta decidir», validar um par ou escolher «Um ou outro» roda a conferência de novo, e o resultado novo voltava para «Prévia de conferência». Agora fica na mesma subaba e no mesmo ponto da tela (mesmo relatório e unidade).
+- Revisadas as outras telas com subabas (Equivalências, Fechamento, Fluxo, NCs, Configurações, Prestadores por unidade): guardam a subaba e não têm o problema.
+
 ## Equivalências TUSS simplificadas — **IMPLEMENTADA na v3.0.0-alpha.36** (pedido de 24/11/2026; prévia aprovada: https://claude.ai/artifact/Pz54KXDqMFps4d4a48iuCT e `docs/prototipos/equivalencias-simplificadas.html`; teste: `test/eq_tela.mjs`)
 
 **Pedido:**

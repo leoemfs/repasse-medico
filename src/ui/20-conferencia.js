@@ -132,8 +132,10 @@ async function executarConferencia() {
   if (!un) return avisar('Escolha a unidade dos laudos: o PDF não informa a unidade.', 'warn');
   if (!(tol >= 0)) return avisar('Tolerância inválida.', 'warn');
   if (!exigirAberta(S.comp, 'executar uma conferência')) return;
+  const mesmo = S.conf && S.conf.ctx?.relId === x.id && S.conf.ctx?.unidadeCod === un, y = window.scrollY;
   const { res, rodada } = await rodarConferencia(x, un, tol, medSel);
   desenharConferencia();
+  if (mesmo) window.scrollTo(window.scrollX, y);   // continua no mesmo ponto da tela
   avisar(`Conferência concluída: ${res.porStatus.conferido.n} conferidas, ${res.nMV - res.porStatus.conferido.n} linhas do MV com pendência ou ressalva.`, 'ok');
   return rodada;
 }
@@ -148,7 +150,11 @@ async function rodarConferencia(x, un, tol, medSel) {
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;
   const ant = rodadaAnterior(S.rodadas, rodada);
   await guardarRodada(rodada);
-  S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '' };
+  // Mesmo relatório e unidade (ex.: rodou de novo depois de validar uma equivalência em «O que falta decidir»): fica na
+  // mesma subaba, em vez de voltar para a Prévia (pedido de 24/11/2026).
+  const antes = S.conf && S.conf.ctx?.relId === x.id && S.conf.ctx?.unidadeCod === un ? S.conf : null;
+  S.conf = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtroStatus: new Set(), filtroMarc: new Set(), busca: '',
+    ...(antes ? { aba: antes.aba, umaMais: antes.umaMais, soFalta: antes.soFalta } : {}) };
   ctx.fonteNC = `conf|${x.id}|${un}`;
   // Conciliação com o Power BI (SOL-F9): explica os «Só no laudo» e sugere natureza e responsável.
   let cands = candidatosDaConferencia(res, ctx, S.cfg);
