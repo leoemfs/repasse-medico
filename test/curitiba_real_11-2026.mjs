@@ -11,12 +11,12 @@ const b64 = f => fs.readFileSync(D + f).toString('base64');
 const br = await chromium.launch(), page = await br.newPage(), erros = [];
 page.on('pageerror', e => erros.push(e.message));
 await page.goto('file://' + raiz + 'dist/harness.html'); await page.waitForFunction(() => window.PRONTO, null, { timeout: 30000 });
-const arqs = Object.fromEntries(['7.pdf', '14.pdf', '10490.pdf', '11467.pdf', '6703.pdf', '8016.pdf', '17771.pdf', 'laudos.xlsx'].map(f => [f, b64(f)]));
+const arqs = Object.fromEntries(['7.pdf', '14.pdf', '10490.pdf', '11467.pdf', '6703.pdf', '8016.pdf', '17771.pdf', '10490_v2.pdf', 'laudos.xlsx'].map(f => [f, b64(f)]));
 const o = await page.evaluate(async (arqs) => {
   const H = window.H, u8 = s => { const b = atob(s); const a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; };
   const cfg = H.configPadrao(), eq = H.eqVazia(), o = { rel: {}, conf: {} }, rels = {};
   const ap = await H.lerApolo(u8(arqs['laudos.xlsx']), 'laudos');
-  for (const f of ['7.pdf', '14.pdf', '10490.pdf', '11467.pdf', '6703.pdf', '8016.pdf', '17771.pdf']) {
+  for (const f of ['7.pdf', '14.pdf', '10490.pdf', '11467.pdf', '6703.pdf', '8016.pdf', '17771.pdf', '10490_v2.pdf']) {
     const { linhas } = await H.lerLinhasPdf(H.pdfjs, u8(arqs[f])); const rel = rels[f] = H.interpretarMV(linhas, f);
     H.registrarPrestadorDoMV(cfg, rel.cab.prestadorCod, rel.cab.prestadorNome);
     o.rel[f] = { ok: rel.ok, ext: rel.totExtraido, pdf: rel.totalGeral, cod: rel.cab.prestadorCod };
@@ -34,7 +34,9 @@ const o = await page.evaluate(async (arqs) => {
     const p = P(rel.cab.prestadorCod), c = p?.regras?.v3regra ? H.calcularV3(p.regras.v3regra, lin) : null;
     o.conf[f] = { procs: procs.length, pareadas: procs.filter(x => x.l).length, hmDevido: hm.filter(x => cl(x) === 'devido').length, hmDevidoValor: Math.round(hm.filter(x => cl(x) === 'devido').reduce((s, x) => s + x.r.vlRepasse, 0) * 100) / 100,
       hmSemBase: av.hmSemBase.n, pacotes: av.pacotes.n, subst: av.substituidos.n, substValor: av.substituidos.valor, email: c ? H.textoEmailV3(c) : '', usgOutroMedico: procs.filter(x => /ULTRASS/.test(x.r.grupoNome) && x.marcadores.has('outro-medico')).length, usg: procs.filter(x => /ULTRASS/.test(x.r.grupoNome)).length, hmExcluir: av.hmExcluir.n, hmExcluirValor: av.hmExcluir.valor, grupos: av.hmExcluir.grupos.map(g => `${g.grupo}:${g.n}`).sort(), fora: av.foraEscopo.n,
-      calc: c ? { pac: c.pacotes?.valor, total: c.total, exames: c.exames, bruto: c.brutoUSG, hm: c.hm.valor, pct: c.pct, valorMV: c.valorMV } : null };
+      hmExcluirChaves: av.hmExcluir.grupos.flatMap(g => g.linhas.map(x => `${x.r.atendimento}|${x.r.codigo}|${x.r.vlTotal}`)).sort(),
+      chaves: mv.map(x => `${x.r.atendimento}|${x.r.codigo}|${x.r.vlTotal}`),
+      calc: c ? { pac: c.pacotes?.valor, liquido: c.liquido, base: c.base, total: c.total, exames: c.exames, bruto: c.brutoUSG, hm: c.hm.valor, pct: c.pct, valorMV: c.valorMV } : null };
   }
   const cur = H.laudosDaUnidade(ap, cfg, '5');
   o.apolo = { curitiba: cur.length, trocadas: cur.filter(l => l.modalidadeApolo).length, semTitulo: cur.filter(l => !H.modalidadeDoTituloV3(l.titulo)).length };
@@ -62,7 +64,13 @@ const Mt = o.conf['17771.pdf'];
 ok(Mt.hmDevido === 9 && Mt.hmSemBase === 0 && Mt.hmExcluir === 85 && Mt.hmExcluirValor === 5168, `Matheus: 9 HM de USG Unimed devidos; 85 HM de mamografia a 100% a excluir (R$ ${Mt.hmExcluirValor})`);
 ok(Mt.pacotes === 5 && Mt.subst === 4 && Mt.substValor === 694.16, `Matheus: 5 pacotes de mamografia Bradesco considerados; 4 mamografias Bradesco lançadas a 100% substituídas (R$ ${Mt.substValor}, fora do fechamento)`);
 ok(Mt.calc.total === 9225, `Matheus (tudo aceito): 383 × 15 + 134 × 10 (HU) + 50 USG × 35 + 9 HM × 35 + 5 pacotes × 15 = R$ ${Mt.calc.total} (MV R$ 15.087,16 − R$ 5.168,00 de HM − R$ 694,16 de bases a 100%)`);
-ok([I, G, M, Pa, A, E, Mt].every(x => x.fora === 0), 'nenhuma tomografia nos relatórios');
+// Nova extração do Dr. Ian (24/11/2026), depois das correções no MV.
+const I2 = o.conf['10490_v2.pdf'];
+ok(o.rel['10490_v2.pdf'].pdf.join() === '128877.91,128877.91' && I2.pareadas >= 1725, `Ian (nova extração): relatório lido (R$ 128.877,91), ${I2.pareadas}/${I2.procs} USG com laudo`);
+ok(I2.hmExcluir === 0 && I.hmExcluirChaves.every(k => !I2.chaves.includes(k)), `os 6 HM que a ferramenta mandou excluir saíram do MV na nova extração (restam ${I2.hmExcluir})`);
+ok(I2.hmDevido === 538 && I2.hmSemBase === 0 && I2.calc.exames === 1738 && I2.calc.bruto === 101265.79 && I2.calc.hm === 27612.12, `Ian: 1.738 exames · USG R$ ${I2.calc.bruto} · HM Unimed R$ ${I2.calc.hm} (538, todos com o exame base)`);
+ok(I2.calc.liquido === 117085.58 && I2.calc.pct === 70 && I2.calc.total === 81959.91 && /R\$ 128\.877,91 menos os impostos \(9,15%\) = R\$ 117\.085,58 \* 70% = R\$ 81\.959,91/.test(I2.email), `Ian: R$ 128.877,91 − 9,15% = R$ 117.085,58 × 70% = NF R$ ${I2.calc.total}`);
+ok([I, G, M, Pa, A, E, Mt, I2].every(x => x.fora === 0), 'nenhuma tomografia nos relatórios');
 ok(o.ctl['7']?.producao && o.ctl['7'].laudos === 236 && o.ctl['14']?.producao && o.ctl['14'].laudos === 26, `Prestadores por unidade (5): 7 = ${o.ctl['7']?.laudos} e 14 = ${o.ctl['14']?.laudos} laudos por produção (só ressonância)`);
 ok(Pa.usg === 1 && Pa.usgOutroMedico === 1, `14: a USG que o MV lançou para ele tem laudo de outro médico — candidato a correção de prestador (${Pa.usgOutroMedico} de ${Pa.usg})`);
 ok(o.ctl['10490']?.laudos > 0 && o.ctl['11467']?.laudos > 0, `médicos V3 contam pela regra: Ian ${o.ctl['10490']?.laudos}, Gilson ${o.ctl['11467']?.laudos} (${o.ctl['11467']?.fora || 'nada fora da regra'})`);

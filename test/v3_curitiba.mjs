@@ -75,6 +75,16 @@ const fx = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.
   return { total: c.total, hm: c.hm.valor, pac: c.pacotes.valor, texto: textoEmailV3(c) }; });
 ok(fx.hm === 132 && fx.pac === 45 && fx.total === 330 + 132 + 90 + 45, `valor fixo: 10 USG × 33 + 4 HM × 33 (o valor de HM antigo, 10, é ignorado) + 2 RM × 45 + pacote 45 = ${fx.total}`);
 ok(/Pacotes \(ressonância\/mamografia\): 1 = R\$ 45,00/.test(fx.texto), 'o e-mail mostra o pacote');
+// E-mail do Dr. Ian de 10/2026, como o usuário envia hoje (24/11/2026); «R$ 0,00» onde o e-mail dele trazia «R$ 00,00».
+const emailIan = await p.evaluate(() => { const { calcularV3, textoEmailV3, regraV3Padrao } = window.__RM.t;
+  return textoEmailV3(calcularV3(regraV3Padrao(), [
+    { grupo: 'ULTRASSONOGRAFIA - OUTROS', desc: 'USG MAMAS - OP', convenio: 'UNIMED CURITIBA -', quant: 1539, vlTotal: 93838.16, vlRepasse: 93838.16, tipoItem: 'procedimento' },
+    { grupo: '78 - HONORARIOS MEDICOS PF', desc: 'USG MAMAS - HM', convenio: 'UNIMED CURITIBA -', quant: 400, vlTotal: 21907.88, vlRepasse: 21907.88, tipoItem: 'hm' }])); });
+const EMAIL_IAN_10 = ['Boa tarde a todos, segue relatório de produção para conferência.', '', 'Foram realizados 1539 exames de ultrassom.', '',
+  'Densitometria: R$ 0,00 (SEM PRODUÇÃO)', 'Honorários USG UNIMED: R$ 21.907,88', 'USG: R$ 93.838,16', '',
+  'Ultrassom: R$ 93.838,16 mais HM R$ 21.907,88 = R$ 115.746,04 menos os impostos (9,15%) = R$ 105.155,28 * 70% = R$ 73.608,69', '',
+  'Total para emissão da nota fiscal: R$ 73.608,69'].join('\n');
+ok(emailIan === EMAIL_IAN_10, 'e-mail do Dr. Ian igual ao enviado pelo usuário (10/2026: R$ 73.608,69)' + (emailIan === EMAIL_IAN_10 ? '' : '\n' + emailIan));
 // HM de USG Unimed = valor do exame base correspondente, para todos na V3 (23/11/2026): se a USG muda (exceção), o HM muda junto.
 const hmb = await p.evaluate(() => { const { calcularV3, textoEmailV3 } = window.__RM.t;
   const regra = { modo: 'fixo', grupos: [{ grupo: '*USG*', valorLaudo: 33, excecoes: [{ convenio: 'UNIMED', valorLaudo: 40 }] }] };

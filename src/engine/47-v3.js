@@ -269,10 +269,11 @@ function avisosV3(c) {
   return a;
 }
 
-// Texto do e-mail no formato usado hoje (exemplo do Dr. Ian, 10/2026).
+// Texto do e-mail no formato usado hoje (exemplo do Dr. Ian, 10/2026, enviado pelo usuário em 24/11/2026).
+const SAUDACAO_EMAIL_V3 = 'Boa tarde a todos, segue relatório de produção para conferência.';
 function textoEmailV3(c) {
   if (c.modo === 'fixo') {
-    const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', ''];
+    const R = v => `R$ ${fmtBR(v)}`, L = [SAUDACAO_EMAIL_V3, ''];
     for (const i of c.itens) {
       L.push(i.qtd ? `${i.rotulo}: ${i.conta}` : `${i.rotulo}: R$ 0,00 (SEM PRODUÇÃO)`);
       if (i.hmQtd) L.push(`Honorários ${i.grupo === GRUPO_USG_V3 ? 'USG' : i.rotulo} UNIMED: ${i.contaHM}`);
@@ -281,7 +282,7 @@ function textoEmailV3(c) {
     L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
     return L.join('\n');
   }
-  const R = v => `R$ ${fmtBR(v)}`, L = ['Boa tarde, segue relatório de produção para conferência.', '', `Foram realizados ${c.exames} exames de ultrassom.`, ''];
+  const R = v => `R$ ${fmtBR(v)}`, L = [SAUDACAO_EMAIL_V3, '', `Foram realizados ${c.exames} exames de ultrassom.`, ''];
   for (const o of c.outros) {
     if (!o.qtd && !o.bruto) { L.push(`${o.nome}: R$ 0,00 (SEM PRODUÇÃO)`); continue; }
     const como = o.forma === 'pct-bruto' ? `${fmtBR(o.pct)}% de ${R(o.bruto)}` : o.forma === 'pct-liquido' ? `${fmtBR(o.pct)}% de ${R(o.bruto)} menos os impostos` : o.forma === 'por-laudo' ? `${o.qtd} × ${R(o.valorLaudo)}` : 'não paga';
@@ -296,9 +297,8 @@ function textoEmailV3(c) {
     L.push('Ultrassom: não pago pela regra deste médico.');
   } else {
     const soma = c.hmNaBase ? `Ultrassom: ${R(c.brutoUSG)} mais HM ${R(c.hm.valor)} = ${R(c.base)}` : `Ultrassom: ${R(c.base)}`;
-    L.push(soma);
-    if (c.forma === 'pct-bruto') L.push(`* ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
-    else L.push(`menos os impostos (${pctTxt(fmtBR(c.impostos))}) = ${R(c.liquido)} * ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
+    // Uma linha só, como no e-mail do usuário (24/11/2026).
+    L.push(c.forma === 'pct-bruto' ? `${soma} * ${pctTxt(c.pct)} = ${R(c.valorUSG)}` : `${soma} menos os impostos (${pctTxt(fmtBR(c.impostos))}) = ${R(c.liquido)} * ${pctTxt(c.pct)} = ${R(c.valorUSG)}`);
   }
   if (c.pacotes?.qtd) L.push(`Pacotes (ressonância/mamografia): ${c.pacotes.qtd} = ${R(c.pacotes.valor)}`);
   L.push('', `Total para emissão da nota fiscal: ${R(c.total)}`);
