@@ -22,6 +22,28 @@
 Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os testes: `test/p0_decisoes.mjs`, `p1_otimizacoes.mjs`, `ponta_a_ponta_ficticio.mjs`, `bench_pior_caso.mjs`, `pasta_por_aba.mjs` e `p3_regras_config.mjs`. Para rodar tudo o que não precisa de `dados/`, use `node tools/testes.mjs`.
 
 
+
+## Exames compostos repetidos no mesmo dia — **IMPLEMENTADA na v3.0.0-alpha.31** (24/11/2026; teste: `test/exames_repetidos.mjs`)
+
+Achado nos testes com 12 relatórios de USG reais de 11/2026 (1.077 linhas, base de equivalências rev65 → rev66):
+1. **Falsa ambiguidade.** Dois exames iguais no dia (ex.: dois Dopplers de tireoide, cada um com a sua página de USG): as páginas ficavam ligadas só ao 1º exame, e a 2ª linha virava «Mais de um laudo plausível». Agora, página secundária do mesmo grupo (paciente, dia, modalidade e médico) não conta como alternativa.
+2. **«Mesmo estudo» perdido.** Com duas regras compostas no dia (ex.: punção e Doppler), o motor olhava só a primeira e marcava a página de USG como «pode ser o mesmo estudo». Agora vale a regra que reconhece o laudo.
+
+**Resultado nos relatórios reais** (base rev66):
+- 892 linhas conferidas, contra 871 sem a correção;
+- «pode ser o mesmo estudo»: 2, contra 19.
+
+**Base de equivalências rev66** (ajustes pedidos pelo usuário; a base fica fora do repositório):
+- «DOPPLER DE TIREÓIDE»: o 1º item aceita 40901654 ou 40901203;
+- punções: uma regra «um ou outro» (40809099 ou 40809161) para os 9 títulos;
+- nova regra «DOPPLER DE MAMAS»: 40901114 + 40901386.
+
+Com a base rev65 eram 809 linhas conferidas; com a rev66 e o motor da alpha.31, são 892.
+
+## Correção da v3.0.0-alpha.28 — Enter nas confirmações (pedido de 24/11/2026)
+- As caixas de confirmação abriam com o foco no «Cancelar», e o Enter num campo acionava o primeiro botão (também o «Cancelar»): o Enter nunca confirmava.
+- Agora o Enter num campo aciona o botão principal (o último que não é «Cancelar»); sem campos, o foco começa no botão principal. Numa área de texto o Enter continua quebrando linha; Esc cancela. Teste: `test/ponta_a_ponta_ficticio.mjs`.
+
 ## Correção da v3.0.0-alpha.27 — tela estreita / celular (pedido de 24/11/2026)
 - No celular, o menu lateral (232 px) deixava uns 260 px para a tela, e o quadro da competência empurrava a página para o lado (cartões cortados).
 - Agora, em tela de até 900 px, o menu começa **recolhido** (só ícones); o ☰ abre. O topo e os textos longos quebram de linha. Teste: `test/menu.mjs`.
@@ -760,7 +782,24 @@ Origem: `analise-fluxo-e-gargalos.md`. Regra de projeto: **cada dado tem um dono
 - **Proposta:** guardar os candidatos (e os dispensados) na competência, com a mesma retenção de 60 dias das NCs para os dados de pacientes.
 - **Aceite:** depois de recarregar, a revisão continua de onde parou.
 
-## SOL-F18 — Base compartilhada para a equipe — PLANEJADO
+## SOL-F18 — Base compartilhada para a equipe — **IMPLEMENTADA**: configuração, equivalências e Fluxo já iam pela pasta da rede (SOL-F36, F37 e v3.0); as **NCs** na v3.0.0-alpha.30 (pedido de 24/11/2026; teste: `test/nc_sync.mjs`)
+
+**Como ficou (NCs, v3.0.0-alpha.30):**
+- **Arquivo:** um por competência, `AAAA-MM - Mês › 02 - Não conformidades › nao_conformidades.json`, ao lado da planilha de NCs. Leva as NCs e os candidatos dispensados daquela competência. Os candidatos continuam só no navegador.
+- **Mescla de três vias,** como nas outras bases:
+  - o que mudou de um lado só, vale;
+  - a mesma NC alterada pelos dois vira conflito: a pessoa escolhe a versão, e o histórico das duas fica;
+  - a exclusão feita por um sai também do outro;
+  - a mesma NC registrada pelos dois antes de sincronizar fica uma só, a mais antiga.
+- **Quando sincroniza:**
+  - toda gravação de NC agenda a sincronização;
+  - um relógio confere a cada 30 s se a outra pessoa mudou o arquivo;
+  - trocar a competência sincroniza a nova;
+  - abrir a aba de NCs também sincroniza.
+- **Barra «NCs sincronizadas»** no topo da aba Não conformidades, com quem mudou por último e «Sincronizar agora».
+- **Dados de pacientes:** as NCs ficam só na pasta da rede, como a planilha de NCs, e seguem a retenção. Quando a retenção apaga o nome, a mudança também vai para a pasta.
+
+**Proposta original:**
 - **Hoje:** cada navegador tem a sua configuração, equivalências, NCs e fluxo. A equipe de dois troca backup à mão, com risco de retrabalho e divergência.
 - **Proposta:** na pasta de rede (junto com a SOL-F10), um arquivo por base (configuração, equivalências, NCs, fluxo, competências), com revisão e «quem alterou».
   - Ao abrir, a ferramenta carrega a versão mais nova.
