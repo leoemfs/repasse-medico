@@ -104,3 +104,30 @@ function situacaoCorrecoesMV(res, ctx, ncs, decisoes, rodadas) {
   for (const x of res.linhas) if (x.r && x.tipo === 'hm' && classeDaLinhaConf(x) === 'excluido') out.hm.push({ linha: x, continua: kdsAntes.has(chaveMVDecisao(x.r)) });
   return out;
 }
+
+/* v3.0.0-alpha.38 — Ordem da tabela da Conferência (pedido de 24/11/2026, prévia aprovada). Só muda a ordem em que as linhas
+ * aparecem (na tela e na aba principal do Excel); nada da conferência muda. «rel» = ordem do relatório do MV (a de antes;
+ * laudos «Só no laudo» vêm depois, na ordem em que a conferência os listou). */
+const ORDENS_CONF = { rel: 'Ordem do relatório', pac: 'Paciente (A→Z)', data: 'Data', proc: 'Procedimento', laudo: 'Laudo (Apolo)', vl: 'Vl Repasse (maior primeiro)' };
+function ordenarLinhasConf(linhas, ordem = {}) {
+  const k = ORDENS_CONF[ordem.k] ? ordem.k : 'rel', pos = new Map(linhas.map((x, i) => [x, i]));
+  const pac = x => norm(x.r?.paciente || x.l?.paciente || ''), dia = x => isoDia(x.r?.data || x.l?.data) || '9999', rel = (a, b) => pos.get(a) - pos.get(b);
+  const proc = x => x.r ? `${x.r.codigo} ${x.r.procDesc || ''}` : '~', laudo = x => x.l?.titulo ? norm(x.l.titulo) : '~';
+  const cmp = {
+    rel, pac: (a, b) => pac(a).localeCompare(pac(b)) || dia(a).localeCompare(dia(b)) || rel(a, b),
+    data: (a, b) => dia(a).localeCompare(dia(b)) || pac(a).localeCompare(pac(b)) || rel(a, b),
+    proc: (a, b) => proc(a).localeCompare(proc(b)) || pac(a).localeCompare(pac(b)) || rel(a, b),
+    laudo: (a, b) => laudo(a).localeCompare(laudo(b)) || pac(a).localeCompare(pac(b)) || rel(a, b),
+    vl: (a, b) => (b.r?.vlRepasse ?? -1) - (a.r?.vlRepasse ?? -1) || pac(a).localeCompare(pac(b)) || rel(a, b)
+  }[k];
+  const out = [...linhas].sort(cmp);
+  return ordem.inv ? out.reverse() : out;
+}
+// Faixa alternada por paciente quando a ordem é «Paciente»: devolve Map linha → {banda, inicio, n (linhas do paciente)}.
+function gruposPorPaciente(linhasOrdenadas) {
+  const m = new Map(), n = new Map(), pac = x => norm(x.r?.paciente || x.l?.paciente || '');
+  for (const x of linhasOrdenadas) n.set(pac(x), (n.get(pac(x)) || 0) + 1);
+  let banda = false, ant = null;
+  for (const x of linhasOrdenadas) { const p = pac(x), ini = p !== ant; if (ini) banda = !banda; ant = p; m.set(x, { banda, inicio: ini, n: n.get(p) }); }
+  return m;
+}

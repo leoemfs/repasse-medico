@@ -112,7 +112,7 @@ function xlsxConferencia(res, ctx) {
   for (const x of res.linhas) if (x.r) for (const c of x.cands) C.push([x.r.seq, { v: x.r.codigo, st: T }, x.r.paciente, x.r.data, STATUS_CONF[x.status].nome, c.tier, c.l.titulo, c.l.medico, c.l.data || '', ['', 'semelhante', 'truncado', 'idêntico'][c.nm], c.dd, c.proc.estado, x.l === c.l ? 'SIM' : 'NÃO']);
   return criarXlsx([
     { nome: 'O que falta decidir', larguras: [9, 60, 44, 10, 32, 11, 12, 40, 40, 22, 22, 12, 80], linhas: F, filtro: F.length > 2 },
-    { nome: 'Conferência', larguras: largP, linhas: [cabPrincipal, ...res.linhas.map(linhaPrincipal)], filtro: true },
+    { nome: 'Conferência', larguras: largP, linhas: [cabPrincipal, ...(ctx.ordem ? ordenarLinhasConf(res.linhas, ctx.ordem) : res.linhas).map(x => linhaPrincipal(x, res.linhas.indexOf(x)))], filtro: true },
     { nome: 'Resumo', larguras: [52, 22, 16, 16], linhas: R, filtro: false, congelar: false },
     { nome: 'Informações', larguras: [44, 110], linhas: I, filtro: false, congelar: false },
     { nome: 'Técnico', larguras: [24, 8, 8, 30, 7, 10, 11, 12, 7, 9, 12, 22, 12, 10, 12, 8, 60, 24], linhas: [cabTec, ...res.linhas.map(linhaTec)], filtro: true },

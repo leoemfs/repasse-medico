@@ -1,0 +1,82 @@
+<!-- Prévia aprovada em 24/11/2026 (artefato https://claude.ai/artifact/3vrHwttWwVnGTuz2deaGPu). Usa app.css e app-menu.js da base de prévias (https://claude.ai/artifact/1C13Rg6D9EMoN3JJYe4TEP); fora do artefato abre sem o visual do app. -->
+<title>Prévia: ordenar a Conferência</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  .cf-ordem{display:flex;align-items:center;gap:6px;font-size:13px}
+  .cf-ordem select{width:auto}
+  .tw th.ord{cursor:pointer;user-select:none;white-space:nowrap}
+  .tw th.ord:hover{text-decoration:underline}
+  .tw th.ord .seta{font-size:10px;opacity:.85;margin-left:4px}
+  .tw tr.grp-b td{background:var(--infobg)}
+  .tw tr.grp-ini td{border-top:2px solid var(--line)}
+  .grp-tag{display:inline-block;font-size:11px;color:var(--muted);margin-left:6px}
+  .previa-nota{border-left:4px solid var(--warn);background:var(--warnbg);padding:10px 14px;border-radius:8px;font-size:13px}
+</style>
+<div class="shell" data-pag="conferencia">
+  <main class="main">
+    <header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Conferência</h1></div>
+      <div class="topo-dir"><span class="chip">Competência 11/2026 · aberta</span><span class="badge warn">PRÉVIA · dados fictícios</span></div></header>
+    <div class="aviso-fixo" role="status" style="background:var(--infobg);color:var(--text)"><b>Prévia sem código do app.</b> Novo <b>«Ordenar por»</b> na barra da tabela e títulos de coluna clicáveis. Em «Paciente (A→Z)», as linhas do mesmo paciente ficam juntas, com faixa alternada por paciente. Clique nos títulos e troque a ordem.</div>
+
+    <div class="card">
+      <h2 style="margin-top:0">700 - Dr. Exemplo Setecentos <span class="muted small">· unidade 4 · IMG · REPASSE 30/11/2026</span></h2>
+      <div class="cf-rapido" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <input type="search" id="cfBusca" aria-label="Buscar" placeholder="Buscar paciente, código, título ou médico…" style="max-width:340px">
+        <label class="small"><input type="checkbox" id="soFalta" checked> só o que falta decidir</label>
+        <label class="cf-ordem" for="ordem">Ordenar por
+          <select id="ordem"><option value="rel">Ordem do relatório</option><option value="pac">Paciente (A→Z)</option><option value="data">Data</option><option value="proc">Procedimento</option><option value="laudo">Laudo (Apolo)</option><option value="vl">Vl Repasse (maior primeiro)</option></select></label>
+        <span style="flex:1"></span><button type="button" class="sec mini">Filtros</button>
+      </div>
+      <p class="small muted" id="info" style="margin:10px 0"></p>
+      <div class="tw"><table><thead><tr id="cab"></tr></thead><tbody id="corpo"></tbody></table></div>
+      <p class="small muted">A ordem escolhida vale também para «Exportar Excel» e fica lembrada neste navegador. «Ordem do relatório» é a de hoje (a do PDF do MV).</p>
+    </div>
+    <div class="previa-nota"><b>Para decidir:</b> só o «Ordenar por» (e os títulos clicáveis) bastam, ou também quer a faixa alternada por paciente quando a ordem for «Paciente»?</div>
+  </main>
+</div>
+<script src="app-menu.js"></script>
+<script>
+// Dados fictícios (nomes e valores inventados). seq = ordem no relatório do MV.
+const L = [
+  { seq: 1, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'LUCAS DA SILVA ROCHA', data: '2026-10-08', proc: '41001109 · TC ABDOME SUPERIOR-OP', laudo: 'TOMOGRAFIA DE ABDOME TOTAL', vl: 20 },
+  { seq: 2, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'MARIANA OLIVEIRA LUZ', data: '2026-10-03', proc: '41001109 · TC ABDOME SUPERIOR-OP', laudo: 'TOMOGRAFIA DE ABDOME TOTAL', vl: 20 },
+  { seq: 3, cls: 'pend', st: ['so-faturamento', 'Só no faturamento'], pac: 'LUCAS DA SILVA ROCHA', data: '2026-10-08', proc: '41001117 · TC PELVE OU BACIA-OP', laudo: '—', vl: 20 },
+  { seq: 4, cls: 'pend', st: ['so-faturamento', 'Só no faturamento'], pac: 'MARIANA OLIVEIRA LUZ', data: '2026-10-03', proc: '41001117 · TC PELVE OU BACIA-OP', laudo: '—', vl: 20 },
+  { seq: 5, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'DIRCE APARECIDA GOMES', data: '2026-10-28', proc: '41001168 · ANGIOTOMOGRAFIA (CRÂNIO OU PESCOÇO…)', laudo: 'ANGIOTOMOGRAFIA DAS CARÓTIDAS E VERTEBRAIS', vl: 45 },
+  { seq: 6, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'BEATRIZ MORAES', data: '2026-10-29', proc: '41001168 · ANGIOTOMOGRAFIA (CRÂNIO OU PESCOÇO…)', laudo: 'ANGIOTOMOGRAFIA DAS CARÓTIDAS E VERTEBRAIS', vl: 45 },
+  { seq: 7, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'PAULO STEFANI', data: '2026-10-16', proc: '41001168 · ANGIOTOMOGRAFIA (CRÂNIO OU PESCOÇO…)', laudo: 'ANGIOTOMOGRAFIA DAS CARÓTIDAS E VERTEBRAIS', vl: 45 },
+  { seq: 8, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'DIRCE APARECIDA GOMES', data: '2026-10-28', proc: '41001171 · TC ANGIO CAROTIDAS', laudo: 'ANGIOTOMOGRAFIA DAS CARÓTIDAS E VERTEBRAIS', vl: 45 },
+  { seq: 9, cls: 'pend', st: ['so-faturamento', 'Só no faturamento'], pac: 'CARLA MENDES DIAS', data: '2026-10-30', proc: '41101014 · RMN CRANIO (ENCEFALO) - OP', laudo: '—', vl: 60 },
+  { seq: 10, cls: 'pend', st: ['pendente', 'Pendente / ambíguo'], pac: 'BEATRIZ MORAES', data: '2026-10-29', proc: '41001171 · TC ANGIO CAROTIDAS', laudo: 'ANGIOTOMOGRAFIA DAS CARÓTIDAS E VERTEBRAIS', vl: 45 },
+  { seq: 11, cls: 'devido', st: ['conferido', 'Conferido'], pac: 'ANTONIO BRAGA', data: '2026-10-02', proc: '41001010 · TC CRANIO-OP', laudo: 'TOMOGRAFIA DE CRÂNIO', vl: 20 }
+];
+const COLS = [['', null], ['Classe · situação', null], ['Paciente', 'pac'], ['Data', 'data'], ['Procedimento no MV', 'proc'], ['Laudo (Apolo)', 'laudo'], ['Vl Repasse', 'vl']];
+const NOME_CL = { pend: 'Pendente', devido: 'Devido' };
+const O = { k: 'rel', inv: false };
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+const dataBR = d => d.split('-').reverse().join('/');
+const cmp = { rel: (a, b) => a.seq - b.seq, pac: (a, b) => a.pac.localeCompare(b.pac) || a.data.localeCompare(b.data) || a.seq - b.seq, data: (a, b) => a.data.localeCompare(b.data) || a.pac.localeCompare(b.pac),
+  proc: (a, b) => a.proc.localeCompare(b.proc) || a.pac.localeCompare(b.pac), laudo: (a, b) => a.laudo.localeCompare(b.laudo) || a.pac.localeCompare(b.pac), vl: (a, b) => b.vl - a.vl || a.pac.localeCompare(b.pac) };
+function desenhar() {
+  const q = $('cfBusca').value.trim().toUpperCase(), so = $('soFalta').checked;
+  const lin = L.filter(x => (!so || x.cls === 'pend') && (!q || `${x.pac} ${x.proc} ${x.laudo}`.includes(q))).sort(cmp[O.k]);
+  if (O.inv) lin.reverse();
+  $('cab').innerHTML = COLS.map(([t, k]) => k ? `<th class="ord" data-k="${k}" aria-sort="${O.k === k ? (O.inv ? 'descending' : 'ascending') : 'none'}">${t}${O.k === k ? `<span class="seta">${O.inv ? '▼' : '▲'}</span>` : ''}</th>` : `<th>${t ? t : '<input type="checkbox" aria-label="Marcar todas">'}</th>`).join('');
+  let banda = false, ant = '';
+  const contar = p => lin.filter(x => x.pac === p).length;
+  $('corpo').innerHTML = lin.map(x => {
+    const novo = O.k === 'pac' && x.pac !== ant; if (novo) banda = !banda; ant = x.pac;
+    const n = O.k === 'pac' && novo ? contar(x.pac) : 0;
+    return `<tr class="${O.k === 'pac' ? (banda ? 'grp-b' : '') + (novo ? ' grp-ini' : '') : ''}"><td><input type="checkbox" aria-label="Marcar a linha"></td>
+      <td><span class="st cl-${x.cls}">${NOME_CL[x.cls]}</span><div><span class="st st-${x.st[0]}">${x.st[1]}</span></div></td>
+      <td>${x.pac}${n > 1 ? `<span class="grp-tag">${n} linhas</span>` : ''}</td><td>${dataBR(x.data)}</td><td>${x.proc}</td><td>${x.laudo}</td><td class="n">${fmt(x.vl)}</td></tr>`;
+  }).join('');
+  $('info').innerHTML = `<b>${lin.length} linha(s) · R$ ${fmt(lin.reduce((s, x) => s + x.vl, 0))}</b> · ordem: ${$('ordem').selectedOptions[0].text}${O.inv ? ' (invertida)' : ''}`;
+  $('ordem').value = O.k;
+}
+document.addEventListener('click', e => { const th = e.target.closest('th.ord'); if (!th) return; if (O.k === th.dataset.k) O.inv = !O.inv; else { O.k = th.dataset.k; O.inv = false; } desenhar(); });
+$('ordem').onchange = e => { O.k = e.target.value; O.inv = false; desenhar(); };
+$('cfBusca').oninput = desenhar; $('soFalta').onchange = desenhar;
+desenhar();
+</script>

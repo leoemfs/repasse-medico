@@ -539,3 +539,8 @@ th .cf-sel{margin:0}
 #eqTab tr.sel td,#cardCompostas tr.sel td{background:var(--infobg)}
 .eq-lote{position:sticky;bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--side);color:#fff;border-radius:12px;padding:10px 14px;margin-top:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:5}
 .eq-lote[hidden]{display:none}.eq-lote b{margin-right:auto}.eq-lote button.sec{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+
+/* v3.0.0-alpha.38: ordem da tabela da Conferência */
+.cf-ordem{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.cf-ordem select{width:auto;padding:4px 8px}
+.th-ord{cursor:pointer;user-select:none;white-space:nowrap}.th-ord:hover,.th-ord:focus-visible{text-decoration:underline}.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}
+.tw tr.grp-b td{background:var(--infobg)}.tw tr.grp-ini td{border-top:2px solid var(--line)}.grp-tag{display:inline-block;font-size:11px;color:var(--muted);margin-left:6px}
