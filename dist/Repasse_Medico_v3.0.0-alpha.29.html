@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.28</title>
+<title>Repasse Médico v3.0.0-alpha.29</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -494,7 +494,14 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .rot-passo.alerta .n{background:var(--errbg);color:var(--err);border-color:transparent}
 .rot-agora{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line)}
 .rot-agora p{margin:0;font-size:13px;max-width:72ch}.rot-agora .acoes{margin:0}
-.rot-rel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12.5px}.rot-rel:empty{display:none}
+.rot-rel{margin-top:10px;font-size:12.5px}.rot-rel:empty{display:none}
+.rr-topo{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.rr-lista{border:1px solid var(--line);border-radius:10px;margin-top:8px;overflow:hidden}
+.rr-busca{display:flex;gap:10px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}.rr-busca input{flex:1;max-width:320px}
+.rr-rolar{max-height:240px;overflow:auto}.rr-rolar table{width:100%;border-collapse:collapse}
+.rr-rolar th{position:sticky;top:0;background:var(--card);text-align:left;font-size:11.5px;color:var(--muted);padding:5px 10px;border-bottom:1px solid var(--line)}
+.rr-rolar td{padding:4px 10px;border-bottom:1px solid var(--line);cursor:pointer}.rr-rolar tr:hover td{background:var(--infobg)}
+.rr-rolar tr.sel td{background:var(--accent);color:var(--on-accent)}
 .rot-rel .marc{display:inline-flex;gap:6px;align-items:center}.rot-rel .marc i{font-style:normal;font-weight:700;font-size:11px;padding:0 6px;border-radius:999px;background:var(--bg);color:var(--muted)}
 .rot-rel .marc.sel i{background:var(--card);color:var(--accent)}
 @media (max-width:1100px){.rot-passos{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -512,7 +519,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.28 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.29 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -557,7 +564,7 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.28';
+const MOTOR_VERSAO = '3.0.0-alpha.29';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -7901,14 +7908,31 @@ function desenharRoteiroConf() {
   if (mesmo) ligarReconferir(c);
   desenharRoteiroRelatorios();
 }
-// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir»: clicar escolhe o relatório.
+// Passo de cada relatório da lista (filtro de unidade e grupo), em «O que conferir». Pedido de 24/11/2026: com dezenas de
+// relatórios os botões ocupavam a tela toda; agora é uma linha com a contagem por passo e uma lista recolhível, com rolagem
+// e busca (prévia em docs/prototipos/roteiro-relatorios-compacto.html). Clicar numa linha escolhe o relatório.
+const RR = { aberto: null, passo: null, q: '' };
 function desenharRoteiroRelatorios() {
   const alvo = $('cfRotRels'); if (!alvo || !$('cfRel')) return;
   const ids = [...$('cfRel').options].map(o => o.value), lista = ids.map(id => S.relatorios.find(r => r.id === id)).filter(Boolean);
   if (lista.length < 2) { alvo.innerHTML = ''; return; }
-  alvo.innerHTML = `<span class="small muted">Em que passo está cada relatório:</span>${lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
-    return `<button type="button" class="marc${x.id === $('cfRel').value ? ' sel' : ''}" data-rotrel="${esc(x.id)}">${esc(x.rel.cab.prestadorCod)} - ${esc(x.rel.cab.prestadorNome)}${un ? ` · un. ${esc(un)}` : ''} <i>${rt ? rotuloPassoRoteiro(rt) : 'sem unidade'}</i></button>`; }).join('')}`;
-  alvo.querySelectorAll('[data-rotrel]').forEach(b => b.onclick = () => { $('cfRel').value = b.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+  const itens = lista.map(x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null;
+    const k = !rt ? 'sem' : rt.passo >= 6 ? 'env' : 'p' + (rt.passo + 1);
+    return { x, un, k, rot: !rt ? 'sem unidade' : rt.passo >= 6 ? '✓ enviado' : `passo ${rt.passo + 1}` }; });
+  const cont = {}; itens.forEach(i => { cont[i.k] = cont[i.k] || { n: 0, rot: i.rot }; cont[i.k].n++; });
+  const ordem = Object.keys(cont).sort((a, b) => (a === 'sem' ? -1 : b === 'sem' ? 1 : a === 'env' ? 1 : b === 'env' ? -1 : a.localeCompare(b, 'pt', { numeric: true })));
+  if (RR.passo && !cont[RR.passo]) RR.passo = null;
+  const aberto = RR.aberto ?? lista.length <= 8, sel = $('cfRel').value, q = norm(RR.q);
+  const vis = itens.filter(i => (!RR.passo || i.k === RR.passo) && (!q || norm(`${i.x.rel.cab.prestadorCod} ${i.x.rel.cab.prestadorNome} UN ${i.un} ${rotGr(grDoRel(i.x))}`).includes(q)));
+  alvo.innerHTML = `<div class="rr-topo"><span class="small muted">Em que passo está cada relatório:</span>${ordem.map(k => `<button type="button" class="marc${RR.passo === k ? ' sel' : ''}" data-rrpasso="${k}">${esc(cont[k].rot)} <i>${cont[k].n}</i></button>`).join('')}
+    <button type="button" class="sec mini" data-rrabrir aria-expanded="${aberto}">${aberto ? 'Recolher ▴' : 'Ver lista ▾'}</button></div>
+    ${aberto ? `<div class="rr-lista"><div class="rr-busca"><input id="rrBusca" placeholder="Buscar prestador ou unidade…" value="${esc(RR.q)}"><span class="small muted">${vis.length} de ${lista.length}${RR.passo ? ' · ' + esc(cont[RR.passo].rot) : ''}</span></div>
+      <div class="rr-rolar"><table><thead><tr><th>Prestador</th><th>Un.</th><th>Grupo</th><th>Passo</th></tr></thead><tbody>${vis.map(i => `<tr data-rotrel="${esc(i.x.id)}"${i.x.id === sel ? ' class="sel"' : ''}><td>${esc(i.x.rel.cab.prestadorCod)} - ${esc(i.x.rel.cab.prestadorNome)}</td><td>${esc(i.un || '—')}</td><td>${esc(rotGr(grDoRel(i.x)))}</td><td>${esc(i.rot)}</td></tr>`).join('')}</tbody></table></div></div>` : ''}`;
+  alvo.querySelectorAll('[data-rrpasso]').forEach(b => b.onclick = () => { const k = b.dataset.rrpasso; RR.passo = RR.passo === k ? null : k; if (RR.passo) RR.aberto = true; desenharRoteiroRelatorios(); });
+  alvo.querySelector('[data-rrabrir]').onclick = () => { RR.aberto = !aberto; desenharRoteiroRelatorios(); };
+  const bu = $('rrBusca'); if (bu) bu.oninput = () => { RR.q = bu.value; const pos = bu.selectionStart; desenharRoteiroRelatorios(); const n = $('rrBusca'); n.focus(); n.setSelectionRange(pos, pos); };
+  alvo.querySelectorAll('[data-rotrel]').forEach(t => t.onclick = () => { $('cfRel').value = t.dataset.rotrel; $('cfRel').dispatchEvent(new Event('change')); });
+  const linhaSel = alvo.querySelector('tr.sel'), rolar = alvo.querySelector('.rr-rolar'); if (linhaSel && rolar) rolar.scrollTop = Math.max(0, linhaSel.offsetTop - 60);
 }
 
 /* ---- src/ui/21-causas.js ---- */
