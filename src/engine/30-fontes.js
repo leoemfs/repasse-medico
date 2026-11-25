@@ -26,7 +26,7 @@ async function lerApolo(bytes, nome, onProgresso) {
     const data = paraData(bruto), medico = txt(r, 'medico');
     if (!paciente) semNome++; if (!data) semData++; if (!medico) semMedico++; if (!titulo) semTitulo++;
     laudos.push({
-      i: laudos.length, linhaPlanilha: k + 2, idLaudo: String(g(r, 'idLaudo')), acesso: String(g(r, 'acesso')),
+      i: laudos.length, linhaPlanilha: r.linha || k + 2, idLaudo: String(g(r, 'idLaudo')), acesso: String(g(r, 'acesso')),
       unidade: txt(r, 'unidade') || '(sem unidade)', paciente, pn: norm(paciente), idPac: String(g(r, 'idPac')),
       titulo, tituloOriginal: String(g(r, 'titulo')), tn: norm(titulo), descricao: txt(r, 'descricao'),
       data, dia: diaSerial(data), convenio: txt(r, 'convenio'), modalidade: txt(r, 'modalidade').toUpperCase(), medico, mn: norm(medico)
