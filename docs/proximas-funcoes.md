@@ -38,7 +38,11 @@ Caso: relatório da Melanie (10264), unidade 4. A linha do MV «MARTA APARECIDA 
 
 ## Ponte Apolo → Power BI → MV (em conversa, 25/11/2026)
 - Power BI não tem ID do paciente (tem `CPF_PACIENTE`); o Apolo não tem CPF. A ponte segue o processo manual: nome completo do Power BI × nome do Apolo, data (atendimento é único por data), unidade (`Nome Empresa`), grupo × modalidade, código × título (equivalências), convênio (com nomes equivalentes) → atendimento → linha do MV pelo número.
-- Mais de um atendimento possível: **sempre ressalva** para análise. Prestador do Power BI só informativo. Próximo passo: prévia da tela.
+- Mais de um atendimento possível: **sempre ressalva** para análise. Prestador do Power BI só informativo.
+- **IMPLEMENTADA na v3.0.0-alpha.47** (prévia aprovada: https://claude.ai/artifact/Qbn5XCrRs3jiDJLDjL8SFZ; `docs/prototipos/ponte-atendimento/`; teste: `test/ponte.mjs`):
+  - Motor em `src/engine/89b-ponte.js`: `nomeAbreviadoCompat` (Apolo abreviado × nome completo), `indicePBIAtendimentos`, `criteriosPonte` (nome, data, unidade, grupo × modalidade, código × título, convênio) e `ponteDoLaudo` (firme | dúvida | nenhum).
+  - Conferência: a linha do MV usa o nome completo do atendimento no Power BI para achar o laudo (mesmo dia). «Só no laudo»: atendimento achado no Power BI, se está ou não neste relatório, e para quem foi faturado (só informativo); dois ou mais atendimentos = dúvida.
+  - Na tela, uma linha só («Power BI · atendimento … · N de 6 critérios»), com os critérios recolhidos — pedido de não poluir a tela.
 
 ## Pedido de 25/11/2026 — ID, convênio, unidades ignoradas e «Só no laudo»
 - **IMPLEMENTADO na v3.0.0-alpha.42:**

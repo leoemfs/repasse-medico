@@ -29,7 +29,7 @@ function conciliarLaudo(pbi, laudo, opc) {
   const ix = indicePBINomes(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
   for (const l of ix.candidatos(laudo.pn, laudo.dia, tol)) {
     if (opc.unidadeCod && opc.unidadeCod !== '*' && String(l.unidadeCod) !== String(opc.unidadeCod)) continue;
-    const nm = nivelNome(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;
+    const nm = nivelNomePonte(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;   // nome abreviado no Apolo também (25/11/2026)
     const mods = modalidadesDoGrupo(l.grupo);
     const eq = opc.idxEq && laudo.titulo ? avaliarProcedimento(opc.idxEq, l.codigo, laudo.titulo, { unidade: opc.unidadeCod, convenio: l.convenio }).estado : '';
     const pontos = (eq === 'validada' ? 4 : eq === 'pendente' ? 2 : 0) + (mods && laudo.modalidade && mods.includes(laudo.modalidade) ? 1 : 0) + (diaSerial(l.data) === laudo.dia ? 1 : 0) + (nm === 3 ? 1 : 0);

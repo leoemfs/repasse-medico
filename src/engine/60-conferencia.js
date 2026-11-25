@@ -78,6 +78,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
+  // Ponte pelo atendimento (25/11/2026): com o Power BI carregado, o nome completo do atendimento da linha do MV também
+  // serve para achar o laudo (nome cortado no MV × abreviado no Apolo). Só no mesmo dia: o atendimento é único por data.
+  const ixAt = opc.pbi ? indicePBIAtendimentos(opc.pbi) : null;
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
   aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
@@ -110,9 +113,15 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   for (const b of procs) {
     b.cands = [];
     if (!b.pn || b.dia === null) continue;
-    for (const l of ixNome.candidatos(b.pn, b.dia, tol)) {
+    const at = ixAt ? ixAt.get(String(b.r.atendimento || '').trim()) : null;
+    if (at && at.pn) b.ponte = at;
+    const viaNome = ixNome.candidatos(b.pn, b.dia, tol), vistos = new Set(viaNome.map(l => l.i));
+    const viaAt = at && at.pn && at.dia === b.dia ? ixNome.candidatos(at.pn, b.dia, 0).filter(l => !vistos.has(l.i)) : [];
+    for (const l of [...viaNome, ...viaAt]) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
-      const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
+      let nm = nivelNome(b.pn, l.pn, minTrunc), ponte = false;
+      if (at && at.pn && at.dia === b.dia && l.dia === b.dia) { const np = nivelNomePonte(at.pn, l.pn, minTrunc); if (np > nm) { nm = np; ponte = true; } }
+      if (!nm) continue;
       const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });
       const dd = Math.abs(b.dia - l.dia);
       // Título validado para OUTRO código é evidência contra o par: fica atrás dos pares sem cadastro na mesma faixa.
@@ -132,7 +141,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 5 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
       const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 6 && !proc.composta ? af : 0;
-      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg) });
+      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg), ponte });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
     b.cands.sort(ordem);
@@ -188,6 +197,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
+    // Atendimento no Power BI (só na memória: não vai para a rodada gravada nem para o Excel).
+    if (b.ponte) Object.defineProperty(out, 'ponte', { value: b.ponte, enumerable: false });
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
     // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (foraV3(b)) {
@@ -371,6 +382,8 @@ function diagnosticoLinha(x) {
     const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');
     return { nivel: 'warn', titulo: 'Composição incompleta no MV', texto: `O laudo «${c.titulo}» espera ${esaperaOu(esperaTxt)}; falta no MV: ${falta}.` };
   }
+  if (x.status === 'so-laudo' && x.ponteLaudo?.nivel === 'duvida') return { nivel: 'warn', titulo: 'Dois ou mais atendimentos possíveis no Power BI', texto: 'Ressalva para análise: o mais provável aparece primeiro, com os critérios que bateram.' };
+  if (x.status === 'so-laudo' && x.pbi?.situacao === 'outro-prestador') return { nivel: 'err', titulo: `Atendimento ${x.pbi.atendimento || ''} faturado, mas fora do repasse deste prestador`.replace('  ', ' '), texto: `No Power BI está faturado para o prestador ${x.pbi.prestador || '—'}. Provável lançamento para outro prestador; confira a conta ${x.pbi.conta || '—'} no MV.` };
   if (x.status === 'so-laudo') return { nivel: 'err', titulo: 'Laudo sem lançamento neste relatório do MV', texto: 'Em geral o exame está lançado para outro prestador. Também pode ser conta aberta, fora de remessa ou código TUSS errado na conta.' };
   if (x.status === 'so-faturamento') return { nivel: 'err', titulo: 'Lançado no MV sem laudo correspondente', texto: mot };
   if (m.has('outro-medico')) return { nivel: 'err', titulo: 'Laudo assinado por outro médico', texto: `O laudo é de ${l?.medico || '(sem médico)'}, não do prestador deste relatório.` };

@@ -11,7 +11,7 @@ const blobUrl = id => URL.createObjectURL(new Blob([bytes(id)], { type: 'text/ja
 const s = document.createElement('script'); s.textContent = new TextDecoder().decode(bytes('lib-jszip')); document.head.appendChild(s);
 const pdfjs = await import(blobUrl('lib-pdf'));
 pdfjs.GlobalWorkerOptions.workerSrc = blobUrl('lib-worker');
-window.H = { pdfjs, lerLinhasPdf, interpretarMV, lerApolo, removerUnidadesIgnoradas, idApolo, convenioApolo, lerPowerBI, importarPlanilhaEquivalencias, eqVazia, mesclarEquivalencias, alterarStatusEq,
+window.H = { pdfjs, lerLinhasPdf, interpretarMV, lerApolo, nomeAbreviadoCompat, ponteDoLaudo, criteriosPonte, conferirCruzado, cfgPadrao: typeof configPadrao !== "undefined" ? configPadrao : null, eqVaziaP: typeof eqVazia !== "undefined" ? eqVazia : null, removerUnidadesIgnoradas, idApolo, convenioApolo, lerPowerBI, importarPlanilhaEquivalencias, eqVazia, mesclarEquivalencias, alterarStatusEq,
   configPadrao, registrarPrestadorDoMV, conferirCruzado, corrigirPrestador, xlsxConferencia, xlsxCorrecao, xlsxExtracao, conflitosEquivalencias,
   registroRodada, compararRodadas, STATUS_CONF, ESTADO_CORR, MARCADORES, MOTIVOS_CORR, norm, nivelNome, avaliarProcedimento, indiceEquivalencias, chaveTitulo,
   classificarItem, modalidadeDoTituloV3, hmV3Situacao, avisosConferenciaV3, classeDaLinhaConf, totaisPorClasse, calcularV3, aplicarRegrasConfig, laudosDaUnidade, controlePrestadoresUnidade, aplicarCadastroV3Padrao, migrarConfig, textoEmailV3 };

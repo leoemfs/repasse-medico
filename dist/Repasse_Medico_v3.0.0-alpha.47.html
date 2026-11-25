@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.46</title>
+<title>Repasse Médico v3.0.0-alpha.47</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -585,13 +585,17 @@ th .cf-sel{margin:0}
 .la-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
 .nomes-eq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.nomes-eq .marc{cursor:default}.nomes-eq .marc b{margin-left:4px;cursor:pointer;color:var(--muted)}
 .nomes-eq input{max-width:180px;font-size:12px;padding:3px 6px}.nomes-eq .sug{color:var(--warn)}
+.la-ponte{font-size:12.5px;margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.la-ponte-duvida{border:1px dashed var(--warn);border-radius:8px;padding:2px 8px 8px;margin-top:8px}
+.la-crit{display:inline}.la-crit summary{display:inline;cursor:pointer;color:var(--accent);font-weight:600}.la-crit[open] summary{margin-right:4px}
+.la-crit>span{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle}.chip-s.na{background:var(--bg);color:var(--muted)}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.46 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.47 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -636,7 +640,7 @@ th .cf-sel{margin:0}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.46';
+const MOTOR_VERSAO = '3.0.0-alpha.47';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -3319,6 +3323,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   const medicos = opc.medicos && opc.medicos.length ? new Set(opc.medicos) : null;   // null = todos os médicos
   const Lun = laudosDaUnidade(apolo, cfg, opc.unidadeCod);
   const ixNome = indiceNomes(Lun, l => l.dia, l => l.pn);
+  // Ponte pelo atendimento (25/11/2026): com o Power BI carregado, o nome completo do atendimento da linha do MV também
+  // serve para achar o laudo (nome cortado no MV × abreviado no Apolo). Só no mesmo dia: o atendimento é único por data.
+  const ixAt = opc.pbi ? indicePBIAtendimentos(opc.pbi) : null;
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
   aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
@@ -3351,9 +3358,15 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   for (const b of procs) {
     b.cands = [];
     if (!b.pn || b.dia === null) continue;
-    for (const l of ixNome.candidatos(b.pn, b.dia, tol)) {
+    const at = ixAt ? ixAt.get(String(b.r.atendimento || '').trim()) : null;
+    if (at && at.pn) b.ponte = at;
+    const viaNome = ixNome.candidatos(b.pn, b.dia, tol), vistos = new Set(viaNome.map(l => l.i));
+    const viaAt = at && at.pn && at.dia === b.dia ? ixNome.candidatos(at.pn, b.dia, 0).filter(l => !vistos.has(l.i)) : [];
+    for (const l of [...viaNome, ...viaAt]) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
-      const nm = nivelNome(b.pn, l.pn, minTrunc); if (!nm) continue;
+      let nm = nivelNome(b.pn, l.pn, minTrunc), ponte = false;
+      if (at && at.pn && at.dia === b.dia && l.dia === b.dia) { const np = nivelNomePonte(at.pn, l.pn, minTrunc); if (np > nm) { nm = np; ponte = true; } }
+      if (!nm) continue;
       const proc = avaliarProcedimento(idx, b.r.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: b.r.convenio });
       const dd = Math.abs(b.dia - l.dia);
       // Título validado para OUTRO código é evidência contra o par: fica atrás dos pares sem cadastro na mesma faixa.
@@ -3373,7 +3386,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 5 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
       const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 6 && !proc.composta ? af : 0;
-      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg) });
+      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg), ponte });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
     b.cands.sort(ordem);
@@ -3429,6 +3442,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (r.repeticao) marc.add('linha-repetida');
     if (r.vlTotal <= simb) marc.add('valor-simbolico');
     const out = { origem: 'MV', b, r, l: null, tipo: b.tipo, regraTipo: b.regraTipo, marcadores: marc, motivos, cands: (b.cands || []).slice(0, 5) };
+    // Atendimento no Power BI (só na memória: não vai para a rodada gravada nem para o Excel).
+    if (b.ponte) Object.defineProperty(out, 'ponte', { value: b.ponte, enumerable: false });
     // V3 (Curitiba): HM de USG/Doppler Unimed é devido sem laudo próprio, desde que o exame base esteja no relatório.
     // HM de raio-X e mamografia (e qualquer outro que não seja USG Unimed) não é pago a ninguém: «HM a excluir do MV» (SOL-F30, regras de 23/11/2026).
     if (foraV3(b)) {
@@ -3612,6 +3627,8 @@ function diagnosticoLinha(x) {
     const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');
     return { nivel: 'warn', titulo: 'Composição incompleta no MV', texto: `O laudo «${c.titulo}» espera ${esaperaOu(esperaTxt)}; falta no MV: ${falta}.` };
   }
+  if (x.status === 'so-laudo' && x.ponteLaudo?.nivel === 'duvida') return { nivel: 'warn', titulo: 'Dois ou mais atendimentos possíveis no Power BI', texto: 'Ressalva para análise: o mais provável aparece primeiro, com os critérios que bateram.' };
+  if (x.status === 'so-laudo' && x.pbi?.situacao === 'outro-prestador') return { nivel: 'err', titulo: `Atendimento ${x.pbi.atendimento || ''} faturado, mas fora do repasse deste prestador`.replace('  ', ' '), texto: `No Power BI está faturado para o prestador ${x.pbi.prestador || '—'}. Provável lançamento para outro prestador; confira a conta ${x.pbi.conta || '—'} no MV.` };
   if (x.status === 'so-laudo') return { nivel: 'err', titulo: 'Laudo sem lançamento neste relatório do MV', texto: 'Em geral o exame está lançado para outro prestador. Também pode ser conta aberta, fora de remessa ou código TUSS errado na conta.' };
   if (x.status === 'so-faturamento') return { nivel: 'err', titulo: 'Lançado no MV sem laudo correspondente', texto: mot };
   if (m.has('outro-medico')) return { nivel: 'err', titulo: 'Laudo assinado por outro médico', texto: `O laudo é de ${l?.medico || '(sem médico)'}, não do prestador deste relatório.` };
@@ -5760,7 +5777,7 @@ function conciliarLaudo(pbi, laudo, opc) {
   const ix = indicePBINomes(pbi), tol = +opc.tol || 0, minTrunc = +opc.cfg?.parametros?.minTruncamento || 20, cands = [];
   for (const l of ix.candidatos(laudo.pn, laudo.dia, tol)) {
     if (opc.unidadeCod && opc.unidadeCod !== '*' && String(l.unidadeCod) !== String(opc.unidadeCod)) continue;
-    const nm = nivelNome(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;
+    const nm = nivelNomePonte(laudo.pn, l.pn, minTrunc); if (nm < 2) continue;   // nome abreviado no Apolo também (25/11/2026)
     const mods = modalidadesDoGrupo(l.grupo);
     const eq = opc.idxEq && laudo.titulo ? avaliarProcedimento(opc.idxEq, l.codigo, laudo.titulo, { unidade: opc.unidadeCod, convenio: l.convenio }).estado : '';
     const pontos = (eq === 'validada' ? 4 : eq === 'pendente' ? 2 : 0) + (mods && laudo.modalidade && mods.includes(laudo.modalidade) ? 1 : 0) + (diaSerial(l.data) === laudo.dia ? 1 : 0) + (nm === 3 ? 1 : 0);
@@ -5801,6 +5818,92 @@ function enriquecerCandidatosComPBI(cands, pbi, opc) {
   }
   return resumo;
 }
+
+/* ---- src/engine/89b-ponte.js ---- */
+/* ============================================================
+ * Ponte Apolo → Power BI → MV pelo atendimento (prévia aprovada em 25/11/2026: docs/prototipos/ponte-atendimento/)
+ * Sem ID em comum entre Apolo e Power BI: o laudo acha o atendimento no Power BI pelo nome completo + data + unidade +
+ * grupo × modalidade + código × título (equivalências) + convênio — o mesmo filtro que a pessoa faz à mão. O atendimento
+ * é único por data. Do atendimento, a linha do MV vem pelo número. O prestador do Power BI nunca decide o par (o repasse
+ * do MV reflete as redistribuições feitas no MV): só aparece como informação. Nomes do Power BI ficam só na memória.
+ * ============================================================ */
+
+// Nome abreviado do Apolo («MARIA AP SANTOS OLIVEIRA», «M APARECIDA SANTOS») × nome completo do Power BI. Cada parte do
+// nome curto casa, em ordem, com uma parte do longo: igual, inicial (1 letra) ou começo (2+ letras, ex.: AP); partes do longo podem
+// sobrar (nome do meio omitido). A primeira parte precisa casar com a primeira do longo, e pelo menos duas partes de
+// 3+ letras precisam casar — «M S» sozinho não liga ninguém.
+function nomeAbreviadoCompat(a, b) {
+  if (!a || !b) return false;
+  const ta = tokensNome(a), tb = tokensNome(b), [c, l] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+  if (c.length < 2) return false;
+  const casa = (t, u) => t === u || (t.length === 1 && u[0] === t) || (t.length >= 2 && u.startsWith(t));
+  if (!casa(c[0], l[0])) return false;
+  let j = 1, fortes = c[0].length >= 3 ? 1 : 0;
+  for (let i = 1; i < c.length; i++) {
+    while (j < l.length && !casa(c[i], l[j])) j++;
+    if (j >= l.length) return false;
+    if (c[i].length >= 3) fortes++;
+    j++;
+  }
+  return fortes >= 2;
+}
+// Nível de nome usado pela ponte: o da conferência, ou 2 (compatível) quando um é abreviação do outro.
+const nivelNomePonte = (a, b, minTrunc = 20) => Math.max(nivelNome(a, b, minTrunc), nomeAbreviadoCompat(a, b) ? 2 : 0);
+
+// Power BI agrupado por atendimento (cache na própria planilha, fora do que é gravado).
+function indicePBIAtendimentos(pbi) {
+  if (!pbi) return new Map();
+  if (pbi._ixAt) return pbi._ixAt;
+  const m = new Map();
+  for (const l of pbi.linhas || []) {
+    const k = String(l.atendimento || '').trim(); if (!k) continue;
+    let a = m.get(k);
+    if (!a) m.set(k, a = { atendimento: k, pn: l.pn, nome: l.paciente || '', dia: l.data ? diaSerial(l.data) : null, unidadeCod: l.unidadeCod, empresa: l.empresa, conta: l.conta, convenio: l.convenio, prestadores: new Set(), linhas: [] });
+    if (l.prestador) a.prestadores.add(String(l.prestador));
+    a.linhas.push(l);
+  }
+  const porDia = new Map(); for (const a of m.values()) if (a.dia !== null) (porDia.get(a.dia) || porDia.set(a.dia, []).get(a.dia)).push(a);
+  Object.defineProperty(pbi, '_ixAt', { value: m, enumerable: false }); Object.defineProperty(pbi, '_ixAtDia', { value: porDia, enumerable: false });
+  return m;
+}
+const unidadeDoLaudo = (cfg, l) => (cfg.unidades || []).find(u => (u.apolo || []).some(n => norm(n) === norm(l.unidade)))?.cod;
+
+// Os seis critérios laudo × atendimento do Power BI. ok: true (bate) | false (não bate) | null (sem dado para comparar).
+function criteriosPonte(l, at, opc) {
+  const cfg = opc.cfg, un = unidadeDoLaudo(cfg, l);
+  const grupoOk = l.modalidade ? at.linhas.some(x => (modalidadesDoGrupo(x.grupo) || []).includes(l.modalidade)) : null;
+  const codigoOk = opc.idxEq && l.titulo ? at.linhas.some(x => avaliarProcedimento(opc.idxEq, x.codigo, l.titulo, { unidade: opc.unidadeCod, modalidade: l.modalidade, convenio: x.convenio }).estado === 'validada') : null;
+  const cv = convenioCompativel(at.convenio, l.convenio, cfg);
+  return [
+    { k: 'Nome', ok: nivelNomePonte(l.pn, at.pn, +cfg.parametros?.minTruncamento || 20) >= 2 },
+    { k: 'Data', ok: l.dia !== null && l.dia === at.dia },
+    { k: 'Unidade', ok: un && at.unidadeCod ? String(un) === String(at.unidadeCod) : null },
+    { k: 'Grupo × modalidade', ok: grupoOk },
+    { k: 'Código × título', ok: codigoOk },
+    { k: 'Convênio', ok: cv === null ? null : cv }
+  ];
+}
+const pontosCriterios = cr => cr.filter(c => c.ok === true).length;
+
+/* Atendimento(s) do laudo no Power BI. Nome e data precisam bater (o atendimento é único por data). Um só atendimento
+ * possível = vínculo firme; dois ou mais = dúvida (sempre ressalva para a pessoa analisar), com o de mais critérios à frente. */
+function ponteDoLaudo(pbi, l, opc) {
+  if (!pbi || !l?.pn || l.dia === null || l.dia === undefined) return null;
+  const minTrunc = +opc.cfg.parametros?.minTruncamento || 20, achados = [];
+  indicePBIAtendimentos(pbi);
+  for (const at of pbi._ixAtDia.get(l.dia) || []) {
+    if (!at.pn || at.pn[0] !== l.pn[0]) continue;
+    if (nivelNomePonte(l.pn, at.pn, minTrunc) < 2) continue;
+    const cr = criteriosPonte(l, at, opc);
+    if (cr[2].ok === false && cr[3].ok === false) continue;   // outra unidade e outro tipo de exame: não é este
+    achados.push({ at, criterios: cr, pontos: pontosCriterios(cr) });
+  }
+  if (!achados.length) return { nivel: 'nenhum' };
+  achados.sort((a, b) => b.pontos - a.pontos);
+  return { nivel: achados.length === 1 ? 'firme' : 'duvida', melhor: achados[0], alternativas: achados.slice(1, 4) };
+}
+// Texto curto da ponte para a tela e para os motivos.
+const textoPonte = p => p?.melhor ? `atendimento ${p.melhor.at.atendimento} no Power BI (${p.melhor.at.nome}) · ${p.melhor.pontos} de 6 critérios` : '';
 
 /* ---- src/engine/90-relatorios.js ---- */
 /* ============================================================
@@ -7598,7 +7701,7 @@ async function executarConferencia() {
 // Executa e registra uma conferência (usada pelo botão e para rodar de novo após validar equivalências).
 async function rodarConferencia(x, un, tol, medSel) {
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
-  const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos }), indiceDecisoesComp());
+  const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos, pbi: S.pbi }), indiceDecisoesComp());
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
   const medicosNomes = medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '';
   const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
@@ -7616,7 +7719,7 @@ async function rodarConferencia(x, un, tol, medSel) {
   let cands = candidatosDaConferencia(res, ctx, S.cfg);
   if (S.pbi) {
     const opcPBI = { unidadeCod: un, tol, prestadorCod: x.rel.cab.prestadorCod, cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), idxPrest: indicePrestadores(S.cfg) };
-    for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } }
+    for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } const pl = ponteDoLaudo(S.pbi, l.l, opcPBI); if (pl) Object.defineProperty(l, 'ponteLaudo', { value: pl, enumerable: false }); }
     ctx.pbiResumo = enriquecerCandidatosComPBI(cands, S.pbi, opcPBI); ctx.pbiNome = S.pbi.nome;
   }
   // P1: com todos os médicos no escopo, os candidatos «Só no laudo» ficam só os do prestador (quando há cadastro dele na unidade).
@@ -7875,13 +7978,30 @@ function cartoesCandidatos(x, i, k) {
     return `<div class="la-cand${cd.l === x.l ? ' escolhido' : ''}"><b>«${esc(cd.l.titulo)}» · ${fmtData(cd.l.data)}</b><span class="small muted">${esc(cd.l.medico || 'sem médico')} · faixa ${cd.tier} (${esc(FAIXA[cd.tier] || '')})${cd.l === x.l ? ' · <b>par escolhido</b>' : ''}</span><div class="chips-s">${chips}</div>${escolher ? `<div><button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button></div>` : ''}</div>`;
   }).join('')}</div></div>`;
 }
+// Ponte pelo atendimento (25/11/2026): uma linha só, com os critérios recolhidos — para não poluir a tela.
+function linhaPonte(x) {
+  if (!S.pbi) return x.status === 'so-laudo' ? '<div class="la-ponte muted">Power BI não carregado: a busca do atendimento pelo laudo não foi feita.</div>' : '';
+  const opc = { cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), unidadeCod: S.conf?.ctx?.unidadeCod };
+  const crit = cr => `<details class="la-crit"><summary>${pontosCriterios(cr)} de 6 critérios</summary><span>${cr.map(c => `<span class="chip-s ${c.ok === true ? 'ok' : c.ok === false ? 'err' : 'na'}">${esc(c.k)}${c.ok === null ? ' ?' : ''}</span>`).join('')}</span></details>`;
+  const prest = at => at.prestadores.size ? ` · faturado para ${[...at.prestadores].map(esc).join(', ')} <span class="muted">(só informativo)</span>` : '';
+  const noRel = at => { const y = (S.conf?.res?.linhas || []).find(z => z.r && String(z.r.atendimento) === String(at.atendimento)); return y ? ` · está na linha ${y.r.seq} deste relatório` : ' · <b>não está neste relatório</b>'; };
+  if (x.r && x.ponte) {
+    const at = x.ponte, cd = x.l ? x.cands.find(c => c.l === x.l) : null;
+    return `<div class="la-ponte"><b>Power BI</b> atendimento ${copiavel(at.atendimento)} · ${esc(at.nome)}${cd?.ponte ? ' · <span class="chip-s ok">laudo achado pelo nome do Power BI</span>' : ''}${prest(at)}${x.l ? crit(criteriosPonte(x.l, at, opc)) : ''}</div>`;
+  }
+  const p = x.ponteLaudo; if (!x.l || !p) return '';
+  if (p.nivel === 'nenhum') return '<div class="la-ponte"><b>Power BI</b> nenhum atendimento com nome e data compatíveis com o laudo.</div>';
+  const um = (a, tit) => `<div class="la-ponte"><b>${tit}</b> atendimento ${copiavel(a.at.atendimento)} · ${esc(a.at.nome)}${noRel(a.at)}${prest(a.at)}${crit(a.criterios)}</div>`;
+  if (p.nivel === 'firme') return um(p.melhor, 'Power BI');
+  return `<div class="la-ponte-duvida">${um(p.melhor, 'Power BI · mais provável')}${p.alternativas.map(a => um(a, 'ou')).join('')}</div>`;
+}
 function detalheLinhaConf(x, i, k, obs, ctx) {
   const d = diagnosticoLinha(x), tags = [...x.marcadores].map(m => MARCADORES[m]).filter(Boolean);
   const meta = [`Linha ${x.r ? x.r.seq : '—'}${x.r ? ' do relatório' : ''}`, `origem ${x.origem}`, x.decisao ? 'com decisão' : k === 'pend' ? 'sem decisão (não entra no fechamento)' : ''].filter(Boolean).join(' · ');
   return `<div class="la">
     <div class="la-topo">${k ? pillClasse(k) : ''}${tags.map(t => `<span class="la-tag">${esc(t)}</span>`).join('')}<span class="la-meta">${esc(meta)}</span></div>
     <div class="la-diag ${d.nivel}"><b>${esc(d.titulo)}</b>${d.texto ? `<p>${atendimentosCopiaveis(esc(d.texto))}</p>` : ''}</div>
-    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
+    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}${linhaPonte(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
     <details class="la-mais"><summary>Ver as evidências completas (${x.motivos.length})</summary><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul></details>
     <div class="la-acoes">${botoesDecisao(x, i)}${k === 'pend' && !x.decisao ? '<span class="small muted">Depois de decidir, a próxima linha que falta decidir abre sozinha.</span>' : ''}</div>
     <div><label class="campo">Observação<textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea></label><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
@@ -8223,7 +8343,7 @@ function itensPlanilhaUnidade(un, gr, ch = S.comp) {
     const ctx = { chaveCompetencia: ch, relId: x.id, relatorio: { ...x.rel, arquivo: x.rel.arquivo || x.nome }, apoloNome: S.apolo?.nome || '', unidadeCod: un, unidadeNome: uNome, parametros: rod?.parametros || {}, operador: S.operador, rodadaId: rod?.id || '' };
     if (!rod || !S.apolo) return { res: null, ctx, rodada: null };
     const medSel = rod.parametros?.medico || '@prest', medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
-    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
+    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos, pbi: S.pbi }), idxDec);
     return { res, ctx, rodada: rod };
   });
 }
