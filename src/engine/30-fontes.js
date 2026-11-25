@@ -2,6 +2,25 @@
  * Planilhas de entrada: laudos do Apolo e base auxiliar do Power BI
  * ============================================================ */
 
+/* Pedido de 25/11/2026. ID do laudo no Apolo = coluna PATIENT_ID. ID com mais de um paciente: «DUPLICATE» (problema para
+ * investigar, nunca corrigido); célula vazia: «SEM ID». Convênio (PATIENT_INSURANCE) vazio: «SEM CONVÊNIO». Nada é inventado. */
+const idApolo = l => !l ? '' : l.idDuplo ? 'DUPLICATE' : (l.idPac || 'SEM ID');
+const convenioApolo = l => (l && l.convenio) || 'SEM CONVÊNIO';
+// Unidades do Apolo que a ferramenta ignora (não são da rede): padrão editável em Configurações → parâmetros.
+const UNIDADES_IGNORADAS_PADRAO = ['ISCAL', 'GRUPO SRA LON', 'Associação da Santa Casa de Misericórdia de Ourinhos', 'Hospital Providência Apucarana'];
+const chaveUnidadeIgnorada = s => norm(s).replace(/\s+/g, '');
+function unidadeIgnorada(cfg, nome) {
+  const k = chaveUnidadeIgnorada(nome), lista = cfg?.parametros?.unidadesIgnoradas || UNIDADES_IGNORADAS_PADRAO;
+  return !!k && lista.some(x => { const c = chaveUnidadeIgnorada(x); return c && (k === c || k.includes(c)); });
+}
+// Tira da planilha os laudos dessas unidades (vale na leitura e ao abrir uma planilha guardada); devolve quantos saíram.
+function removerUnidadesIgnoradas(ap, cfg) {
+  if (!ap || !Array.isArray(ap.laudos)) return 0;
+  const antes = ap.laudos.length; ap.laudos = ap.laudos.filter(l => !unidadeIgnorada(cfg, l.unidade));
+  ap.laudos.forEach((l, i) => { l.i = i; });
+  const n = antes - ap.laudos.length; ap.unidadesIgnoradas = (ap.unidadesIgnoradas || 0) + n; return n;
+}
+
 /* Laudos do Apolo. Aceita o formato atual (inglês) e o antigo (português).
  * Nunca descarta laudo em silêncio: linha sem nome ou sem data entra marcada;
  * só é ignorada a linha sem nenhum dado útil, e a contagem é informada (RN-189). */

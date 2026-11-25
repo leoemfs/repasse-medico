@@ -216,10 +216,11 @@ async function carregarApolo(f) {
     const bytes = await lerArquivo(f);
     const ap = await lerApolo(bytes, f.name, n => { const b = $('barApolo'); if (b) b.style.width = Math.min(95, n / 300) + '%'; });
     if (!await aceitarProducao(f.name, producaoDoArquivo(ap, () => ap.laudos.map(l => l.data)))) return RENDER.inicio();
+    const nIgn = removerUnidadesIgnoradas(ap, S.cfg);   // unidades fora da rede (Configurações → parâmetros)
     S.apolo = ap; S.apolo.hash = hashBytes(bytes); S.apolo.tamanho = f.size; Object.defineProperty(S.apolo, 'bytes', { value: bytes, enumerable: false });
     await guardarPlanilha('apolo', S.apolo);
     const semUnidade = [...new Set(S.apolo.laudos.map(l => norm(l.unidade)))].filter(u => !S.cfg.unidades.some(x => (x.apolo || []).map(norm).includes(u)));
-    avisar(`${f.name}: ${S.apolo.laudos.length} laudos lidos.${semUnidade.length ? ` ${semUnidade.length} unidade(s) do Apolo sem cadastro em Bases.` : ''}`, semUnidade.length ? 'warn' : 'ok');
+    avisar(`${f.name}: ${S.apolo.laudos.length} laudos lidos.${nIgn ? ` ${nIgn} de unidades ignoradas ficaram de fora.` : ''}${semUnidade.length ? ` ${semUnidade.length} unidade(s) do Apolo sem cadastro em Bases.` : ''}`, semUnidade.length ? 'warn' : 'ok');
   } catch (e) { S.apolo = null; avisar(`${f.name}: ${e.message}`, 'err'); }
   RENDER.inicio();
 }

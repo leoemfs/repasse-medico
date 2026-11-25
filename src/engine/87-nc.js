@@ -172,7 +172,9 @@ const vencendoRetencaoNC = (base, dias, janela = 7, hoje = new Date()) =>
 
 /* ---------- Candidatos vindos das análises ---------- */
 const TIPOS_CANDIDATO_NC = {
-  'so-laudo': { nome: 'Só no laudo', natureza: 'nao-lancado', dica: 'laudo sem lançamento no MV' },
+  // 25/11/2026: na prática, o «Só no laudo» quase sempre está lançado para outro médico; conta aberta, fora de remessa ou
+  // código TUSS errado na conta também acontecem (o Power BI, quando carregado, ajusta a natureza).
+  'so-laudo': { nome: 'Só no laudo', natureza: 'prestador-incorreto', dica: 'laudo sem lançamento no MV: em geral lançado para outro prestador; ou conta aberta, fora de remessa ou código TUSS errado na conta' },
   'so-faturamento': { nome: 'Só no faturamento', natureza: '', dica: 'lançado no MV sem laudo correspondente' },
   'eq-divergente': { nome: 'Procedimento diverge', natureza: 'lancado-incorreto', dica: 'procedimento do MV diferente do laudo' },
   'outro-medico': { nome: 'Laudo de outro médico', natureza: 'prestador-incorreto', dica: 'par encontrado com laudo assinado por outro médico' },

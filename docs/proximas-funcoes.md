@@ -25,6 +25,15 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Pedido de 25/11/2026 — ID, convênio, unidades ignoradas e «Só no laudo»
+- **IMPLEMENTADO na v3.0.0-alpha.42:**
+  - «ID Apolo» do laudo = coluna `PATIENT_ID`. ID com mais de um paciente aparece como **DUPLICATE** (para investigar); célula vazia, **SEM ID**. Nada é preenchido com dado fictício.
+  - Convênio do laudo = `PATIENT_INSURANCE`; vazio aparece como **SEM CONVÊNIO**.
+  - Unidades ignoradas por padrão (laudos saem da planilha na leitura): ISCAL, GRUPO SRA LON, Associação da Santa Casa de Misericórdia de Ourinhos, Hospital Providência Apucarana (`parametros.unidadesIgnoradas`).
+  - «Só no laudo»: natureza sugerida da NC passa a ser **Prestador incorreto** (na prática, a conta está para outro médico); o Power BI ainda ajusta quando mostra conta aberta, fora de remessa etc.
+  - Títulos com acento quebrado (ex.: «TorÃ¡cica») já são corrigidos na leitura (`fixMojibake`).
+- **Aguardando aprovação da prévia** (https://claude.ai/artifact/VSLSUPPdKQQzL29fARx3Vi): lista de unidades ignoradas editável em Configurações; «Nomes equivalentes» no cadastro de convênios (nome resumido no Apolo / cortado no MV contam como o mesmo convênio).
+
 ## Correção da v3.0.0-alpha.41 — «linha N da planilha» do laudo deslocada (pedido de 25/11/2026)
 - Linhas em branco na planilha do Apolo eram puladas na leitura e o número da linha mostrado no laudo ficava menor que o real. Agora vem o número real da linha no Excel.
 - O «ID Apolo» é a coluna de nome exato «ID» da mesma linha do laudo (não mudou).
