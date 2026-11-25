@@ -184,8 +184,10 @@ async function reterRodadas(grupos = null, base = S.rodadas) {
 
 /* ---------- Mensagens, diálogos e downloads ---------- */
 let avisoTimer = null;
-function avisar(texto, tipo = 'info') {
+// acao (opcional): { rotulo, fn } — botão no próprio aviso (ex.: «Desfazer» depois de arrastar no quadro).
+function avisar(texto, tipo = 'info', acao = null) {
   const a = $('aviso'); a.className = `aviso ${tipo}`; a.textContent = texto; a.hidden = false;
+  if (acao) { const b = document.createElement('button'); b.type = 'button'; b.className = 'sec mini'; b.style.marginLeft = '8px'; b.textContent = acao.rotulo; b.onclick = () => { a.hidden = true; acao.fn(); }; a.appendChild(b); }
   clearTimeout(avisoTimer); avisoTimer = setTimeout(() => { a.hidden = true; }, tipo === 'err' ? 15000 : 6000);
 }
 // Diálogo simples: devolve o valor do botão clicado e os campos preenchidos.

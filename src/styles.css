@@ -581,3 +581,9 @@ th .cf-sel{margin:0}
 .la-ponte-duvida{border:1px dashed var(--warn);border-radius:8px;padding:2px 8px 8px;margin-top:8px}
 .la-crit{display:inline}.la-crit summary{display:inline;cursor:pointer;color:var(--accent);font-weight:600}.la-crit[open] summary{margin-right:4px}
 .la-crit>span{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle}.chip-s.na{background:var(--bg);color:var(--muted)}
+/* Quadro: arrastar e soltar (25/11/2026) */
+.qd-card[draggable=true]{cursor:grab}.qd-card.arrastado{opacity:.45}
+.quadro.arrastando .qd-col.pode{border-color:var(--accent);border-style:dashed}
+.quadro.arrastando .qd-col.pode.sobre{background:var(--infobg)}
+.quadro.arrastando .qd-col.nao{opacity:.5}
+.qd-nao{font-size:11px;color:var(--err);margin:-4px 0 6px}

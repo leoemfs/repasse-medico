@@ -1,0 +1,62 @@
+<title>Quadro arrastável</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.qk{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:10px;overflow-x:auto;padding-bottom:6px}
+.qk-col{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:320px;display:flex;flex-direction:column;gap:8px;transition:background .12s,border-color .12s,opacity .12s}
+.qk-col h3{margin:0;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.qk-col h3 span{font-size:11px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 7px}
+.qk-col .dica{font-size:11px;color:var(--muted);margin-top:-4px}
+.qk-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:7px 9px;font-size:12.5px;cursor:grab;display:grid;gap:2px}
+.qk-card:active{cursor:grabbing}.qk-card.arrastando{opacity:.45}
+.qk-card b{font-size:12.5px}.qk-card small{color:var(--muted)}
+.qk-card.alerta{border-left-color:var(--err)}
+/* durante o arrasto */
+.qk.drag .qk-col.pode{border-color:var(--accent);border-style:dashed}
+.qk.drag .qk-col.pode.sobre{background:var(--infobg)}
+.qk.drag .qk-col.nao{opacity:.45}
+.qk-col .motivo-nao{display:none;font-size:11px;color:var(--err)}
+.qk.drag .qk-col.nao .motivo-nao{display:block}
+.qk-toast{position:fixed;right:16px;bottom:16px;max-width:420px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:10px 12px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.qk-toast.err{border-left-color:var(--err)}
+.qk-dlg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:grid;place-items:center}
+.qk-dlg>div{background:var(--card);border-radius:10px;padding:16px;width:min(420px,92vw);display:grid;gap:10px}
+.qk-dlg h3{margin:0}
+</style>
+<div class="shell" data-pag="fechamento"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Fechamento e envio</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Arraste os cartões entre as colunas. Durante o arrasto, as colunas que aceitam o cartão ficam tracejadas; as outras ficam apagadas e dizem por quê.</div>
+<div class="card"><h2>Quadro por prestador</h2>
+<p class="small muted">Arrastar registra a ação no Fluxo (com data e operador), como o menu do cartão faz hoje. Clicar no cartão continua abrindo o menu.</p>
+<div class="qk" id="qk"></div></div>
+<div class="card"><h3>Regras do arrastar</h3><ul class="small">
+<li><b>A conferir</b> e <b>Em correção</b> seguem a conferência (rodada e aceite): não aceitam cartão arrastado. Soltar ali não faz nada.</li>
+<li><b>Aguardando terceiros</b>: aceita de qualquer coluna e pede o motivo e quem aguarda. Tirar de lá volta para a coluna calculada.</li>
+<li><b>Enviado</b>, <b>NF recebida</b> e <b>Concluído</b> exigem aceite em todas as unidades. Pular etapas registra as anteriores juntas (pergunta antes).</li>
+<li>Voltar para a esquerda desfaz as marcas (ex.: de Enviado para Com aceite desfaz o «e-mail enviado»), com confirmação.</li>
+<li>Toda mudança mostra um aviso com «Desfazer».</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const COLS=[['conferir','A conferir','segue a conferência'],['correcao','Em correção','segue a conferência'],['terceiros','Aguardando terceiros',''],['aceite','Com aceite',''],['enviado','Enviado',''],['nf','NF recebida',''],['concluido','Concluído','']];
+const ORDEM=['aceite','enviado','nf','concluido'];
+let cards=[{n:'ALEXANDRE ROMANUS',i:'6703 · Curitiba',c:'conferir',ac:false},{n:'ELEN AKIKO NAKANO',i:'8016 · Curitiba',c:'conferir',ac:false},
+{n:'AMANDA SOUZA DE ASSIS',i:'7873 · IMG · R$ 866,88 · sem aceite: un. 2',c:'correcao',ac:false,al:true},
+{n:'GUSTAVO ANDRADE DE MARGALHO',i:'5 · IMG · R$ 563,60',c:'aceite',ac:true},{n:'HELOISA MARTINS CARDOSO',i:'8049 · IMG · R$ 26,52',c:'aceite',ac:true},
+{n:'LUCAS YAMADA',i:'9033 · IMG · R$ 376,80',c:'enviado',ac:true},{n:'MARCELO GARCIA MARINI',i:'7 · IMG · R$ 1.597,26',c:'nf',ac:true}];
+let arr=null,ultimo=null;const $=s=>document.querySelector(s);
+function motivoNao(col,cd){if(!cd)return'';if(col==='conferir'||col==='correcao')return'segue a conferência';if(['enviado','nf','concluido','aceite'].includes(col)&&!cd.ac)return'precisa de aceite em todas as unidades';if(col===cd.c)return'já está aqui';return'';}
+function des(){$('#qk').innerHTML=COLS.map(([k,n,d])=>{const cs=cards.filter(c=>c.c===k);return`<section class="qk-col" data-col="${k}"><h3>${n}<span>${cs.length}</span></h3>${d?`<div class="dica">${d}</div>`:''}<div class="motivo-nao"></div>${cs.map(c=>`<div class="qk-card${c.al?' alerta':''}" draggable="true" data-n="${c.n}"><b>${c.n}</b><small>${c.i}</small>${c.mot?`<small>aguarda: ${c.mot}</small>`:''}</div>`).join('')||'<small class="muted">—</small>'}</section>`}).join('');
+document.querySelectorAll('.qk-card').forEach(el=>{el.ondragstart=e=>{arr=cards.find(c=>c.n===el.dataset.n);el.classList.add('arrastando');e.dataTransfer.setData('text/plain',arr.n);$('#qk').classList.add('drag');document.querySelectorAll('.qk-col').forEach(col=>{const m=motivoNao(col.dataset.col,arr);col.classList.toggle('pode',!m);col.classList.toggle('nao',!!m);col.querySelector('.motivo-nao').textContent=m;});};el.ondragend=()=>{el.classList.remove('arrastando');$('#qk').classList.remove('drag');document.querySelectorAll('.qk-col').forEach(c=>c.classList.remove('pode','nao','sobre'));};});
+document.querySelectorAll('.qk-col').forEach(col=>{col.ondragover=e=>{if(col.classList.contains('pode')){e.preventDefault();col.classList.add('sobre');}};col.ondragleave=()=>col.classList.remove('sobre');col.ondrop=e=>{e.preventDefault();soltar(arr,col.dataset.col);};});}
+function toast(t,err){document.querySelectorAll('.qk-toast').forEach(x=>x.remove());const d=document.createElement('div');d.className='qk-toast'+(err?' err':'');d.innerHTML=t+(ultimo?' <button class="sec mini" id="desf">Desfazer</button>':'');document.body.appendChild(d);const b=$('#desf');if(b)b.onclick=()=>{cards=ultimo;ultimo=null;d.remove();des();};setTimeout(()=>d.remove(),6000);}
+function dlg(tit,corpo,ok){const d=document.createElement('div');d.className='qk-dlg';d.innerHTML=`<div><h3>${tit}</h3>${corpo}<div class="acoes"><button class="sec" id="dc">Cancelar</button><button id="dk">Confirmar</button></div></div>`;document.body.appendChild(d);$('#dc').onclick=()=>d.remove();$('#dk').onclick=()=>{ok(d);d.remove();};}
+function soltar(c,col){if(!c||motivoNao(col,c))return;const antes=JSON.parse(JSON.stringify(cards));
+ if(col==='terceiros')return dlg(`«${c.n}» aguardando terceiros`,'<label class="campo">Quem aguarda<select id="qa"><option>Médico</option><option>Unidade</option><option>Faturamento</option></select></label><label class="campo">Motivo<input id="qm" placeholder="ex.: NF com valor errado"></label>',d=>{ultimo=antes;c.mot=d.querySelector('#qa').value+' — '+(d.querySelector('#qm').value||'sem motivo');c.c='terceiros';des();toast(`«${c.n}» em Aguardando terceiros.`);});
+ const de=c.c==='terceiros'?'aceite':c.c,i0=ORDEM.indexOf(de),i1=ORDEM.indexOf(col);
+ const fazer=()=>{ultimo=antes;c.mot='';c.c=col;des();toast(i1>i0?`«${c.n}»: ${ORDEM.slice(i0+1,i1+1).map(k=>({enviado:'e-mail enviado',nf:'NF recebida',concluido:'NF encaminhada ao Financeiro'}[k])).join(', ')} registrado(s) hoje por Leo.`:i1<i0?`«${c.n}»: marca(s) desfeita(s).`:`«${c.n}» saiu de Aguardando terceiros.`);};
+ if(i1-i0>1)return dlg('Registrar as etapas juntas?',`<p class="small">De «${COLS.find(x=>x[0]===de)[1]}» para «${COLS.find(x=>x[0]===col)[1]}» registra também as etapas do meio, com a data de hoje.</p>`,fazer);
+ if(i1<i0)return dlg('Desfazer?',`<p class="small">Voltar para «${COLS.find(x=>x[0]===col)[1]}» desfaz as marcas das colunas à direita.</p>`,fazer);
+ fazer();}
+des();
+</script>

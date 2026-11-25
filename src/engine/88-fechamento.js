@@ -29,6 +29,26 @@ function colunaQuadro(x) {
   if (x.semAceite.length) return 'correcao';
   return d.nfRecebida ? 'nf' : d.relatorio ? 'enviado' : 'aceite';
 }
+/* Arrastar no quadro (prévia aprovada em 25/11/2026: docs/prototipos/quadro-arrastar/): soltar numa coluna vira a ação que
+ * leva o cartão até ela. A conferir e Em correção seguem a conferência (não aceitam). Aguardando terceiros pede o motivo.
+ * Com aceite → Concluído exigem aceite em todas as unidades; pular etapas registra as do meio; voltar desfaz as da direita.
+ * Devolve { ok, motivo, aguardando, tirarAguardando, marcar: [campos], desmarcar: [campos], confirmar: texto|'' }. */
+const DOC_POR_COLUNA = { aceite: [], enviado: ['relatorio'], nf: ['relatorio', 'nfRecebida'], concluido: ['relatorio', 'nfRecebida', 'nfFinanceiro'] };
+const NOME_DOC = { relatorio: 'e-mail enviado', nfRecebida: 'NF recebida', nfFinanceiro: 'NF encaminhada ao Financeiro' };
+function movimentoQuadro(x, destino) {
+  const nao = motivo => ({ ok: false, motivo });
+  if (destino === x.coluna) return nao('já está aqui');
+  if (destino === 'conferir' || destino === 'correcao') return nao('segue a conferência');
+  if (destino === 'terceiros' && x.doc?.nfFinanceiro) return nao('já concluído: volte antes para NF recebida');
+  if (destino === 'terceiros') return { ok: true, aguardando: true, marcar: [], desmarcar: [], confirmar: '' };
+  const quer = DOC_POR_COLUNA[destino]; if (!quer) return nao('coluna desconhecida');
+  if (!x.temValores) return nao('sem rodada de conferência');
+  if (x.semAceite.length) return nao('precisa de aceite em todas as unidades');
+  const d = x.doc || {}, campos = ['relatorio', 'nfRecebida', 'nfFinanceiro'];
+  const marcar = campos.filter(c => quer.includes(c) && !d[c]), desmarcar = campos.filter(c => !quer.includes(c) && d[c]);
+  const confirmar = desmarcar.length ? `Desfaz: ${desmarcar.map(c => NOME_DOC[c]).join(', ')}.` : marcar.length > 1 ? `Registra juntas, com a data de hoje: ${marcar.map(c => NOME_DOC[c]).join(', ')}.` : '';
+  return { ok: true, tirarAguardando: !!x.aguardando, marcar, desmarcar, confirmar };
+}
 const fechamentoVazio = () => ({ ajustes: { usg: {}, img: {}, curitiba: {} }, nfs: [], blocos: { complementar: [], cetrus: [] }, valorPeriodoCetrus: 1000, obs: { usg: '', img: '', curitiba: '' }, manual: {} });
 
 /* ---------- NF complementar (SOL-F28): lançamentos da competência em USG, IMG e Curitiba ----------

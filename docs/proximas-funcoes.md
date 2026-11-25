@@ -26,6 +26,9 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Quadro do Fechamento: arrastar e soltar — **IMPLEMENTADA na v3.0.0-alpha.48** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/4HFA7sQzQshp7wqgLMBEiF e `docs/prototipos/quadro-arrastar/`; teste: `test/quadro_fechamento.mjs`)
+- Soltar numa coluna registra a ação que leva o cartão até ela (regra no motor: `movimentoQuadro`). A conferir e Em correção seguem a conferência e não aceitam. Aguardando terceiros pede quem aguarda e o motivo. Com aceite → Concluído exigem aceite em todas as unidades; pular etapas registra as do meio e voltar desfaz as da direita (com confirmação). O aviso traz «Desfazer». Clicar no cartão continua abrindo o menu.
+
 ## Pareamento: a mesma paciente vem antes de um nome apenas semelhante — **CORRIGIDO na v3.0.0-alpha.46** (caso real de 25/11/2026; teste: `test/mesma_paciente.mjs`)
 Caso: relatório da Melanie (10264), unidade 4. A linha do MV «MARTA APARECIDA DA» (40808033, mamografia convencional, 19/10) pareou com o laudo de **outra paciente**, «MARIA APARECIDA FLORA DE SOUZA SZEREMETA» (16/10, Dr. Caio, outro convênio). O laudo certo, da Marta (19/10, Melanie, «Mamografia Digital»), sobrou como «Só no laudo». A usuária aceitou a linha do MV depois de conferir no MV, e o «Só no laudo» continuou aparecendo como erro a cada reconferência.
 - **Causa:** o laudo de nome apenas semelhante com título validado para o código cobrado («MAMOGRAFIA BILATERAL» → 40808033) tinha prioridade (faixa 5) sobre o da mesma paciente e data com o título validado para outro código («Mamografia Digital» → 40808041, faixa 6).

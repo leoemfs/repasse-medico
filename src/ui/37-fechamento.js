@@ -397,10 +397,60 @@ function desenharQuadro(corpo, f) {
     ${x.doc?.relatorio ? `<span class="qd-data">e-mail ${fmtCurta(paraData(x.doc.relatorio))}</span>` : ''}${x.doc?.nfRecebida ? `<span class="qd-data">NF ${fmtCurta(paraData(x.doc.nfRecebida))}</span>` : ''}</button>`;
   corpo.innerHTML = `<div class="card"><div class="fx-topo"><h2 style="margin:0">Quadro por prestador</h2>
     <label class="campo" style="margin:0">Repasse<select id="qdTipo">${opcoes([['todos', 'Todos'], ['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba (V3)']], FH.qTipo)}</select></label></div>
-    <p class="small muted">Os cartões mudam de coluna sozinhos, pelos dados: rodada, aceite, e-mail e NF (controle documental do Fluxo). Clique no cartão para registrar envio, NF, «Aguardando terceiros» ou abrir a conferência.</p>
+    <p class="small muted">Os cartões seguem os dados: rodada, aceite, e-mail e NF (controle documental do Fluxo). Arraste um cartão para outra coluna para registrar o envio, a NF ou «Aguardando terceiros» (A conferir e Em correção seguem a conferência), ou clique nele para o menu.</p>
     <div class="quadro">${COLUNAS_QUADRO.map(([k, nome, dica]) => { const c = todos.filter(y => y.x.coluna === k); return `<section class="qd-col qd-${k}" data-col="${k}"><h3 title="${esc(dica)}">${esc(nome)} <span class="qd-n">${c.length}</span></h3>${c.map(card).join('') || '<p class="small muted">—</p>'}</section>`; }).join('')}</div></div>`;
   $('qdTipo').onchange = e => { FH.qTipo = e.target.value; desenharQuadro(corpo, f); };
   corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
+  ligarArrastarQuadro(corpo, f);
+}
+/* Arrastar e soltar entre as colunas (25/11/2026). A regra de cada movimento vem do motor (movimentoQuadro). */
+function ligarArrastarQuadro(corpo, f) {
+  const quadro = corpo.querySelector('.quadro'); if (!quadro) return;
+  let arr = null;
+  const achar = card => { const [t, cod] = card.dataset.sit.split('|'); const x = (f[t] || []).find(y => y.cod === cod); return x ? { x, t } : null; };
+  const limpar = () => { quadro.classList.remove('arrastando'); quadro.querySelectorAll('.qd-col').forEach(c => { c.classList.remove('pode', 'nao', 'sobre'); c.querySelector('.qd-nao')?.remove(); }); quadro.querySelectorAll('.qd-card.arrastado').forEach(c => c.classList.remove('arrastado')); };
+  quadro.querySelectorAll('.qd-card').forEach(card => {
+    card.draggable = true;
+    card.ondragstart = e => {
+      arr = achar(card); if (!arr) return;
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', card.dataset.sit); fecharMenuSituacao();
+      card.classList.add('arrastado'); quadro.classList.add('arrastando');
+      quadro.querySelectorAll('.qd-col').forEach(col => { const m = movimentoQuadro(arr.x, col.dataset.col); col.classList.add(m.ok ? 'pode' : 'nao');
+        if (!m.ok && m.motivo !== 'já está aqui') col.querySelector('h3').insertAdjacentHTML('afterend', `<p class="qd-nao">${esc(m.motivo)}</p>`); });
+    };
+    card.ondragend = limpar;
+  });
+  quadro.querySelectorAll('.qd-col').forEach(col => {
+    col.ondragover = e => { if (col.classList.contains('pode')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; col.classList.add('sobre'); } };
+    col.ondragleave = e => { if (!col.contains(e.relatedTarget)) col.classList.remove('sobre'); };
+    col.ondrop = async e => { e.preventDefault(); const a = arr; arr = null; limpar(); if (a) await moverNoQuadro(a.x, a.t, col.dataset.col); };
+  });
+}
+async function moverNoQuadro(x, t, destino) {
+  const m = movimentoQuadro(x, destino); if (!m.ok) return;
+  if (m.aguardando) return acaoSituacao('aguardando', t, x);   // pede quem aguarda e o motivo (mesmo diálogo do menu)
+  if (!exigirAberta(S.comp, 'mudar a situação')) return;
+  const op = await exigirOperador(); if (!op) return;
+  const nomeCol = Object.fromEntries(COLUNAS_QUADRO.map(([k, n]) => [k, n]));
+  if (m.confirmar && !await confirmar(`Mover «${x.nome}» para «${nomeCol[destino]}»?`, esc(m.confirmar), 'Mover')) return;
+  const comp = S.fluxo.competencias[S.comp], g = comp?.grupos?.[GRUPO_DOC[t]];
+  if ((m.marcar.length || m.desmarcar.length) && !comp) return avisar(`Inicie as Etapas do mês da competência ${rotuloCompetencia(S.comp)} (Fechamento e envio › Etapas do mês) para registrar envio e NF.`, 'warn');
+  if ((m.marcar.length || m.desmarcar.length) && !g?.documental) return avisar('O grupo deste repasse no Fluxo mensal não tem controle documental.', 'warn');
+  // Guarda o estado anterior para o «Desfazer».
+  const docAntes = g?.documental?.[x.cod] ? { ...g.documental[x.cod] } : null, aguAntes = x.aguardando ? { ...x.aguardando } : null;
+  if (m.marcar.length || m.desmarcar.length) {
+    const d = g.documental[x.cod] = g.documental[x.cod] || novoDocumental({ cod: x.cod, nome: x.nome }), hoje = isoDia(new Date());
+    for (const c of m.marcar) d[c] = hoje; for (const c of m.desmarcar) d[c] = '';
+    salvarFluxo();
+  }
+  if (m.tirarAguardando) salvarFech(fe => { for (const tt of t === 'curitiba' ? ['curitiba', 'img'] : [t]) { const a = fe.aguardando?.[tt]?.[x.cod]; if (!a) continue; (fe.aguardandoHist ||= []).push({ ...a, tipo: t, cod: x.cod, ate: agoraISO(), retiradaPor: op }); delete fe.aguardando[tt][x.cod]; } });
+  const feito = [...m.marcar.map(c => `${NOME_DOC[c]} registrado hoje`), ...m.desmarcar.map(c => `${NOME_DOC[c]} desfeito`), m.tirarAguardando ? '«Aguardando terceiros» retirado' : ''].filter(Boolean).join(', ');
+  RENDER.fechamento();
+  avisar(`${x.nome} → ${nomeCol[destino]}${feito ? `: ${feito}` : ''}.`, 'ok', { rotulo: 'Desfazer', fn: () => {
+    if (m.marcar.length || m.desmarcar.length) { if (docAntes) g.documental[x.cod] = docAntes; else delete g.documental[x.cod]; salvarFluxo(); }
+    if (m.tirarAguardando && aguAntes) salvarFech(fe => { fe.aguardando = fe.aguardando || {}; fe.aguardando[t] = { ...(fe.aguardando[t] || {}), [x.cod]: aguAntes }; if (Array.isArray(fe.aguardandoHist)) fe.aguardandoHist.pop(); });
+    RENDER.fechamento(); avisar(`Movimento de ${x.nome} desfeito.`, 'ok');
+  } });
 }
 
 /* v3.0.0-alpha.20 (simplificação): uma linha só de subabas no topo — Etapas do mês (antes «Fluxo mensal») e os repasses. */
