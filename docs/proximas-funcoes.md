@@ -26,6 +26,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.51 (pedido de 25/11/2026)
+- Subabas (ex.: «Conferir relatório | Prestadores por unidade») mostravam rolagem vertical: a sublinha da aba ativa passava 2 px da barra. Agora a linha de base é sombra interna e não há rolagem vertical.
+- Linha aberta (Conferência e Correção): laudos candidatos embaixo do quadro MV × laudo, e não mais ao lado.
+
 ## Cartões «flutuantes» — **IMPLEMENTADA na v3.0.0-alpha.50** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/MjBUiH4UkQP8FMaFFCFZRU e `docs/prototipos/cartoes-flutuantes/`)
 - Todos os `.card` com borda mais definida (`--card-borda`) e sombra difusa em duas camadas (`--sombra-card`), nos temas claro e escuro.
 
