@@ -44,7 +44,7 @@ await p.click('[data-revisar-nc]'); await p.waitForSelector('#rvTab table');
 ok(await p.textContent('#titulo') === 'Não conformidades', 'atalho abre a aba Não conformidades com a revisão');
 const boxes = await p.$$('#rvTab tr:has(td:text-is("Só no laudo")) input[data-cand]'); for (const x of boxes.slice(0, 3)) await x.check();
 await p.click('#rvReg'); await p.waitForSelector('#dlg[open]');
-ok(await p.inputValue('#dlgCorpo select[name=natureza]') === 'nao-lancado', 'natureza sugerida para «Só no laudo»: procedimento não lançado');
+ok(await p.inputValue('#dlgCorpo select[name=natureza]') === 'prestador-incorreto', 'natureza sugerida para «Só no laudo»: prestador incorreto');
 await p.fill('#dlgCorpo input[name=responsavel]', 'GISLAINE.CARVALHO'); await p.fill('#dlgCorpo input[name=detalhe]', 'RX patela'); await okDlg();
 const reg = await S(() => window.__RM.S.nc.itens.slice(1).map(x => [x.competencia, x.natureza, x.responsavel, x.detalhe, x.situacao, x.origem.tipo].join('/')));
 ok(reg.length === 3 && reg.every(r => r === '2026-10/nao-lancado/GISLAINE.CARVALHO/RX patela/aberta/conferencia'), `3 NCs registradas em 10/2026 (${reg[0]})`);

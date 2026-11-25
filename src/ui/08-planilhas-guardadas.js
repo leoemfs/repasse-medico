@@ -41,7 +41,7 @@ async function restaurarPlanilhasDaCompetencia() {
     const reg = await dbArquivo('get', chaveGuardada(tipo));
     if (!reg?.dados) continue;
     const obj = reg.dados; obj.guardada = { em: reg.em, por: reg.por, comp: reg.comp };
-    if (tipo === 'apolo') S.apolo = obj; else S.pbi = obj;
+    if (tipo === 'apolo') { removerUnidadesIgnoradas(obj, S.cfg); S.apolo = obj; } else S.pbi = obj;
     n++;
   }
   return n;
