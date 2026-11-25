@@ -15,7 +15,7 @@ fs.rmSync(saida, { recursive: true, force: true }); fs.mkdirSync(saida + '/verso
  * Sem service worker: a página nunca fica presa numa versão antiga em cache. */
 const atual = lista[0], manifest = {
   name: 'Repasse Médico', short_name: 'Repasse', description: 'Conferência do repasse médico: MV × Apolo, equivalências TUSS, correção de prestador e fechamento.',
-  id: './', start_url: './', scope: './', display: 'standalone', display_override: ['window-controls-overlay', 'standalone'], orientation: 'any',
+  id: './', start_url: './', scope: './', display: 'standalone', orientation: 'any',
   background_color: '#f3f6fa', theme_color: '#172536', lang: 'pt-BR',
   icons: [{ src: 'icones/icone-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icones/icone-512.png', sizes: '512x512', type: 'image/png' }, { src: 'icones/icone-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
 };
