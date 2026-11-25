@@ -71,11 +71,13 @@ function cfgConferencia() {
       <label class="campo">Tolerância — correção de prestador (dias)<input type="number" id="pTolP" min="0" max="60" value="${p.tolCorrecao}"><span class="small muted">0 = mesma data (recomendado).</span></label>
       <label class="campo">Truncamento mínimo do nome (caracteres)<input type="number" id="pTrunc" min="10" max="60" value="${p.minTruncamento}"><span class="small muted">Prefixo no meio de palavra só conta a partir deste tamanho.</span></label>
       <label class="campo">Valor simbólico até (R$)<input type="number" id="pSimb" min="0" step="0.01" value="${p.valorSimbolico}"><span class="small muted">Só marca a linha; não muda a categoria.</span></label>
-      <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
+
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
     <label class="campo" style="margin-top:10px">Unidades do Apolo ignoradas (uma por linha)<textarea id="pUnIgn" rows="5" style="max-width:520px">${esc((p.unidadesIgnoradas || UNIDADES_IGNORADAS_PADRAO).join('\n'))}</textarea>
       <span class="small muted">Laudos dessas unidades saem da planilha do Apolo na leitura: não entram na conferência, nos títulos nem em «Só no laudo». Maiúsculas, acentos e espaços não importam. Depois de mudar, carregue a planilha de novo.</span></label>
     <div class="acoes"><button id="pSalvar">Salvar parâmetros</button><button class="sec" id="pUnIgnPadrao">Voltar ao padrão das unidades ignoradas</button></div></div>
+  ${cartaoListaPrestadores('gen', 'Prestadores genéricos', 'Lançados antes de se saber quem lauda (ex.: TC e RMN da unidade). O relatório de qualquer um deles vai para a Correção de prestador, que identifica o médico de cada linha.', prestadoresGenericos(S.cfg), [['2', '']])}
+  ${cartaoListaPrestadores('fora', 'Prestadores fora da correção', 'Procedimentos desses prestadores não podem ficar no relatório de um prestador genérico: na Correção de prestador, as linhas identificadas para eles ganham destaque vermelho e entram no resumo do topo.', listaForaCorrecao(S.cfg), PRESTADORES_FORA_CORRECAO_PADRAO)}
   <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
     ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
   <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
@@ -91,8 +93,10 @@ function ligarConferencia() {
     salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
   });
   $('pUnIgnPadrao').onclick = () => { $('pUnIgn').value = UNIDADES_IGNORADAS_PADRAO.join('\n'); avisar('Lista padrão de volta no campo: clique em «Salvar parâmetros» para gravar.', 'ok'); };
+  ligarListaPrestadores('gen', 'prestadoresGenericos', [['2', '']]);
+  ligarListaPrestadores('fora', 'prestadoresForaCorrecao', PRESTADORES_FORA_CORRECAO_PADRAO);
   $('pSalvar').onclick = () => {
-    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim(), unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
+    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
     if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.', 'parametros');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
@@ -302,3 +306,29 @@ function cfgSobre() {
     <div class="acoes"><button class="sec" id="sbVerificar">Verificar atualização agora</button></div></div>`;
 }
 function ligarSobre() { $('sbVerificar').onclick = async () => { await verificarAtualizacao(true); const e = $('sbAtual'); if (e) e.textContent = textoAtualizacao(); }; }
+
+/* Lista de prestadores (código e nome do cadastro), no padrão aprovado em 25/11/2026: caixinhas com ×, campo para adicionar
+ * por código ou nome e «Voltar ao padrão». Usada por «Prestadores genéricos» e «Prestadores fora da correção». */
+function nomePrestadorLista(cod, padrao) { const p = (S.cfg.prestadores || []).find(x => String(x.cod) === String(cod)); return p?.nomeMV || (padrao || []).find(x => x[0] === String(cod))?.[1] || 'sem cadastro'; }
+function cartaoListaPrestadores(id, titulo, lead, codigos, padrao) {
+  const opc = (S.cfg.prestadores || []).filter(p => !codigos.includes(String(p.cod))).map(p => `<option value="${esc(`${p.cod} - ${p.nomeMV || ''}`)}">`).join('');
+  return `<div class="card" id="pl-${id}"><div class="fx-topo"><h2 style="margin:0">${esc(titulo)} <span class="muted small">${codigos.length} prestador(es)</span></h2><button type="button" class="sec mini" data-plpadrao="${id}">Voltar ao padrão</button></div>
+    <p class="lead">${esc(lead)}</p>
+    <div class="pl-add"><input data-plbusca="${id}" list="plOpc-${id}" placeholder="Adicionar prestador: código ou nome…" style="max-width:340px"><datalist id="plOpc-${id}">${opc}</datalist><button type="button" class="sec" data-pladd="${id}">Adicionar</button></div>
+    <div class="pl-grade">${codigos.map(c => `<div class="pl-item"><span class="cod">${esc(c)}</span><span class="nome">${esc(nomePrestadorLista(c, padrao))}</span><button type="button" data-plx="${id}|${esc(c)}" title="Tirar da lista" aria-label="Tirar ${esc(c)} da lista">×</button></div>`).join('') || '<p class="muted small">Nenhum.</p>'}</div></div>`;
+}
+function ligarListaPrestadores(id, campo, padrao) {
+  const card = $(`pl-${id}`); if (!card) return;
+  const gravar = (lista, msg) => { S.cfg.parametros[campo] = lista; if (campo === 'prestadoresGenericos') S.cfg.parametros.prestadorGenerico = lista[0] || ''; salvarCfg(msg, 'parametros'); RENDER.configuracoes(); };
+  const atual = () => campo === 'prestadoresGenericos' ? prestadoresGenericos(S.cfg) : listaForaCorrecao(S.cfg);
+  card.querySelector(`[data-plpadrao="${id}"]`).onclick = () => gravar(padrao.map(p => p[0]), 'Lista de volta ao padrão.');
+  card.querySelectorAll('[data-plx]').forEach(b => b.onclick = () => { const c = b.dataset.plx.split('|')[1]; gravar(atual().filter(x => x !== c), `Prestador ${c} tirado da lista.`); });
+  const add = () => {
+    const v = card.querySelector('[data-plbusca]').value.trim(), cod = (v.match(/^(\d+)/) || [])[1] || (S.cfg.prestadores || []).find(p => norm(p.nomeMV || '').includes(norm(v)) && v.length >= 3)?.cod;
+    if (!cod) return avisar('Informe o código do prestador ou escolha um nome da lista.', 'warn');
+    if (atual().includes(String(cod))) return avisar(`O prestador ${cod} já está na lista.`, 'warn');
+    gravar([...atual(), String(cod)], `Prestador ${cod} incluído na lista.`);
+  };
+  card.querySelector(`[data-pladd="${id}"]`).onclick = add;
+  card.querySelector('[data-plbusca]').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
+}

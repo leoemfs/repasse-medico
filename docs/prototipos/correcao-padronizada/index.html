@@ -1,0 +1,85 @@
+<title>Correção de prestador padronizada</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.tw2{overflow-x:auto}.tw2 table{width:100%;border-collapse:collapse;font-size:12.5px}
+.tw2 th{position:static}.tw2 td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tw2 tr.cl{cursor:pointer}.tw2 tr.cl:hover td{background:var(--infobg)}
+.tw2 tr.lista td:first-child{box-shadow:inset 4px 0 0 var(--err)}
+.tag-lista{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--errbg);color:var(--err);margin-top:3px}
+.pac{white-space:nowrap}.cp{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 4px;margin-left:4px;border-radius:6px;vertical-align:middle;line-height:0}
+.cp svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}.cp:hover{color:var(--accent)}.cp.ok{color:var(--ok)}
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--infobg);border-radius:6px;padding:0 2px 0 6px}
+.cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;line-height:0}.cpv svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.faixa-lista{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-left:4px solid var(--err);background:var(--errbg);border-radius:8px;padding:9px 12px;margin:10px 0;font-size:13px}
+/* linha aberta: mesmo padrão da Conferência */
+.la{display:grid;gap:12px;padding:6px 4px}
+.la-topo{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.la-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.la-meta{font-size:12px;color:var(--muted);margin-left:auto}
+.la-diag{border-left:4px solid var(--ok);background:var(--okbg);border-radius:8px;padding:9px 12px}.la-diag p{margin:3px 0 0;font-size:13px}
+.la-diag.err{border-left-color:var(--err);background:var(--errbg)}
+.la-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+.la-h{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.qd{width:100%;border-collapse:collapse;font-size:12.5px}.qd td{padding:5px 8px;border-bottom:1px solid var(--line)}.qd td:first-child{color:var(--muted);width:1%;white-space:nowrap}
+.la-cand{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid;gap:5px;font-size:12.5px}
+.chips-s{display:flex;flex-wrap:wrap;gap:4px}.chip-s{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.chip-s.ok{background:var(--okbg);color:var(--ok)}.chip-s.warn{background:var(--warnbg);color:var(--warn)}
+.la-acoes{display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+.pl-add{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pl-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.pl-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-left:3px solid var(--err);border-radius:8px;padding:6px 8px;background:var(--card);font-size:12.5px}
+.pl-item .cod{font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;color:var(--muted)}
+.pl-item .nome{flex:1;min-width:0}
+.pl-item button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
+.pl-item button:hover{color:var(--err);background:var(--errbg)}
+</style>
+<div class="shell" data-pag="conferencia"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Correção de prestador</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Mesmas funções de hoje (filtros por estado, busca, Excel, NC); muda a aparência para ficar igual à Conferência, com o atalho de copiar e o destaque dos prestadores da lista.</div>
+<div class="card">
+  <div class="faixa-lista"><b>4 linhas de prestadores que não podem ficar neste relatório</b><span>· R$ 380,00 · Marcelo Garcia Marini (2), Melanie Eiko (1), Nilton Paccola Lovato (1)</span><button class="sec mini" id="soLista">Mostrar só essas</button></div>
+  <div class="acoes"><input type="search" placeholder="Buscar paciente, código ou médico…" style="max-width:420px"><button>Exportar planilha de trabalho</button><button class="sec" title="Mantém unidade, tolerância e filtros">Reler o PDF da pasta e identificar de novo</button></div>
+  <p class="small muted" style="margin:4px 0 0">Sem a pasta conectada, o botão vira «Carregar o PDF novo e identificar de novo». Depois de corrigir no MV e gerar o PDF de novo, um clique relê e mostra o que mudou (como na Conferência).</p>
+  <div class="tw2"><table><thead><tr><th>Linha</th><th>Estado</th><th>Código</th><th>Procedimento MV</th><th>Paciente</th><th>Data</th><th>Médico do laudo</th><th>Cód. prestador</th><th class="n">Vl Repasse</th></tr></thead><tbody id="corpo"></tbody></table></div>
+</div>
+<div class="card"><div class="fx-topo"><h2 style="margin:0">Prestadores fora da correção <span class="muted small" id="plN"></span></h2><button class="sec mini" id="plPadrao">Voltar ao padrão</button></div>
+<p class="lead">Procedimentos desses prestadores não podem ficar no relatório do prestador genérico: na Correção de prestador, as linhas identificadas para eles ganham destaque vermelho e entram no resumo do topo.</p>
+<div class="pl-add"><input id="plBusca" list="plOpc" placeholder="Adicionar prestador: código ou nome…" style="max-width:340px"><datalist id="plOpc"><option value="6703 - Alexandre Romanus"><option value="8016 - Elen Akiko Nakano"><option value="11467 - Gilson Yoiti Ogassawara"><option value="17771 - Matheus Leite Ramos de Souza"></datalist><button class="sec" id="plAdd">Adicionar</button></div>
+<div class="pl-grade" id="plLista"></div></div>
+<div class="card"><h3>O que muda</h3><ul class="small">
+<li>Tabela e linha aberta no mesmo padrão da Conferência: situação no topo, diagnóstico em uma frase, quadro da linha do MV com atendimento copiável e laudos do paciente em cartões.</li>
+<li>Ícone para copiar o nome do paciente com um clique, sem abrir a linha.</li>
+<li>Prestadores da lista: faixa vermelha na linha, etiqueta «não pode ficar neste relatório» e resumo no topo com «Mostrar só essas».</li>
+<li><b>Reler o PDF</b>: botão «Reler o PDF da pasta e identificar de novo» (ou carregar o PDF novo), igual ao da Conferência, mantendo unidade, tolerância e filtros.</li>
+<li>Nada muda no cálculo, nos filtros por estado, no Excel nem no «Apontar como NC».</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const ic='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+const L=[[20,'40808033','MAMOGRAFIA CONVENCIONAL BILATERAL - OP','TEREZINHA MARIA DA SILVA DE','23/10/2026','Caio Vinicius de Castro','', '80,00',false,'2204511'],
+[24,'40808041','MAMOGRAFIA DIGITAL BILATERAL - OP','MOARA CRISTINA ARATA','05/10/2026','Melanie Eiko Aranda Lopes Makiyama Butarello','10264','160,00',true,'2204712'],
+[25,'40808041','MAMOGRAFIA DIGITAL BILATERAL - OP','SILVANA RUFINO DE SOUZA','08/10/2026','Caio Vinicius de Castro','','80,00',false,'2205003'],
+[26,'40801128','RX ADENOIDES OU CAVUM - OP','BENJAMIN DA SILVA LUIZ','17/10/2026','Nilton Paccola Lovato','12','55,00',true,'2206120'],
+[27,'40808033','MAMOGRAFIA CONVENCIONAL BILATERAL - OP','CLEIDE APARECIDA ROSA','12/10/2026','Marcelo Garcia Marini','7','85,00',true,'2205874'],
+[28,'40808033','MAMOGRAFIA CONVENCIONAL BILATERAL - OP','IVONE PEREIRA LIMA','14/10/2026','Marcelo Garcia Marini','7','80,00',true,'2205990']];
+let aberto=1,soLista=false;
+function det(l){return `<tr><td colspan="9"><div class="la">
+<div class="la-topo"><span class="st st-identificado">Prestador identificado</span>${l[8]?'<span class="tag-lista">não pode ficar neste relatório</span>':''}<span class="la-tag">Nome idêntico</span><span class="la-tag">Equivalência validada</span><span class="la-meta">Linha ${l[0]} do relatório · tipo Procedimento / exame</span></div>
+<div class="la-diag ${l[8]?'err':''}"><b>${l[8]?`Lançado no genérico, mas o laudo é de ${l[5]} (${l[6]})`:`Laudo de ${l[5]}`}</b><p>Nome idêntico, mesma data, «Mamografia Digital» validado para ${l[1]} (regra composta «MAMOGRAFIA DIGITAL», Leo).${l[8]?' Esse prestador está na lista: corrija no MV.':''}</p></div>
+<div class="la-grid"><div><h4 class="la-h">Linha do MV</h4><table class="qd"><tr><td>Paciente</td><td>${l[3]}</td></tr><tr><td>Data</td><td>${l[4]}</td></tr><tr><td>Procedimento</td><td>${l[1]} · ${l[2]}</td></tr><tr><td>Convênio</td><td>TABELA DE CORTESIA · grupo MAMOGRAFIA DIAGNOSTICA</td></tr><tr><td>Identificação</td><td>atendimento <span class="cpv" data-v="${l[9]}">${l[9]}<button title="Copiar">${ic}</button></span> <span class="small muted">· conta 2540012</span></td></tr></table></div>
+<div><h4 class="la-h">Laudos do paciente na data (1)</h4><div class="la-cand"><b>«Mamografia Digital» · ${l[4]}</b><div class="chips-s"><span class="chip-s ok">nome idêntico</span><span class="chip-s ok">mesma data</span><span class="chip-s ok">equivalência validada</span></div></div></div></div>
+<div class="la-acoes"><button class="sec mini">Apontar como NC…</button></div></div></td></tr>`;}
+function des(){const v=L.filter(l=>!soLista||l[8]);document.getElementById('corpo').innerHTML=v.map((l,i)=>`<tr class="cl${l[8]?' lista':''}" data-i="${L.indexOf(l)}"><td>${l[0]}</td><td><span class="st st-identificado">Prestador identificado</span>${l[8]?'<br><span class="tag-lista">não pode ficar aqui</span>':''}</td><td>${l[1]}</td><td>${l[2]}</td><td class="pac">${l[3]}<button class="cp" data-cp="${l[3]}" title="Copiar o nome">${ic}</button></td><td>${l[4]}</td><td>${l[5]}</td><td>${l[6]}</td><td class="n">${l[7]}</td></tr>${L.indexOf(l)===aberto?det(l):''}`).join('');}
+document.addEventListener('click',async e=>{const c=e.target.closest('[data-cp]'),v=e.target.closest('.cpv button');if(c||v){e.stopPropagation();const t=c?c.dataset.cp:v.parentNode.dataset.v;try{await navigator.clipboard.writeText(t)}catch(_){}(c||v).classList.add('ok');setTimeout(()=>(c||v).classList.remove('ok'),1200);return;}
+if(e.target.id==='soLista'){soLista=!soLista;e.target.textContent=soLista?'Mostrar todas':'Mostrar só essas';des();return;}
+const tr=e.target.closest('tr.cl');if(tr){const i=+tr.dataset.i;aberto=aberto===i?-1:i;des();}});
+des();
+const PADRAO=[['7873','Amanda Souza de Assis'],['5','Gustavo Andrade De Margalho'],['8049','Heloisa Martins Cardoso'],['10175','Henrique Pini Sonomiya'],['11718','Lucas Franklin Amarante'],['9033','Lucas Yamada'],['8873','Lucca Maricato de Las Villas Rodrigues'],['7','Marcelo Garcia Marini'],['15','Marcelo Miyazaki Yoshida'],['10264','Melanie Eiko'],['12','Nilton Paccola Lovato'],['14','Paulo Asshaias Felipe'],['3','Rafael Ogasawara Ferreira'],['9','Roberto Brazao Farinha'],['13','Thales Cavallini Rossi'],['10285','Wesley Americo Bergamin']];
+let pl=PADRAO.slice();
+function desPl(){document.getElementById('plN').textContent=pl.length+' prestadores';document.getElementById('plLista').innerHTML=pl.map(([c,n],i)=>`<div class="pl-item"><span class="cod">${c}</span><span class="nome">${n}</span><button data-plx="${i}" title="Tirar da lista" aria-label="Tirar ${n}">×</button></div>`).join('');}
+document.getElementById('plLista').onclick=e=>{const b=e.target.closest('[data-plx]');if(b){pl.splice(+b.dataset.plx,1);desPl();}};
+document.getElementById('plAdd').onclick=()=>{const v=document.getElementById('plBusca').value.trim(),m=v.match(/^(\d+)\s*-\s*(.+)$/);if(m&&!pl.some(p=>p[0]===m[1])){pl.push([m[1],m[2]]);document.getElementById('plBusca').value='';desPl();}};
+document.getElementById('plPadrao').onclick=()=>{pl=PADRAO.slice();desPl();};
+desPl();
+</script>

@@ -5,7 +5,7 @@ const NIVEL_NOME = ['', 'semelhante', 'truncado', 'idêntico'];
 const FAIXA = { 1: 'validada · mesma data', 2: 'validada · data na tolerância', 3: 'não validada · mesma data', 4: 'não validada · data na tolerância', 5: 'nome semelhante', 6: 'sem equivalência · mesma data' };
 
 // Finalidade do PDF: o do prestador genérico vai para a Correção; os demais, para a Conferência.
-const finalidadePadrao = rel => String(rel.cab.prestadorCod) === String(S.cfg.parametros.prestadorGenerico || '2') ? 'correcao' : 'conferencia';
+const finalidadePadrao = rel => ehPrestadorGenerico(S.cfg, rel.cab.prestadorCod) ? 'correcao' : 'conferencia';
 const relatoriosPara = prefixo => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) === (prefixo === 'co' ? 'correcao' : 'conferencia'));
 /* Pedido de 17/11/2026: cada aba sincroniza só a pasta dela, sem reler tudo — Conferência lê «Relatórios para conferência»;
  * Correção de prestador lê «Correção de prestador». Só aparece com a pasta raiz conectada. */
@@ -21,7 +21,7 @@ document.addEventListener('click', e => {
 });
 function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
-  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
+  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `Os relatórios dos prestadores genéricos (${esc(prestadoresGenericos(S.cfg).join(', '))}) entram aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
 }
 // Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
 const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };

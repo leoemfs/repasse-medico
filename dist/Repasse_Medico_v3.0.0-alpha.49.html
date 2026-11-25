@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.48</title>
+<title>Repasse Médico v3.0.0-alpha.49</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -595,13 +595,25 @@ th .cf-sel{margin:0}
 .quadro.arrastando .qd-col.pode.sobre{background:var(--infobg)}
 .quadro.arrastando .qd-col.nao{opacity:.5}
 .qd-nao{font-size:11px;color:var(--err);margin:-4px 0 6px}
+/* Correção de prestador no padrão da Conferência (25/11/2026) */
+.faixa-fora{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;border-left:4px solid var(--err);background:var(--errbg);border-radius:8px;padding:9px 12px;margin:10px 0;font-size:13px}
+.tag-fora{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--errbg);color:var(--err);margin-top:3px}
+tr.fora-corr>td:first-child{box-shadow:inset 4px 0 0 var(--err)}
+.cp-nome.ok{color:var(--ok)}
+.pl-add{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pl-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.pl-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-left:3px solid var(--err);border-radius:8px;padding:6px 8px;background:var(--card);font-size:12.5px}
+#pl-gen .pl-item{border-left-color:var(--accent)}
+.pl-item .cod{font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;color:var(--muted)}.pl-item .nome{flex:1;min-width:0}
+.pl-item button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
+.pl-item button:hover{color:var(--err);background:var(--errbg)}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.48 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.49 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -646,7 +658,7 @@ th .cf-sel{margin:0}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.48';
+const MOTOR_VERSAO = '3.0.0-alpha.49';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -1380,7 +1392,7 @@ const RETENCAO_NC_PADRAO = 60;
 function configPadrao() {
   return {
     schema: SCHEMA_CONFIG, versaoSchema: 1, revisao: 1, atualizadoEm: agoraISO(),
-    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO, prestadorGenerico: '2', unidadesIgnoradas: clone(UNIDADES_IGNORADAS_PADRAO) },
+    parametros: { tolConferencia: 7, tolCorrecao: 0, minTruncamento: 20, valorSimbolico: 0.01, retencaoNC: RETENCAO_NC_PADRAO, prestadorGenerico: '2', prestadoresGenericos: ['2'], unidadesIgnoradas: clone(UNIDADES_IGNORADAS_PADRAO), prestadoresForaCorrecao: PRESTADORES_FORA_CORRECAO_PADRAO.map(p => p[0]) },
     unidades: UNIDADES_PADRAO.map(u => ({ ...clone(u), cnpj: UNIDADES_REGRAS[u.cod]?.cnpj || '', pctUSG: UNIDADES_REGRAS[u.cod]?.pctUSG ? { ...UNIDADES_REGRAS[u.cod].pctUSG } : null })),
     prestadores: [],
     faturistas: clone(FATURISTAS_PADRAO),
@@ -1418,6 +1430,8 @@ function migrarConfig(c) {
   if (c.parametros && c.parametros.retencaoNC === undefined) { c.parametros.retencaoNC = RETENCAO_NC_PADRAO; mudou = true; }
   // Prestador genérico: lançado antes de se saber quem lauda; o relatório dele vai para a Correção de prestador.
   if (c.parametros && c.parametros.prestadorGenerico === undefined) { c.parametros.prestadorGenerico = '2'; mudou = true; }
+  if (c.parametros && !Array.isArray(c.parametros.prestadoresGenericos)) { c.parametros.prestadoresGenericos = [String(c.parametros.prestadorGenerico || '2')]; mudou = true; }
+  if (c.parametros && !Array.isArray(c.parametros.prestadoresForaCorrecao)) { c.parametros.prestadoresForaCorrecao = PRESTADORES_FORA_CORRECAO_PADRAO.map(p => p[0]); mudou = true; }
   if (c.parametros && !Array.isArray(c.parametros.unidadesIgnoradas)) { c.parametros.unidadesIgnoradas = clone(UNIDADES_IGNORADAS_PADRAO); mudou = true; }
   // MedicalShare: nome antigo no Apolo da unidade 17 (Palhano), faturada pela AlphaSonic Londrina.
   const u17 = (c.unidades || []).find(u => String(u.cod) === '17');
@@ -4046,6 +4060,27 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     nLaudosUnidade: Lun.length, eqRevisao: eqBase.revisao, eqValidadas: eqBase.itens.filter(e => e.status === 'validada').length
   };
 }
+
+/* Prestadores fora da correção (pedido de 25/11/2026): procedimentos desses prestadores não podem ficar no relatório do
+ * prestador genérico. Editável em Configurações (parametros.prestadoresForaCorrecao); a linha identificada para um deles
+ * ganha destaque e entra no resumo do topo da Correção de prestador. */
+const PRESTADORES_FORA_CORRECAO_PADRAO = [['7873', 'Amanda Souza de Assis'], ['5', 'Gustavo Andrade De Margalho'], ['8049', 'Heloisa Martins Cardoso'],
+  ['10175', 'Henrique Pini Sonomiya'], ['11718', 'Lucas Franklin Amarante'], ['9033', 'Lucas Yamada'], ['8873', 'Lucca Maricato de Las Villas Rodrigues'],
+  ['7', 'Marcelo Garcia Marini'], ['15', 'Marcelo Miyazaki Yoshida'], ['10264', 'Melanie Eiko'], ['12', 'Nilton Paccola Lovato'], ['14', 'Paulo Asshaias Felipe'],
+  ['3', 'Rafael Ogasawara Ferreira'], ['9', 'Roberto Brazao Farinha'], ['13', 'Thales Cavallini Rossi'], ['10285', 'Wesley Americo Bergamin']];
+const listaForaCorrecao = cfg => (cfg?.parametros?.prestadoresForaCorrecao || PRESTADORES_FORA_CORRECAO_PADRAO.map(p => p[0])).map(String);
+const linhaForaCorrecao = (cfg, o) => !!o?.prestador?.cod && listaForaCorrecao(cfg).includes(String(o.prestador.cod));
+function resumoForaCorrecao(res, cfg) {
+  const ls = res.linhas.filter(o => linhaForaCorrecao(cfg, o)), porPrest = new Map();
+  for (const o of ls) { const k = String(o.prestador.cod), a = porPrest.get(k) || { cod: k, nome: o.prestador.nomeMV || o.medico || '', n: 0 }; a.n++; porPrest.set(k, a); }
+  return { n: ls.length, valor: ls.reduce((s, o) => s + (+o.r.vlRepasse || 0), 0), prestadores: [...porPrest.values()].sort((a, b) => b.n - a.n) };
+}
+
+/* Prestadores genéricos (pedido de 25/11/2026): lançados antes de se saber quem lauda (ex.: TC e RMN da unidade). O relatório
+ * de qualquer um deles vai para a Correção de prestador. Antes era um código só (parametros.prestadorGenerico, ainda lido). */
+const prestadoresGenericos = cfg => (Array.isArray(cfg?.parametros?.prestadoresGenericos) && cfg.parametros.prestadoresGenericos.length
+  ? cfg.parametros.prestadoresGenericos : [cfg?.parametros?.prestadorGenerico || '2']).map(String);
+const ehPrestadorGenerico = (cfg, cod) => prestadoresGenericos(cfg).includes(String(cod));
 
 /* ---- src/engine/80-rodadas.js ---- */
 /* ============================================================
@@ -7592,7 +7627,7 @@ const NIVEL_NOME = ['', 'semelhante', 'truncado', 'idêntico'];
 const FAIXA = { 1: 'validada · mesma data', 2: 'validada · data na tolerância', 3: 'não validada · mesma data', 4: 'não validada · data na tolerância', 5: 'nome semelhante', 6: 'sem equivalência · mesma data' };
 
 // Finalidade do PDF: o do prestador genérico vai para a Correção; os demais, para a Conferência.
-const finalidadePadrao = rel => String(rel.cab.prestadorCod) === String(S.cfg.parametros.prestadorGenerico || '2') ? 'correcao' : 'conferencia';
+const finalidadePadrao = rel => ehPrestadorGenerico(S.cfg, rel.cab.prestadorCod) ? 'correcao' : 'conferencia';
 const relatoriosPara = prefixo => S.relatorios.filter(x => (x.finalidade || finalidadePadrao(x.rel)) === (prefixo === 'co' ? 'correcao' : 'conferencia'));
 /* Pedido de 17/11/2026: cada aba sincroniza só a pasta dela, sem reler tudo — Conferência lê «Relatórios para conferência»;
  * Correção de prestador lê «Correção de prestador». Só aparece com a pasta raiz conectada. */
@@ -7608,7 +7643,7 @@ document.addEventListener('click', e => {
 });
 function semRelatorioPara(prefixo) {
   const outro = prefixo === 'co' ? 'Conferência' : 'Correção de prestador';
-  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `O relatório do prestador genérico (código ${esc(S.cfg.parametros.prestadorGenerico || '2')}) entra aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
+  return `<div class="card"><h2>Nenhum relatório para ${prefixo === 'co' ? 'a correção de prestador' : 'a conferência'}</h2><p class="lead">${S.relatorios.length} PDF(s) carregado(s), todos marcados para ${outro}. ${prefixo === 'co' ? `Os relatórios dos prestadores genéricos (${esc(prestadoresGenericos(S.cfg).join(', '))}) entram aqui automaticamente.` : ''} Para mudar, use a coluna «Finalidade» na lista de relatórios do Início.</p><div class="acoes"><button onclick="location.hash='inicio'">Ir para o Início</button></div>${botaoSyncPasta(prefixo) ? `<div class="acoes">${botaoSyncPasta(prefixo)}</div>` : ''}</div>`;
 }
 // Filtro do seletor de relatórios por unidade e grupo (vários PDFs do mesmo prestador, lidos da pasta).
 const FILTRO_REL = { cf: { un: '*', gr: '*' }, co: { un: '*', gr: '*' } };
@@ -10313,7 +10348,9 @@ async function executarCorrecao() {
   const rodada = registroRodada(res, ctx); ctx.rodadaId = rodada.id;
   const ant = rodadaAnterior(S.rodadas, rodada);
   await guardarRodada(rodada);
-  S.corr = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtro: new Set(), busca: '' };
+  // Mesmo prestador e unidade (ex.: «Reler o PDF»): mantém filtros e busca.
+  const antes = S.corr && String(S.corr.ctx?.relatorio?.cab?.prestadorCod) === String(x.rel.cab.prestadorCod) && S.corr.ctx?.unidadeCod === un ? S.corr : null;
+  S.corr = { res, ctx, rodada, comparacao: ant ? { ant, grupos: compararRodadas(ant, rodada) } : null, filtro: antes?.filtro || new Set(), busca: antes?.busca || '', soLista: !!antes?.soLista };
   ctx.fonteNC = `corr|${x.id}|${un}`;
   guardarCandidatosNC(ctx.fonteNC, `Correção ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome} · ${ctx.unidadeNome}`, `Corr. ${x.rel.cab.prestadorCod} · un. ${un}`, candidatosDaCorrecao(res, ctx, S.cfg));
   desenharCorrecao();
@@ -10330,33 +10367,96 @@ function desenharCorrecao() {
     ${comparacao ? resumoComparacao(comparacao) : ''}
     <div class="tiles">${Object.entries(ESTADO_CORR).map(([k, e]) => `<button class="tile st-${k}${res.porEstado[k].n ? '' : ' vazio'}${S.corr.filtro.has(k) ? ' sel' : ''}" data-st="${k}"><b>${res.porEstado[k].n}</b><small>${esc(e.nome)}</small><small class="muted" style="display:block;font-weight:400">R$ ${fmtBR(res.porEstado[k].vlRepasse)}</small></button>`).join('')}</div>
     <div class="marcadores">${Object.entries(res.porMotivo).map(([k, n]) => `<span class="marc">${esc(MOTIVOS_CORR[k])} · ${n}</span>`).join('')}</div>
-    <div class="acoes"><input type="search" id="coBusca" placeholder="Buscar paciente, código ou médico…" value="${esc(S.corr.busca)}" style="max-width:420px"><button id="coExcel">Exportar planilha de trabalho</button></div>
+    ${faixaForaCorrecao(res)}
+    <div class="acoes"><input type="search" id="coBusca" placeholder="Buscar paciente, código ou médico…" value="${esc(S.corr.busca)}" style="max-width:420px"><button id="coExcel">Exportar planilha de trabalho</button>${botaoRelerCorrecao()}</div>
     <div id="coTab" style="margin-top:10px"></div></div>
     ${ctx.fonteNC ? cartaoCandidatosNC(ctx.fonteNC) : ''}
     <div class="grid2"><div class="card"><h2>Médicos identificados</h2><div id="coMed"></div></div>
     <div class="card"><h2>Equivalências desta rodada</h2><div id="coEq"></div></div></div>`;
   ligarCartaoCandidatosNC(c);
+  ligarRelerCorrecao(c);
+  if ($('coSoLista')) $('coSoLista').onclick = () => { S.corr.soLista = !S.corr.soLista; desenharCorrecao(); };
   c.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { const s = S.corr.filtro; s.has(b.dataset.st) ? s.delete(b.dataset.st) : s.add(b.dataset.st); desenharCorrecao(); });
   $('coExcel').onclick = () => entregarArquivo(xlsxCorrecao(res, ctx), nomeArquivoAnalise('correcao', ctx), 'corr', ctx.chaveCompetencia || S.comp);
   const filtrar = () => {
     const q = norm(S.corr.busca);
-    return res.linhas.filter(o => (!S.corr.filtro.size || S.corr.filtro.has(o.estado)) && (!q || norm([o.r.paciente, o.r.codigo, o.r.procDesc, o.medico].join(' ')).includes(q)));
+    return res.linhas.filter(o => (!S.corr.soLista || linhaForaCorrecao(S.cfg, o)) && (!S.corr.filtro.size || S.corr.filtro.has(o.estado)) && (!q || norm([o.r.paciente, o.r.codigo, o.r.procDesc, o.medico].join(' ')).includes(q)));
   };
   const t = tabela($('coTab'), {
     linhas: filtrar(), colunas: [
-      { t: 'Linha', n: true, v: o => o.r.seq }, { t: 'Estado', html: o => chipStatus(o.estado, ESTADO_CORR[o.estado].nome) },
-      { t: 'Código', v: o => o.r.codigo }, { t: 'Procedimento MV', v: o => o.r.procDesc }, { t: 'Paciente', v: o => o.r.paciente }, { t: 'Data', v: o => fmtData(o.r.data) },
+      { t: 'Linha', n: true, v: o => o.r.seq }, { t: 'Estado', html: o => `${chipStatus(o.estado, ESTADO_CORR[o.estado].nome)}${linhaForaCorrecao(S.cfg, o) ? '<br><span class="tag-fora">não pode ficar aqui</span>' : ''}` },
+      { t: 'Código', v: o => o.r.codigo }, { t: 'Procedimento MV', v: o => o.r.procDesc }, { t: 'Paciente', html: o => `<span class="pac">${esc(o.r.paciente)}${o.r.paciente ? `<button type="button" class="cp-nome" data-copiar="${esc(o.r.paciente)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>` }, { t: 'Data', v: o => fmtData(o.r.data) },
       { t: 'Médico do laudo', v: o => o.estado === 'identificado' ? o.medico : '' }, { t: 'Cód. prestador', v: o => o.prestador?.cod || '' },
       { t: 'Motivo', v: o => MOTIVOS_CORR[o.motivo] || '' }, { t: 'Vl Repasse', n: true, v: o => fmtBR(o.r.vlRepasse) }
     ],
-    detalhe: o => `<div class="acoes" style="margin:0 0 8px"><button class="sec mini" data-nc-linha="${res.linhas.indexOf(o)}">Apontar como NC…</button></div><div class="det"><div><h4>Detalhe objetivo</h4><p>${esc(o.detalhe)}</p>${o.alertas.length ? `<h4>Alertas</h4><ul>${o.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul>` : ''}
-      <div class="small muted">Tipo: ${esc(TIPOS_ITEM[o.tipo])} · grupo ${esc(o.r.grupoNome)} · conta ${esc(o.r.conta)} · atendimento ${esc(o.r.atendimento)} · ${esc(o.r.convenio)}</div></div>
-      <div><h4>Laudos do paciente na data (sem nomes de médico quando não identificado)</h4>${o.evidencias.length ? `<ul>${o.evidencias.map(e => `<li>«${esc(e.titulo)}» · ${fmtData(e.data)} · nome ${NIVEL_NOME[e.nm]} · equivalência: ${esc(ROTULO_EQ[e.eq] || e.eq)}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum.</p>'}</div></div>`
+    classeLinha: o => linhaForaCorrecao(S.cfg, o) ? 'fora-corr' : '',
+    detalhe: o => detalheLinhaCorrecao(o, res.linhas.indexOf(o))
   });
   $('coBusca').oninput = e => { S.corr.busca = e.target.value; t.atualizar(filtrar()); };
+  $('coTab').addEventListener('click', async e => {
+    const b = e.target.closest('[data-copiar]'); if (!b) return; e.stopPropagation();
+    try { await navigator.clipboard.writeText(b.dataset.copiar); const k = b.closest('.cpv') || b; k.classList.add('ok'); setTimeout(() => k.classList.remove('ok'), 1200); }
+    catch (_) { avisar('Não foi possível copiar: selecione o texto e use Ctrl+C.', 'warn'); }
+  });
   $('coTab').addEventListener('click', e => { const b = e.target.closest('[data-nc-linha]'); if (b) abrirRegistroNC([candidatoDaLinhaCorrecao(res.linhas[+b.dataset.ncLinha], ctx, S.cfg)]).then(ok => ok && desenharCorrecao()); });
   tabela($('coMed'), { porPagina: 50, linhas: res.porMedico, colunas: [{ t: 'Médico (Apolo)', v: m => m.medico }, { t: 'Cód. prestador', v: m => m.cod || 'sem cadastro' }, { t: 'Linhas', n: true, v: m => m.n }, { t: 'Vl Repasse', n: true, v: m => fmtBR(m.vlRepasse) }], vazio: 'Nenhum médico identificado.' });
   painelEqRodada($('coEq'), paresDaCorrecao(res), executarCorrecao);
+}
+
+/* Padrão da Conferência na Correção de prestador (prévia aprovada em 25/11/2026: docs/prototipos/correcao-padronizada/).
+ * Só a aparência muda: cálculo, filtros, Excel e NC continuam os mesmos. */
+function faixaForaCorrecao(res) {
+  const r = resumoForaCorrecao(res, S.cfg); if (!r.n) return '';
+  return `<div class="faixa-fora"><b>${r.n} linha(s) de prestadores que não podem ficar neste relatório</b><span>· R$ ${fmtBR(r.valor)} · ${r.prestadores.map(p => `${esc(p.nome || p.cod)} (${p.n})`).join(', ')}</span><button type="button" class="sec mini" id="coSoLista">${S.corr.soLista ? 'Mostrar todas' : 'Mostrar só essas'}</button></div>`;
+}
+function detalheLinhaCorrecao(o, i) {
+  const fora = linhaForaCorrecao(S.cfg, o), nomePrest = o.prestador ? `${o.prestador.nomeMV || o.medico} (${o.prestador.cod})` : o.medico;
+  const tags = [MOTIVOS_CORR[o.motivo], ...(o.alertas.length ? [`${o.alertas.length} alerta(s)`] : [])].filter(Boolean);
+  const titulo = o.estado === 'identificado' ? (fora ? `Lançado no genérico, mas o laudo é de ${nomePrest}` : `Laudo de ${nomePrest}`) : ESTADO_CORR[o.estado].nome;
+  const nivel = fora ? 'err' : o.estado === 'identificado' ? 'ok' : 'warn';
+  const ch = (n, t) => `<span class="chip-s ${n}">${esc(t)}</span>`;
+  const cards = o.evidencias.length ? o.evidencias.map(e => `<div class="la-cand"><b>«${esc(e.titulo)}» · ${fmtData(e.data)}</b><div class="chips-s">${e.nm >= 3 ? ch('ok', 'nome idêntico') : e.nm === 2 ? ch('warn', 'nome truncado') : ch('err', 'nome semelhante')}${(e.dd || 0) === 0 ? ch('ok', 'mesma data') : ch('warn', `data ±${e.dd} dia(s)`)}${e.eq === 'validada' ? ch('ok', 'equivalência validada') : ch(e.eq === 'divergente' ? 'err' : 'warn', ROTULO_EQ[e.eq] || e.eq || 'sem equivalência')}</div></div>`).join('') : '<p class="muted small">Nenhum laudo do paciente na data.</p>';
+  return `<div class="la">
+    <div class="la-topo">${chipStatus(o.estado, ESTADO_CORR[o.estado].nome)}${fora ? '<span class="tag-fora">não pode ficar neste relatório</span>' : ''}${tags.map(t => `<span class="la-tag">${esc(t)}</span>`).join('')}<span class="la-meta">Linha ${o.r.seq} do relatório · ${esc(TIPOS_ITEM[o.tipo] || '')}</span></div>
+    <div class="la-diag ${nivel}"><b>${esc(titulo)}</b><p>${esc(o.detalhe)}${fora ? ' Esse prestador está na lista: corrija no MV.' : ''}</p></div>
+    <div class="la-grid"><div><section class="cf-cmp qd"><div class="qd-tit"><b>Linha do MV</b></div><div class="qd-rol"><table class="qd-tab"><tbody>
+      <tr><td>Paciente</td><td>${esc(o.r.paciente)}</td></tr><tr><td>Data</td><td>${fmtData(o.r.data)}</td></tr>
+      <tr><td>Procedimento</td><td>${esc(`${o.r.codigo} · ${o.r.procDesc || ''}`)}</td></tr><tr><td>Convênio</td><td>${esc(o.r.convenio || '—')} · grupo ${esc(o.r.grupoNome || '—')}</td></tr>
+      <tr><td>Identificação</td><td>atendimento ${copiavel(o.r.atendimento)}<br><span class="small muted">conta ${esc(o.r.conta || '—')}</span></td></tr></tbody></table></div></section>
+      ${o.alertas.length ? `<div class="small" style="margin-top:8px"><b>Alertas</b><ul style="margin:4px 0 0;padding-left:18px">${o.alertas.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}</div>
+      <div><h4 class="la-h">Laudos do paciente na data (${o.evidencias.length})</h4><div class="la-cands">${cards}</div></div></div>
+    <div class="la-acoes"><button class="sec mini" data-nc-linha="${i}">Apontar como NC…</button></div></div>`;
+}
+// «Reler o PDF» (como na Conferência): pasta conectada relê o arquivo de lá; senão pede o PDF novo. Mantém unidade,
+// tolerância, filtros e busca, e roda a identificação de novo.
+function botaoRelerCorrecao() {
+  const x = S.relatorios.find(r => r.id === S.corr?.ctx?.relId), daPasta = pastaConectadaConf() && !!x?.caminhoPasta;
+  return `<button class="sec" id="coReler" title="Mantém unidade, tolerância e filtros">${daPasta ? 'Reler o PDF da pasta e identificar de novo' : 'Carregar o PDF novo e identificar de novo'}</button><input type="file" id="coReArq" accept=".pdf,application/pdf" hidden>`;
+}
+function ligarRelerCorrecao(c) {
+  const bt = c.querySelector('#coReler'), arq = c.querySelector('#coReArq'); if (!bt) return;
+  bt.onclick = () => { const x = S.relatorios.find(r => r.id === S.corr.ctx.relId); if (pastaConectadaConf() && x?.caminhoPasta) return comProcessando(bt, () => relerCorrecao(null), 'a releitura'); arq.value = ''; arq.click(); };
+  arq.onchange = () => arq.files[0] && comProcessando(bt, () => relerCorrecao(arq.files[0]), 'a releitura');
+}
+async function relerCorrecao(arquivo) {
+  if (!exigirAberta(S.comp, 'executar uma correção de prestador')) return;
+  const { ctx } = S.corr, atual = S.relatorios.find(r => r.id === ctx.relId), prest = String(ctx.relatorio.cab.prestadorCod), un = ctx.unidadeCod, tol = ctx.parametros.tol;
+  let x = null;
+  if (!arquivo) {
+    await atualizarDaPasta({ silencioso: true, so: 'correcao' });
+    x = S.relatorios.find(r => r.caminhoPasta && r.caminhoPasta === atual?.caminhoPasta) || S.relatorios.find(r => r.caminhoPasta && String(r.rel.cab.prestadorCod) === prest && r.unidadePasta === atual?.unidadePasta);
+    if (!x) return avisar('O PDF deste relatório não foi encontrado na pasta da competência. Use «Carregar o PDF novo» ou confira no Início.', 'warn');
+  } else {
+    const n0 = S.relatorios.length; await carregarPDFs([arquivo]);
+    x = S.relatorios.length > n0 ? S.relatorios.at(-1) : S.relatorios.find(r => r.nome === arquivo.name && String(r.rel.cab.prestadorCod) === prest);
+    if (!x) return;
+    if (String(x.rel.cab.prestadorCod) !== prest) { if (S.relatorios.length > n0) S.relatorios.pop(); return avisar(`${arquivo.name} é do prestador ${x.rel.cab.prestadorCod} - ${x.rel.cab.prestadorNome}, não do ${prest}. Nada foi identificado.`, 'warn'); }
+    x.finalidade = 'correcao';
+  }
+  RENDER.correcao();
+  if ($('coRel')) { $('coRel').value = x.id; $('coRel').dispatchEvent(new Event('change')); }
+  if ($('coUn')) $('coUn').value = un; if ($('coTol')) $('coTol').value = tol;
+  await executarCorrecao();
 }
 
 /* ---- src/ui/35-nc.js ---- */
@@ -13022,11 +13122,13 @@ function cfgConferencia() {
       <label class="campo">Tolerância — correção de prestador (dias)<input type="number" id="pTolP" min="0" max="60" value="${p.tolCorrecao}"><span class="small muted">0 = mesma data (recomendado).</span></label>
       <label class="campo">Truncamento mínimo do nome (caracteres)<input type="number" id="pTrunc" min="10" max="60" value="${p.minTruncamento}"><span class="small muted">Prefixo no meio de palavra só conta a partir deste tamanho.</span></label>
       <label class="campo">Valor simbólico até (R$)<input type="number" id="pSimb" min="0" step="0.01" value="${p.valorSimbolico}"><span class="small muted">Só marca a linha; não muda a categoria.</span></label>
-      <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
+
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
     <label class="campo" style="margin-top:10px">Unidades do Apolo ignoradas (uma por linha)<textarea id="pUnIgn" rows="5" style="max-width:520px">${esc((p.unidadesIgnoradas || UNIDADES_IGNORADAS_PADRAO).join('\n'))}</textarea>
       <span class="small muted">Laudos dessas unidades saem da planilha do Apolo na leitura: não entram na conferência, nos títulos nem em «Só no laudo». Maiúsculas, acentos e espaços não importam. Depois de mudar, carregue a planilha de novo.</span></label>
     <div class="acoes"><button id="pSalvar">Salvar parâmetros</button><button class="sec" id="pUnIgnPadrao">Voltar ao padrão das unidades ignoradas</button></div></div>
+  ${cartaoListaPrestadores('gen', 'Prestadores genéricos', 'Lançados antes de se saber quem lauda (ex.: TC e RMN da unidade). O relatório de qualquer um deles vai para a Correção de prestador, que identifica o médico de cada linha.', prestadoresGenericos(S.cfg), [['2', '']])}
+  ${cartaoListaPrestadores('fora', 'Prestadores fora da correção', 'Procedimentos desses prestadores não podem ficar no relatório de um prestador genérico: na Correção de prestador, as linhas identificadas para eles ganham destaque vermelho e entram no resumo do topo.', listaForaCorrecao(S.cfg), PRESTADORES_FORA_CORRECAO_PADRAO)}
   <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
     ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
   <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
@@ -13042,8 +13144,10 @@ function ligarConferencia() {
     salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
   });
   $('pUnIgnPadrao').onclick = () => { $('pUnIgn').value = UNIDADES_IGNORADAS_PADRAO.join('\n'); avisar('Lista padrão de volta no campo: clique em «Salvar parâmetros» para gravar.', 'ok'); };
+  ligarListaPrestadores('gen', 'prestadoresGenericos', [['2', '']]);
+  ligarListaPrestadores('fora', 'prestadoresForaCorrecao', PRESTADORES_FORA_CORRECAO_PADRAO);
   $('pSalvar').onclick = () => {
-    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim(), unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
+    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
     if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.', 'parametros');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }
@@ -13253,6 +13357,32 @@ function cfgSobre() {
     <div class="acoes"><button class="sec" id="sbVerificar">Verificar atualização agora</button></div></div>`;
 }
 function ligarSobre() { $('sbVerificar').onclick = async () => { await verificarAtualizacao(true); const e = $('sbAtual'); if (e) e.textContent = textoAtualizacao(); }; }
+
+/* Lista de prestadores (código e nome do cadastro), no padrão aprovado em 25/11/2026: caixinhas com ×, campo para adicionar
+ * por código ou nome e «Voltar ao padrão». Usada por «Prestadores genéricos» e «Prestadores fora da correção». */
+function nomePrestadorLista(cod, padrao) { const p = (S.cfg.prestadores || []).find(x => String(x.cod) === String(cod)); return p?.nomeMV || (padrao || []).find(x => x[0] === String(cod))?.[1] || 'sem cadastro'; }
+function cartaoListaPrestadores(id, titulo, lead, codigos, padrao) {
+  const opc = (S.cfg.prestadores || []).filter(p => !codigos.includes(String(p.cod))).map(p => `<option value="${esc(`${p.cod} - ${p.nomeMV || ''}`)}">`).join('');
+  return `<div class="card" id="pl-${id}"><div class="fx-topo"><h2 style="margin:0">${esc(titulo)} <span class="muted small">${codigos.length} prestador(es)</span></h2><button type="button" class="sec mini" data-plpadrao="${id}">Voltar ao padrão</button></div>
+    <p class="lead">${esc(lead)}</p>
+    <div class="pl-add"><input data-plbusca="${id}" list="plOpc-${id}" placeholder="Adicionar prestador: código ou nome…" style="max-width:340px"><datalist id="plOpc-${id}">${opc}</datalist><button type="button" class="sec" data-pladd="${id}">Adicionar</button></div>
+    <div class="pl-grade">${codigos.map(c => `<div class="pl-item"><span class="cod">${esc(c)}</span><span class="nome">${esc(nomePrestadorLista(c, padrao))}</span><button type="button" data-plx="${id}|${esc(c)}" title="Tirar da lista" aria-label="Tirar ${esc(c)} da lista">×</button></div>`).join('') || '<p class="muted small">Nenhum.</p>'}</div></div>`;
+}
+function ligarListaPrestadores(id, campo, padrao) {
+  const card = $(`pl-${id}`); if (!card) return;
+  const gravar = (lista, msg) => { S.cfg.parametros[campo] = lista; if (campo === 'prestadoresGenericos') S.cfg.parametros.prestadorGenerico = lista[0] || ''; salvarCfg(msg, 'parametros'); RENDER.configuracoes(); };
+  const atual = () => campo === 'prestadoresGenericos' ? prestadoresGenericos(S.cfg) : listaForaCorrecao(S.cfg);
+  card.querySelector(`[data-plpadrao="${id}"]`).onclick = () => gravar(padrao.map(p => p[0]), 'Lista de volta ao padrão.');
+  card.querySelectorAll('[data-plx]').forEach(b => b.onclick = () => { const c = b.dataset.plx.split('|')[1]; gravar(atual().filter(x => x !== c), `Prestador ${c} tirado da lista.`); });
+  const add = () => {
+    const v = card.querySelector('[data-plbusca]').value.trim(), cod = (v.match(/^(\d+)/) || [])[1] || (S.cfg.prestadores || []).find(p => norm(p.nomeMV || '').includes(norm(v)) && v.length >= 3)?.cod;
+    if (!cod) return avisar('Informe o código do prestador ou escolha um nome da lista.', 'warn');
+    if (atual().includes(String(cod))) return avisar(`O prestador ${cod} já está na lista.`, 'warn');
+    gravar([...atual(), String(cod)], `Prestador ${cod} incluído na lista.`);
+  };
+  card.querySelector(`[data-pladd="${id}"]`).onclick = add;
+  card.querySelector('[data-plbusca]').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); add(); } };
+}
 
 /* ---- src/ui/98-atualizacao.js ---- */
 /* ============================================================

@@ -111,3 +111,24 @@ function corrigirPrestador(relatorio, apolo, cfg, eqBase, opc) {
     nLaudosUnidade: Lun.length, eqRevisao: eqBase.revisao, eqValidadas: eqBase.itens.filter(e => e.status === 'validada').length
   };
 }
+
+/* Prestadores fora da correção (pedido de 25/11/2026): procedimentos desses prestadores não podem ficar no relatório do
+ * prestador genérico. Editável em Configurações (parametros.prestadoresForaCorrecao); a linha identificada para um deles
+ * ganha destaque e entra no resumo do topo da Correção de prestador. */
+const PRESTADORES_FORA_CORRECAO_PADRAO = [['7873', 'Amanda Souza de Assis'], ['5', 'Gustavo Andrade De Margalho'], ['8049', 'Heloisa Martins Cardoso'],
+  ['10175', 'Henrique Pini Sonomiya'], ['11718', 'Lucas Franklin Amarante'], ['9033', 'Lucas Yamada'], ['8873', 'Lucca Maricato de Las Villas Rodrigues'],
+  ['7', 'Marcelo Garcia Marini'], ['15', 'Marcelo Miyazaki Yoshida'], ['10264', 'Melanie Eiko'], ['12', 'Nilton Paccola Lovato'], ['14', 'Paulo Asshaias Felipe'],
+  ['3', 'Rafael Ogasawara Ferreira'], ['9', 'Roberto Brazao Farinha'], ['13', 'Thales Cavallini Rossi'], ['10285', 'Wesley Americo Bergamin']];
+const listaForaCorrecao = cfg => (cfg?.parametros?.prestadoresForaCorrecao || PRESTADORES_FORA_CORRECAO_PADRAO.map(p => p[0])).map(String);
+const linhaForaCorrecao = (cfg, o) => !!o?.prestador?.cod && listaForaCorrecao(cfg).includes(String(o.prestador.cod));
+function resumoForaCorrecao(res, cfg) {
+  const ls = res.linhas.filter(o => linhaForaCorrecao(cfg, o)), porPrest = new Map();
+  for (const o of ls) { const k = String(o.prestador.cod), a = porPrest.get(k) || { cod: k, nome: o.prestador.nomeMV || o.medico || '', n: 0 }; a.n++; porPrest.set(k, a); }
+  return { n: ls.length, valor: ls.reduce((s, o) => s + (+o.r.vlRepasse || 0), 0), prestadores: [...porPrest.values()].sort((a, b) => b.n - a.n) };
+}
+
+/* Prestadores genéricos (pedido de 25/11/2026): lançados antes de se saber quem lauda (ex.: TC e RMN da unidade). O relatório
+ * de qualquer um deles vai para a Correção de prestador. Antes era um código só (parametros.prestadorGenerico, ainda lido). */
+const prestadoresGenericos = cfg => (Array.isArray(cfg?.parametros?.prestadoresGenericos) && cfg.parametros.prestadoresGenericos.length
+  ? cfg.parametros.prestadoresGenericos : [cfg?.parametros?.prestadorGenerico || '2']).map(String);
+const ehPrestadorGenerico = (cfg, cod) => prestadoresGenericos(cfg).includes(String(cod));
