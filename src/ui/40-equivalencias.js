@@ -41,7 +41,7 @@ function desenharEquivalencias() {
       <p class="small muted">Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (título com Doppler = exame base <i>e</i> Doppler). «Só um código» mantém o escolhido e volta os outros a pendente.</p></details></div>`
       : `<div class="eq-alerta">${cobertos.length ? `<details><summary>✓ <b>Sem conflitos.</b> ${cobertos.length} título(s) com mais de um código estão resolvidos por regra composta. <u>Ver</u></summary><ul class="small">${cobertos.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} · regra «${esc(nomeComposta(regraDoConf(c)))}»</li>`).join('')}</ul></details>` : '✓ <b>Sem conflitos.</b>'}</div>`}
     <div class="eq-seg" role="tablist"><button data-eqvb="rel" class="${FE.vb === 'rel' ? 'on' : ''}">Relações</button><button data-eqvb="reg" class="${FE.vb === 'reg' ? 'on' : ''}">Regras compostas (${(S.eq.compostas || []).length})</button></div>
-    ${FE.vb === 'reg' ? cardCompostas() : `<div id="eqRel"><div class="eq-filtros">
+    ${FE.vb === 'reg' ? cardCompostas() + cardSomas() : `<div id="eqRel"><div class="eq-filtros">
       <input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="Buscar código, descrição do MV ou título do Apolo" aria-label="Buscar">
       <details class="eq-mais"${maisAbertos ? ' open' : ''}><summary class="sec mini" role="button">Mais filtros ▾</summary><div class="grid3">
         <label class="campo">Confiança da análise<select id="eqCf">${opcoes([['*', 'Todas'], ['Alta', 'Alta'], ['Média', 'Média'], ['Baixa', 'Baixa'], ['', 'Sem confiança']], FE.confianca)}</select></label>
@@ -54,7 +54,7 @@ function desenharEquivalencias() {
   pg.querySelectorAll('[data-eqvb]').forEach(b => b.onclick = () => { FE.vb = b.dataset.eqvb; FE.sel.clear(); RENDER.equivalencias(); });
   const cd = $('eqConfDet'); if (cd) cd.ontoggle = () => { FE.confAberto = cd.open; };
   const arq = pg.querySelector('.eq-arq'); arq.querySelectorAll('.lista button').forEach(b => b.addEventListener('click', () => arq.removeAttribute('open')));
-  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
+  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias')); ligarSomas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   $('pag-equivalencias').querySelectorAll('[data-confou]').forEach(b => b.onclick = () => conflitoUmOuOutro(conf[+b.dataset.confou]));
   $('pag-equivalencias').querySelectorAll('[data-confjt]').forEach(b => b.onclick = () => { const c = conf[+b.dataset.confjt];

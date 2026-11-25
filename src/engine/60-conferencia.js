@@ -39,6 +39,8 @@ const MARCADORES = {
   'laudo-sem-data': 'Laudo sem data válida',
   'composta': 'Regra composta',
   'composta-falta': 'Composição incompleta',
+  'soma': 'Laudos que somam o código',
+  'soma-falta': 'Soma de laudos incompleta',
   'escolhido-titulo': 'Laudo escolhido pelo título (vários exames no mesmo dia)',
   'hm-v3-devido': 'HM V3 devido',
   'hm-v3-excluir': 'HM V3 a excluir',
@@ -163,6 +165,19 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // 25/11/2026: primeiro os laudos do médico do relatório (todas as faixas); só a linha que ficar sem par procura nos
   // laudos de outros médicos (e, se achar, vira «laudo de outro médico»). Sem médico escolhido, mesmoMedico é null e tudo
   // entra na primeira rodada, como antes.
+  // Laudos que somam um código (25/11/2026): antes das faixas, a linha cujo código tem regra validada fica com TODOS os
+  // laudos da regra (mesmo paciente, mesmo dia da linha, mesmo médico — o do relatório primeiro). Faltando algum, a
+  // linha segue o pareamento normal e ganha o aviso «Soma incompleta».
+  for (const b of procs) {
+    if (b.par) continue;
+    const regras = somasDoCodigo(eqBase, b.r.codigo, opc.unidadeCod, b.r.convenio); if (!regras.length) continue;
+    const r = somaDaLinha(regras, b.cands, l => !usado.has(l.i) && l.dia === b.dia, c => c.mesmoMedico === false ? 0 : 1);
+    if (!r) continue;
+    if (r.falta) { b.somaFalta = r; continue; }
+    const c0 = b.cands.find(c => c.l === r.laudos[0]);
+    b.par = { ...c0, tier: 1, dd: 0, contra: false, proc: { estado: 'validada', motivo: `Laudos que somam o código: «${nomeSoma(r.soma)}» (${r.soma.responsavel || 'sem responsável'})` }, soma: { regra: r.soma, laudos: r.laudos } };
+    for (const l of r.laudos) usado.set(l.i, b);
+  }
   for (const deOutro of [false, true]) for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if ((c.mesmoMedico === false) === deOutro && c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
@@ -257,6 +272,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (p) {
       out.l = p.l; out.par = p;
       if (p.dd) { marc.add('data-divergente'); motivos.push(`Data: MV ${fmtData(r.data)} × laudo ${fmtData(p.l.data)}`); }
+      if (p.soma) { marc.add('soma'); motivos.push(`${p.soma.laudos.length} laudos fecham o código pela regra «${nomeSoma(p.soma.regra)}»: ${p.soma.laudos.map(l => `«${l.titulo}»`).join(' + ')} (${p.l.medico || 'sem médico'}).`); }
+      if (b.somaFalta && !p.soma) { marc.add('soma-falta'); motivos.push(`Soma incompleta pela regra «${nomeSoma(b.somaFalta.soma)}»: falta ${b.somaFalta.falta.join(', ')} no mesmo dia.`); }
       if (p.nm === 1) { marc.add('nome-semelhante'); motivos.push(`Nome apenas semelhante: MV «${r.paciente}» × laudo «${p.l.paciente}»`); }
       if (p.proc.estado === 'pendente') { marc.add('eq-pendente'); motivos.push(`${p.proc.motivo}: ${r.codigo} × «${p.l.titulo}»`); }
       if (p.proc.estado === 'conflito') { marc.add('eq-conflito'); motivos.push(p.proc.motivo); }
@@ -387,6 +404,8 @@ function diagnosticoLinha(x) {
   const r = x.r, l = x.l, m = x.marcadores || new Set(), c = x.compostaDet, mot = (x.motivos || [])[0] || '';
   const mv = r ? `${r.codigo} ${r.procDesc || ''}`.trim() : '';
   const esperaTxt = c ? c.itens.map(i => `${i.esperado > 1 ? `${i.esperado}× ` : ''}${i.rotulo}`).join(' + ') : '';
+  if (m.has('soma') && x.par?.soma) return { nivel: 'ok', titulo: `Os ${x.par.soma.laudos.length} laudos do paciente fecham o código da conta`, texto: `Regra «${nomeSoma(x.par.soma.regra)}»: ${x.par.soma.laudos.map(l => `«${l.titulo}»`).join(' + ')}, ${l?.medico || 'sem médico'}.` };
+  if (m.has('soma-falta')) return { nivel: 'warn', titulo: 'Soma de laudos incompleta', texto: (x.motivos || []).find(t => t.startsWith('Soma incompleta')) || mot };
   if (c && c.fora && r) return { nivel: 'err', titulo: 'O MV lançou um código que não faz parte do exame laudado', texto: `O laudo «${c.titulo}», pela regra composta «${c.nome}», espera ${esaperaOu(esperaTxt)}. O MV lançou ${mv}, que não é parte dessa regra.` };
   if (c && c.itens.some(i => i.lancado !== null && i.lancado < i.esperado)) {
     const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');

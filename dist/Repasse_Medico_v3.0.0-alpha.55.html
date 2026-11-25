@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.54</title>
+<title>Repasse Médico v3.0.0-alpha.55</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--card-borda:#b9c5d4;--sombra-card:0 1px 2px rgba(16,32,56,.06),0 4px 14px rgba(16,32,56,.08);--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -625,13 +625,29 @@ tr.nc-sit-tratativa>td:first-child{box-shadow:inset 4px 0 0 var(--warn)}tr.nc-si
 .nc-dobra summary{cursor:pointer;font-weight:700;font-size:13px}.nc-dobra[open] summary{margin-bottom:8px}
 .nc-ind{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:1000px){.nc-esteira{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-chamadas,.nc-ind{grid-template-columns:minmax(0,1fr)}.nc-filtros{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-filtros input{grid-column:1/-1}}
+/* Laudos que somam um código (25/11/2026) */
+.sm-lista{display:grid;gap:8px}
+.sm-item{display:grid;grid-template-columns:minmax(0,1.4fr) 24px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13px}
+.sm-item.off{border-left-color:var(--muted);opacity:.75}.sm-tits{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.sm-eq{font-size:18px;color:var(--muted);text-align:center}
+.sm-form{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;border:1px dashed var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.sm-tits-in,.sm-dir{display:grid;gap:6px;align-content:start}
+@media (max-width:900px){.sm-item,.sm-form{grid-template-columns:minmax(0,1fr)}}
+/* NCs e resolvidos no MV abrem ao clicar (25/11/2026) */
+.cm-l{cursor:pointer}.cm-tab tr.cm-l:hover td{background:var(--infobg)}
+.cm-tab tr.cm-l td:first-child::before,.cm-res li.cm-l::before{content:"▸";color:var(--muted);margin-right:6px}
+.cm-tab tr.cm-l.aberto td:first-child::before,.cm-res li.cm-l.aberto::before{content:"▾"}
+.cm-res{list-style:none;padding-left:0}.cm-res li{margin:4px 0}
+.cm-dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px;padding:12px 14px;background:var(--bg);border-radius:8px;font-size:12.5px;margin:6px 0;cursor:default}
+.cm-dl dt{color:var(--muted);font-size:11.5px}.cm-dl dd{margin:0 0 4px;font-weight:600}
+.cm-acoes{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:900px){.cm-dl{grid-template-columns:minmax(0,1fr)}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.54 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.55 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -676,7 +692,7 @@ tr.nc-sit-tratativa>td:first-child{box-shadow:inset 4px 0 0 var(--warn)}tr.nc-si
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.54';
+const MOTOR_VERSAO = '3.0.0-alpha.55';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -2507,6 +2523,45 @@ function aplicarCobertas(base, operador = '', competencia = '') {
   return n;
 }
 
+/* ---- src/engine/50b-somas.js ---- */
+/* ============================================================
+ * Laudos que somam um código (prévia aprovada em 25/11/2026: docs/prototipos/laudos-somam-codigo/)
+ * O contrário da regra composta: dois ou mais laudos do MESMO paciente, MESMO dia e MESMO médico valem UM código da
+ * conta (ex.: TC abdome superior + TC abdome inferior = 41001095 TC ABDOME TOTAL). Fica em eq.somas e viaja pela pasta
+ * junto com as equivalências. Só regra validada vale na conferência.
+ * { id, titulos: [..], codigo, desc, escopo: { unidade: '*', convenio: '*' }, status, responsavel, validadoEm, historico }
+ * ============================================================ */
+function novaSoma({ titulos, codigo, desc = '', escopo = {} }, por) {
+  return { id: 'som-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), titulos: titulos.map(t => String(t).trim()).filter(Boolean),
+    codigo: String(codigo).trim(), desc: String(desc || '').trim(), escopo: { unidade: escopo.unidade || '*', convenio: escopo.convenio || '*' },
+    status: 'validada', responsavel: por || '', validadoEm: agoraISO(), historico: [{ em: agoraISO(), por: por || '', de: '', para: 'validada', motivo: 'regra criada' }] };
+}
+const nomeSoma = s => `${s.titulos.join(' + ')} = ${s.codigo}${s.desc ? ' ' + s.desc : ''}`;
+// Regras validadas que valem para o código, a unidade e o convênio da linha do MV.
+function somasDoCodigo(eq, codigo, unidade, convenio) {
+  return (eq?.somas || []).filter(s => s.status === 'validada' && String(s.codigo) === String(codigo)
+    && ((s.escopo?.unidade || '*') === '*' || String(s.escopo.unidade) === String(unidade || ''))
+    && ((s.escopo?.convenio || '*') === '*' || norm(s.escopo.convenio) === norm(convenio || '')));
+}
+/* Procura entre os laudos candidatos da linha um conjunto que cubra todos os títulos da regra, do mesmo médico e do mesmo
+ * dia, com laudos ainda livres. Médicos em ordem de preferência (o do relatório primeiro). Devolve { soma, laudos } ou
+ * { soma, falta: [títulos] } quando só uma parte existe; null se nenhuma regra se aplica. */
+function somaDaLinha(regras, cands, livre, preferirMedico) {
+  let parcial = null;
+  for (const s of regras) {
+    const chaves = s.titulos.map(chaveTitulo), porMed = new Map();
+    for (const c of cands) { const k = chaveTitulo(c.l.titulo); if (!chaves.includes(k) || !livre(c.l)) continue; const g = `${c.l.mn}|${c.l.dia}`; (porMed.get(g) || porMed.set(g, []).get(g)).push(c); }
+    const grupos = [...porMed.values()].sort((a, b) => (preferirMedico(b[0]) - preferirMedico(a[0])));
+    for (const g of grupos) {
+      const laudos = chaves.map(k => g.find(c => chaveTitulo(c.l.titulo) === k)?.l);
+      if (laudos.every(Boolean)) return { soma: s, laudos };
+      const falta = s.titulos.filter((t, i) => !laudos[i]);
+      if (!parcial || falta.length < parcial.falta.length) parcial = { soma: s, falta, laudos: laudos.filter(Boolean) };
+    }
+  }
+  return parcial;
+}
+
 /* ---- src/engine/51-eq-sync.js ---- */
 /* ============================================================
  * SOL-F37 — Equivalências TUSS compartilhadas pela pasta da rede: mescla de três vias.
@@ -2519,6 +2574,7 @@ function unidadesEq(base) {
   const m = new Map(); if (!base) return m;
   for (const e of base.itens || []) m.set('rel|' + chaveRelacaoEq(e), e);
   for (const c of base.compostas || []) m.set('cmp|' + c.id, c);
+  for (const c of base.somas || []) m.set('som|' + c.id, c);   // laudos que somam um código (25/11/2026)
   return m;
 }
 const RANK_STATUS_EQ = { pendente: 0, coberta: 1, desativada: 2, validada: 3 };
@@ -2550,11 +2606,12 @@ function mesclarEq(local, remoto, base) {
       if (p.startsWith('rel|') && (l.status === 'pendente' || r.status === 'pendente')) { const v = l.status === 'pendente' ? r : l; out.set(p, juntarHistoricoEq(v, v === l ? r : l)); continue; }
     }
     out.set(p, l);
-    conflitos.push({ p, rotulo: p.startsWith('rel|') ? `«${(l || r).titulo}» → ${(l || r).codigo}` : `Regra composta «${nomeComposta(l || r)}»`, local: l, remoto: r });
+    conflitos.push({ p, rotulo: p.startsWith('rel|') ? `«${(l || r).titulo}» → ${(l || r).codigo}` : p.startsWith('som|') ? `Laudos que somam «${nomeSoma(l || r)}»` : `Regra composta «${nomeComposta(l || r)}»`, local: l, remoto: r });
   }
   const eq = { ...clone(remoto), ...clone(local) };
   eq.itens = [...out].filter(([p, v]) => p.startsWith('rel|') && v).map(([, v]) => clone(v));
   eq.compostas = [...out].filter(([p, v]) => p.startsWith('cmp|') && v).map(([, v]) => clone(v));
+  eq.somas = [...out].filter(([p, v]) => p.startsWith('som|') && v).map(([, v]) => clone(v));
   const cat = new Map([...(remoto.catalogoTUSS || []), ...(local.catalogoTUSS || [])].map(t => [t.codigo, t]));
   if (cat.size) eq.catalogoTUSS = [...cat.values()];
   eq.revisao = Math.max(+local.revisao || 0, +remoto.revisao || 0) + 1;
@@ -2564,7 +2621,7 @@ function aplicarEscolhasEq(eq, conflitos, escolhas) {
   const r = clone(eq);
   conflitos.forEach((c, i) => {
     const v = juntarHistoricoEq(escolhas[i] === 'remoto' ? c.remoto : c.local, escolhas[i] === 'remoto' ? c.local : c.remoto);
-    const lista = c.p.startsWith('rel|') ? r.itens : (r.compostas ||= []), chave = c.p.slice(4);
+    const lista = c.p.startsWith('rel|') ? r.itens : c.p.startsWith('som|') ? (r.somas ||= []) : (r.compostas ||= []), chave = c.p.slice(4);
     const idx = lista.findIndex(x => (c.p.startsWith('rel|') ? chaveRelacaoEq(x) : x.id) === chave);
     if (idx >= 0) { if (v) lista[idx] = v; else lista.splice(idx, 1); } else if (v) lista.push(v);
   });
@@ -3322,6 +3379,8 @@ const MARCADORES = {
   'laudo-sem-data': 'Laudo sem data válida',
   'composta': 'Regra composta',
   'composta-falta': 'Composição incompleta',
+  'soma': 'Laudos que somam o código',
+  'soma-falta': 'Soma de laudos incompleta',
   'escolhido-titulo': 'Laudo escolhido pelo título (vários exames no mesmo dia)',
   'hm-v3-devido': 'HM V3 devido',
   'hm-v3-excluir': 'HM V3 a excluir',
@@ -3446,6 +3505,19 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // 25/11/2026: primeiro os laudos do médico do relatório (todas as faixas); só a linha que ficar sem par procura nos
   // laudos de outros médicos (e, se achar, vira «laudo de outro médico»). Sem médico escolhido, mesmoMedico é null e tudo
   // entra na primeira rodada, como antes.
+  // Laudos que somam um código (25/11/2026): antes das faixas, a linha cujo código tem regra validada fica com TODOS os
+  // laudos da regra (mesmo paciente, mesmo dia da linha, mesmo médico — o do relatório primeiro). Faltando algum, a
+  // linha segue o pareamento normal e ganha o aviso «Soma incompleta».
+  for (const b of procs) {
+    if (b.par) continue;
+    const regras = somasDoCodigo(eqBase, b.r.codigo, opc.unidadeCod, b.r.convenio); if (!regras.length) continue;
+    const r = somaDaLinha(regras, b.cands, l => !usado.has(l.i) && l.dia === b.dia, c => c.mesmoMedico === false ? 0 : 1);
+    if (!r) continue;
+    if (r.falta) { b.somaFalta = r; continue; }
+    const c0 = b.cands.find(c => c.l === r.laudos[0]);
+    b.par = { ...c0, tier: 1, dd: 0, contra: false, proc: { estado: 'validada', motivo: `Laudos que somam o código: «${nomeSoma(r.soma)}» (${r.soma.responsavel || 'sem responsável'})` }, soma: { regra: r.soma, laudos: r.laudos } };
+    for (const l of r.laudos) usado.set(l.i, b);
+  }
   for (const deOutro of [false, true]) for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
     for (const b of procs) if (!b.par) for (const c of b.cands) if ((c.mesmoMedico === false) === deOutro && c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
@@ -3540,6 +3612,8 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     if (p) {
       out.l = p.l; out.par = p;
       if (p.dd) { marc.add('data-divergente'); motivos.push(`Data: MV ${fmtData(r.data)} × laudo ${fmtData(p.l.data)}`); }
+      if (p.soma) { marc.add('soma'); motivos.push(`${p.soma.laudos.length} laudos fecham o código pela regra «${nomeSoma(p.soma.regra)}»: ${p.soma.laudos.map(l => `«${l.titulo}»`).join(' + ')} (${p.l.medico || 'sem médico'}).`); }
+      if (b.somaFalta && !p.soma) { marc.add('soma-falta'); motivos.push(`Soma incompleta pela regra «${nomeSoma(b.somaFalta.soma)}»: falta ${b.somaFalta.falta.join(', ')} no mesmo dia.`); }
       if (p.nm === 1) { marc.add('nome-semelhante'); motivos.push(`Nome apenas semelhante: MV «${r.paciente}» × laudo «${p.l.paciente}»`); }
       if (p.proc.estado === 'pendente') { marc.add('eq-pendente'); motivos.push(`${p.proc.motivo}: ${r.codigo} × «${p.l.titulo}»`); }
       if (p.proc.estado === 'conflito') { marc.add('eq-conflito'); motivos.push(p.proc.motivo); }
@@ -3670,6 +3744,8 @@ function diagnosticoLinha(x) {
   const r = x.r, l = x.l, m = x.marcadores || new Set(), c = x.compostaDet, mot = (x.motivos || [])[0] || '';
   const mv = r ? `${r.codigo} ${r.procDesc || ''}`.trim() : '';
   const esperaTxt = c ? c.itens.map(i => `${i.esperado > 1 ? `${i.esperado}× ` : ''}${i.rotulo}`).join(' + ') : '';
+  if (m.has('soma') && x.par?.soma) return { nivel: 'ok', titulo: `Os ${x.par.soma.laudos.length} laudos do paciente fecham o código da conta`, texto: `Regra «${nomeSoma(x.par.soma.regra)}»: ${x.par.soma.laudos.map(l => `«${l.titulo}»`).join(' + ')}, ${l?.medico || 'sem médico'}.` };
+  if (m.has('soma-falta')) return { nivel: 'warn', titulo: 'Soma de laudos incompleta', texto: (x.motivos || []).find(t => t.startsWith('Soma incompleta')) || mot };
   if (c && c.fora && r) return { nivel: 'err', titulo: 'O MV lançou um código que não faz parte do exame laudado', texto: `O laudo «${c.titulo}», pela regra composta «${c.nome}», espera ${esaperaOu(esperaTxt)}. O MV lançou ${mv}, que não é parte dessa regra.` };
   if (c && c.itens.some(i => i.lancado !== null && i.lancado < i.esperado)) {
     const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');
@@ -8261,12 +8337,43 @@ function cartaoCorrecoesMV(corr) {
   const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
   const cont = [...corr.ncs.filter(x => x.situacao === 'continua'), ...corr.resolvidos.filter(x => x.situacao === 'continua'), ...corr.hm.filter(x => x.continua)];
   const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'], lancada: ['ok', 'Corrigida: lançada no MV (o laudo agora tem par; a NC não passa para a linha)'] };
-  return `<div class="card"><h2>Correções no MV</h2>
+  return `<div class="card cm-card"><h2>Correções no MV</h2>
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
-    <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
-    <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
+    <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table class="cm-tab"><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map((x, i) => `<tr class="cm-l" data-cmab="nc${i}"><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr><tr class="cm-det" data-cmdet="nc${i}" hidden><td colspan="3">${detalheCorrecaoMV(x.linha, x.nc, null, `nc${i}`)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
+    <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small cm-res">${corr.resolvidos.map((x, i) => `<li class="cm-l" data-cmab="rs${i}"><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})<div class="cm-det" data-cmdet="rs${i}" hidden>${detalheCorrecaoMV(x.linha, null, x.d, `rs${i}`)}</div></li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
     <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">${corr.hm.some(x => x.linha.marcadores?.has('hm-v3-excluir')) ? 'Curitiba (V3): HM de raio-X, de mamografia e qualquer HM que não seja de USG Unimed (inclusive no 78 PF) não é pago a ninguém.' : 'Fora da V3 nenhum HM é pago, de nenhum grupo'}: estes itens não compõem o repasse — peça a exclusão no MV.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.linha.r.grupoNome ? ` · <span class="muted">${esc(x.linha.r.grupoNome)} · ${esc(x.linha.r.convenio || '')}</span>` : ''}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
+
+/* NCs e resolvidos no MV abrem ao clicar (prévia aprovada em 25/11/2026: docs/prototipos/ncs-do-relatorio/): dados da linha
+ * e da NC, paciente / ID / conta copiáveis, «Copiar tudo» e «Abrir a NC». */
+const CM_ITENS = new Map();   // chave → { nc, texto } para «Copiar tudo» e «Abrir a NC»
+function detalheCorrecaoMV(x, nc, d, chave) {
+  const r = x?.r || {}, pac = r.paciente || nc?.paciente || '', id = r.atendimento || nc?.idAtendimento || '', conta = r.conta || nc?.conta || '';
+  const proc = r.codigo ? `${r.codigo} · ${r.procDesc || ''}` : `${nc?.codigo || ''} ${nc?.titulo || ''}`.trim();
+  const data = r.data ? fmtData(r.data) : nc?.data ? fmtData(paraData(nc.data)) : '—';
+  const nat = nc ? (NATUREZA_NC[nc.natureza]?.nome || nc.natureza || '') : 'Resolvido no MV';
+  const det = nc ? (nc.detalhe || '') : (d?.justificativa || '');
+  const texto = [pac, id && `ID ${id}`, conta && `conta ${conta}`, data, proc, r.vlRepasse != null ? `R$ ${fmtBR(r.vlRepasse)}` : '', `${nat}${det ? `: ${det}` : ''}`].filter(Boolean).join(' · ');
+  CM_ITENS.set(chave, { nc, texto });
+  const cv = v => v ? copiavel(v) : '—';
+  return `<dl class="cm-dl"><div><dt>Paciente</dt><dd>${cv(pac)}</dd><dt>ID / atendimento</dt><dd>${cv(id)}</dd><dt>Conta</dt><dd>${cv(conta)}</dd></div>
+    <div><dt>Data</dt><dd>${esc(data)}</dd><dt>Procedimento</dt><dd>${esc(proc || '—')}</dd><dt>Valor do repasse</dt><dd>${r.vlRepasse != null ? `R$ ${fmtBR(r.vlRepasse)}` : '—'}</dd></div>
+    <div><dt>${nc ? 'Natureza' : 'Situação'}</dt><dd>${esc(nat)}</dd><dt>${nc ? 'Detalhe' : 'Justificativa'}</dt><dd>${esc(det || '—')}</dd>${nc ? `<dt>Responsável · situação da NC</dt><dd>${esc(nc.responsavel || '—')} · ${esc(SITUACAO_NC[nc.situacao] || nc.situacao || '')}</dd><dt>Unidade · convênio</dt><dd>${esc(nc.unidade || '—')} · ${esc(nc.convenio || r.convenio || '—')}</dd>` : `<dt>Por</dt><dd>${esc(d?.por || '—')}</dd>`}</div>
+    <div class="cm-acoes"><button type="button" class="mini" data-cmtudo="${chave}">Copiar tudo</button>${nc ? `<button type="button" class="sec mini" data-cmnc="${chave}">Abrir a NC</button>` : ''}${nc ? `<span class="small muted">Registrada por ${esc(nc.criadaPor || '—')} em ${new Date(nc.criadaEm).toLocaleDateString('pt-BR')}</span>` : ''}</div></dl>`;
+}
+document.addEventListener('click', async e => {
+  const card = e.target.closest('.cm-card'); if (!card) return;
+  const cp = e.target.closest('[data-copiar]');
+  if (cp) { e.stopPropagation(); try { await navigator.clipboard.writeText(cp.dataset.copiar); const k = cp.closest('.cpv') || cp; k.classList.add('ok'); setTimeout(() => k.classList.remove('ok'), 1200); } catch (_) { avisar('Não foi possível copiar: selecione o texto e use Ctrl+C.', 'warn'); } return; }
+  const tudo = e.target.closest('[data-cmtudo]');
+  if (tudo) { try { await navigator.clipboard.writeText(CM_ITENS.get(tudo.dataset.cmtudo)?.texto || ''); tudo.textContent = 'Copiado ✓'; setTimeout(() => { tudo.textContent = 'Copiar tudo'; }, 1500); } catch (_) { avisar('Não foi possível copiar.', 'warn'); } return; }
+  const abrir = e.target.closest('[data-cmnc]');
+  if (abrir) { const nc = CM_ITENS.get(abrir.dataset.cmnc)?.nc; if (nc) { location.hash = 'nc'; setTimeout(() => editarNC(nc), 150); } return; }
+  if (e.target.closest('.cm-det')) return;
+  const l = e.target.closest('[data-cmab]'); if (!l) return;
+  const det = card.querySelector(`[data-cmdet="${l.dataset.cmab}"]`); if (!det) return;
+  det.hidden = !det.hidden; l.classList.toggle('aberto', !det.hidden);
+});
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;
@@ -10024,14 +10131,14 @@ async function sincronizarEq({ interativo = false } = {}) {
         eq = aplicarEscolhasEq(eq, conflitos, conflitos.map((x, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local'));
       }
       aplicarCobertas(eq, S.operador, S.comp);
-      const mudouLocal = JSON.stringify(eq.itens) !== JSON.stringify(S.eq.itens) || JSON.stringify(eq.compostas || []) !== JSON.stringify(S.eq.compostas || []);
+      const mudouLocal = JSON.stringify(eq.itens) !== JSON.stringify(S.eq.itens) || JSON.stringify(eq.compostas || []) !== JSON.stringify(S.eq.compostas || []) || JSON.stringify(eq.somas || []) !== JSON.stringify(S.eq.somas || []);
       if (mudouLocal) {
         const novas = novasValidadasEq(antes, eq); S.eq = eq; gravarEqLocal();
         if (novas.length && remoto) avisar(`${novas.length} relação(ões) validada(s) chegaram pela pasta (${remoto.atualizadoPor || 'outra pessoa'}). Rode de novo as conferências afetadas («O que mais destrava» ou a própria Conferência).`, 'ok');
         if (location.hash === '#equivalencias') RENDER.equivalencias();
       }
-      const remEq = remoto ? JSON.stringify([remoto.eq.itens, remoto.eq.compostas || []]) : '';
-      if (remEq !== JSON.stringify([S.eq.itens, S.eq.compostas || []])) {
+      const remEq = remoto ? JSON.stringify([remoto.eq.itens, remoto.eq.compostas || [], remoto.eq.somas || []]) : '';
+      if (remEq !== JSON.stringify([S.eq.itens, S.eq.compostas || [], S.eq.somas || []])) {
         const fh = await dir.getFileHandle(ARQ_EQ, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };
@@ -11427,7 +11534,7 @@ function desenharEquivalencias() {
       <p class="small muted">Muitas vezes não é erro: o título pode ser <b>um código ou outro</b> (escroto = bolsa escrotal <i>ou</i> órgãos superficiais) ou <b>os dois juntos</b> (título com Doppler = exame base <i>e</i> Doppler). «Só um código» mantém o escolhido e volta os outros a pendente.</p></details></div>`
       : `<div class="eq-alerta">${cobertos.length ? `<details><summary>✓ <b>Sem conflitos.</b> ${cobertos.length} título(s) com mais de um código estão resolvidos por regra composta. <u>Ver</u></summary><ul class="small">${cobertos.map(c => `<li>«${esc(c.titulo)}» → ${c.codigos.map(esc).join(', ')} · regra «${esc(nomeComposta(regraDoConf(c)))}»</li>`).join('')}</ul></details>` : '✓ <b>Sem conflitos.</b>'}</div>`}
     <div class="eq-seg" role="tablist"><button data-eqvb="rel" class="${FE.vb === 'rel' ? 'on' : ''}">Relações</button><button data-eqvb="reg" class="${FE.vb === 'reg' ? 'on' : ''}">Regras compostas (${(S.eq.compostas || []).length})</button></div>
-    ${FE.vb === 'reg' ? cardCompostas() : `<div id="eqRel"><div class="eq-filtros">
+    ${FE.vb === 'reg' ? cardCompostas() + cardSomas() : `<div id="eqRel"><div class="eq-filtros">
       <input type="search" id="eqBusca" value="${esc(FE.busca)}" placeholder="Buscar código, descrição do MV ou título do Apolo" aria-label="Buscar">
       <details class="eq-mais"${maisAbertos ? ' open' : ''}><summary class="sec mini" role="button">Mais filtros ▾</summary><div class="grid3">
         <label class="campo">Confiança da análise<select id="eqCf">${opcoes([['*', 'Todas'], ['Alta', 'Alta'], ['Média', 'Média'], ['Baixa', 'Baixa'], ['', 'Sem confiança']], FE.confianca)}</select></label>
@@ -11440,7 +11547,7 @@ function desenharEquivalencias() {
   pg.querySelectorAll('[data-eqvb]').forEach(b => b.onclick = () => { FE.vb = b.dataset.eqvb; FE.sel.clear(); RENDER.equivalencias(); });
   const cd = $('eqConfDet'); if (cd) cd.ontoggle = () => { FE.confAberto = cd.open; };
   const arq = pg.querySelector('.eq-arq'); arq.querySelectorAll('.lista button').forEach(b => b.addEventListener('click', () => arq.removeAttribute('open')));
-  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias'));
+  ligarAbasEq($('pag-equivalencias')); ligarCompostas($('pag-equivalencias')); ligarSomas($('pag-equivalencias'));
   $('pag-equivalencias').querySelectorAll('[data-conf]').forEach(b => b.onclick = () => desfazerConflito(conf[+b.dataset.conf]));
   $('pag-equivalencias').querySelectorAll('[data-confou]').forEach(b => b.onclick = () => conflitoUmOuOutro(conf[+b.dataset.confou]));
   $('pag-equivalencias').querySelectorAll('[data-confjt]').forEach(b => b.onclick = () => { const c = conf[+b.dataset.confjt];
@@ -11860,6 +11967,55 @@ function descTussUI(cd) {
   // Catálogo TUSS geral (base de dados, Power BI, relatórios carregados).
   try { const it = catalogo('tuss', S.cfg, contextoCatalogo()).find(x => String(x.cod) === k); if (it?.nome) { descTussUI.m.set(k, it.nome); return it.nome; } } catch (e) { /* sem catálogo */ }
   return '';
+}
+
+/* ---- src/ui/41b-somas.js ---- */
+/* ============================================================
+ * Equivalências → «Laudos que somam um código» (prévia aprovada em 25/11/2026: docs/prototipos/laudos-somam-codigo/)
+ * Cadastro das regras do motor (src/engine/50b-somas.js): títulos dos laudos + código do MV + escopo.
+ * ============================================================ */
+const SM = { nova: false, nTit: 2 };
+function cardSomas() {
+  const l = S.eq.somas || [], val = l.filter(s => s.status === 'validada').length;
+  const titulos = [...new Set([...(S.apolo?.laudos || []).map(x => x.titulo), ...(S.eq.itens || []).map(e => e.titulo)].filter(Boolean))].sort().slice(0, 4000);
+  const codigos = (S.eq.catalogoTUSS || []).slice(0, 4000);
+  const item = s => `<div class="sm-item${s.status === 'validada' ? '' : ' off'}"><div class="sm-tits">${s.titulos.map(t => `<span class="tag-cp">${esc(t)}</span>`).join('<span class="muted"> + </span>')}</div><span class="sm-eq">=</span>
+    <div><b>${esc(s.codigo)}</b>${s.desc ? ` · ${esc(s.desc)}` : ''}<small class="nc-det">${s.status === 'validada' ? `validada por ${esc(s.responsavel || '—')} em ${new Date(s.validadoEm).toLocaleDateString('pt-BR')}` : 'sem validação (não vale na conferência)'} · ${s.escopo.unidade === '*' ? 'todas as unidades' : `unidade ${esc(s.escopo.unidade)}`}${s.escopo.convenio === '*' ? '' : ` · convênio ${esc(s.escopo.convenio)}`}</small></div>
+    <button type="button" class="sec mini" data-smst="${esc(s.id)}">${s.status === 'validada' ? 'Tirar validação' : 'Validar de novo'}</button></div>`;
+  return `<div id="cardSomas" class="card" style="margin-top:14px"><div class="fx-topo"><h2 style="margin:0">Laudos que somam um código <span class="muted small">${l.length} regra(s) · ${val} validada(s)</span></h2>${SM.nova ? '' : '<button type="button" class="sec" id="smNova">+ Nova regra</button>'}</div>
+    <p class="lead">O contrário da regra composta: dois ou mais laudos do mesmo paciente, no mesmo dia e do mesmo médico valem <b>um código</b> da conta (ex.: TC abdome superior + inferior = TC abdome total). Na conferência, a linha do MV fecha com todos eles juntos.</p>
+    <div class="sm-lista">${l.map(item).join('') || '<p class="muted small">Nenhuma regra ainda.</p>'}</div>
+    ${SM.nova ? `<div class="sm-form"><div class="sm-tits-in"><span class="small muted">Títulos dos laudos (todos no mesmo dia)</span>${Array.from({ length: SM.nTit }, (_, i) => `<input data-smtit="${i}" list="smTitOpc" placeholder="título do laudo no Apolo">`).join('')}<datalist id="smTitOpc">${titulos.map(t => `<option value="${esc(t)}">`).join('')}</datalist><button type="button" class="sec mini" id="smMaisTit" style="justify-self:start">+ outro título</button></div>
+      <div class="sm-dir"><label class="campo">Código no MV<input id="smCod" list="smCodOpc" placeholder="ex.: 41001095"><datalist id="smCodOpc">${codigos.map(t => `<option value="${esc(`${t.codigo} - ${t.desc || ''}`)}">`).join('')}</datalist></label>
+        <label class="campo">Unidade<select id="smUn"><option value="*">Todas as unidades</option>${opcoes(S.cfg.unidades.map(u => [u.cod, `${u.cod} - ${u.nome}`]), '')}</select></label>
+        <label class="campo">Convênio<select id="smConv"><option value="*">Todos os convênios</option>${opcoes((S.cfg.convenios || []).map(c => [c.nome, c.nome]), '')}</select></label>
+        <div class="acoes" style="margin:0"><button type="button" id="smValidar">Validar regra</button><button type="button" class="sec" id="smCancelar">Cancelar</button></div></div></div>` : ''}</div>`;
+}
+function ligarSomas(raiz) {
+  if (!raiz.querySelector('#cardSomas')) return;
+  const re = () => RENDER.equivalencias();
+  if ($('smNova')) $('smNova').onclick = () => { SM.nova = true; SM.nTit = 2; re(); };
+  if ($('smCancelar')) $('smCancelar').onclick = () => { SM.nova = false; re(); };
+  if ($('smMaisTit')) $('smMaisTit').onclick = () => { const vals = [...raiz.querySelectorAll('[data-smtit]')].map(i => i.value); SM.nTit++; re(); raiz.querySelectorAll('[data-smtit]').forEach((i, k) => { i.value = vals[k] || ''; }); };
+  if ($('smValidar')) $('smValidar').onclick = async () => {
+    const titulos = [...raiz.querySelectorAll('[data-smtit]')].map(i => i.value.trim()).filter(Boolean), cv = $('smCod').value.trim(), codigo = (cv.match(/^(\d+)/) || [])[1] || cv, desc = cv.includes(' - ') ? cv.slice(cv.indexOf(' - ') + 3) : '';
+    if (titulos.length < 2) return avisar('Informe pelo menos dois títulos de laudo.', 'warn');
+    if (new Set(titulos.map(chaveTitulo)).size < titulos.length) return avisar('Os títulos precisam ser diferentes.', 'warn');
+    if (!/^\d+$/.test(codigo)) return avisar('Informe o código do procedimento no MV.', 'warn');
+    const op = await exigirOperador(); if (!op) return;
+    (S.eq.somas ||= []).push(novaSoma({ titulos, codigo, desc, escopo: { unidade: $('smUn').value, convenio: $('smConv').value } }, op));
+    S.eq.revisao = (+S.eq.revisao || 0) + 1; S.eq.atualizadoEm = agoraISO(); SM.nova = false;
+    salvarEq(`Regra validada: ${titulos.join(' + ')} = ${codigo}. Rode a conferência de novo para valer.`); re();
+  };
+  raiz.querySelectorAll('[data-smst]').forEach(b => b.onclick = async () => {
+    const s = (S.eq.somas || []).find(x => x.id === b.dataset.smst); if (!s) return;
+    const op = await exigirOperador(); if (!op) return;
+    const para = s.status === 'validada' ? 'desativada' : 'validada';
+    (s.historico ||= []).push({ em: agoraISO(), por: op, de: s.status, para, motivo: para === 'validada' ? 'validada de novo' : 'validação retirada' });
+    s.status = para; if (para === 'validada') { s.responsavel = op; s.validadoEm = agoraISO(); }
+    S.eq.revisao = (+S.eq.revisao || 0) + 1; S.eq.atualizadoEm = agoraISO();
+    salvarEq(`Regra «${nomeSoma(s)}»: ${para === 'validada' ? 'validada' : 'validação retirada'}.`); re();
+  });
 }
 
 /* ---- src/ui/42-destrava.js ---- */

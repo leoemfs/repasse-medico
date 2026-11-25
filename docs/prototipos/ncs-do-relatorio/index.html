@@ -1,0 +1,42 @@
+<title>NCs deste relatório</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.tw4{overflow-x:auto}.tw4 table{width:100%;border-collapse:collapse;font-size:12.5px}.tw4 th{position:static}
+.tw4 td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tw4 tr.cl{cursor:pointer}.tw4 tr.cl:hover td{background:var(--infobg)}.tw4 tr.cl td:first-child::before{content:"▸";color:var(--muted);margin-right:6px}
+.tw4 tr.cl.ab td:first-child::before{content:"▾"}
+.det{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px;padding:12px 14px;background:var(--bg);border-radius:8px;font-size:12.5px}
+.det dt{color:var(--muted);font-size:11.5px}.det dd{margin:0 0 4px;font-weight:600}
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;background:var(--infobg);border-radius:6px;padding:0 2px 0 6px}
+.cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;line-height:0}.cpv svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.cpv.ok{background:var(--okbg)}
+.det-acoes{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+</style>
+<div class="shell" data-pag="conferencia"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Conferência cruzada</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Aba «NCs e correções no MV»: clique numa NC para abrir os detalhes, copiar nome, ID ou tudo de uma vez.</div>
+<div class="card"><h2>Correções no MV</h2><p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>
+<h3>NCs deste relatório</h3>
+<div class="tw4"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody id="corpo"></tbody></table></div></div>
+<div class="card"><h3>O que muda</h3><ul class="small">
+<li>Cada NC da tabela abre ao clicar (▸ / ▾), com os dados da linha e da NC.</li>
+<li>Paciente, ID/atendimento e conta copiáveis com um clique; <b>«Copiar tudo»</b> copia um resumo pronto para colar (e-mail, chamado, planilha).</li>
+<li><b>«Abrir na aba Não conformidades»</b> leva direto à NC para editar.</li>
+<li>Mesmo comportamento na lista «Resolvidos no MV».</li></ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const ic='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+const cp=v=>`<span class="cpv" data-v="${v}">${v}<button title="Copiar">${ic}</button></span>`;
+const N=[{sit:['warn','Aguardando correção no MV (reimporte o PDF depois de corrigir)'],pac:'SEBASTIAO HELIO DE JESUS',data:'03/10/2026',cod:'41101227',proc:'RMN COLUNA CERVICAL OU DORSAL OU LOMBAR - OP',vl:'44,88',at:'2206631',conta:'2543310',un:'Ultramed Cambe',conv:'UNIMED',nat:'Prestador incorreto',det:'Laudo assinado por Wesley A. Bergamin',resp:'FATURAMENTO.ANA',ncsit:'Aberta',por:'Leo',em:'25/11/2026'}];
+let ab=0;
+function des(){document.getElementById('corpo').innerHTML=N.map((n,i)=>`<tr class="cl${ab===i?' ab':''}" data-i="${i}"><td><span class="badge ${n.sit[0]}">${n.sit[1]}</span></td><td class="small">${n.pac} · ${n.data} · ${n.cod} ${n.proc} · R$ ${n.vl}</td><td class="small">${n.nat} · ${n.por} · ${n.em}</td></tr>${ab===i?`<tr><td colspan="3"><dl class="det">
+<div><dt>Paciente</dt><dd>${cp(n.pac)}</dd><dt>ID / atendimento</dt><dd>${cp(n.at)}</dd><dt>Conta</dt><dd>${cp(n.conta)}</dd></div>
+<div><dt>Data</dt><dd>${n.data}</dd><dt>Procedimento</dt><dd>${n.cod} · ${n.proc}</dd><dt>Valor do repasse</dt><dd>R$ ${n.vl}</dd></div>
+<div><dt>Natureza</dt><dd>${n.nat}</dd><dt>Detalhe</dt><dd>${n.det}</dd><dt>Responsável · situação da NC</dt><dd>${n.resp} · ${n.ncsit}</dd><dt>Unidade · convênio</dt><dd>${n.un} · ${n.conv}</dd></div>
+<div class="det-acoes"><button class="mini" data-tudo="${i}">Copiar tudo</button><button class="sec mini">Abrir na aba Não conformidades</button><span class="small muted">Registrada por ${n.por} em ${n.em}</span></div></dl></td></tr>`:''}`).join('');}
+document.addEventListener('click',async e=>{const b=e.target.closest('.cpv button');if(b){e.stopPropagation();const s=b.parentNode;try{await navigator.clipboard.writeText(s.dataset.v)}catch(_){}s.classList.add('ok');setTimeout(()=>s.classList.remove('ok'),1200);return;}
+const t=e.target.closest('[data-tudo]');if(t){const n=N[+t.dataset.tudo];try{await navigator.clipboard.writeText(`${n.pac} · ID ${n.at} · conta ${n.conta} · ${n.data} · ${n.cod} ${n.proc} · R$ ${n.vl} · ${n.nat}: ${n.det}`)}catch(_){}t.textContent='Copiado ✓';setTimeout(()=>t.textContent='Copiar tudo',1500);return;}
+const tr=e.target.closest('tr.cl');if(tr){const i=+tr.dataset.i;ab=ab===i?-1:i;des();}});
+des();
+</script>

@@ -1,0 +1,44 @@
+<title>Laudos que somam um código</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.sm-lista{display:grid;gap:8px}
+.sm-item{display:grid;grid-template-columns:minmax(0,1.4fr) 24px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13px}
+.sm-item .tits{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.sm-item .mais{color:var(--muted);font-weight:700}
+.sm-item .eq{font-size:18px;color:var(--muted);text-align:center}
+.tt{background:var(--infobg);color:var(--accent);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600}
+.cd{font-weight:700}.sm-meta{font-size:11.5px;color:var(--muted)}
+.form{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;border:1px dashed var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.form .tits-in{display:grid;gap:6px}
+.la-diag{border-left:4px solid var(--ok);background:var(--okbg);border-radius:8px;padding:9px 12px}.la-diag p{margin:3px 0 0;font-size:13px}
+</style>
+<div class="shell" data-pag="equivalencias"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Equivalências TUSS</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Regra nova, ao lado das regras compostas: <b>vários laudos do mesmo paciente e dia valem um código</b> do MV (ex.: TC abdome superior + inferior = TC abdome total).</div>
+
+<div class="card"><div class="fx-topo"><h2 style="margin:0">Laudos que somam um código <span class="muted small">2 regras</span></h2><button class="sec" id="nova">+ Nova regra</button></div>
+<p class="lead">O contrário da regra composta: em vez de um laudo valer vários códigos, <b>dois ou mais laudos</b> do mesmo paciente, no mesmo dia e do mesmo médico valem <b>um código</b> da conta. Na conferência, a linha do MV fecha com todos eles juntos.</p>
+<div class="sm-lista" id="lista"></div>
+<div class="form" id="form" hidden>
+  <div class="tits-in"><label class="campo">Títulos dos laudos (todos precisam existir no mesmo dia)<input placeholder="ex.: TOMOGRAFIA DE ABDOME SUPERIOR"></label><input placeholder="ex.: TOMOGRAFIA DE ABDOME INFERIOR"><button class="sec mini" type="button" style="justify-self:start">+ outro título</button></div>
+  <div style="display:grid;gap:8px"><label class="campo">Código no MV<input placeholder="ex.: 41001095 - TC ABDOME TOTAL"></label><label class="campo">Vale para<select><option>Todas as unidades e convênios</option><option>Só a unidade…</option><option>Só o convênio…</option></select></label><div class="acoes" style="margin:0"><button>Validar regra</button><button class="sec" id="cancelar">Cancelar</button></div></div>
+</div></div>
+
+<div class="card"><h3>Como aparece na conferência (linha aberta)</h3>
+<div class="la-diag"><b>Os 2 laudos do paciente fecham o código da conta</b><p>Regra «TC abdome superior + inferior = 41001095 TC ABDOME TOTAL» (validada por Leo): «TOMOGRAFIA DE ABDOME SUPERIOR» e «TOMOGRAFIA DE ABDOME INFERIOR», Henrique Pini, 10/10/2026.</p></div>
+<p class="small muted">Se faltar um dos laudos, a linha fica pendente com «Soma incompleta: falta TOMOGRAFIA DE ABDOME INFERIOR».</p></div>
+
+<div class="card"><h3>Regras desta prévia</h3><ul class="small">
+<li>Os laudos precisam ser do <b>mesmo paciente, mesmo dia e mesmo médico</b>; cada laudo só entra numa soma.</li>
+<li>Com a regra validada, a linha do MV fica <b>conferida</b>; sem a regra, a ferramenta sugere criá-la quando vê o padrão (dois títulos parciais e o código «total»).</li>
+<li>Validar, tirar a validação e o histórico funcionam como nas regras compostas; a regra vai para a pasta da rede junto com as equivalências.</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const R=[[['TOMOGRAFIA DE ABDOME SUPERIOR','TOMOGRAFIA DE ABDOME INFERIOR'],'41001095','TC ABDOME TOTAL','validada por Leo em 25/11/2026 · todas as unidades'],
+[['RM ABDOME SUPERIOR','RM PELVE'],'41101170','RM ABDOME TOTAL','validada por Leo em 25/11/2026 · todas as unidades']];
+function des(){document.getElementById('lista').innerHTML=R.map(([t,c,d,m])=>`<div class="sm-item"><div class="tits">${t.map(x=>`<span class="tt">${x}</span>`).join('<span class="mais">+</span>')}</div><span class="eq">=</span><div><span class="cd">${c}</span> · ${d}<div class="sm-meta">${m}</div></div><button class="sec mini">Tirar validação</button></div>`).join('');}
+document.getElementById('nova').onclick=()=>document.getElementById('form').hidden=false;
+document.getElementById('cancelar').onclick=()=>document.getElementById('form').hidden=true;
+des();
+</script>
