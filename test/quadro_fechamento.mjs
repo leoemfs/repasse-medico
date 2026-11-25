@@ -57,6 +57,18 @@ await menu('nfRecebida'); ok((await coluna()).endsWith(':nf'), '«NF recebida» 
 await menu('nfFinanceiro'); ok((await coluna()).endsWith(':concluido') && await naColuna('concluido'), '«NF encaminhada ao Financeiro» → «Concluído»');
 const doc = await p.evaluate(t => window.__RM.S.fluxo.competencias['2026-11'].grupos[t].documental['15'], tipo);
 ok(doc?.relatorio && doc?.nfRecebida && doc?.nfFinanceiro, 'as marcas ficam no controle documental do Fluxo (dono do dado)');
+// Arrastar e soltar (v3.0.0-alpha.48): voltar desfaz as marcas da direita; pular etapas registra as do meio; Desfazer.
+const arrastar = async destino => { await p.locator('.qd-card[data-sit$="|15"]').dragTo(p.locator(`.qd-col[data-col="${destino}"]`)); await p.waitForTimeout(300); };
+const confirmaDlg = async () => { await p.waitForSelector('#dlg[open]'); await p.click('#dlgBotoes button[value="ok"]'); await p.waitForTimeout(300); };
+await arrastar('aceite'); await confirmaDlg();
+ok((await coluna()).endsWith(':aceite') && await naColuna('aceite'), 'arrastar de «Concluído» para «Com aceite» (confirmando) desfaz e-mail e NFs');
+await arrastar('conferir'); ok((await coluna()).endsWith(':aceite'), '«A conferir» não aceita cartão arrastado (segue a conferência)');
+await arrastar('nf'); await confirmaDlg();
+const d2 = await p.evaluate(t => window.__RM.S.fluxo.competencias['2026-11'].grupos[t].documental['15'], tipo);
+ok((await coluna()).endsWith(':nf') && d2.relatorio && d2.nfRecebida && !d2.nfFinanceiro, 'pular de «Com aceite» para «NF recebida» registra e-mail e NF juntos');
+await p.click('#aviso button'); await p.waitForTimeout(300);
+ok((await coluna()).endsWith(':aceite'), '«Desfazer» no aviso volta o cartão para «Com aceite»');
+await arrastar('concluido'); await confirmaDlg(); ok((await coluna()).endsWith(':concluido'), 'arrastar até «Concluído» registra as três marcas');
 // Excel de indicadores com a aba «Quadro».
 const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#fhInd')]); await dl.saveAs(out + 'quadro_indicadores.xlsx');
 const q = JSON.parse(execFileSync('python3', ['-I', '-c', `import openpyxl,json,sys

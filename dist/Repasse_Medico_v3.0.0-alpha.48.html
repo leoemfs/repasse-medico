@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.47</title>
+<title>Repasse Médico v3.0.0-alpha.48</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -589,13 +589,19 @@ th .cf-sel{margin:0}
 .la-ponte-duvida{border:1px dashed var(--warn);border-radius:8px;padding:2px 8px 8px;margin-top:8px}
 .la-crit{display:inline}.la-crit summary{display:inline;cursor:pointer;color:var(--accent);font-weight:600}.la-crit[open] summary{margin-right:4px}
 .la-crit>span{display:inline-flex;flex-wrap:wrap;gap:3px;vertical-align:middle}.chip-s.na{background:var(--bg);color:var(--muted)}
+/* Quadro: arrastar e soltar (25/11/2026) */
+.qd-card[draggable=true]{cursor:grab}.qd-card.arrastado{opacity:.45}
+.quadro.arrastando .qd-col.pode{border-color:var(--accent);border-style:dashed}
+.quadro.arrastando .qd-col.pode.sobre{background:var(--infobg)}
+.quadro.arrastando .qd-col.nao{opacity:.5}
+.qd-nao{font-size:11px;color:var(--err);margin:-4px 0 6px}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.47 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.48 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -640,7 +646,7 @@ th .cf-sel{margin:0}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.47';
+const MOTOR_VERSAO = '3.0.0-alpha.48';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -5320,6 +5326,26 @@ function colunaQuadro(x) {
   if (x.semAceite.length) return 'correcao';
   return d.nfRecebida ? 'nf' : d.relatorio ? 'enviado' : 'aceite';
 }
+/* Arrastar no quadro (prévia aprovada em 25/11/2026: docs/prototipos/quadro-arrastar/): soltar numa coluna vira a ação que
+ * leva o cartão até ela. A conferir e Em correção seguem a conferência (não aceitam). Aguardando terceiros pede o motivo.
+ * Com aceite → Concluído exigem aceite em todas as unidades; pular etapas registra as do meio; voltar desfaz as da direita.
+ * Devolve { ok, motivo, aguardando, tirarAguardando, marcar: [campos], desmarcar: [campos], confirmar: texto|'' }. */
+const DOC_POR_COLUNA = { aceite: [], enviado: ['relatorio'], nf: ['relatorio', 'nfRecebida'], concluido: ['relatorio', 'nfRecebida', 'nfFinanceiro'] };
+const NOME_DOC = { relatorio: 'e-mail enviado', nfRecebida: 'NF recebida', nfFinanceiro: 'NF encaminhada ao Financeiro' };
+function movimentoQuadro(x, destino) {
+  const nao = motivo => ({ ok: false, motivo });
+  if (destino === x.coluna) return nao('já está aqui');
+  if (destino === 'conferir' || destino === 'correcao') return nao('segue a conferência');
+  if (destino === 'terceiros' && x.doc?.nfFinanceiro) return nao('já concluído: volte antes para NF recebida');
+  if (destino === 'terceiros') return { ok: true, aguardando: true, marcar: [], desmarcar: [], confirmar: '' };
+  const quer = DOC_POR_COLUNA[destino]; if (!quer) return nao('coluna desconhecida');
+  if (!x.temValores) return nao('sem rodada de conferência');
+  if (x.semAceite.length) return nao('precisa de aceite em todas as unidades');
+  const d = x.doc || {}, campos = ['relatorio', 'nfRecebida', 'nfFinanceiro'];
+  const marcar = campos.filter(c => quer.includes(c) && !d[c]), desmarcar = campos.filter(c => !quer.includes(c) && d[c]);
+  const confirmar = desmarcar.length ? `Desfaz: ${desmarcar.map(c => NOME_DOC[c]).join(', ')}.` : marcar.length > 1 ? `Registra juntas, com a data de hoje: ${marcar.map(c => NOME_DOC[c]).join(', ')}.` : '';
+  return { ok: true, tirarAguardando: !!x.aguardando, marcar, desmarcar, confirmar };
+}
 const fechamentoVazio = () => ({ ajustes: { usg: {}, img: {}, curitiba: {} }, nfs: [], blocos: { complementar: [], cetrus: [] }, valorPeriodoCetrus: 1000, obs: { usg: '', img: '', curitiba: '' }, manual: {} });
 
 /* ---------- NF complementar (SOL-F28): lançamentos da competência em USG, IMG e Curitiba ----------
@@ -6795,8 +6821,10 @@ async function reterRodadas(grupos = null, base = S.rodadas) {
 
 /* ---------- Mensagens, diálogos e downloads ---------- */
 let avisoTimer = null;
-function avisar(texto, tipo = 'info') {
+// acao (opcional): { rotulo, fn } — botão no próprio aviso (ex.: «Desfazer» depois de arrastar no quadro).
+function avisar(texto, tipo = 'info', acao = null) {
   const a = $('aviso'); a.className = `aviso ${tipo}`; a.textContent = texto; a.hidden = false;
+  if (acao) { const b = document.createElement('button'); b.type = 'button'; b.className = 'sec mini'; b.style.marginLeft = '8px'; b.textContent = acao.rotulo; b.onclick = () => { a.hidden = true; acao.fn(); }; a.appendChild(b); }
   clearTimeout(avisoTimer); avisoTimer = setTimeout(() => { a.hidden = true; }, tipo === 'err' ? 15000 : 6000);
 }
 // Diálogo simples: devolve o valor do botão clicado e os campos preenchidos.
@@ -11120,10 +11148,60 @@ function desenharQuadro(corpo, f) {
     ${x.doc?.relatorio ? `<span class="qd-data">e-mail ${fmtCurta(paraData(x.doc.relatorio))}</span>` : ''}${x.doc?.nfRecebida ? `<span class="qd-data">NF ${fmtCurta(paraData(x.doc.nfRecebida))}</span>` : ''}</button>`;
   corpo.innerHTML = `<div class="card"><div class="fx-topo"><h2 style="margin:0">Quadro por prestador</h2>
     <label class="campo" style="margin:0">Repasse<select id="qdTipo">${opcoes([['todos', 'Todos'], ['usg', 'USG'], ['img', 'IMG'], ['curitiba', 'Curitiba (V3)']], FH.qTipo)}</select></label></div>
-    <p class="small muted">Os cartões mudam de coluna sozinhos, pelos dados: rodada, aceite, e-mail e NF (controle documental do Fluxo). Clique no cartão para registrar envio, NF, «Aguardando terceiros» ou abrir a conferência.</p>
+    <p class="small muted">Os cartões seguem os dados: rodada, aceite, e-mail e NF (controle documental do Fluxo). Arraste um cartão para outra coluna para registrar o envio, a NF ou «Aguardando terceiros» (A conferir e Em correção seguem a conferência), ou clique nele para o menu.</p>
     <div class="quadro">${COLUNAS_QUADRO.map(([k, nome, dica]) => { const c = todos.filter(y => y.x.coluna === k); return `<section class="qd-col qd-${k}" data-col="${k}"><h3 title="${esc(dica)}">${esc(nome)} <span class="qd-n">${c.length}</span></h3>${c.map(card).join('') || '<p class="small muted">—</p>'}</section>`; }).join('')}</div></div>`;
   $('qdTipo').onchange = e => { FH.qTipo = e.target.value; desenharQuadro(corpo, f); };
   corpo.querySelectorAll('[data-sit]').forEach(b => b.onclick = e => { e.stopPropagation(); abrirMenuSituacao(b, f); });
+  ligarArrastarQuadro(corpo, f);
+}
+/* Arrastar e soltar entre as colunas (25/11/2026). A regra de cada movimento vem do motor (movimentoQuadro). */
+function ligarArrastarQuadro(corpo, f) {
+  const quadro = corpo.querySelector('.quadro'); if (!quadro) return;
+  let arr = null;
+  const achar = card => { const [t, cod] = card.dataset.sit.split('|'); const x = (f[t] || []).find(y => y.cod === cod); return x ? { x, t } : null; };
+  const limpar = () => { quadro.classList.remove('arrastando'); quadro.querySelectorAll('.qd-col').forEach(c => { c.classList.remove('pode', 'nao', 'sobre'); c.querySelector('.qd-nao')?.remove(); }); quadro.querySelectorAll('.qd-card.arrastado').forEach(c => c.classList.remove('arrastado')); };
+  quadro.querySelectorAll('.qd-card').forEach(card => {
+    card.draggable = true;
+    card.ondragstart = e => {
+      arr = achar(card); if (!arr) return;
+      e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', card.dataset.sit); fecharMenuSituacao();
+      card.classList.add('arrastado'); quadro.classList.add('arrastando');
+      quadro.querySelectorAll('.qd-col').forEach(col => { const m = movimentoQuadro(arr.x, col.dataset.col); col.classList.add(m.ok ? 'pode' : 'nao');
+        if (!m.ok && m.motivo !== 'já está aqui') col.querySelector('h3').insertAdjacentHTML('afterend', `<p class="qd-nao">${esc(m.motivo)}</p>`); });
+    };
+    card.ondragend = limpar;
+  });
+  quadro.querySelectorAll('.qd-col').forEach(col => {
+    col.ondragover = e => { if (col.classList.contains('pode')) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; col.classList.add('sobre'); } };
+    col.ondragleave = e => { if (!col.contains(e.relatedTarget)) col.classList.remove('sobre'); };
+    col.ondrop = async e => { e.preventDefault(); const a = arr; arr = null; limpar(); if (a) await moverNoQuadro(a.x, a.t, col.dataset.col); };
+  });
+}
+async function moverNoQuadro(x, t, destino) {
+  const m = movimentoQuadro(x, destino); if (!m.ok) return;
+  if (m.aguardando) return acaoSituacao('aguardando', t, x);   // pede quem aguarda e o motivo (mesmo diálogo do menu)
+  if (!exigirAberta(S.comp, 'mudar a situação')) return;
+  const op = await exigirOperador(); if (!op) return;
+  const nomeCol = Object.fromEntries(COLUNAS_QUADRO.map(([k, n]) => [k, n]));
+  if (m.confirmar && !await confirmar(`Mover «${x.nome}» para «${nomeCol[destino]}»?`, esc(m.confirmar), 'Mover')) return;
+  const comp = S.fluxo.competencias[S.comp], g = comp?.grupos?.[GRUPO_DOC[t]];
+  if ((m.marcar.length || m.desmarcar.length) && !comp) return avisar(`Inicie as Etapas do mês da competência ${rotuloCompetencia(S.comp)} (Fechamento e envio › Etapas do mês) para registrar envio e NF.`, 'warn');
+  if ((m.marcar.length || m.desmarcar.length) && !g?.documental) return avisar('O grupo deste repasse no Fluxo mensal não tem controle documental.', 'warn');
+  // Guarda o estado anterior para o «Desfazer».
+  const docAntes = g?.documental?.[x.cod] ? { ...g.documental[x.cod] } : null, aguAntes = x.aguardando ? { ...x.aguardando } : null;
+  if (m.marcar.length || m.desmarcar.length) {
+    const d = g.documental[x.cod] = g.documental[x.cod] || novoDocumental({ cod: x.cod, nome: x.nome }), hoje = isoDia(new Date());
+    for (const c of m.marcar) d[c] = hoje; for (const c of m.desmarcar) d[c] = '';
+    salvarFluxo();
+  }
+  if (m.tirarAguardando) salvarFech(fe => { for (const tt of t === 'curitiba' ? ['curitiba', 'img'] : [t]) { const a = fe.aguardando?.[tt]?.[x.cod]; if (!a) continue; (fe.aguardandoHist ||= []).push({ ...a, tipo: t, cod: x.cod, ate: agoraISO(), retiradaPor: op }); delete fe.aguardando[tt][x.cod]; } });
+  const feito = [...m.marcar.map(c => `${NOME_DOC[c]} registrado hoje`), ...m.desmarcar.map(c => `${NOME_DOC[c]} desfeito`), m.tirarAguardando ? '«Aguardando terceiros» retirado' : ''].filter(Boolean).join(', ');
+  RENDER.fechamento();
+  avisar(`${x.nome} → ${nomeCol[destino]}${feito ? `: ${feito}` : ''}.`, 'ok', { rotulo: 'Desfazer', fn: () => {
+    if (m.marcar.length || m.desmarcar.length) { if (docAntes) g.documental[x.cod] = docAntes; else delete g.documental[x.cod]; salvarFluxo(); }
+    if (m.tirarAguardando && aguAntes) salvarFech(fe => { fe.aguardando = fe.aguardando || {}; fe.aguardando[t] = { ...(fe.aguardando[t] || {}), [x.cod]: aguAntes }; if (Array.isArray(fe.aguardandoHist)) fe.aguardandoHist.pop(); });
+    RENDER.fechamento(); avisar(`Movimento de ${x.nome} desfeito.`, 'ok');
+  } });
 }
 
 /* v3.0.0-alpha.20 (simplificação): uma linha só de subabas no topo — Etapas do mês (antes «Fluxo mensal») e os repasses. */
