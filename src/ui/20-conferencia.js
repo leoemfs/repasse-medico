@@ -714,9 +714,14 @@ async function removerDecisaoConsiderar(x) {
  * Mesmas regras de Rodadas: observação obrigatória quando há pendências (já descontadas as decisões).
  * O aceite fica na rodada (aparece em Rodadas e muda a situação no Fechamento). Desfazer guarda o histórico. */
 const rodadaDaConf = () => S.conf && (S.rodadas.find(r => r.id === S.conf.ctx.rodadaId) || S.conf.rodada);
+// 25/11/2026: o «próximo» segue a lista do roteiro («Em que passo está cada relatório»): a mesma ordem do seletor
+// «Relatório MV» (unidade, grupo, prestador), com o filtro de unidade e grupo e, se escolhido, o do passo.
 function proximoRelatorioConf() {
-  const rels = relatoriosPara('cf'), i = rels.findIndex(r => r.id === S.conf?.ctx.relId);
-  return i >= 0 && i < rels.length - 1 ? rels[i + 1] : null;
+  const cur = S.conf?.ctx.relId, sel = $('cfRel');
+  const lista = (sel ? [...sel.options].map(o => o.value) : relatoriosPara('cf').map(r => r.id)).map(id => S.relatorios.find(r => r.id === id)).filter(Boolean);
+  const passoDe = x => { const un = unidadeParaRoteiro(x), rt = un ? roteiroDe(x, un) : null; return !rt ? 'sem' : rt.passo >= 6 ? 'env' : 'p' + (rt.passo + 1); };
+  const i = lista.findIndex(r => r.id === cur);
+  return lista.slice(i + 1).find(x => x.id !== cur && (!RR.passo || passoDe(x) === RR.passo)) || null;
 }
 function quadroAceite() {
   const r = rodadaDaConf(); if (!r) return '';
@@ -740,7 +745,7 @@ function quadroAceite() {
 function ligarQuadroAceite() {
   const irProximo = () => {
     const prox = proximoRelatorioConf(); if (!prox) return;
-    S.cfProximo = { relId: prox.id, unidadeCod: S.conf.ctx.unidadeCod };
+    S.cfProximo = { relId: prox.id, unidadeCod: unDoRel(prox) || S.conf.ctx.unidadeCod };
     S.conf = null; RENDER.conferencia(); window.scrollTo(0, 0);
     avisar(`Próximo relatório: ${prox.rel.cab.prestadorCod} - ${prox.rel.cab.prestadorNome}. Confira a unidade e o médico e execute a conferência.`, 'ok');
   };

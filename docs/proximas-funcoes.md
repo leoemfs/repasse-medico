@@ -26,6 +26,9 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.56 — «ir para o próximo relatório» segue a lista do roteiro (pedido de 25/11/2026; teste: `test/proximo_relatorio.mjs`)
+- Antes o próximo era o seguinte na ordem de carregamento dos PDFs. Agora segue a lista «Em que passo está cada relatório» (ordem do seletor «Relatório MV»: unidade, grupo, prestador), com o filtro de unidade e grupo e, se escolhido, o do passo. A unidade do próximo vem do próprio relatório.
+
 ## Laudos que somam um código e NCs do relatório abrindo — **IMPLEMENTADA na v3.0.0-alpha.55** (pedido de 25/11/2026; prévias aprovadas: https://claude.ai/artifact/L1J7iV5uoKR2eyAfAxR9M4 e https://claude.ai/artifact/YVsRv1sbPXL4YP5zyyL4C9; `docs/prototipos/laudos-somam-codigo/` e `docs/prototipos/ncs-do-relatorio/`; testes: `test/ponte.mjs`, `test/somas_tela.mjs`)
 - Regra nova em `eq.somas` (motor: `src/engine/50b-somas.js`): dois ou mais laudos do mesmo paciente, mesmo dia e mesmo médico valem um código da conta (ex.: TC abdome superior + inferior = 41001095 TC ABDOME TOTAL). Na conferência, a linha fica conferida com todos os laudos; faltando um, «Soma de laudos incompleta». Cadastro em Equivalências → Regras, ao lado das compostas; viaja pela pasta com as equivalências.
 - Aba «NCs e correções no MV»: NCs e resolvidos abrem ao clicar, com paciente/ID/conta copiáveis, «Copiar tudo» e «Abrir a NC».
