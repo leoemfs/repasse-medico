@@ -25,6 +25,13 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.45 — barra de título do app instalado (pedido de 25/11/2026)
+- O manifesto pedia `window-controls-overlay`: no app instalado o Edge tirava a barra de título e o conteúdo ficava por baixo dos botões da janela, sem área para arrastar. Agora é `standalone` (barra de título normal do Edge).
+
+## Ponte Apolo → Power BI → MV (em conversa, 25/11/2026)
+- Power BI não tem ID do paciente (tem `CPF_PACIENTE`); o Apolo não tem CPF. A ponte segue o processo manual: nome completo do Power BI × nome do Apolo, data (atendimento é único por data), unidade (`Nome Empresa`), grupo × modalidade, código × título (equivalências), convênio (com nomes equivalentes) → atendimento → linha do MV pelo número.
+- Mais de um atendimento possível: **sempre ressalva** para análise. Prestador do Power BI só informativo. Próximo passo: prévia da tela.
+
 ## Pedido de 25/11/2026 — ID, convênio, unidades ignoradas e «Só no laudo»
 - **IMPLEMENTADO na v3.0.0-alpha.42:**
   - «ID Apolo» do laudo = coluna `PATIENT_ID`. ID com mais de um paciente aparece como **DUPLICATE** (para investigar); célula vazia, **SEM ID**. Nada é preenchido com dado fictício.
