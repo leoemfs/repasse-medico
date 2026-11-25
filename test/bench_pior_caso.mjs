@@ -30,7 +30,9 @@ console.log(JSON.stringify(r));
 // Assinatura do resultado: qualquer otimização tem de mantê-la. Era '41a7085c' na v3.0.0-alpha.10 (antes das otimizações do P2).
 // v3.0.0-alpha.23 (SOL-F47, mudança de regra, não de desempenho): o título do laudo desempata exames do mesmo paciente. Neste caso,
 // linhas com laudo do próprio código 2.936 → 2.977 de 3.000, «ambíguo» 2.936 → 2.925, mesmas contagens por situação.
-const ASSINATURA = '6eb626c3';
+// v3.0.0-alpha.44 (mudança de regra, caso real de 25/11/2026): a mesma paciente na mesma data vem antes de um nome apenas semelhante.
+// Neste caso, linhas com laudo da própria paciente 2.997 → 2.999, «nome apenas semelhante» 3 → 1, «Só no laudo» 27.003 → 27.002.
+const ASSINATURA = 'ac021c51';
 console.log((r.assinatura === ASSINATURA ? '✔ ' : '✘ ') + `resultado idêntico ao de antes das otimizações (assinatura ${r.assinatura})`); if (r.assinatura !== ASSINATURA) process.exitCode = 1;
 console.log((r.ms < 8000 ? '✔ ' : '✘ ') + `pior caso em ${(r.ms / 1000).toFixed(1)} s (era 6,8 s na auditoria e 14,9 s nesta máquina antes do P2; limite do teste 8 s)`); if (r.ms >= 8000) process.exitCode = 1;
 if (perfil) { const { profile } = await cdp.send('Profiler.stop'); const self = new Map(), dt = profile.timeDeltas; const byId = new Map(profile.nodes.map(n => [n.id, n]));

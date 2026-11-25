@@ -101,10 +101,11 @@ await p.click('#cfAba-nc'); await p.waitForTimeout(100);
 await p.click('[data-revisar-nc]'); await p.waitForSelector('#rvTab table');
 await p.locator('#rvTab tr', { hasText: 'FABIO NUNES LEAL' }).locator('input[data-cand]').check();
 await p.click('#rvReg'); await p.waitForSelector('#dlg[open]');
-ok(await p.inputValue('#dlgCorpo select[name=natureza]') === 'nao-lancado', 'natureza sugerida para o «Só no laudo»: não lançado');
+// v3.0.0-alpha.42 (decisão de 25/11/2026): sem o Power BI, o «Só no laudo» sugere «prestador incorreto» (em geral lançado para outro médico).
+ok(await p.inputValue('#dlgCorpo select[name=natureza]') === 'prestador-incorreto', 'natureza sugerida para o «Só no laudo» sem Power BI: prestador incorreto');
 await p.fill('#dlgCorpo input[name=responsavel]', 'FATURISTA DA UNIDADE'); await okDlg();
 const ncs = await p.evaluate(() => window.__RM.S.nc.itens.map(x => `${x.paciente}:${x.natureza}:${x.competencia}`).sort());
-ok(ncs.length === 2 && ncs.includes('FABIO NUNES LEAL:nao-lancado:2026-11') && ncs.includes('DORA NUNES PIRES:lancado-incorreto:2026-11'), `2 NCs registradas na competência 11/2026 (${ncs.join(' · ')})`);
+ok(ncs.length === 2 && ncs.includes('FABIO NUNES LEAL:prestador-incorreto:2026-11') && ncs.includes('DORA NUNES PIRES:lancado-incorreto:2026-11'), `2 NCs registradas na competência 11/2026 (${ncs.join(' · ')})`);
 const ncX = await baixar('#ncExp', 'ncs.xlsx'); await p.waitForTimeout(300); if (await p.isVisible('#dlg[open]')) await okDlg('');   // «Marcar como Enviada?» → não
 const ncAbas = abas(ncX);
 ok(Object.values(ncAbas).flat().flat().some(c => String(c).includes('FABIO NUNES LEAL')) && Object.values(ncAbas).flat().flat().some(c => String(c).includes('DORA NUNES PIRES')), `Excel das NCs com as duas linhas (abas: ${Object.keys(ncAbas).join(', ')})`);
