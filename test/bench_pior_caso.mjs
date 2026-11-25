@@ -30,7 +30,7 @@ console.log(JSON.stringify(r));
 // Assinatura do resultado: qualquer otimização tem de mantê-la. Era '41a7085c' na v3.0.0-alpha.10 (antes das otimizações do P2).
 // v3.0.0-alpha.23 (SOL-F47, mudança de regra, não de desempenho): o título do laudo desempata exames do mesmo paciente. Neste caso,
 // linhas com laudo do próprio código 2.936 → 2.977 de 3.000, «ambíguo» 2.936 → 2.925, mesmas contagens por situação.
-// v3.0.0-alpha.45 (mudança de regra, caso real de 25/11/2026): a mesma paciente na mesma data vem antes de um nome apenas semelhante.
+// v3.0.0-alpha.46 (mudança de regra, caso real de 25/11/2026): a mesma paciente na mesma data vem antes de um nome apenas semelhante.
 // Neste caso, linhas com laudo da própria paciente 2.997 → 2.999, «nome apenas semelhante» 3 → 1, «Só no laudo» 27.003 → 27.002.
 const ASSINATURA = 'ac021c51';
 console.log((r.assinatura === ASSINATURA ? '✔ ' : '✘ ') + `resultado idêntico ao de antes das otimizações (assinatura ${r.assinatura})`); if (r.assinatura !== ASSINATURA) process.exitCode = 1;

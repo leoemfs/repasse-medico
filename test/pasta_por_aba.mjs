@@ -67,14 +67,17 @@ ok(porNome[1] === '4', `unidade pelo nome dela no arquivo (generico_${porNome[0]
 // Correção: «Sincronizar pasta» lê só a Correção de prestador.
 await p.goto(html + '#correcao'); await p.waitForTimeout(300);
 ok(await p.isVisible('[data-syncpasta="correcao"]'), 'aba Correção de prestador tem «Sincronizar pasta» (pasta conectada, nenhum PDF ainda)');
+// Guarda todos os avisos mostrados: o da sincronização da configuração pode substituir o da leitura da pasta (era instável).
+await p.evaluate(() => { window.__avisos = []; new MutationObserver(() => window.__avisos.push(document.getElementById('aviso').textContent)).observe(document.getElementById('aviso'), { childList: true, characterData: true, subtree: true }); });
 await p.click('[data-syncpasta="correcao"]');
 await p.waitForFunction(() => window.__RM.S.relatorios.some(x => x.rel.cab.prestadorCod === '2'), null, { timeout: 20000 }); await p.waitForTimeout(400);
 const r1 = await p.evaluate(() => window.__RM.S.relatorios.map(x => `${x.rel.cab.prestadorCod}:${x.finalidade}:${x.unidadePasta}`));
 // Desde a alpha.19, conectar a pasta já lê os PDFs da conferência; a Correção traz o dela, uma vez só.
 ok(r1.filter(x => x.startsWith('2:')).length === 1 && r1.includes('2:correcao:17'), `«Sincronizar pasta» da Correção traz o PDF dela (${r1.join(' · ')}), com a unidade 17 tirada do nome do arquivo`);
 // O aviso da sincronização da configuração pode passar na frente por um instante: espera o da leitura da pasta.
-await p.waitForFunction(() => /Correção de prestador/.test(document.getElementById('aviso').textContent), null, { timeout: 5000 }).catch(() => {});
-ok(/Correção de prestador/.test(await p.textContent('#aviso')), `aviso diz que leu só a Correção de prestador (${(await p.textContent('#aviso')).slice(0, 80)})`);
+await p.waitForFunction(() => (window.__avisos || []).some(t => /Correção de prestador/.test(t)), null, { timeout: 5000 }).catch(() => {});
+const avisosCorr = await p.evaluate(() => window.__avisos || []);
+ok(avisosCorr.some(t => /Correção de prestador/.test(t)), `aviso diz que leu só a Correção de prestador (${(avisosCorr.find(t => /Correção de prestador/.test(t)) || avisosCorr.at(-1) || '').slice(0, 80)})`);
 // Conferência: lê só «Relatórios para conferência».
 await p.goto(html + '#conferencia'); await p.waitForTimeout(300);
 await p.click('[data-syncpasta="conferencia"]');

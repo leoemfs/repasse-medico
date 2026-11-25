@@ -1,4 +1,4 @@
-// v3.0.0-alpha.45 — Caso real de 25/11/2026 (Melanie, unidade 4): a linha do MV «MARTA APARECIDA DA» (mamografia convencional)
+// v3.0.0-alpha.46 — Caso real de 25/11/2026 (Melanie, unidade 4): a linha do MV «MARTA APARECIDA DA» (mamografia convencional)
 // pareava com o laudo de OUTRA paciente de nome apenas semelhante («MARIA APARECIDA FLORA…», 3 dias antes, outro médico), porque
 // o título desse laudo estava validado para o código cobrado e o da paciente certa («Mamografia Digital») estava validado para a
 // digital. O laudo certo sobrava «Só no laudo». Agora a mesma paciente, na mesma data, vem antes do nome apenas semelhante.
