@@ -81,6 +81,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // Ponte pelo atendimento (25/11/2026): com o Power BI carregado, o nome completo do atendimento da linha do MV também
   // serve para achar o laudo (nome cortado no MV × abreviado no Apolo). Só no mesmo dia: o atendimento é único por data.
   const ixAt = opc.pbi ? indicePBIAtendimentos(opc.pbi) : null;
+  const ponteCache = new Map();   // laudo.i → ponteDoLaudo (só para laudos de outros médicos)
   marcarOrdemDecisao(relatorio.regs);   // chave de decisão com a ordem da linha repetida (v3.0.0-alpha.9)
   aplicarRegrasConfig(cfg);   // modalidade por grupo e HM da V3 configuráveis (P3)
 
@@ -119,6 +120,12 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
     const viaAt = at && at.pn && at.dia === b.dia ? ixNome.candidatos(at.pn, b.dia, 0).filter(l => !vistos.has(l.i)) : [];
     for (const l of [...viaNome, ...viaAt]) {
       if (b.mods && !b.mods.includes(l.modalidade)) continue;
+      // Laudo de outro médico ligado com segurança (Power BI) a OUTRO atendimento: é de outra visita do paciente (pode haver
+      // mais de um atendimento no mesmo dia), não desta linha.
+      if (ixAt && medicos && !medicos.has(l.mn) && b.r.atendimento) {
+        let pl = ponteCache.get(l.i); if (pl === undefined) { pl = ponteDoLaudo(opc.pbi, l, { cfg, idxEq: idx, unidadeCod: opc.unidadeCod }); ponteCache.set(l.i, pl); }
+        if (pl?.nivel === 'firme' && pl.melhor.at.atendimento !== String(b.r.atendimento).trim()) continue;
+      }
       let nm = nivelNome(b.pn, l.pn, minTrunc), ponte = false;
       if (at && at.pn && at.dia === b.dia && l.dia === b.dia) { const np = nivelNomePonte(at.pn, l.pn, minTrunc); if (np > nm) { nm = np; ponte = true; } }
       if (!nm) continue;
@@ -153,9 +160,12 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
   // Cada procedimento da regra aceita tantas linhas quanto a sua quantidade (ex.: Doppler ×2).
   const compostoUsos = new Map();   // laudo.i → { id, esperados, usos:[n por procedimento], bs:[] }
   const cabeNoComposto = (b, c) => { const u = compostoUsos.get(c.l.i), k = c.proc.itemIdx; return !!(c.proc.composta && u && u.id === c.proc.composta.id && k !== undefined && (u.usos[k] || 0) < (u.esperados[k]?.qtd || 0)); };
-  for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
+  // 25/11/2026: primeiro os laudos do médico do relatório (todas as faixas); só a linha que ficar sem par procura nos
+  // laudos de outros médicos (e, se achar, vira «laudo de outro médico»). Sem médico escolhido, mesmoMedico é null e tudo
+  // entra na primeira rodada, como antes.
+  for (const deOutro of [false, true]) for (const fase2 of [false, true]) for (let t = 1; t <= 7; t++) {
     const fila = [];
-    for (const b of procs) if (!b.par) for (const c of b.cands) if (c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
+    for (const b of procs) if (!b.par) for (const c of b.cands) if ((c.mesmoMedico === false) === deOutro && c.tier === t && secundarioDe.has(c.l.i) === fase2 && (!usado.has(c.l.i) || cabeNoComposto(b, c))) fila.push({ b, c });
     // Dentro da faixa, a maior afinidade título × descrição escolhe primeiro: com vários exames do paciente no mesmo dia,
     // cada linha fica com o laudo do seu exame (e não com o primeiro da planilha).
     fila.sort((x, y) => (y.c.mesmoMedico === true) - (x.c.mesmoMedico === true) || x.c.contra - y.c.contra || y.c.nm - x.c.nm || x.c.dd - y.c.dd || y.c.afd - x.c.afd || (y.c.conv === true) - (x.c.conv === true) || x.b.r.seq - y.b.r.seq || x.c.l.i - y.c.l.i);

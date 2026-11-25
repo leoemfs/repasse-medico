@@ -29,5 +29,22 @@ ok(JSON.stringify(r.abrev) === '[true,false,true,false]', `nome abreviado compat
 ok(r.p1[0] === 'firme' && r.p1[1] === '2209601', `laudo abreviado acha o atendimento no Power BI (vínculo firme): ${JSON.stringify(r.p1)}`);
 ok(r.p2[0] === 'duvida' && r.p2[1] === '2201980' && r.p2[2] === 1, `dois atendimentos possíveis: dúvida, o de mais critérios primeiro: ${JSON.stringify(r.p2)}`);
 ok(r.p3 === 'nenhum', 'paciente sem atendimento compatível: nenhum');
+// Conferência do Henrique (25/11/2026): «TC abdome total» na conta; laudos do Henrique (abdome superior) e do Lucca
+// (abdome total, validado para o código) no mesmo dia. A linha fica com o laudo do Henrique, não com o do Lucca.
+const r2 = await p.evaluate(() => {
+  const cfg = H.cfgPadrao(), eq = H.eqVaziaP();
+  eq.itens.push({ id: 'e1', codigo: '41001095', titulo: 'TC ABDOME TOTAL', status: 'validada', escopo: { unidade: '*', modalidade: '*' }, historico: [], responsavel: 'T' });
+  const data = new Date(Date.UTC(2026, 9, 10)), dia = Math.round(data / 864e5);
+  const L = (i, titulo, med) => ({ i, linhaPlanilha: i + 2, idLaudo: 'L' + i, unidade: 'X', paciente: 'JOAO DA SILVA', pn: 'JOAO DA SILVA', idPac: '9', titulo, tn: titulo, descricao: '', data, dia, convenio: 'UNIMED', modalidade: 'CT', medico: med, mn: med });
+  const apolo = { laudos: [L(0, 'TC ABDOME TOTAL', 'LUCCA MARICATO'), L(1, 'TC ABDOME SUPERIOR', 'HENRIQUE PINI')] };
+  const r = { seq: 1, pagina: 1, codigo: '41001095', procDesc: 'TC ABDOME TOTAL', grupoNome: 'TOMOGRAFIA', conta: '1', atendimento: '100', paciente: 'JOAO DA SILVA', convenio: 'UNIMED', data, vlRepasse: 50, vlTotal: 100, pct: .5, quant: 1, prestadorCod: '10175', prestadorNome: 'HENRIQUE PINI', repasse: '1' };
+  const rel = { cab: { prestadorCod: '10175', prestadorNome: 'HENRIQUE PINI', repasse: '1', descricao: 'REPASSE', competencia: '11/2026' }, regs: [r] };
+  const com = H.conferirCruzado(rel, apolo, cfg, eq, { unidadeCod: '*', tol: 7, medicos: ['HENRIQUE PINI'] });
+  const sem = H.conferirCruzado(rel, apolo, cfg, eq, { unidadeCod: '*', tol: 7, medicos: null });
+  const par = res => res.linhas.find(x => x.r)?.l?.medico || '-';
+  return [par(com), par(sem)];
+});
+ok(r2[0] === 'HENRIQUE PINI', `conferindo o Henrique, a linha fica com o laudo dele, não com o do Lucca (${r2[0]})`);
+ok(r2[1] === 'LUCCA MARICATO', `sem médico escolhido, nada muda: fica o laudo validado (${r2[1]})`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
