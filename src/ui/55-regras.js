@@ -57,7 +57,7 @@ function conveniosVistos() {
 function cardConvenios() {
   const semTipo = S.cfg.convenios.filter(c => !c.tipo).length, vistos = conveniosVistos();
   return `<div class="card" data-sub="convenios"><h2>Convênios <span class="muted small">${S.cfg.convenios.length} cadastrados · ${semTipo} sem tipo</span></h2>
-    <p class="lead">O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
+    <p class="lead"><b>Nomes equivalentes</b> são outras formas do mesmo convênio (resumido na planilha de laudos, cortado no MV): na conferência, MV e laudo com qualquer um desses nomes contam como o mesmo convênio. As sugestões em laranja vêm dos arquivos carregados. O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
     <div class="acoes">${S.pbi ? `<button id="cvPbi" class="sec">Importar do Power BI (${S.pbi.convenios.length})</button>` : '<span class="small muted">Carregue o Power BI no Início para importar a lista com os tipos.</span>'}
       ${vistos.length ? `<button id="cvMV" class="sec">Incluir ${vistos.length} dos relatórios do MV carregados</button>` : ''}<button id="cvAdd" class="sec">+ Convênio</button>
       <label class="small"><input type="checkbox" id="cvSoSem"${BS.soSemTipo ? ' checked' : ''}> só os sem tipo</label><input type="search" id="cvBusca" placeholder="Buscar convênio…" style="max-width:260px"></div>
@@ -119,15 +119,32 @@ function ligarRegras(pg) {
 function desenharConvenios() {
   const q = norm($('cvBusca')?.value || '');
   const lista = S.cfg.convenios.filter(c => (!BS.soSemTipo || !c.tipo) && (!q || norm(c.nome).includes(q))).sort((a, b) => (!!a.tipo - !!b.tipo) || a.nome.localeCompare(b.nome));
+  // Nomes vistos nos arquivos carregados (convênio do laudo e do MV), para sugerir equivalentes.
+  const vistos = [...(S.apolo?.laudos || []).map(l => l.convenio), ...S.relatorios.flatMap(x => x.rel.regs.map(r => r.convenio))];
+  const sug = sugestoesNomesConvenio(S.cfg, vistos);
+  const celEq = c => `<div class="nomes-eq">${(c.equivalentes || []).map((e, j) => `<span class="marc">${esc(e)}<b data-cveqx="${esc(c.nome)}|${j}" title="Remover" role="button" aria-label="Remover ${esc(e)}">×</b></span>`).join('')}${(sug.get(c.nome) || []).map(n => `<button type="button" class="sec mini sug" data-cvsug="${esc(c.nome)}" data-nome="${esc(n)}" title="Aceitar como o mesmo convênio">+ ${esc(n)}?</button>`).join('')}<input data-cveqadd="${esc(c.nome)}" placeholder="+ outro nome (Enter)" aria-label="Novo nome equivalente para ${esc(c.nome)}"></div>`;
   tabela($('cvTab'), {
     linhas: lista, porPagina: 100, vazio: 'Nenhum convênio. Importe do Power BI ou dos relatórios do MV.',
-    colunas: [{ t: 'Convênio', v: c => c.nome }, { t: 'Tipo', html: c => `<select data-cv="${esc(c.nome)}" aria-label="Tipo"><option value="">— sem tipo —</option>${opcoes(Object.entries(TIPOS_CONVENIO), c.tipo)}</select>` }, { t: 'Origem', v: c => c.origem || '' }]
+    colunas: [{ t: 'Convênio', v: c => c.nome }, { t: 'Tipo', html: c => `<select data-cv="${esc(c.nome)}" aria-label="Tipo"><option value="">— sem tipo —</option>${opcoes(Object.entries(TIPOS_CONVENIO), c.tipo)}</select>` }, { t: 'Nomes equivalentes', html: celEq }, { t: 'Origem', v: c => c.origem || '' }]
   });
   $('cvTab').onchange = e => {
     const s = e.target.closest('[data-cv]'); if (!s) return;
     const c = S.cfg.convenios.find(x => x.nome === s.dataset.cv); c.tipo = s.value;
     salvarCfg(`Convênio «${c.nome}» marcado como ${TIPOS_CONVENIO[c.tipo] || 'sem tipo'}.`, 'regras');
   };
+  // Nomes equivalentes (25/11/2026): resumido na planilha de laudos ou cortado no MV contam como o mesmo convênio.
+  const addEq = (nome, novo) => {
+    const c = S.cfg.convenios.find(x => x.nome === nome), v = String(novo || '').trim(); if (!c || !v) return;
+    c.equivalentes = c.equivalentes || [];
+    if ([c.nome, ...c.equivalentes].some(n => norm(n) === norm(v))) return avisar(`«${v}» já é um nome de «${c.nome}».`, 'warn');
+    c.equivalentes.push(v.toUpperCase()); salvarCfg(`«${v}» passa a contar como o convênio «${c.nome}». Rode a conferência de novo para valer.`, 'regras'); desenharConvenios();
+  };
+  $('cvTab').onclick = e => {
+    const x = e.target.closest('[data-cveqx]'), sg = e.target.closest('[data-cvsug]');
+    if (x) { const [nome, j] = [x.dataset.cveqx.slice(0, x.dataset.cveqx.lastIndexOf('|')), +x.dataset.cveqx.slice(x.dataset.cveqx.lastIndexOf('|') + 1)]; const c = S.cfg.convenios.find(y => y.nome === nome); if (!c) return; const [tirado] = c.equivalentes.splice(j, 1); salvarCfg(`«${tirado}» não conta mais como «${c.nome}».`, 'regras'); desenharConvenios(); }
+    if (sg) addEq(sg.dataset.cvsug, sg.dataset.nome);
+  };
+  $('cvTab').onkeydown = e => { const a = e.target.closest('[data-cveqadd]'); if (a && e.key === 'Enter') { e.preventDefault(); addEq(a.dataset.cveqadd, a.value); } };
 }
 
 /* ---------- Regras de um prestador ---------- */

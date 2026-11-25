@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.42</title>
+<title>Repasse Médico v3.0.0-alpha.43</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -563,13 +563,35 @@ th .cf-sel{margin:0}
 .qd-tab tr.dif td{background:var(--warnbg)}.qd-tab tr.dif td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
 .qd-rod{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;border-top:1.5px solid var(--accent);background:var(--bg);font-size:12.5px}
 @media (max-width:760px){.qd-tab td.res,.qd-tab th.res,.qd-tab td:first-child,.qd-tab th:first-child{width:auto}}
+/* Linha aberta da conferência reorganizada (25/11/2026) */
+.la{display:grid;gap:12px;padding:4px 2px}
+.la-topo{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.la-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.la-meta{font-size:12px;color:var(--muted);margin-left:auto}
+.la-diag{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:8px;padding:9px 12px}.la-diag p{margin:3px 0 0;font-size:13px}
+.la-diag.err{border-left-color:var(--err);background:var(--errbg)}.la-diag.ok{border-left-color:var(--ok);background:var(--okbg)}
+.la-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1000px){.la-grid{grid-template-columns:minmax(0,1fr)}}
+.la-col{display:grid;gap:12px}
+.la-h{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.la-esp{width:100%;border-collapse:collapse;font-size:12.5px}.la-esp th,.la-esp td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.la-esp th{font-size:11px;color:var(--muted)}.la-esp .n{text-align:center;font-variant-numeric:tabular-nums}
+.la-esp tr.falta td{color:var(--err)}.la-esp tr.sobra td{color:var(--warn)}
+.la-cands{display:grid;gap:8px}.la-cand{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid;gap:5px;font-size:12.5px}
+.la-cand.escolhido{border-color:var(--accent)}
+.chips-s{display:flex;flex-wrap:wrap;gap:4px}.chip-s{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.chip-s.ok{background:var(--okbg);color:var(--ok)}.chip-s.warn{background:var(--warnbg);color:var(--warn)}.chip-s.err{background:var(--errbg);color:var(--err)}
+.la-mais summary{cursor:pointer;font-size:12.5px;color:var(--accent)}.la-mais ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+.la-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+.nomes-eq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.nomes-eq .marc{cursor:default}.nomes-eq .marc b{margin-left:4px;cursor:pointer;color:var(--muted)}
+.nomes-eq input{max-width:180px;font-size:12px;padding:3px 6px}.nomes-eq .sug{color:var(--warn)}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.42 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.43 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -614,7 +636,7 @@ th .cf-sel{margin:0}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.42';
+const MOTOR_VERSAO = '3.0.0-alpha.43';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -749,10 +771,28 @@ function indiceNomes(itens, diaDe, pnDe) {
 }
 
 // Convênio: o MV costuma truncar; compatível se um for prefixo do outro.
-function convenioCompativel(a, b) {
+function convenioCompativel(a, b, cfg = null) {
   const x = norm(a), y = norm(b);   // norm já tira o espaço do fim
   if (!x || !y) return null;
-  return x === y || y.startsWith(x) || x.startsWith(y);
+  if (x === y || y.startsWith(x) || x.startsWith(y)) return true;
+  // Nomes equivalentes do cadastro de convênios (25/11/2026): resumido no Apolo, cortado no MV, escrito de outro jeito.
+  const nomesDe = c => [c.nome, ...(c.equivalentes || [])].map(n => norm(n)).filter(Boolean);
+  const casa = (n, z) => n === z || n.startsWith(z) || z.startsWith(n);
+  return (cfg?.convenios || []).some(c => { const ns = nomesDe(c); return ns.some(n => casa(n, x)) && ns.some(n => casa(n, y)); });
+}
+
+// Sugestões de nomes equivalentes: nomes vistos (planilha de laudos, relatórios do MV) que não são nome nem equivalente
+// de nenhum convênio cadastrado e parecem um deles (um é começo do outro, ou a mesma primeira palavra). Até 3 por convênio.
+function sugestoesNomesConvenio(cfg, vistos) {
+  const conhecidos = new Set((cfg.convenios || []).flatMap(c => [c.nome, ...(c.equivalentes || [])]).map(n => norm(n)));
+  const soltos = [...new Map((vistos || []).filter(Boolean).map(n => [norm(n), n])).entries()].filter(([k]) => k && !conhecidos.has(k));
+  const out = new Map();
+  for (const c of cfg.convenios || []) {
+    const k = norm(c.nome), w = k.split(' ')[0];
+    const sug = soltos.filter(([z]) => z.startsWith(k) || k.startsWith(z) || (w.length >= 3 && z.split(' ')[0] === w)).map(([, n]) => n).slice(0, 3);
+    if (sug.length) out.set(c.nome, sug);
+  }
+  return out;
 }
 
 /* ---------- Datas (sempre UTC, dia inteiro) ---------- */
@@ -3325,12 +3365,12 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
               : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 6
                 // Nome só semelhante, mesma data, convênio compatível e procedimento sem equivalência: par PENDENTE (decisão humana),
                 // em vez de duas linhas soltas («Só no faturamento» + «Só no laudo»).
-                : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio) !== false) ? 7 : 0;
+                : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio, cfg) !== false) ? 7 : 0;
       if (!tier) continue;
       // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 6 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
       const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 5 && !proc.composta ? af : 0;
-      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio) });
+      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg) });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
     b.cands.sort(ordem);
@@ -3458,6 +3498,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
         marc.add('composta');
         const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(e => e.qtd > (u.usos[e.i] || 0)) : [];
         out.composta = p.proc.composta.id;
+        // Para a tela (25/11/2026): esperado × lançado da regra, e se o código da linha está fora dela.
+        out.compostaDet = { nome: nomeComposta(p.proc.composta), titulo: p.l.titulo, fora: p.proc.estado === 'divergente',
+          itens: u ? u.esperados.filter(e => e.qtd > 0).map(e => ({ rotulo: e.rotulo, esperado: e.qtd, lancado: u.usos[e.i] || 0 })) : (p.proc.esperados || []).filter(e => e.qtd > 0).map(e => ({ rotulo: e.rotulo, esperado: e.qtd, lancado: null })) };
         motivos.push(`${p.proc.motivo}.${falta.length ? '' : ' Composição completa no MV.'}`);
         if (falta.length) { marc.add('composta-falta'); out.compostaFalta = true; motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${textoEsperados(u.esperados)}; falta ${falta.map(e => `${e.rotulo} (esperado ×${e.qtd}, lançado ×${u.usos[e.i] || 0})`).join(', ')} no MV.`); }
       }
@@ -3554,6 +3597,31 @@ function resultadoFiltrado(res, linhas) {
   for (const s of Object.values(porStatus)) { s.vlRepasse = r2(s.vlRepasse); s.vlTotal = r2(s.vlTotal); }
   return { ...res, linhas, porStatus, porMarcador, porDecisao, porTipo, filtrado: true };
 }
+
+/* Diagnóstico em uma frase da linha aberta (pedido de 25/11/2026): título curto + explicação, a partir do que a
+ * conferência já calculou (status, marcadores, regra composta). nivel: ok | warn | err. Sem dado novo: só organiza. */
+function diagnosticoLinha(x) {
+  const r = x.r, l = x.l, m = x.marcadores || new Set(), c = x.compostaDet, mot = (x.motivos || [])[0] || '';
+  const mv = r ? `${r.codigo} ${r.procDesc || ''}`.trim() : '';
+  const esperaTxt = c ? c.itens.map(i => `${i.esperado > 1 ? `${i.esperado}× ` : ''}${i.rotulo}`).join(' + ') : '';
+  if (c && c.fora && r) return { nivel: 'err', titulo: 'O MV lançou um código que não faz parte do exame laudado', texto: `O laudo «${c.titulo}», pela regra composta «${c.nome}», espera ${esaperaOu(esperaTxt)}. O MV lançou ${mv}, que não é parte dessa regra.` };
+  if (c && c.itens.some(i => i.lancado !== null && i.lancado < i.esperado)) {
+    const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');
+    return { nivel: 'warn', titulo: 'Composição incompleta no MV', texto: `O laudo «${c.titulo}» espera ${esaperaOu(esperaTxt)}; falta no MV: ${falta}.` };
+  }
+  if (x.status === 'so-laudo') return { nivel: 'err', titulo: 'Laudo sem lançamento neste relatório do MV', texto: 'Em geral o exame está lançado para outro prestador. Também pode ser conta aberta, fora de remessa ou código TUSS errado na conta.' };
+  if (x.status === 'so-faturamento') return { nivel: 'err', titulo: 'Lançado no MV sem laudo correspondente', texto: mot };
+  if (m.has('outro-medico')) return { nivel: 'err', titulo: 'Laudo assinado por outro médico', texto: `O laudo é de ${l?.medico || '(sem médico)'}, não do prestador deste relatório.` };
+  if (m.has('ambiguo')) return { nivel: 'warn', titulo: 'Mais de um laudo plausível', texto: 'Escolha o laudo certo entre os candidatos.' };
+  if (m.has('eq-divergente')) return { nivel: 'err', titulo: 'Procedimento do MV diferente do laudo', texto: `O MV lançou ${mv}; o laudo é «${l?.titulo || ''}».` };
+  if (m.has('eq-pendente') || m.has('eq-sem-cadastro') || m.has('eq-conflito')) return { nivel: 'warn', titulo: 'Equivalência código × título ainda não decidida', texto: mot };
+  if (m.has('convenio-divergente')) return { nivel: 'warn', titulo: 'Convênio diferente entre MV e laudo', texto: mot };
+  if (m.has('nome-semelhante')) return { nivel: 'warn', titulo: 'Nome do paciente apenas semelhante', texto: mot };
+  if (x.status === 'conferido') return { nivel: 'ok', titulo: 'Par conferido', texto: mot };
+  if (x.status === 'ressalva') return { nivel: 'warn', titulo: 'Conferido com ressalva', texto: mot };
+  return { nivel: 'warn', titulo: STATUS_CONF[x.status]?.nome || 'Linha para analisar', texto: mot };
+}
+const esaperaOu = t => t || 'os itens da regra';
 
 /* ---- src/engine/61-causas.js ---- */
 /* ============================================================
@@ -7711,13 +7779,7 @@ function desenharConferencia() {
       { t: 'Vl Repasse', n: true, th: () => thOrdem('vl', 'Vl Repasse'), v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
     classeLinha: x => { const g = grupos.get(x); return g ? `${g.banda ? 'grp-b' : ''}${g.inicio ? ' grp-ini' : ''}` : ''; },
-    detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
-      return `${comparacaoMVLaudo(x, ctx)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul>
-      ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${copiavel(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
-      ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">ID Apolo ${idApolo(x.l) === 'DUPLICATE' ? `<span class="badge err">DUPLICATE</span> ${copiavel(x.l.idPac)}` : x.l.idPac ? copiavel(x.l.idPac) : '<span class="badge warn">SEM ID</span>'} · ${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(convenioApolo(x.l))} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}
-      <h4 style="margin-top:8px">Observação</h4><textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
-      ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
-      <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]}) · título ${Math.round((cd.af || 0) * 100)}%${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
+    detalhe: x => detalheLinhaConf(x, res.linhas.indexOf(x), classeDaLinhaConf(x), observacoesDaLinha(idxObs, x.r, x.l), ctx)
   });
   // Caixa do cabeçalho (pedido de 24/11/2026): marca ou desmarca todas as linhas do filtro.
   const caixaTodos = v => { const cb = $('cfTab').querySelector('[data-seltodos]'); if (!cb) return; const n = v.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length; cb.checked = !!v.length && n === v.length; cb.indeterminate = n > 0 && n < v.length; };
@@ -7773,12 +7835,62 @@ function desenharConferencia() {
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
 /* v3.0.0-alpha.40 (prévia aprovada em 24/11/2026: docs/prototipos/quadro-comparacao/) — Comparação 1 a 1 MV × laudo num
  * quadro marcado, como planilha: faixa de título, colunas MV | Laudo | Resultado, diferença destacada e resumo no rodapé. */
+/* Linha aberta da conferência, reorganizada (prévia aprovada em 25/11/2026: docs/prototipos/linha-aberta/):
+ * situação numa linha → diagnóstico em uma frase → MV × laudo (com identificação) | esperado × lançado e candidatos
+ * → evidências completas recolhidas → decisão e observação. */
+const identMV = r => r ? `atendimento ${copiavel(r.atendimento)}<br><span class="small muted">conta ${esc(r.conta || '—')} · página ${esc(r.pagina ?? '—')}${r.repasse ? ` · repasse ${esc(r.repasse)}` : ''}${r.repeticao ? ` · repetida ${r.repeticao.i}/${r.repeticao.n}` : ''}</span>` : '—';
+const identLaudo = l => {
+  if (!l) return '—';
+  const id = idApolo(l), v = id === 'DUPLICATE' ? `<span class="badge err">DUPLICATE</span> ${copiavel(l.idPac)}` : l.idPac ? copiavel(l.idPac) : '<span class="badge warn">SEM ID</span>';
+  return `ID Apolo ${v}<br><span class="small muted">${esc(l.unidade || '')} · ${esc(l.modalidade || '')} · linha ${esc(l.linhaPlanilha ?? '—')} da planilha</span>`;
+};
+// Lado único (só no MV ou só no laudo): o quadro 1 a 1 não se aplica; mostra o que existe.
+function ladoUnicoConf(x) {
+  const r = x.r, l = x.l, lin = r
+    ? [['Paciente', esc(r.paciente)], ['Data', fmtData(r.data)], ['Procedimento', esc(`${r.codigo} · ${r.procDesc || ''}`)], ['Convênio', esc(r.convenio || '—')], ['Identificação', identMV(r)]]
+    : [['Paciente', esc(l.paciente)], ['Data', fmtData(l.data)], ['Laudo', esc(`${l.titulo}${l.descricao ? ` · ${l.descricao}` : ''}`)], ['Convênio', esc(convenioApolo(l))], ['Médico', esc(l.medico || '—')], ['Identificação', identLaudo(l)]];
+  return `<section class="cf-cmp qd"><div class="qd-tit"><b>${r ? 'Linha do MV' : 'Laudo (Apolo)'}</b><span>sem par ${r ? 'no laudo' : 'no MV'}</span></div><div class="qd-rol"><table class="qd-tab"><tbody>${lin.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</tbody></table></div></section>`;
+}
+function quadroComposta(x) {
+  const c = x.compostaDet; if (!c || !c.itens.length) return '';
+  const linhas = c.itens.map(i => { const falta = i.lancado !== null && i.lancado < i.esperado;
+    return `<tr class="${falta ? 'falta' : ''}"><td>${esc(i.rotulo)}</td><td class="n">${i.esperado}</td><td class="n">${i.lancado ?? '—'}</td><td>${falta ? 'falta' : i.lancado === null ? '' : 'ok'}</td></tr>`; });
+  if (c.fora && x.r) linhas.push(`<tr class="sobra"><td>${esc(`${x.r.codigo} ${x.r.procDesc || ''}`)}</td><td class="n">0</td><td class="n">1</td><td>fora da regra</td></tr>`);
+  return `<div><h4 class="la-h">Regra composta «${esc(c.nome)}»: esperado × lançado</h4><table class="la-esp"><thead><tr><th>Procedimento</th><th class="n">Esperado</th><th class="n">Lançado</th><th></th></tr></thead><tbody>${linhas.join('')}</tbody></table></div>`;
+}
+function cartoesCandidatos(x, i, k) {
+  if (!x.cands.length) return `<div><h4 class="la-h">Laudos candidatos</h4><p class="muted small">Nenhum laudo do paciente na tolerância de data.</p></div>`;
+  const ch = (nivel, t) => `<span class="chip-s ${nivel}">${esc(t)}</span>`;
+  const escolher = x.r && k === 'pend' && !x.decisao && x.cands.length > 1;
+  return `<div><h4 class="la-h">Laudos candidatos (${x.cands.length})</h4><div class="la-cands">${x.cands.map((cd, j) => {
+    const af = Math.round((cd.af || 0) * 100), est = cd.proc?.estado, dd = Math.abs(cd.dd ?? 0);
+    const chips = [dd === 0 ? ch('ok', 'mesma data') : ch('warn', `data ±${dd} dia(s)`),
+      cd.nm >= 3 ? ch('ok', 'nome idêntico') : cd.nm === 2 ? ch('warn', 'nome truncado') : ch('err', 'nome semelhante'),
+      est === 'validada' ? ch('ok', 'equivalência validada') : ch(est === 'divergente' ? 'err' : 'warn', ROTULO_EQ[est] || est || 'sem equivalência'),
+      cd.mesmoMedico === false ? ch('err', 'outro médico') : '',
+      ch(af >= 70 ? 'ok' : af >= 40 ? 'warn' : 'err', `título ${af}%`)].join('');
+    return `<div class="la-cand${cd.l === x.l ? ' escolhido' : ''}"><b>«${esc(cd.l.titulo)}» · ${fmtData(cd.l.data)}</b><span class="small muted">${esc(cd.l.medico || 'sem médico')} · faixa ${cd.tier} (${esc(FAIXA[cd.tier] || '')})${cd.l === x.l ? ' · <b>par escolhido</b>' : ''}</span><div class="chips-s">${chips}</div>${escolher ? `<div><button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button></div>` : ''}</div>`;
+  }).join('')}</div></div>`;
+}
+function detalheLinhaConf(x, i, k, obs, ctx) {
+  const d = diagnosticoLinha(x), tags = [...x.marcadores].map(m => MARCADORES[m]).filter(Boolean);
+  const meta = [`Linha ${x.r ? x.r.seq : '—'}${x.r ? ' do relatório' : ''}`, `origem ${x.origem}`, x.decisao ? 'com decisão' : k === 'pend' ? 'sem decisão (não entra no fechamento)' : ''].filter(Boolean).join(' · ');
+  return `<div class="la">
+    <div class="la-topo">${k ? pillClasse(k) : ''}${tags.map(t => `<span class="la-tag">${esc(t)}</span>`).join('')}<span class="la-meta">${esc(meta)}</span></div>
+    <div class="la-diag ${d.nivel}"><b>${esc(d.titulo)}</b>${d.texto ? `<p>${atendimentosCopiaveis(esc(d.texto))}</p>` : ''}</div>
+    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
+    <details class="la-mais"><summary>Ver as evidências completas (${x.motivos.length})</summary><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul></details>
+    <div class="la-acoes">${botoesDecisao(x, i)}${k === 'pend' && !x.decisao ? '<span class="small muted">Depois de decidir, a próxima linha que falta decidir abre sozinha.</span>' : ''}</div>
+    <div><label class="campo">Observação<textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea></label><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
+    ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
+  </div>`;
+}
 function comparacaoMVLaudo(x, ctx = null) {
   if (!x.r || !x.l) return '';
   const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
   const b = (ok, t) => `<span class="badge ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
   const mesmoDia = isoDia(x.r.data) === isoDia(x.l.data), eqOk = cd?.proc?.estado === 'validada';
-  const cv = convenioCompativel(x.r.convenio, x.l.convenio);   // o MV corta o nome do convênio (mesma regra do motor)
+  const cv = convenioCompativel(x.r.convenio, x.l.convenio, S.cfg);   // o MV corta o nome do convênio (mesma regra do motor)
   const cab = ctx?.relatorio?.cab, medMV = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
   const mesmoMed = cab && x.l.medico ? medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico)) : null;
   const linhas = [
@@ -7786,14 +7898,15 @@ function comparacaoMVLaudo(x, ctx = null) {
     ['Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia],
     ['Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, eqOk ? 'equivalência validada' : (ROTULO_EQ[cd.proc.estado] || cd.proc.estado)) : '', !!(cd && !eqOk)],
     ['Convênio', x.r.convenio, convenioApolo(x.l), cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false],
-    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false]
+    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false],
+    ['Identificação', { html: identMV(x.r) }, { html: identLaudo(x.l) }, '', false]
   ];
   const difs = linhas.filter(l => l[4]), iguais = linhas.filter(l => !l[4] && l[3]).length;
   const origem = [x.r.seq ? `linha ${x.r.seq} do relatório` : '', x.l.idLaudo ? `laudo ${x.l.idLaudo}${x.l.linhaPlanilha ? ` (linha ${x.l.linhaPlanilha} da planilha)` : ''}` : ''].filter(Boolean).join(' · ');
   return `<section class="cf-cmp qd" aria-label="Comparação 1 a 1 MV × laudo">
     <div class="qd-tit"><b>Comparação 1 a 1 · MV × laudo</b>${origem ? `<span>${esc(origem)}</span>` : ''}</div>
     <div class="qd-rol"><table class="qd-tab"><thead><tr><th></th><th class="mv">MV (relatório de repasse)</th><th>Laudo (Apolo)</th><th class="res">Resultado</th></tr></thead><tbody>
-    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${esc(mv || '—')}</td><td>${esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
+    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${mv?.html ?? esc(mv || '—')}</td><td>${la?.html ?? esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
     </tbody></table></div>
     <div class="qd-rod"><b>${iguais} igua${iguais === 1 ? 'l' : 'is'} · ${difs.length ? `${difs.length} diferença${difs.length > 1 ? 's' : ''}:` : 'nenhuma diferença'}</b>${difs.length ? ` ${esc(difs.map(l => l[0]).join(', '))} <span class="muted">— decida abaixo</span>` : ''}</div>
   </section>`;
@@ -12024,7 +12137,7 @@ function conveniosVistos() {
 function cardConvenios() {
   const semTipo = S.cfg.convenios.filter(c => !c.tipo).length, vistos = conveniosVistos();
   return `<div class="card" data-sub="convenios"><h2>Convênios <span class="muted small">${S.cfg.convenios.length} cadastrados · ${semTipo} sem tipo</span></h2>
-    <p class="lead">O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
+    <p class="lead"><b>Nomes equivalentes</b> são outras formas do mesmo convênio (resumido na planilha de laudos, cortado no MV): na conferência, MV e laudo com qualquer um desses nomes contam como o mesmo convênio. As sugestões em laranja vêm dos arquivos carregados. O tipo define a tabela de valores do IMG: SUS usa a tabela SUS; Convênio e Particular usam a de convênios e particulares. O Power BI traz Convênio ou Particular; o SUS é marcado aqui (o tipo marcado à mão nunca é trocado por uma importação).</p>
     <div class="acoes">${S.pbi ? `<button id="cvPbi" class="sec">Importar do Power BI (${S.pbi.convenios.length})</button>` : '<span class="small muted">Carregue o Power BI no Início para importar a lista com os tipos.</span>'}
       ${vistos.length ? `<button id="cvMV" class="sec">Incluir ${vistos.length} dos relatórios do MV carregados</button>` : ''}<button id="cvAdd" class="sec">+ Convênio</button>
       <label class="small"><input type="checkbox" id="cvSoSem"${BS.soSemTipo ? ' checked' : ''}> só os sem tipo</label><input type="search" id="cvBusca" placeholder="Buscar convênio…" style="max-width:260px"></div>
@@ -12086,15 +12199,32 @@ function ligarRegras(pg) {
 function desenharConvenios() {
   const q = norm($('cvBusca')?.value || '');
   const lista = S.cfg.convenios.filter(c => (!BS.soSemTipo || !c.tipo) && (!q || norm(c.nome).includes(q))).sort((a, b) => (!!a.tipo - !!b.tipo) || a.nome.localeCompare(b.nome));
+  // Nomes vistos nos arquivos carregados (convênio do laudo e do MV), para sugerir equivalentes.
+  const vistos = [...(S.apolo?.laudos || []).map(l => l.convenio), ...S.relatorios.flatMap(x => x.rel.regs.map(r => r.convenio))];
+  const sug = sugestoesNomesConvenio(S.cfg, vistos);
+  const celEq = c => `<div class="nomes-eq">${(c.equivalentes || []).map((e, j) => `<span class="marc">${esc(e)}<b data-cveqx="${esc(c.nome)}|${j}" title="Remover" role="button" aria-label="Remover ${esc(e)}">×</b></span>`).join('')}${(sug.get(c.nome) || []).map(n => `<button type="button" class="sec mini sug" data-cvsug="${esc(c.nome)}" data-nome="${esc(n)}" title="Aceitar como o mesmo convênio">+ ${esc(n)}?</button>`).join('')}<input data-cveqadd="${esc(c.nome)}" placeholder="+ outro nome (Enter)" aria-label="Novo nome equivalente para ${esc(c.nome)}"></div>`;
   tabela($('cvTab'), {
     linhas: lista, porPagina: 100, vazio: 'Nenhum convênio. Importe do Power BI ou dos relatórios do MV.',
-    colunas: [{ t: 'Convênio', v: c => c.nome }, { t: 'Tipo', html: c => `<select data-cv="${esc(c.nome)}" aria-label="Tipo"><option value="">— sem tipo —</option>${opcoes(Object.entries(TIPOS_CONVENIO), c.tipo)}</select>` }, { t: 'Origem', v: c => c.origem || '' }]
+    colunas: [{ t: 'Convênio', v: c => c.nome }, { t: 'Tipo', html: c => `<select data-cv="${esc(c.nome)}" aria-label="Tipo"><option value="">— sem tipo —</option>${opcoes(Object.entries(TIPOS_CONVENIO), c.tipo)}</select>` }, { t: 'Nomes equivalentes', html: celEq }, { t: 'Origem', v: c => c.origem || '' }]
   });
   $('cvTab').onchange = e => {
     const s = e.target.closest('[data-cv]'); if (!s) return;
     const c = S.cfg.convenios.find(x => x.nome === s.dataset.cv); c.tipo = s.value;
     salvarCfg(`Convênio «${c.nome}» marcado como ${TIPOS_CONVENIO[c.tipo] || 'sem tipo'}.`, 'regras');
   };
+  // Nomes equivalentes (25/11/2026): resumido na planilha de laudos ou cortado no MV contam como o mesmo convênio.
+  const addEq = (nome, novo) => {
+    const c = S.cfg.convenios.find(x => x.nome === nome), v = String(novo || '').trim(); if (!c || !v) return;
+    c.equivalentes = c.equivalentes || [];
+    if ([c.nome, ...c.equivalentes].some(n => norm(n) === norm(v))) return avisar(`«${v}» já é um nome de «${c.nome}».`, 'warn');
+    c.equivalentes.push(v.toUpperCase()); salvarCfg(`«${v}» passa a contar como o convênio «${c.nome}». Rode a conferência de novo para valer.`, 'regras'); desenharConvenios();
+  };
+  $('cvTab').onclick = e => {
+    const x = e.target.closest('[data-cveqx]'), sg = e.target.closest('[data-cvsug]');
+    if (x) { const [nome, j] = [x.dataset.cveqx.slice(0, x.dataset.cveqx.lastIndexOf('|')), +x.dataset.cveqx.slice(x.dataset.cveqx.lastIndexOf('|') + 1)]; const c = S.cfg.convenios.find(y => y.nome === nome); if (!c) return; const [tirado] = c.equivalentes.splice(j, 1); salvarCfg(`«${tirado}» não conta mais como «${c.nome}».`, 'regras'); desenharConvenios(); }
+    if (sg) addEq(sg.dataset.cvsug, sg.dataset.nome);
+  };
+  $('cvTab').onkeydown = e => { const a = e.target.closest('[data-cveqadd]'); if (a && e.key === 'Enter') { e.preventDefault(); addEq(a.dataset.cveqadd, a.value); } };
 }
 
 /* ---------- Regras de um prestador ---------- */
@@ -12693,7 +12823,9 @@ function cfgConferencia() {
       <label class="campo">Valor simbólico até (R$)<input type="number" id="pSimb" min="0" step="0.01" value="${p.valorSimbolico}"><span class="small muted">Só marca a linha; não muda a categoria.</span></label>
       <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
-    <div class="acoes"><button id="pSalvar">Salvar parâmetros</button></div></div>
+    <label class="campo" style="margin-top:10px">Unidades do Apolo ignoradas (uma por linha)<textarea id="pUnIgn" rows="5" style="max-width:520px">${esc((p.unidadesIgnoradas || UNIDADES_IGNORADAS_PADRAO).join('\n'))}</textarea>
+      <span class="small muted">Laudos dessas unidades saem da planilha do Apolo na leitura: não entram na conferência, nos títulos nem em «Só no laudo». Maiúsculas, acentos e espaços não importam. Depois de mudar, carregue a planilha de novo.</span></label>
+    <div class="acoes"><button id="pSalvar">Salvar parâmetros</button><button class="sec" id="pUnIgnPadrao">Voltar ao padrão das unidades ignoradas</button></div></div>
   <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
     ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
   <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
@@ -12708,8 +12840,9 @@ function ligarConferencia() {
     S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
     salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
   });
+  $('pUnIgnPadrao').onclick = () => { $('pUnIgn').value = UNIDADES_IGNORADAS_PADRAO.join('\n'); avisar('Lista padrão de volta no campo: clique em «Salvar parâmetros» para gravar.', 'ok'); };
   $('pSalvar').onclick = () => {
-    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
+    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim(), unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
     if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.', 'parametros');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }

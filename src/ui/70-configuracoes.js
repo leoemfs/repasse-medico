@@ -73,7 +73,9 @@ function cfgConferencia() {
       <label class="campo">Valor simbólico até (R$)<input type="number" id="pSimb" min="0" step="0.01" value="${p.valorSimbolico}"><span class="small muted">Só marca a linha; não muda a categoria.</span></label>
       <label class="campo">Prestador genérico (código no MV)<input type="text" id="pGen" value="${esc(p.prestadorGenerico ?? '2')}"><span class="small muted">O relatório dele vai para a Correção de prestador.</span></label>
       <label class="campo">Retenção dos dados de pacientes nas NCs (dias)<input type="number" id="pRet" min="1" max="366" value="${p.retencaoNC ?? RETENCAO_NC_PADRAO}"><span class="small muted">Depois desse prazo, nome e ID/atendimento são apagados; o resto da NC fica para os indicadores.</span></label></div>
-    <div class="acoes"><button id="pSalvar">Salvar parâmetros</button></div></div>
+    <label class="campo" style="margin-top:10px">Unidades do Apolo ignoradas (uma por linha)<textarea id="pUnIgn" rows="5" style="max-width:520px">${esc((p.unidadesIgnoradas || UNIDADES_IGNORADAS_PADRAO).join('\n'))}</textarea>
+      <span class="small muted">Laudos dessas unidades saem da planilha do Apolo na leitura: não entram na conferência, nos títulos nem em «Só no laudo». Maiúsculas, acentos e espaços não importam. Depois de mudar, carregue a planilha de novo.</span></label>
+    <div class="acoes"><button id="pSalvar">Salvar parâmetros</button><button class="sec" id="pUnIgnPadrao">Voltar ao padrão das unidades ignoradas</button></div></div>
   <div class="card"><h2>Planilhas de entrada ${notaEscopo(true)}</h2><p class="lead">Planilha de laudos e do Power BI guardadas por competência neste navegador (já lidas, sem CPF), para não carregar de novo a cada sessão.</p>
     ${Object.entries(TIPOS_GUARDADOS).map(([k, t]) => `<label class="small" style="display:block"><input type="checkbox" data-guardarauto="${k}"${guardarPlanilhasAtivo(k) ? ' checked' : ''}> Guardar automaticamente a ${esc(t)} quando ela for carregada</label>`).join('')}</div>
   <div class="card"><h2>Regras e bases usadas pela conferência</h2><p class="lead">As regras de negócio ficam num lugar só e valem para os dois motores (conferência cruzada e correção de prestador).</p>
@@ -88,8 +90,9 @@ function ligarConferencia() {
     S.cfg.parametros.guardarPlanilhas = { ...(S.cfg.parametros.guardarPlanilhas || {}), [ch.dataset.guardarauto]: ch.checked };
     salvarCfg(`Guardar a ${TIPOS_GUARDADOS[ch.dataset.guardarauto]} automaticamente: ${ch.checked ? 'sim' : 'não'}.`, 'parametros');
   });
+  $('pUnIgnPadrao').onclick = () => { $('pUnIgn').value = UNIDADES_IGNORADAS_PADRAO.join('\n'); avisar('Lista padrão de volta no campo: clique em «Salvar parâmetros» para gravar.', 'ok'); };
   $('pSalvar').onclick = () => {
-    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim() };
+    const n = { ...S.cfg.parametros, tolConferencia: +$('pTolC').value, tolCorrecao: +$('pTolP').value, minTruncamento: +$('pTrunc').value, valorSimbolico: +$('pSimb').value, retencaoNC: +$('pRet').value, prestadorGenerico: $('pGen').value.trim(), unidadesIgnoradas: $('pUnIgn').value.split('\n').map(x => x.trim()).filter(Boolean) };
     if (['tolConferencia', 'tolCorrecao', 'minTruncamento', 'valorSimbolico'].some(k => !Number.isFinite(n[k]) || n[k] < 0) || !(n.retencaoNC >= 1 && n.retencaoNC <= 366)) return avisar('Valores inválidos (retenção: 1 a 366 dias).', 'err');
     S.cfg.parametros = n; salvarCfg('Parâmetros salvos.', 'parametros');
     const apagadas = aplicarRetencaoNC(S.nc, n.retencaoNC); if (apagadas) { salvarNC(); avisar(`Parâmetros salvos. ${apagadas} NC(s) passaram do novo prazo: dados de pacientes apagados.`, 'ok'); }

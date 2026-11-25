@@ -326,13 +326,7 @@ function desenharConferencia() {
       { t: 'Vl Repasse', n: true, th: () => thOrdem('vl', 'Vl Repasse'), v: x => x.r ? fmtBR(x.r.vlRepasse) : '' }
     ],
     classeLinha: x => { const g = grupos.get(x); return g ? `${g.banda ? 'grp-b' : ''}${g.inicio ? ' grp-ini' : ''}` : ''; },
-    detalhe: x => { const k = classeDaLinhaConf(x), obs = observacoesDaLinha(idxObs, x.r, x.l), i = res.linhas.indexOf(x);
-      return `${comparacaoMVLaudo(x, ctx)}<div class="acoes" style="margin:0 0 8px">${botoesDecisao(x, i)}</div>${k === 'pend' && !x.decisao ? '<p class="small muted" style="margin:-4px 0 8px">Depois de decidir, a próxima linha que falta decidir abre sozinha.</p>' : ''}<p class="small" style="margin:0 0 6px">${k ? `${pillClasse(k)} ${esc(CLASSES_FECH[k].def)}. ` : ''}<span class="muted">Linha ${x.r ? x.r.seq : '—'} · origem ${esc(x.origem)} · médico do laudo ${esc(x.l?.medico || '—')}${x.marcadores.size ? ` · ${esc([...x.marcadores].map(m => MARCADORES[m]).join(' · '))}` : ''}</span></p><div class="det"><div><h4>Motivo / evidências</h4><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul>
-      ${x.r ? `<h4 style="margin-top:8px">Linha do MV</h4><div class="small">${esc(x.r.codigo)} - ${esc(x.r.procDesc)} · conta ${esc(x.r.conta)} · atendimento ${copiavel(x.r.atendimento)} · ${esc(x.r.convenio)} · página ${x.r.pagina}${x.r.repasse ? ` · repasse ${esc(x.r.repasse)}` : ''}${x.r.repeticao ? ` · repetida ${x.r.repeticao.i}/${x.r.repeticao.n}` : ''}</div>` : ''}
-      ${x.l ? `<h4 style="margin-top:8px">Laudo</h4><div class="small">ID Apolo ${idApolo(x.l) === 'DUPLICATE' ? `<span class="badge err">DUPLICATE</span> ${copiavel(x.l.idPac)}` : x.l.idPac ? copiavel(x.l.idPac) : '<span class="badge warn">SEM ID</span>'} · ${esc(x.l.titulo)} · ${esc(x.l.descricao)} · ${esc(x.l.unidade)} · ${esc(x.l.modalidade)} · ${esc(convenioApolo(x.l))} · linha ${x.l.linhaPlanilha} da planilha</div>` : ''}
-      <h4 style="margin-top:8px">Observação</h4><textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
-      ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
-      <div><h4>Candidatos (paciente e data na tolerância)</h4>${x.cands.length ? `<ul>${x.cands.map((cd, j) => `<li>${cd.l === x.l ? '<strong>' : ''}«${esc(cd.l.titulo)}» · ${esc(cd.l.medico)} · ${fmtData(cd.l.data)} · nome ${NIVEL_NOME[cd.nm]} · ${esc(ROTULO_EQ[cd.proc.estado] || cd.proc.estado)} · faixa ${cd.tier} (${FAIXA[cd.tier]}) · título ${Math.round((cd.af || 0) * 100)}%${cd.l === x.l ? '</strong>' : ''}${x.r && k === 'pend' && !x.decisao && x.cands.length > 1 ? ` <button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button>` : ''}</li>`).join('')}</ul>` : '<p class="muted small">Nenhum candidato.</p>'}</div></div>`; }
+    detalhe: x => detalheLinhaConf(x, res.linhas.indexOf(x), classeDaLinhaConf(x), observacoesDaLinha(idxObs, x.r, x.l), ctx)
   });
   // Caixa do cabeçalho (pedido de 24/11/2026): marca ou desmarca todas as linhas do filtro.
   const caixaTodos = v => { const cb = $('cfTab').querySelector('[data-seltodos]'); if (!cb) return; const n = v.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length; cb.checked = !!v.length && n === v.length; cb.indeterminate = n > 0 && n < v.length; };
@@ -388,12 +382,62 @@ function desenharConferencia() {
 /* v3.0.0-alpha.20 (simplificação): MV × laudo lado a lado, campo por campo, com a diferença destacada. */
 /* v3.0.0-alpha.40 (prévia aprovada em 24/11/2026: docs/prototipos/quadro-comparacao/) — Comparação 1 a 1 MV × laudo num
  * quadro marcado, como planilha: faixa de título, colunas MV | Laudo | Resultado, diferença destacada e resumo no rodapé. */
+/* Linha aberta da conferência, reorganizada (prévia aprovada em 25/11/2026: docs/prototipos/linha-aberta/):
+ * situação numa linha → diagnóstico em uma frase → MV × laudo (com identificação) | esperado × lançado e candidatos
+ * → evidências completas recolhidas → decisão e observação. */
+const identMV = r => r ? `atendimento ${copiavel(r.atendimento)}<br><span class="small muted">conta ${esc(r.conta || '—')} · página ${esc(r.pagina ?? '—')}${r.repasse ? ` · repasse ${esc(r.repasse)}` : ''}${r.repeticao ? ` · repetida ${r.repeticao.i}/${r.repeticao.n}` : ''}</span>` : '—';
+const identLaudo = l => {
+  if (!l) return '—';
+  const id = idApolo(l), v = id === 'DUPLICATE' ? `<span class="badge err">DUPLICATE</span> ${copiavel(l.idPac)}` : l.idPac ? copiavel(l.idPac) : '<span class="badge warn">SEM ID</span>';
+  return `ID Apolo ${v}<br><span class="small muted">${esc(l.unidade || '')} · ${esc(l.modalidade || '')} · linha ${esc(l.linhaPlanilha ?? '—')} da planilha</span>`;
+};
+// Lado único (só no MV ou só no laudo): o quadro 1 a 1 não se aplica; mostra o que existe.
+function ladoUnicoConf(x) {
+  const r = x.r, l = x.l, lin = r
+    ? [['Paciente', esc(r.paciente)], ['Data', fmtData(r.data)], ['Procedimento', esc(`${r.codigo} · ${r.procDesc || ''}`)], ['Convênio', esc(r.convenio || '—')], ['Identificação', identMV(r)]]
+    : [['Paciente', esc(l.paciente)], ['Data', fmtData(l.data)], ['Laudo', esc(`${l.titulo}${l.descricao ? ` · ${l.descricao}` : ''}`)], ['Convênio', esc(convenioApolo(l))], ['Médico', esc(l.medico || '—')], ['Identificação', identLaudo(l)]];
+  return `<section class="cf-cmp qd"><div class="qd-tit"><b>${r ? 'Linha do MV' : 'Laudo (Apolo)'}</b><span>sem par ${r ? 'no laudo' : 'no MV'}</span></div><div class="qd-rol"><table class="qd-tab"><tbody>${lin.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')}</tbody></table></div></section>`;
+}
+function quadroComposta(x) {
+  const c = x.compostaDet; if (!c || !c.itens.length) return '';
+  const linhas = c.itens.map(i => { const falta = i.lancado !== null && i.lancado < i.esperado;
+    return `<tr class="${falta ? 'falta' : ''}"><td>${esc(i.rotulo)}</td><td class="n">${i.esperado}</td><td class="n">${i.lancado ?? '—'}</td><td>${falta ? 'falta' : i.lancado === null ? '' : 'ok'}</td></tr>`; });
+  if (c.fora && x.r) linhas.push(`<tr class="sobra"><td>${esc(`${x.r.codigo} ${x.r.procDesc || ''}`)}</td><td class="n">0</td><td class="n">1</td><td>fora da regra</td></tr>`);
+  return `<div><h4 class="la-h">Regra composta «${esc(c.nome)}»: esperado × lançado</h4><table class="la-esp"><thead><tr><th>Procedimento</th><th class="n">Esperado</th><th class="n">Lançado</th><th></th></tr></thead><tbody>${linhas.join('')}</tbody></table></div>`;
+}
+function cartoesCandidatos(x, i, k) {
+  if (!x.cands.length) return `<div><h4 class="la-h">Laudos candidatos</h4><p class="muted small">Nenhum laudo do paciente na tolerância de data.</p></div>`;
+  const ch = (nivel, t) => `<span class="chip-s ${nivel}">${esc(t)}</span>`;
+  const escolher = x.r && k === 'pend' && !x.decisao && x.cands.length > 1;
+  return `<div><h4 class="la-h">Laudos candidatos (${x.cands.length})</h4><div class="la-cands">${x.cands.map((cd, j) => {
+    const af = Math.round((cd.af || 0) * 100), est = cd.proc?.estado, dd = Math.abs(cd.dd ?? 0);
+    const chips = [dd === 0 ? ch('ok', 'mesma data') : ch('warn', `data ±${dd} dia(s)`),
+      cd.nm >= 3 ? ch('ok', 'nome idêntico') : cd.nm === 2 ? ch('warn', 'nome truncado') : ch('err', 'nome semelhante'),
+      est === 'validada' ? ch('ok', 'equivalência validada') : ch(est === 'divergente' ? 'err' : 'warn', ROTULO_EQ[est] || est || 'sem equivalência'),
+      cd.mesmoMedico === false ? ch('err', 'outro médico') : '',
+      ch(af >= 70 ? 'ok' : af >= 40 ? 'warn' : 'err', `título ${af}%`)].join('');
+    return `<div class="la-cand${cd.l === x.l ? ' escolhido' : ''}"><b>«${esc(cd.l.titulo)}» · ${fmtData(cd.l.data)}</b><span class="small muted">${esc(cd.l.medico || 'sem médico')} · faixa ${cd.tier} (${esc(FAIXA[cd.tier] || '')})${cd.l === x.l ? ' · <b>par escolhido</b>' : ''}</span><div class="chips-s">${chips}</div>${escolher ? `<div><button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button></div>` : ''}</div>`;
+  }).join('')}</div></div>`;
+}
+function detalheLinhaConf(x, i, k, obs, ctx) {
+  const d = diagnosticoLinha(x), tags = [...x.marcadores].map(m => MARCADORES[m]).filter(Boolean);
+  const meta = [`Linha ${x.r ? x.r.seq : '—'}${x.r ? ' do relatório' : ''}`, `origem ${x.origem}`, x.decisao ? 'com decisão' : k === 'pend' ? 'sem decisão (não entra no fechamento)' : ''].filter(Boolean).join(' · ');
+  return `<div class="la">
+    <div class="la-topo">${k ? pillClasse(k) : ''}${tags.map(t => `<span class="la-tag">${esc(t)}</span>`).join('')}<span class="la-meta">${esc(meta)}</span></div>
+    <div class="la-diag ${d.nivel}"><b>${esc(d.titulo)}</b>${d.texto ? `<p>${atendimentosCopiaveis(esc(d.texto))}</p>` : ''}</div>
+    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
+    <details class="la-mais"><summary>Ver as evidências completas (${x.motivos.length})</summary><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul></details>
+    <div class="la-acoes">${botoesDecisao(x, i)}${k === 'pend' && !x.decisao ? '<span class="small muted">Depois de decidir, a próxima linha que falta decidir abre sozinha.</span>' : ''}</div>
+    <div><label class="campo">Observação<textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea></label><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
+    ${obs.length ? `<div class="small muted">${obs.map(o => `${new Date(o.em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })} · ${esc(o.por || '—')}: «${esc(o.texto)}»`).join('<br>')}</div>` : ''}</div>
+  </div>`;
+}
 function comparacaoMVLaudo(x, ctx = null) {
   if (!x.r || !x.l) return '';
   const cd = (x.cands || []).find(c => c.l === x.l), igual = (a, b) => norm(a || '') === norm(b || '');
   const b = (ok, t) => `<span class="badge ${ok ? 'ok' : 'warn'}">${esc(t)}</span>`;
   const mesmoDia = isoDia(x.r.data) === isoDia(x.l.data), eqOk = cd?.proc?.estado === 'validada';
-  const cv = convenioCompativel(x.r.convenio, x.l.convenio);   // o MV corta o nome do convênio (mesma regra do motor)
+  const cv = convenioCompativel(x.r.convenio, x.l.convenio, S.cfg);   // o MV corta o nome do convênio (mesma regra do motor)
   const cab = ctx?.relatorio?.cab, medMV = cab ? `${cab.prestadorCod} - ${cab.prestadorNome}` : '';
   const mesmoMed = cab && x.l.medico ? medicosDoPrestador(S.cfg, cab.prestadorCod).includes(norm(x.l.medico)) : null;
   const linhas = [
@@ -401,14 +445,15 @@ function comparacaoMVLaudo(x, ctx = null) {
     ['Data', fmtData(x.r.data), fmtData(x.l.data), b(mesmoDia, mesmoDia ? 'igual' : 'diferente'), !mesmoDia],
     ['Procedimento', `${x.r.codigo} · ${x.r.procDesc || ''}`, x.l.titulo, cd ? b(eqOk, eqOk ? 'equivalência validada' : (ROTULO_EQ[cd.proc.estado] || cd.proc.estado)) : '', !!(cd && !eqOk)],
     ['Convênio', x.r.convenio, convenioApolo(x.l), cv === false ? b(false, 'diferente') : b(true, igual(x.r.convenio, x.l.convenio) || cv === null ? 'igual' : 'mesmo convênio (nome cortado no MV)'), cv === false],
-    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false]
+    ['Médico', medMV, x.l.medico, mesmoMed === null ? '' : b(mesmoMed, mesmoMed ? 'mesmo prestador' : 'outro médico'), mesmoMed === false],
+    ['Identificação', { html: identMV(x.r) }, { html: identLaudo(x.l) }, '', false]
   ];
   const difs = linhas.filter(l => l[4]), iguais = linhas.filter(l => !l[4] && l[3]).length;
   const origem = [x.r.seq ? `linha ${x.r.seq} do relatório` : '', x.l.idLaudo ? `laudo ${x.l.idLaudo}${x.l.linhaPlanilha ? ` (linha ${x.l.linhaPlanilha} da planilha)` : ''}` : ''].filter(Boolean).join(' · ');
   return `<section class="cf-cmp qd" aria-label="Comparação 1 a 1 MV × laudo">
     <div class="qd-tit"><b>Comparação 1 a 1 · MV × laudo</b>${origem ? `<span>${esc(origem)}</span>` : ''}</div>
     <div class="qd-rol"><table class="qd-tab"><thead><tr><th></th><th class="mv">MV (relatório de repasse)</th><th>Laudo (Apolo)</th><th class="res">Resultado</th></tr></thead><tbody>
-    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${esc(mv || '—')}</td><td>${esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
+    ${linhas.map(([rot, mv, la, res, dif]) => `<tr${dif ? ' class="dif"' : ''}><td>${rot}</td><td class="mv">${mv?.html ?? esc(mv || '—')}</td><td>${la?.html ?? esc(la || '—')}</td><td class="res">${res}</td></tr>`).join('')}
     </tbody></table></div>
     <div class="qd-rod"><b>${iguais} igua${iguais === 1 ? 'l' : 'is'} · ${difs.length ? `${difs.length} diferença${difs.length > 1 ? 's' : ''}:` : 'nenhuma diferença'}</b>${difs.length ? ` ${esc(difs.map(l => l[0]).join(', '))} <span class="muted">— decida abaixo</span>` : ''}</div>
   </section>`;

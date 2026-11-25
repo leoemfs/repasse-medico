@@ -1,0 +1,43 @@
+<title>Convênios e unidades ignoradas</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.nomes-eq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.nomes-eq .marc{cursor:default}.nomes-eq .marc b{margin-left:4px;cursor:pointer;color:var(--muted)}
+.nomes-eq input{max-width:170px;font-size:12px;padding:3px 6px}
+.sug{font-size:11.5px;color:var(--warn)}
+.prev-sec{margin-top:18px}
+</style>
+<div class="shell" data-pag="bases"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Bases e regras</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Duas partes: (1) nomes equivalentes no cadastro de convênios, em Bases e regras; (2) lista editável de unidades ignoradas, em Configurações.</div>
+
+<div class="card"><h2>Convênios <span class="muted small">5 cadastrados · 1 sem tipo</span></h2>
+  <p class="lead">O tipo define a tabela de valores do IMG. <b>Novo:</b> «Nomes equivalentes» são outras formas do mesmo convênio (resumido na planilha de laudos, cortado no MV). Na conferência, MV e laudo com qualquer um desses nomes contam como o mesmo convênio.</p>
+  <div class="acoes"><button class="sec">+ Convênio</button><label class="small"><input type="checkbox"> só os sem tipo</label><input type="search" placeholder="Buscar convênio…" style="max-width:260px"></div>
+  <div class="tw" style="margin-top:8px"><table><thead><tr><th>Convênio</th><th>Tipo</th><th>Nomes equivalentes</th><th>Origem</th></tr></thead><tbody id="cvCorpo"></tbody></table></div>
+  <p class="small muted">Sugestões em laranja vêm dos nomes da planilha de laudos e dos relatórios do MV carregados que parecem o mesmo convênio: clique para aceitar.</p>
+</div>
+
+<div class="card prev-sec"><h2>Configurações → Parâmetros</h2>
+  <div class="grid4">
+    <label class="campo">Tolerância de data (dias)<input type="number" value="7"></label>
+    <label class="campo">Prestador genérico (código no MV)<input type="text" value="2"></label>
+  </div>
+  <label class="campo" style="margin-top:10px">Unidades do Apolo ignoradas (uma por linha)
+    <textarea id="unIgn" rows="5" style="max-width:520px">ISCAL
+GRUPO SRA LON
+Associação da Santa Casa de Misericórdia de Ourinhos
+Hospital Providência Apucarana</textarea>
+    <span class="small muted">Laudos dessas unidades saem da planilha do Apolo na leitura: não entram na conferência, nos títulos nem em «Só no laudo». Maiúsculas, acentos e espaços não importam. Depois de mudar, carregue a planilha de novo.</span></label>
+  <div class="acoes"><button>Salvar parâmetros</button><button class="sec" id="unPadrao">Voltar ao padrão</button></div>
+</div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const cvs=[{n:'UNIMED LONDRINA',t:'Convênio',eq:['UNIMED LDA'],sug:['UNIMED LONDR']},{n:'UNIPAX / ALIANCA',t:'Convênio',eq:[],sug:['UNIPAX']},{n:'SUS',t:'SUS',eq:['SISTEMA UNICO DE SAUDE'],sug:[]},{n:'BRADESCO SAUDE',t:'Convênio',eq:[],sug:['BRADESCO SAUDE S']},{n:'PARTICULAR',t:'',eq:[],sug:[]}];
+function des(){document.getElementById('cvCorpo').innerHTML=cvs.map((c,i)=>`<tr><td>${c.n}</td><td><select><option>${c.t||'— sem tipo —'}</option></select></td><td><div class="nomes-eq">${c.eq.map((e,j)=>`<span class="marc">${e}<b data-x="${i}|${j}" title="Remover">×</b></span>`).join('')}${c.sug.map((e,j)=>`<button class="sec mini sug" data-s="${i}|${j}">+ ${e}?</button>`).join('')}<input placeholder="+ outro nome" data-add="${i}"></div></td><td class="small muted">Power BI</td></tr>`).join('');}
+document.addEventListener('click',e=>{const x=e.target.closest('[data-x]'),s=e.target.closest('[data-s]');if(x){const[i,j]=x.dataset.x.split('|');cvs[i].eq.splice(j,1);des();}if(s){const[i,j]=s.dataset.s.split('|');cvs[i].eq.push(cvs[i].sug.splice(j,1)[0]);des();}});
+document.addEventListener('keydown',e=>{const a=e.target.closest('[data-add]');if(a&&e.key==='Enter'&&a.value.trim()){cvs[a.dataset.add].eq.push(a.value.trim().toUpperCase());des();}});
+document.getElementById('unPadrao').onclick=()=>{document.getElementById('unIgn').value='ISCAL\nGRUPO SRA LON\nAssociação da Santa Casa de Misericórdia de Ourinhos\nHospital Providência Apucarana';};
+des();
+</script>

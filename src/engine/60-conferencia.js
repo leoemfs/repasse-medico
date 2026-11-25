@@ -124,12 +124,12 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
               : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 6
                 // Nome só semelhante, mesma data, convênio compatível e procedimento sem equivalência: par PENDENTE (decisão humana),
                 // em vez de duas linhas soltas («Só no faturamento» + «Só no laudo»).
-                : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio) !== false) ? 7 : 0;
+                : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio, cfg) !== false) ? 7 : 0;
       if (!tier) continue;
       // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 6 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
       const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 5 && !proc.composta ? af : 0;
-      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio) });
+      b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg) });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;
     b.cands.sort(ordem);
@@ -257,6 +257,9 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
         marc.add('composta');
         const u = compostoUsos.get(p.l.i), falta = u ? u.esperados.filter(e => e.qtd > (u.usos[e.i] || 0)) : [];
         out.composta = p.proc.composta.id;
+        // Para a tela (25/11/2026): esperado × lançado da regra, e se o código da linha está fora dela.
+        out.compostaDet = { nome: nomeComposta(p.proc.composta), titulo: p.l.titulo, fora: p.proc.estado === 'divergente',
+          itens: u ? u.esperados.filter(e => e.qtd > 0).map(e => ({ rotulo: e.rotulo, esperado: e.qtd, lancado: u.usos[e.i] || 0 })) : (p.proc.esperados || []).filter(e => e.qtd > 0).map(e => ({ rotulo: e.rotulo, esperado: e.qtd, lancado: null })) };
         motivos.push(`${p.proc.motivo}.${falta.length ? '' : ' Composição completa no MV.'}`);
         if (falta.length) { marc.add('composta-falta'); out.compostaFalta = true; motivos.push(`Composição incompleta: o laudo «${p.l.titulo}» espera ${textoEsperados(u.esperados)}; falta ${falta.map(e => `${e.rotulo} (esperado ×${e.qtd}, lançado ×${u.usos[e.i] || 0})`).join(', ')} no MV.`); }
       }
@@ -353,3 +356,28 @@ function resultadoFiltrado(res, linhas) {
   for (const s of Object.values(porStatus)) { s.vlRepasse = r2(s.vlRepasse); s.vlTotal = r2(s.vlTotal); }
   return { ...res, linhas, porStatus, porMarcador, porDecisao, porTipo, filtrado: true };
 }
+
+/* Diagnóstico em uma frase da linha aberta (pedido de 25/11/2026): título curto + explicação, a partir do que a
+ * conferência já calculou (status, marcadores, regra composta). nivel: ok | warn | err. Sem dado novo: só organiza. */
+function diagnosticoLinha(x) {
+  const r = x.r, l = x.l, m = x.marcadores || new Set(), c = x.compostaDet, mot = (x.motivos || [])[0] || '';
+  const mv = r ? `${r.codigo} ${r.procDesc || ''}`.trim() : '';
+  const esperaTxt = c ? c.itens.map(i => `${i.esperado > 1 ? `${i.esperado}× ` : ''}${i.rotulo}`).join(' + ') : '';
+  if (c && c.fora && r) return { nivel: 'err', titulo: 'O MV lançou um código que não faz parte do exame laudado', texto: `O laudo «${c.titulo}», pela regra composta «${c.nome}», espera ${esaperaOu(esperaTxt)}. O MV lançou ${mv}, que não é parte dessa regra.` };
+  if (c && c.itens.some(i => i.lancado !== null && i.lancado < i.esperado)) {
+    const falta = c.itens.filter(i => i.lancado !== null && i.lancado < i.esperado).map(i => i.rotulo).join(', ');
+    return { nivel: 'warn', titulo: 'Composição incompleta no MV', texto: `O laudo «${c.titulo}» espera ${esaperaOu(esperaTxt)}; falta no MV: ${falta}.` };
+  }
+  if (x.status === 'so-laudo') return { nivel: 'err', titulo: 'Laudo sem lançamento neste relatório do MV', texto: 'Em geral o exame está lançado para outro prestador. Também pode ser conta aberta, fora de remessa ou código TUSS errado na conta.' };
+  if (x.status === 'so-faturamento') return { nivel: 'err', titulo: 'Lançado no MV sem laudo correspondente', texto: mot };
+  if (m.has('outro-medico')) return { nivel: 'err', titulo: 'Laudo assinado por outro médico', texto: `O laudo é de ${l?.medico || '(sem médico)'}, não do prestador deste relatório.` };
+  if (m.has('ambiguo')) return { nivel: 'warn', titulo: 'Mais de um laudo plausível', texto: 'Escolha o laudo certo entre os candidatos.' };
+  if (m.has('eq-divergente')) return { nivel: 'err', titulo: 'Procedimento do MV diferente do laudo', texto: `O MV lançou ${mv}; o laudo é «${l?.titulo || ''}».` };
+  if (m.has('eq-pendente') || m.has('eq-sem-cadastro') || m.has('eq-conflito')) return { nivel: 'warn', titulo: 'Equivalência código × título ainda não decidida', texto: mot };
+  if (m.has('convenio-divergente')) return { nivel: 'warn', titulo: 'Convênio diferente entre MV e laudo', texto: mot };
+  if (m.has('nome-semelhante')) return { nivel: 'warn', titulo: 'Nome do paciente apenas semelhante', texto: mot };
+  if (x.status === 'conferido') return { nivel: 'ok', titulo: 'Par conferido', texto: mot };
+  if (x.status === 'ressalva') return { nivel: 'warn', titulo: 'Conferido com ressalva', texto: mot };
+  return { nivel: 'warn', titulo: STATUS_CONF[x.status]?.nome || 'Linha para analisar', texto: mot };
+}
+const esaperaOu = t => t || 'os itens da regra';

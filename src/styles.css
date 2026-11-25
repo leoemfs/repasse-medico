@@ -555,3 +555,25 @@ th .cf-sel{margin:0}
 .qd-tab tr.dif td{background:var(--warnbg)}.qd-tab tr.dif td:first-child{box-shadow:inset 4px 0 0 var(--warn)}
 .qd-rod{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;border-top:1.5px solid var(--accent);background:var(--bg);font-size:12.5px}
 @media (max-width:760px){.qd-tab td.res,.qd-tab th.res,.qd-tab td:first-child,.qd-tab th:first-child{width:auto}}
+/* Linha aberta da conferência reorganizada (25/11/2026) */
+.la{display:grid;gap:12px;padding:4px 2px}
+.la-topo{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.la-tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.la-meta{font-size:12px;color:var(--muted);margin-left:auto}
+.la-diag{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:8px;padding:9px 12px}.la-diag p{margin:3px 0 0;font-size:13px}
+.la-diag.err{border-left-color:var(--err);background:var(--errbg)}.la-diag.ok{border-left-color:var(--ok);background:var(--okbg)}
+.la-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:1000px){.la-grid{grid-template-columns:minmax(0,1fr)}}
+.la-col{display:grid;gap:12px}
+.la-h{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.la-esp{width:100%;border-collapse:collapse;font-size:12.5px}.la-esp th,.la-esp td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.la-esp th{font-size:11px;color:var(--muted)}.la-esp .n{text-align:center;font-variant-numeric:tabular-nums}
+.la-esp tr.falta td{color:var(--err)}.la-esp tr.sobra td{color:var(--warn)}
+.la-cands{display:grid;gap:8px}.la-cand{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:grid;gap:5px;font-size:12.5px}
+.la-cand.escolhido{border-color:var(--accent)}
+.chips-s{display:flex;flex-wrap:wrap;gap:4px}.chip-s{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.chip-s.ok{background:var(--okbg);color:var(--ok)}.chip-s.warn{background:var(--warnbg);color:var(--warn)}.chip-s.err{background:var(--errbg);color:var(--err)}
+.la-mais summary{cursor:pointer;font-size:12.5px;color:var(--accent)}.la-mais ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+.la-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+.nomes-eq{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.nomes-eq .marc{cursor:default}.nomes-eq .marc b{margin-left:4px;cursor:pointer;color:var(--muted)}
+.nomes-eq input{max-width:180px;font-size:12px;padding:3px 6px}.nomes-eq .sug{color:var(--warn)}
