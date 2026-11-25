@@ -26,6 +26,9 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.54 — NCs: responsável e prestador em colunas separadas (pedido de 25/11/2026)
+- «Responsável» mostra só quem fechou a conta; nova coluna «Prestador lançado → correto» para as NCs de prestador. A exportação para o Qualiex não muda.
+
 ## Pareamento pelo médico do relatório primeiro — **IMPLEMENTADA na v3.0.0-alpha.53** (pedido de 25/11/2026; teste: `test/ponte.mjs`)
 - Com médico escolhido, a linha do MV procura primeiro nos laudos do médico do relatório (todas as faixas); só a que ficar sem par procura nos de outros médicos («laudo de outro médico»). Caso real: conferência do Henrique Pini, «TC abdome total» na conta, laudos dele (superior e inferior) e do Lucca Maricato (total) no mesmo dia, em outro atendimento.
 - Com o Power BI, laudo de outro médico ligado com segurança a OUTRO atendimento não é candidato (o paciente pode ter mais de um atendimento no mesmo dia).
