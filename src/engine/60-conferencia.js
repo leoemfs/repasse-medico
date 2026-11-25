@@ -120,7 +120,7 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const tier = (proc.estado === 'validada' && nm >= 2 && dd === 0) ? 1 : (proc.estado === 'validada' && nm >= 2) ? 2
         : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2 && dd === 0) ? 3
           : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2) ? 4
-            // v3.0.0-alpha.44 (caso real de 25/11/2026): a MESMA paciente, na mesma data, vem antes de um nome apenas semelhante,
+            // v3.0.0-alpha.45 (caso real de 25/11/2026): a MESMA paciente, na mesma data, vem antes de um nome apenas semelhante,
             // mesmo quando o título dela está validado para outro código (ex.: «Mamografia Digital» validada para a digital e o MV
             // cobrou a convencional). Antes o nome semelhante de outra paciente ganhava e o laudo certo sobrava «Só no laudo».
             : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 5

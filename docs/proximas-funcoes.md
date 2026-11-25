@@ -26,7 +26,7 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
-## Pareamento: a mesma paciente vem antes de um nome apenas semelhante — **CORRIGIDO na v3.0.0-alpha.44** (caso real de 25/11/2026; teste: `test/mesma_paciente.mjs`)
+## Pareamento: a mesma paciente vem antes de um nome apenas semelhante — **CORRIGIDO na v3.0.0-alpha.45** (caso real de 25/11/2026; teste: `test/mesma_paciente.mjs`)
 Caso: relatório da Melanie (10264), unidade 4. A linha do MV «MARTA APARECIDA DA» (40808033, mamografia convencional, 19/10) pareou com o laudo de **outra paciente**, «MARIA APARECIDA FLORA DE SOUZA SZEREMETA» (16/10, Dr. Caio, outro convênio). O laudo certo, da Marta (19/10, Melanie, «Mamografia Digital»), sobrou como «Só no laudo». A usuária aceitou a linha do MV depois de conferir no MV, e o «Só no laudo» continuou aparecendo como erro a cada reconferência.
 - **Causa:** o laudo de nome apenas semelhante com título validado para o código cobrado («MAMOGRAFIA BILATERAL» → 40808033) tinha prioridade (faixa 5) sobre o da mesma paciente e data com o título validado para outro código («Mamografia Digital» → 40808041, faixa 6).
 - **Correção:** as duas faixas trocaram de lugar. A mesma paciente na mesma data vem antes do nome apenas semelhante. A linha fica Pendente com «Procedimento diverge» (decisão humana, como antes), mas com o laudo certo.
