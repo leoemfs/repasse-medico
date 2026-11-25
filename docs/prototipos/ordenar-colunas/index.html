@@ -1,0 +1,40 @@
+<title>Ordenar pelas colunas</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.tw3{overflow-x:auto}.tw3 table{width:100%;border-collapse:collapse;font-size:12.5px}.tw3 th{position:static}
+.tw3 td{padding:6px 8px;border-bottom:1px solid var(--line)}
+.th-ord{cursor:pointer;user-select:none;white-space:nowrap}.th-ord:hover,.th-ord:focus-visible{text-decoration:underline}
+.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}.th-ord .seta.apagada{opacity:.35}
+.ord-info{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin:8px 0}
+</style>
+<div class="shell" data-pag="nc"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Não conformidades</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Clique no título de qualquer coluna para ordenar; clique de novo para inverter. Vale para todas as tabelas da ferramenta.</div>
+<div class="card"><h2>NCs da competência</h2>
+<div class="ord-info"><span id="ordTxt"></span><button class="sec mini" id="ordPadrao">Voltar à ordem padrão</button></div>
+<div class="tw3"><table><thead><tr id="cab"></tr></thead><tbody id="corpo"></tbody></table></div></div>
+<div class="card"><h3>Como funciona</h3><ul class="small">
+<li><b>Todas as tabelas</b> (NCs, Correção de prestador, convênios, equivalências, rodadas, prestadores…) ganham títulos clicáveis, como na Conferência.</li>
+<li><b>Texto</b> ordena de A a Z (sem diferença de acento e maiúsculas); <b>datas</b>, da mais antiga para a mais nova; <b>valores</b>, do menor para o maior. Clicar de novo inverte.</li>
+<li><b>Ordem padrão</b> de cada tabela continua a de hoje (em geral por data); o botão «Voltar à ordem padrão» aparece quando você escolhe outra.</li>
+<li>A escolha fica lembrada neste navegador, por tabela.</li>
+<li>A Conferência continua com o seletor «Ordenar por» que já tem.</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const COLS=[['Situação','t'],['Natureza','t'],['Unidade','t'],['Paciente','t'],['ID / atend.','t'],['Data','d'],['Título do laudo','t'],['Médico','t'],['Responsável / prestador','t'],['Vl','n']];
+const L=[['Aberta','Prestador incorreto','Ultramed Cambe','ÉLIDA SOUZA','2207433','07/10/2026','TC CRANIO','Caio V. de Castro','2087 - Faturamento',55],
+['Resolvida','Conta aberta','AlphaSonic Palhano','ANA PAULA ROCHA','2201980','03/10/2026','USG TIREOIDE','Marcelo G. Marini','Unimed',80],
+['Aberta','Procedimento não lançado','Ultramed Cambe','BRUNA LIMA COSTA','2205874','12/10/2026','MAMOGRAFIA DIGITAL','Melanie Eiko','Recepção',160],
+['Aberta','Prestador incorreto','Ultramed Apucarana','CARLOS ALBERTO DIAS','2209601','21/10/2026','USG ABDOME TOTAL','Nilton P. Lovato','12 - Nilton',140]];
+let ord=null;
+const chave=(v,t)=>t==='d'?v.split('/').reverse().join(''):t==='n'?v:String(v).normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase();
+function des(){const v=L.map((l,i)=>({l,i}));if(ord){const t=COLS[ord.k][1];v.sort((a,b)=>{const x=chave(a.l[ord.k],t),y=chave(b.l[ord.k],t);return (x<y?-1:x>y?1:0)*(ord.inv?-1:1)||a.i-b.i;});}
+document.getElementById('cab').innerHTML=COLS.map(([n,t],k)=>{const on=ord&&ord.k===k;return `<th class="${t==='n'?'n':''}"><span class="th-ord" data-k="${k}" role="button" tabindex="0">${n}<span class="seta${on?'':' apagada'}">${on?(ord.inv?'▼':'▲'):'↕'}</span></span></th>`}).join('');
+document.getElementById('corpo').innerHTML=v.map(({l})=>`<tr>${l.map((c,k)=>`<td class="${COLS[k][1]==='n'?'n':''}">${COLS[k][1]==='n'?c.toFixed(2).replace('.',','):c}</td>`).join('')}</tr>`).join('');
+document.getElementById('ordTxt').textContent=ord?`Ordenado por ${COLS[ord.k][0]} (${COLS[ord.k][1]==='t'?(ord.inv?'Z→A':'A→Z'):COLS[ord.k][1]==='d'?(ord.inv?'mais nova primeiro':'mais antiga primeiro'):(ord.inv?'maior primeiro':'menor primeiro')})`:'Ordem padrão (data de registro)';
+document.getElementById('ordPadrao').hidden=!ord;}
+document.addEventListener('click',e=>{const h=e.target.closest('[data-k]');if(h){const k=+h.dataset.k;ord=ord&&ord.k===k?{k,inv:!ord.inv}:{k,inv:false};des();}if(e.target.id==='ordPadrao'){ord=null;des();}});
+des();
+</script>

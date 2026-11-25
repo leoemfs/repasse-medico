@@ -1,0 +1,128 @@
+<title>Não conformidades</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.nc-cab{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+.nc-cab h2{margin:0;font-size:20px}.nc-cab .sub{font-size:12.5px;color:var(--muted)}
+/* esteira de situações: clicável, filtra */
+.esteira{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border:1px solid var(--card-borda,var(--line));border-radius:12px;overflow:hidden;background:var(--card);box-shadow:var(--sombra-card,none);margin-bottom:12px}
+.esteira button{all:unset;cursor:pointer;padding:12px 14px;display:grid;gap:2px;border-right:1px solid var(--line);position:relative}
+.esteira button:last-child{border-right:0}
+.esteira button b{font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+.esteira button small{font-size:12px;color:var(--muted)}
+.esteira button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--c)}
+.esteira button.on{background:var(--infobg)}.esteira button:hover{background:var(--bg)}
+.esteira button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.e-ab{--c:var(--err)}.e-en{--c:var(--accent)}.e-tr{--c:var(--warn)}.e-re{--c:var(--ok)}.e-np{--c:var(--muted)}
+/* faixa de ação */
+.chamadas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+@media (max-width:1000px){.chamadas{grid-template-columns:1fr}}
+.cham{border:1px solid var(--card-borda,var(--line));border-radius:12px;background:var(--card);box-shadow:var(--sombra-card,none);padding:12px 14px;display:grid;gap:6px;font-size:13px}
+.cham h3{margin:0;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.cham .big{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.prazo{display:flex;justify-content:space-between;font-size:12.5px}.prazo b.v{color:var(--err)}.prazo b.p{color:var(--warn)}.prazo b.o{color:var(--ok)}
+/* lista */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--bg)}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-size:12.5px;color:var(--muted)}.seg button em{font-style:normal;font-size:11px;margin-left:5px;opacity:.8}
+.seg button.on{background:var(--card);color:var(--accent);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.barra-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.barra-f{display:grid!important;grid-template-columns:minmax(240px,2fr) repeat(5,minmax(130px,1fr));gap:8px}
+.barra-f select,.barra-f input{width:100%!important;max-width:none;font-size:12.5px;padding:5px 8px;margin:0}
+.barra-f #chips{grid-column:1/-1}
+@media (max-width:1100px){.barra-f{grid-template-columns:repeat(3,minmax(0,1fr))}.barra-f input[type=search]{grid-column:1/-1}}
+.chip-f{display:inline-flex;gap:6px;align-items:center;font-size:12px;background:var(--infobg);color:var(--accent);border-radius:999px;padding:2px 4px 2px 10px}
+.chip-f button{all:unset;cursor:pointer;padding:0 6px;font-weight:700}
+.lista{display:grid;gap:6px}
+.nc-l{display:grid;grid-template-columns:28px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 110px;gap:10px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:8px 10px;background:var(--card);cursor:pointer;font-size:12.5px}
+.nc-l:hover{border-color:var(--accent);border-left-color:var(--c)}
+.nc-l .pac{font-weight:700}.nc-l .mut{color:var(--muted);font-size:12px}
+.nc-l .sit{justify-self:end;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--bg);color:var(--c)}
+.imp{font-size:11px;font-weight:700;color:var(--warn);background:var(--warnbg);border-radius:999px;padding:0 6px;margin-left:6px}
+.cp{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:1px 3px;line-height:0;vertical-align:middle}.cp svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.tnc{width:100%;border-collapse:collapse;font-size:12.5px}.tnc th{position:sticky;top:0;text-align:left;padding:7px 8px;white-space:nowrap}
+.tnc td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tnc tr.l{cursor:pointer}.tnc tr.l:hover td{background:var(--infobg)}
+.tnc tr.l td:first-child{box-shadow:inset 4px 0 0 var(--c)}
+.tnc .sitp{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--bg);color:var(--c);white-space:nowrap}
+.th-ord{cursor:pointer;user-select:none}.th-ord:hover{text-decoration:underline}.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}
+.selbar{position:sticky;bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:10px 14px;margin-top:10px;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.selbar button{background:var(--card);color:var(--accent);border:0}.selbar .sp{flex:1}
+.ind{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media (max-width:900px){.ind{grid-template-columns:1fr}}
+.bar{display:grid;grid-template-columns:minmax(0,180px) 1fr 28px;gap:8px;align-items:center;font-size:12.5px;margin:4px 0}
+.bar>div{height:8px;background:var(--bg);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent2)}
+details.dobra{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--card);margin-top:12px}
+details.dobra summary{cursor:pointer;font-weight:700;font-size:13px}
+</style>
+<div class="shell" data-pag="nc"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Não conformidades</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Todas as funções de hoje continuam: importar, nova NC, exportar para o Qualiex, candidatos, prazos, categorias, filtros, seleção e ações em lote, edição, indicadores e retenção.</div>
+
+<div class="nc-cab"><div><h2>Competência 11/2026</h2><span class="sub">12 NCs · R$ 1.284,40 com impacto no pagamento</span></div>
+<div class="acoes" style="margin:0"><button class="sec">Importar planilha manual</button><button class="sec">+ Nova NC</button><button>Exportar para o Qualiex</button></div></div>
+
+<div class="esteira" id="est"></div>
+
+<div class="chamadas">
+ <div class="cham"><h3>Candidatos das análises <span class="badge warn">para revisar</span></h3><span class="big">9</span><span class="small muted">6 «Só no laudo» · 2 procedimento diverge · 1 outro médico</span><div><button class="mini">Revisar candidatos</button></div></div>
+ <div class="cham"><h3>Prazos de envio</h3><div class="prazo"><span>USG · 3 abertas</span><b class="v">venceu 20/11</b></div><div class="prazo"><span>IMG · 2 abertas</span><b class="p">vence 28/11</b></div><div class="prazo"><span>Curitiba · 0 abertas</span><b class="o">em dia</b></div></div>
+ <div class="cham"><h3>Retenção de dados</h3><span>2 NCs terão nome e ID apagados em até 7 dias.</span><div class="small"><a href="#">Exportar antes</a> · <a href="#">Apagar agora os dados desta competência</a></div></div>
+</div>
+
+<div class="card">
+ <div class="fx-topo"><div class="seg" id="cat"></div><div style="display:flex;gap:10px;align-items:center"><span class="small muted" id="cont"></span></div></div>
+ <div class="barra-f"><input type="search" id="busca" placeholder="Buscar paciente, ID, título ou médico…"><select id="fNat"><option value="">Natureza</option><option>Prestador incorreto</option><option>Conta aberta</option><option>Procedimento não lançado</option></select><select><option>Unidade</option></select><select><option>Responsável</option></select><select><option>Modalidade</option></select><select id="ord"><option value="data">Ordenar: data</option><option value="nome">Ordenar: paciente A–Z</option></select><span id="chips"></span></div>
+ <div class="lista" id="lista"></div>
+ <div class="acoes" style="margin-top:10px"><span class="small muted" id="selN">Com as selecionadas:</span><button class="sec mini">Selecionar as filtradas</button><button class="sec mini" id="limpar">Limpar seleção</button><button class="mini">Marcar como enviadas ao Qualiex</button><button class="mini">Definir responsável</button><button class="mini">Mudar situação</button><button class="mini">Levar para a competência seguinte</button><button class="sec mini" style="color:var(--err);border-color:var(--err)">Excluir</button></div>
+</div>
+
+<details class="dobra"><summary>Indicadores da competência</summary><div class="ind" style="margin-top:10px">
+ <div><h4 class="small muted" style="margin:0 0 6px">Por natureza</h4><div id="bNat"></div></div>
+ <div><h4 class="small muted" style="margin:0 0 6px">Por responsável pelo fechamento da conta</h4><div id="bResp"></div></div></div></details>
+<details class="dobra"><summary>Como funciona</summary><ul class="small"><li>Três categorias, iguais às abas da planilha manual; a exportação sai nas mesmas abas e colunas e pode ser importada de volta.</li><li>Situação: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede.</li><li>Privacidade: nome e ID do paciente são apagados após o prazo de retenção.</li></ul></details>
+
+<div class="card" style="margin-top:12px"><h3>O que muda</h3><ul class="small">
+<li><b>Esteira de situações</b> no topo (Aberta → Enviada → Em tratativa → Regularizada · Não procede): mostra o andamento e filtra com um clique.</li>
+<li><b>Três chamadas de ação</b> lado a lado: candidatos para revisar, prazos de envio (vencido em vermelho) e retenção.</li>
+<li><b>A tabela de hoje fica igual</b> (mesmas colunas e a barra «Com as selecionadas»), com títulos clicáveis para ordenar, a cor da situação na borda e paciente e ID copiáveis.</li>
+<li><b>Categorias</b> em botões segmentados; filtros numa barra só, com <b>ordenar por data ou paciente A–Z</b> e etiquetas dos filtros ativos (× tira).</li>
+
+<li><b>Indicadores e «Como funciona»</b> recolhidos, para a lista ficar no centro.</li></ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const ic='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+const SIT={ab:['Aberta','e-ab'],en:['Enviada ao Qualiex','e-en'],tr:['Em tratativa','e-tr'],re:['Regularizada','e-re'],np:['Não procede','e-np']};
+const CAT=[['todas','Todas'],['proc','Particular'],['conta','Convênios (faturamento)'],['prest','Correção de prestadores']];
+const N=[['ÉLIDA SOUZA','2207433','07/10','Prestador incorreto','Ultramed Cambe','FATURAMENTO.ANA','ab','prest',true,'41001010 - TC CRANIO-OP','CT','CAIO V. DE CASTRO','conferência'],
+['ANA PAULA ROCHA','2201980','03/10','Conta aberta','AlphaSonic Palhano','UNIMED','en','conta',true,'40901173 - USG TIREOIDE','US','MARCELO G. MARINI','Power BI'],
+['EDER JOSE BRAGUIN','2203856','03/10','Duplicidade','GrupoSRA HPA','MARCOS.CAETANO','ab','proc',false,'41001010 - TC CRANIO-OP','CT','AMANDA SOUZA DE ASSIS','conferência'],
+['CARLOS ALBERTO DIAS','2209601','21/10','Prestador incorreto','Ultramed Apucarana','FATURAMENTO.ANA','tr','prest',true,'40901122 - USG ABDOME TOTAL','US','NILTON P. LOVATO','correção'],
+['DORA NUNES PIRES','2203311','09/10','Procedimento não lançado','AlphaSonic Palhano','RECEPÇÃO','re','proc',false,'40808041 - MAMOGRAFIA DIGITAL','MG','MELANIE EIKO','planilha manual']];
+let fSit='',cat='todas',sel=new Set(),q='',ordem='data',fNat='',modo='tabela',ordT=null;
+function des(){
+ const cnt=k=>N.filter(n=>n[6]===k).length;
+ document.getElementById('est').innerHTML=Object.entries(SIT).map(([k,[n,c]])=>`<button class="${c}${fSit===k?' on':''}" data-sit="${k}"><b>${cnt(k)}</b><small>${n}</small></button>`).join('');
+ document.getElementById('cat').innerHTML=CAT.map(([k,n])=>`<button class="${cat===k?'on':''}" data-cat="${k}">${n}<em>${k==='todas'?N.length:N.filter(x=>x[7]===k).length}</em></button>`).join('');
+ let v=N.filter(n=>(!fSit||n[6]===fSit)&&(cat==='todas'||n[7]===cat)&&(!fNat||n[3]===fNat)&&(!q||(n[0]+n[1]).toUpperCase().includes(q.toUpperCase())));
+ if(ordem==='nome')v=v.slice().sort((a,b)=>a[0].localeCompare(b[0]));
+ if(ordT!==null)v=v.slice().sort((a,b)=>String(a[ordT.k]).localeCompare(String(b[ordT.k]),'pt-BR')*(ordT.inv?-1:1));
+ document.getElementById('cont').textContent=`${v.length} de ${N.length} NC(s)`;
+ const chips=[fSit&&['sit','Situação: '+SIT[fSit][0]],fNat&&['nat','Natureza: '+fNat]].filter(Boolean);
+ document.getElementById('chips').innerHTML=chips.map(([k,t])=>`<span class="chip-f">${t}<button data-tira="${k}" aria-label="Tirar filtro">×</button></span>`).join(' ');
+ document.querySelectorAll('[data-modo]').forEach(b=>b.classList.toggle('on',b.dataset.modo===modo));
+ const COL=[[6,'Situação'],[3,'Natureza'],[4,'Unidade'],[0,'Paciente'],[1,'ID / atend.'],[2,'Data'],[9,'Título do laudo'],[10,'Mod.'],[11,'Médico'],[5,'Responsável / prestador'],[8,'Impacta pgto.'],[12,'Origem']];
+ if(modo==='tabela'){document.getElementById('lista').innerHTML=`<div style="overflow-x:auto"><table class="tnc"><thead><tr><th></th>${COL.map(([k,t])=>{const on=ordT&&ordT.k===k;return `<th><span class="th-ord" data-ordt="${k}">${t}<span class="seta">${on?(ordT.inv?'▼':'▲'):'↕'}</span></span></th>`}).join('')}</tr></thead><tbody>${v.map(n=>{const i=N.indexOf(n),c=SIT[n[6]][1];return `<tr class="l" style="--c:var(${getC(c)})"><td><input type="checkbox" data-sel="${i}" ${sel.has(i)?'checked':''} aria-label="Selecionar"></td><td><span class="sitp">${SIT[n[6]][0]}</span></td><td><b>${n[3]}</b></td><td>${n[4]}</td><td>${n[0]}<button class="cp" title="Copiar o nome">${ic}</button></td><td>${n[1]}<button class="cp" title="Copiar o ID">${ic}</button></td><td>${n[2]}/2026</td><td>${n[9]}</td><td>${n[10]}</td><td>${n[11]}</td><td>${n[5]}</td><td>${n[8]?'<span class="imp" style="margin:0">sim</span>':'não'}</td><td><span class="la-tag" style="font-size:11px;padding:1px 7px;border-radius:999px;background:var(--infobg);color:var(--accent)">${n[12]}</span></td></tr>`}).join('')}</tbody></table></div>`;}
+ else document.getElementById('lista').innerHTML=v.map(n=>{const i=N.indexOf(n),c=SIT[n[6]][1];return `<div class="nc-l ${c}" style="--c:var(${getC(c)})"><input type="checkbox" data-sel="${i}" ${sel.has(i)?'checked':''} aria-label="Selecionar"><div><span class="pac">${n[0]}</span><button class="cp" title="Copiar o nome">${ic}</button><br><span class="mut">ID ${n[1]} <button class="cp" title="Copiar o ID">${ic}</button> · ${n[2]}/2026</span></div><div>${n[3]}${n[8]?'<span class="imp">impacta pgto.</span>':''}<br><span class="mut">${n[4]}</span></div><div><span class="mut">Responsável</span><br>${n[5]}</div><span class="sit">${SIT[n[6]][0]}</span></div>`}).join('')||'<p class="muted small">Nenhuma NC com esses filtros.</p>';
+ if(modo==='tabela'&&!v.length)document.getElementById('lista').innerHTML='<p class="muted small">Nenhuma NC com esses filtros.</p>';
+ document.getElementById('selN').textContent=sel.size?`Com as ${sel.size} selecionada(s):`:'Com as selecionadas:';
+ const bar=(id,pares)=>{const m=Math.max(...pares.map(p=>p[1]));document.getElementById(id).innerHTML=pares.map(([n,x])=>`<div class="bar"><span>${n}</span><div><i style="width:${x/m*100}%"></i></div><b>${x}</b></div>`).join('');};
+ bar('bNat',[['Prestador incorreto',2],['Conta aberta',2],['Procedimento não lançado',2]]);bar('bResp',[['Faturamento',3],['Recepção',2],['Unimed',1]]);
+}
+function getC(c){return {'e-ab':'--err','e-en':'--accent','e-tr':'--warn','e-re':'--ok','e-np':'--muted'}[c];}
+document.addEventListener('click',e=>{const s=e.target.closest('[data-sit]'),c=e.target.closest('[data-cat]'),t=e.target.closest('[data-tira]');
+ if(s){fSit=fSit===s.dataset.sit?'':s.dataset.sit;des();}if(c){cat=c.dataset.cat;des();}if(t){if(t.dataset.tira==='sit')fSit='';else{fNat='';document.getElementById('fNat').value='';}des();}if(e.target.id==='limpar'){sel.clear();des();}
+ const m=e.target.closest('[data-modo]');if(m){modo=m.dataset.modo;des();}
+ const o=e.target.closest('[data-ordt]');if(o){const k=+o.dataset.ordt;ordT=ordT&&ordT.k===k?{k,inv:!ordT.inv}:{k,inv:false};des();}});
+document.addEventListener('change',e=>{const s=e.target.closest('[data-sel]');if(s){s.checked?sel.add(+s.dataset.sel):sel.delete(+s.dataset.sel);des();}if(e.target.id==='ord'){ordem=e.target.value;des();}if(e.target.id==='fNat'){fNat=e.target.value;des();}});
+document.getElementById('busca').oninput=e=>{q=e.target.value;des();};
+des();
+</script>
