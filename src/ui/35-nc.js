@@ -180,7 +180,9 @@ function desenharTabelaNC() {
       { t: 'Título do laudo', v: x => x.titulo || x.tituloEstudo },
       { t: 'Mod.', v: x => x.modalidade },
       { t: 'Médico', v: x => x.medico },
-      { t: 'Responsável / prestador', ord: x => x.categoria === 'prestador' ? x.prestadorIncorreto : x.responsavel, html: x => x.categoria === 'prestador' ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : esc(x.responsavel || '—') },
+      // 25/11/2026: «Responsável» é só quem fechou a conta; o prestador lançado → correto tem coluna própria.
+      { t: 'Responsável', v: x => x.responsavel || '—' },
+      { t: 'Prestador lançado → correto', ord: x => x.categoria === 'prestador' ? `${x.prestadorIncorreto || ''} ${x.prestadorCorrigido || x.medico || ''}` : '', html: x => x.categoria === 'prestador' || x.prestadorIncorreto || x.prestadorCorrigido ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : '<span class="muted">—</span>' },
       { t: 'Impacta pgto.', v: x => x.impactaPagamento ? 'sim' : 'não' },
       { t: 'Origem', html: x => `<span class="nc-orig">${esc(ROTULO_ORIGEM[x.origem?.tipo] || x.origem?.tipo || '')}</span>${x.deCompetencia ? `<small class="nc-det">de ${rotuloCompetencia(x.deCompetencia)}</small>` : ''}${x.levadaPara ? `<small class="nc-det">levada p/ ${rotuloCompetencia(x.levadaPara)}</small>` : ''}` }
     ]
