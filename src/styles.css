@@ -587,3 +587,15 @@ th .cf-sel{margin:0}
 .quadro.arrastando .qd-col.pode.sobre{background:var(--infobg)}
 .quadro.arrastando .qd-col.nao{opacity:.5}
 .qd-nao{font-size:11px;color:var(--err);margin:-4px 0 6px}
+/* Correção de prestador no padrão da Conferência (25/11/2026) */
+.faixa-fora{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;border-left:4px solid var(--err);background:var(--errbg);border-radius:8px;padding:9px 12px;margin:10px 0;font-size:13px}
+.tag-fora{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--errbg);color:var(--err);margin-top:3px}
+tr.fora-corr>td:first-child{box-shadow:inset 4px 0 0 var(--err)}
+.cp-nome.ok{color:var(--ok)}
+.pl-add{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pl-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px}
+.pl-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-left:3px solid var(--err);border-radius:8px;padding:6px 8px;background:var(--card);font-size:12.5px}
+#pl-gen .pl-item{border-left-color:var(--accent)}
+.pl-item .cod{font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;color:var(--muted)}.pl-item .nome{flex:1;min-width:0}
+.pl-item button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
+.pl-item button:hover{color:var(--err);background:var(--errbg)}

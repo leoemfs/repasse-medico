@@ -26,6 +26,11 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção de prestador no padrão da Conferência — **IMPLEMENTADA na v3.0.0-alpha.49** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/8L5Kbtd7tHx2TLmDb414ku e `docs/prototipos/correcao-padronizada/`; teste: `test/correcao_tela.mjs`)
+- Linha aberta no padrão da Conferência (situação, diagnóstico, linha do MV com atendimento copiável, laudos em cartões); ícone de copiar o nome; «Reler o PDF da pasta / Carregar o PDF novo e identificar de novo» (mantém unidade, tolerância, filtros e busca). Cálculo, filtros, Excel e NC sem mudança.
+- **Prestadores fora da correção** (16 por padrão, `parametros.prestadoresForaCorrecao`): linha com destaque vermelho, etiqueta e resumo no topo com «Mostrar só essas». Lista editável em Configurações.
+- **Prestadores genéricos** viram lista (`parametros.prestadoresGenericos`, ex.: 2, TC e RMN da unidade): o relatório de qualquer um vai para a Correção. Mesmo cartão de lista em Configurações.
+
 ## Quadro do Fechamento: arrastar e soltar — **IMPLEMENTADA na v3.0.0-alpha.48** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/4HFA7sQzQshp7wqgLMBEiF e `docs/prototipos/quadro-arrastar/`; teste: `test/quadro_fechamento.mjs`)
 - Soltar numa coluna registra a ação que leva o cartão até ela (regra no motor: `movimentoQuadro`). A conferir e Em correção seguem a conferência e não aceitam. Aguardando terceiros pede quem aguarda e o motivo. Com aceite → Concluído exigem aceite em todas as unidades; pular etapas registra as do meio e voltar desfaz as da direita (com confirmação). O aviso traz «Desfazer». Clicar no cartão continua abrindo o menu.
 

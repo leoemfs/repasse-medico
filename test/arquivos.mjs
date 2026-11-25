@@ -53,7 +53,7 @@ await botao('ok');
 ok(await S(() => window.__RM.S.relatorios.length === 0 && !window.__RM.S.apolo), 'arquivos limpos para a nova competência');
 
 // 5) Parâmetro do prestador genérico em Configurações.
-await p.goto(html + '#configuracoes'); await p.waitForSelector('#pGen');
-ok(await p.inputValue('#pGen') === '2', 'prestador genérico configurável (padrão 2)');
+await p.goto(html + '#configuracoes'); await p.waitForSelector('#pl-gen');
+ok(/\b2\b/.test(await p.textContent('#pl-gen .pl-grade')), 'prestadores genéricos configuráveis (padrão: 2)');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
