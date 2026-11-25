@@ -25,6 +25,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.41 — «linha N da planilha» do laudo deslocada (pedido de 25/11/2026)
+- Linhas em branco na planilha do Apolo eram puladas na leitura e o número da linha mostrado no laudo ficava menor que o real. Agora vem o número real da linha no Excel.
+- O «ID Apolo» é a coluna de nome exato «ID» da mesma linha do laudo (não mudou).
+
 ## Ordem da tabela da Conferência — **IMPLEMENTADA na v3.0.0-alpha.38** (pedido de 24/11/2026; prévia aprovada: https://claude.ai/artifact/3vrHwttWwVnGTuz2deaGPu; teste: `test/ordem_conferencia.mjs`)
 Pedido: «gostaria de um filtro que pudesse deixar em ordem alfabética; o Luciano possui dois procedimentos em linhas diferentes, que correspondem ao mesmo laudo de abdome total».
 - **«Ordenar por»**, ao lado de «só o que falta decidir»: Ordem do relatório (padrão, a de antes) · Paciente (A→Z) · Data · Procedimento · Laudo (Apolo) · Vl Repasse (maior primeiro).

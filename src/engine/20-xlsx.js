@@ -76,7 +76,7 @@ async function lerXlsx(bytes, { aba = null, onProgresso = null } = {}) {
           const inner = m[2] || '';
           if (inner.indexOf('<v>') >= 0 || inner.indexOf('<is>') >= 0) {
             const a = linha(inner);
-            if (a.length) { rows.push(a); vazias = 0; const rn = (m[1].match(/\br="(\d+)"/) || [])[1]; if (rn) rows.ultima = +rn; }
+            if (a.length) { rows.push(a); vazias = 0; const rn = (m[1].match(/\br="(\d+)"/) || [])[1]; if (rn) { rows.ultima = +rn; a.linha = +rn; } }   // a.linha: número real da linha no Excel (linhas em branco não entram em rows)
           } else if (rows.length && ++vazias >= 3000) fim();
         }
         buf = buf.slice(last);
