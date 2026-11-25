@@ -26,6 +26,11 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Pareamento pelo médico do relatório primeiro — **IMPLEMENTADA na v3.0.0-alpha.53** (pedido de 25/11/2026; teste: `test/ponte.mjs`)
+- Com médico escolhido, a linha do MV procura primeiro nos laudos do médico do relatório (todas as faixas); só a que ficar sem par procura nos de outros médicos («laudo de outro médico»). Caso real: conferência do Henrique Pini, «TC abdome total» na conta, laudos dele (superior e inferior) e do Lucca Maricato (total) no mesmo dia, em outro atendimento.
+- Com o Power BI, laudo de outro médico ligado com segurança a OUTRO atendimento não é candidato (o paciente pode ter mais de um atendimento no mesmo dia).
+- **Próximo (prévia):** regra «dois laudos valem um código» (ex.: TC abdome superior + inferior no mesmo dia = TC abdome total na conta).
+
 ## Não conformidades redesenhada e ordenar pelos títulos — **IMPLEMENTADA na v3.0.0-alpha.52** (pedido de 25/11/2026; prévias aprovadas: https://claude.ai/artifact/4W2yMEXh586qjMi82ABDPX e https://claude.ai/artifact/HZQwvfix5SPtee1TYrp6Ut; `docs/prototipos/nc-redesenho/` e `docs/prototipos/ordenar-colunas/`; teste: `test/nc_tela.mjs`)
 - NCs: esteira de situações clicável (filtra), três chamadas (candidatos, prazos, retenção), filtros numa linha, a tabela de sempre (mesmas colunas e «Com as selecionadas») com cor da situação na borda e paciente/ID copiáveis, indicadores e «Como funciona» recolhidos.
 - Todas as tabelas (componente `tabela`): títulos clicáveis para ordenar (texto A→Z, data, número; clicar de novo inverte), «Voltar à ordem padrão», escolha lembrada por tabela. `data-i` continua sendo a posição na lista original. A Conferência mantém a ordenação própria.
