@@ -1,0 +1,74 @@
+<title>Ponte Apolo, Power BI e MV</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.pt{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:14px 16px;display:grid;gap:12px;margin-bottom:16px}
+.pt-cab{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.pt-cab h3{margin:0;font-size:15px}
+.cad{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+@media (max-width:900px){.cad{grid-template-columns:1fr}}
+.cad>div{padding:10px 12px;font-size:12.5px;display:grid;gap:3px;align-content:start}.cad>div+div{border-left:1px solid var(--line)}
+.cad h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.cad .elo{font-size:11.5px;color:var(--accent);font-weight:700}
+.crit{width:100%;border-collapse:collapse;font-size:12.5px}.crit td,.crit th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.crit th{position:static}.crit .s{font-weight:700}.crit .s.ok{color:var(--ok)}.crit .s.no{color:var(--err)}.crit .s.na{color:var(--muted)}
+.nivel{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px}
+.nivel.a{background:var(--okbg);color:var(--ok)}.nivel.b{background:var(--warnbg);color:var(--warn)}.nivel.c{background:var(--errbg);color:var(--err)}
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--infobg);border-radius:6px;padding:0 6px}
+.info{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.alt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}@media (max-width:900px){.alt{grid-template-columns:1fr}}
+.alt>div{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;display:grid;gap:4px}
+</style>
+<div class="shell" data-pag="conferencia"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Conferência cruzada</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. Como a ponte Apolo → Power BI → MV aparece na linha aberta. Três situações: ligação firme, «Só no laudo» explicado pelo Power BI e dúvida entre dois atendimentos.</div>
+
+<!-- Caso 1 -->
+<div class="pt">
+  <div class="pt-cab"><span class="st cl-ok">Conferido</span><h3>Caso 1 · nome cortado no MV, ligado pelo atendimento</h3><span class="nivel a">vínculo firme · 6 de 6 critérios</span></div>
+  <div class="cad">
+    <div><h4>Apolo (laudo)</h4><b>MARIA AP. SANTOS OLIVEIRA</b><span>ID Apolo <span class="cpv">4309370</span></span><span>13/10/2026 · Ultramed Cambe · US</span><span>«USG ABDOME TOTAL» · UNIMED</span></div>
+    <div><h4>Power BI (faturamento)</h4><span class="elo">↔ pelo nome completo + filtros</span><b>MARIA APARECIDA DOS SANTOS OLIVEIRA</b><span>atendimento <span class="cpv">2209601</span> · conta 2545010</span><span>13/10/2026 · ULTRAMED CAMBE · ULTRASSONOGRAFIA</span><span>40901122 USG ABDOME TOTAL · UNIMED</span></div>
+    <div><h4>Repasse MV</h4><span class="elo">↔ pelo atendimento 2209601</span><b>MARIA APARECIDA DOS S</b><span>atendimento <span class="cpv">2209601</span> · página 3</span><span>13/10/2026 · 40901122 USG ABDOME TOTAL</span><span>UNIMED</span></div>
+  </div>
+  <table class="crit"><thead><tr><th>Critério (Apolo × Power BI)</th><th>Resultado</th><th>Detalhe</th></tr></thead><tbody>
+    <tr><td>Nome</td><td class="s ok">bate</td><td>abreviado no Apolo, compatível com o nome completo</td></tr>
+    <tr><td>Data</td><td class="s ok">bate</td><td>13/10/2026 (atendimento é único por data)</td></tr>
+    <tr><td>Unidade</td><td class="s ok">bate</td><td>Ultramed Cambe = ULTRAMED CAMBE</td></tr>
+    <tr><td>Grupo × modalidade</td><td class="s ok">bate</td><td>ULTRASSONOGRAFIA × US</td></tr>
+    <tr><td>Código × título</td><td class="s ok">bate</td><td>40901122 × «USG ABDOME TOTAL» (equivalência validada)</td></tr>
+    <tr><td>Convênio</td><td class="s ok">bate</td><td>UNIMED</td></tr>
+  </tbody></table>
+  <div class="info">Prestador no Power BI: 1503 · no repasse MV: 1503. Só informativo, não entra no critério.</div>
+</div>
+
+<!-- Caso 2 -->
+<div class="pt">
+  <div class="pt-cab"><span class="st cl-pend">Pendente</span><h3>Caso 2 · «Só no laudo»: o Power BI acha o atendimento</h3><span class="nivel a">vínculo firme · 5 de 6</span></div>
+  <div class="cad">
+    <div><h4>Apolo (laudo)</h4><b>JOAO B. FERREIRA</b><span>ID Apolo <span class="cpv">4352708</span></span><span>07/10/2026 · Ultramed Cambe · CT</span><span>«TC CRANIO» · SUS</span></div>
+    <div><h4>Power BI (faturamento)</h4><span class="elo">↔ pelo nome completo + filtros</span><b>JOAO BATISTA FERREIRA</b><span>atendimento <span class="cpv">2207433</span> · conta 2542884</span><span>07/10/2026 · ULTRAMED CAMBE · TOMOGRAFIA</span><span>41001010 TC CRANIO · SUS</span></div>
+    <div><h4>Repasse MV (este prestador)</h4><span class="elo">atendimento 2207433 não está neste relatório</span><span class="small muted">Nenhuma linha deste relatório com o atendimento.</span></div>
+  </div>
+  <div class="la-diag err" style="border-left:4px solid var(--err);background:var(--errbg);border-radius:8px;padding:9px 12px"><b>Atendimento 2207433 faturado, mas fora do repasse deste prestador</b><p style="margin:3px 0 0;font-size:13px">No Power BI está faturado para o prestador 2087. Provável lançamento para outro prestador; confira a conta 2542884 no MV.</p></div>
+  <div class="info">Critério que não bateu: convênio (Apolo «SUS» × Power BI «SUS - SISTEMA UNICO»): resolva com os nomes equivalentes do convênio.</div>
+</div>
+
+<!-- Caso 3 -->
+<div class="pt">
+  <div class="pt-cab"><span class="st cl-res">Ressalva</span><h3>Caso 3 · dois atendimentos possíveis</h3><span class="nivel b">dúvida · para analisar</span></div>
+  <p class="small" style="margin:0">Laudo «USG TIREOIDE» de <b>ANA P. SILVA</b> em 03/10/2026 (ID Apolo 4401122). O Power BI tem duas pacientes com nome compatível na mesma data e unidade:</p>
+  <div class="alt">
+    <div><b>ANA PAULA DA SILVA</b><span>atendimento <span class="cpv">2201980</span> · USG TIREOIDE · UNIMED</span><span class="small"><span class="s" style="color:var(--ok);font-weight:700">5 de 6</span> · convênio não bate</span><span class="small muted">No repasse MV: linha 12</span></div>
+    <div><b>ANA PAULA SILVA SOUZA</b><span>atendimento <span class="cpv">2202311</span> · USG ABDOME · PARTICULAR</span><span class="small"><span class="s" style="color:var(--warn);font-weight:700">4 de 6</span> · código e convênio não batem</span><span class="small muted">Não está neste relatório</span></div>
+  </div>
+  <div class="info">Fica como <b>ressalva</b> com o de mais critérios (atendimento 2201980) sugerido, até você analisar. Nunca decide sozinho quando há mais de um atendimento.</div>
+</div>
+
+<div class="card"><h3>Regras desta prévia</h3><ul class="small">
+  <li>A ponte vai do laudo ao Power BI por <b>nome completo, data, unidade, grupo × modalidade, código × título (equivalências) e convênio (com nomes equivalentes)</b>; daí ao MV pelo <b>número do atendimento</b>.</li>
+  <li><b>Vínculo firme</b>: um único atendimento com nome e data batendo e a maioria dos outros critérios. <b>Dúvida</b>: dois ou mais atendimentos possíveis → sempre ressalva.</li>
+  <li>Laudos do mesmo ID Apolo no mês aproveitam o nome completo já achado no Power BI.</li>
+  <li>O prestador do Power BI aparece só como informação; nunca decide o par.</li>
+  <li>Sem Power BI carregado, a conferência funciona como hoje (por nome) e avisa que a ponte não foi usada.</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>

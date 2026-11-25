@@ -142,7 +142,7 @@ async function executarConferencia() {
 // Executa e registra uma conferência (usada pelo botão e para rodar de novo após validar equivalências).
 async function rodarConferencia(x, un, tol, medSel) {
   const medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
-  const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos }), indiceDecisoesComp());
+  const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol, medicos, pbi: S.pbi }), indiceDecisoesComp());
   const unidade = un === '*' ? 'Todas as unidades' : `${un} - ${unidadePorCod(S.cfg, un)?.nome || ''}`;
   const medicosNomes = medicos ? [...new Set(S.apolo.laudos.filter(l => medicos.includes(l.mn)).map(l => l.medico))].join(', ') : '';
   const ctx = { chaveCompetencia: S.comp, relId: x.id, relatorio: x.rel, apoloNome: S.apolo.nome, unidadeCod: un, unidadeNome: unidade, medicoSel: medSel, medicosNomes, parametros: { tol, medico: medSel }, operador: S.operador, cfgRevisao: S.cfg.revisao,
@@ -160,7 +160,7 @@ async function rodarConferencia(x, un, tol, medSel) {
   let cands = candidatosDaConferencia(res, ctx, S.cfg);
   if (S.pbi) {
     const opcPBI = { unidadeCod: un, tol, prestadorCod: x.rel.cab.prestadorCod, cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), idxPrest: indicePrestadores(S.cfg) };
-    for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } }
+    for (const l of res.linhas) if (l.status === 'so-laudo' && l.l) { const c = conciliarLaudo(S.pbi, l.l, opcPBI); if (c) { l.pbi = c; l.motivos.push(c.texto); } const pl = ponteDoLaudo(S.pbi, l.l, opcPBI); if (pl) Object.defineProperty(l, 'ponteLaudo', { value: pl, enumerable: false }); }
     ctx.pbiResumo = enriquecerCandidatosComPBI(cands, S.pbi, opcPBI); ctx.pbiNome = S.pbi.nome;
   }
   // P1: com todos os médicos no escopo, os candidatos «Só no laudo» ficam só os do prestador (quando há cadastro dele na unidade).
@@ -419,13 +419,30 @@ function cartoesCandidatos(x, i, k) {
     return `<div class="la-cand${cd.l === x.l ? ' escolhido' : ''}"><b>«${esc(cd.l.titulo)}» · ${fmtData(cd.l.data)}</b><span class="small muted">${esc(cd.l.medico || 'sem médico')} · faixa ${cd.tier} (${esc(FAIXA[cd.tier] || '')})${cd.l === x.l ? ' · <b>par escolhido</b>' : ''}</span><div class="chips-s">${chips}</div>${escolher ? `<div><button class="sec mini" data-escolher="${i}|${j}">Este é o laudo certo</button></div>` : ''}</div>`;
   }).join('')}</div></div>`;
 }
+// Ponte pelo atendimento (25/11/2026): uma linha só, com os critérios recolhidos — para não poluir a tela.
+function linhaPonte(x) {
+  if (!S.pbi) return x.status === 'so-laudo' ? '<div class="la-ponte muted">Power BI não carregado: a busca do atendimento pelo laudo não foi feita.</div>' : '';
+  const opc = { cfg: S.cfg, idxEq: indiceEquivalencias(S.eq), unidadeCod: S.conf?.ctx?.unidadeCod };
+  const crit = cr => `<details class="la-crit"><summary>${pontosCriterios(cr)} de 6 critérios</summary><span>${cr.map(c => `<span class="chip-s ${c.ok === true ? 'ok' : c.ok === false ? 'err' : 'na'}">${esc(c.k)}${c.ok === null ? ' ?' : ''}</span>`).join('')}</span></details>`;
+  const prest = at => at.prestadores.size ? ` · faturado para ${[...at.prestadores].map(esc).join(', ')} <span class="muted">(só informativo)</span>` : '';
+  const noRel = at => { const y = (S.conf?.res?.linhas || []).find(z => z.r && String(z.r.atendimento) === String(at.atendimento)); return y ? ` · está na linha ${y.r.seq} deste relatório` : ' · <b>não está neste relatório</b>'; };
+  if (x.r && x.ponte) {
+    const at = x.ponte, cd = x.l ? x.cands.find(c => c.l === x.l) : null;
+    return `<div class="la-ponte"><b>Power BI</b> atendimento ${copiavel(at.atendimento)} · ${esc(at.nome)}${cd?.ponte ? ' · <span class="chip-s ok">laudo achado pelo nome do Power BI</span>' : ''}${prest(at)}${x.l ? crit(criteriosPonte(x.l, at, opc)) : ''}</div>`;
+  }
+  const p = x.ponteLaudo; if (!x.l || !p) return '';
+  if (p.nivel === 'nenhum') return '<div class="la-ponte"><b>Power BI</b> nenhum atendimento com nome e data compatíveis com o laudo.</div>';
+  const um = (a, tit) => `<div class="la-ponte"><b>${tit}</b> atendimento ${copiavel(a.at.atendimento)} · ${esc(a.at.nome)}${noRel(a.at)}${prest(a.at)}${crit(a.criterios)}</div>`;
+  if (p.nivel === 'firme') return um(p.melhor, 'Power BI');
+  return `<div class="la-ponte-duvida">${um(p.melhor, 'Power BI · mais provável')}${p.alternativas.map(a => um(a, 'ou')).join('')}</div>`;
+}
 function detalheLinhaConf(x, i, k, obs, ctx) {
   const d = diagnosticoLinha(x), tags = [...x.marcadores].map(m => MARCADORES[m]).filter(Boolean);
   const meta = [`Linha ${x.r ? x.r.seq : '—'}${x.r ? ' do relatório' : ''}`, `origem ${x.origem}`, x.decisao ? 'com decisão' : k === 'pend' ? 'sem decisão (não entra no fechamento)' : ''].filter(Boolean).join(' · ');
   return `<div class="la">
     <div class="la-topo">${k ? pillClasse(k) : ''}${tags.map(t => `<span class="la-tag">${esc(t)}</span>`).join('')}<span class="la-meta">${esc(meta)}</span></div>
     <div class="la-diag ${d.nivel}"><b>${esc(d.titulo)}</b>${d.texto ? `<p>${atendimentosCopiaveis(esc(d.texto))}</p>` : ''}</div>
-    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
+    <div class="la-grid"><div>${x.r && x.l ? comparacaoMVLaudo(x, ctx) : ladoUnicoConf(x)}${linhaPonte(x)}</div><div class="la-col">${quadroComposta(x)}${cartoesCandidatos(x, i, k)}</div></div>
     <details class="la-mais"><summary>Ver as evidências completas (${x.motivos.length})</summary><ul>${x.motivos.map(m => `<li>${atendimentosCopiaveis(esc(m))}</li>`).join('')}</ul></details>
     <div class="la-acoes">${botoesDecisao(x, i)}${k === 'pend' && !x.decisao ? '<span class="small muted">Depois de decidir, a próxima linha que falta decidir abre sozinha.</span>' : ''}</div>
     <div><label class="campo">Observação<textarea class="cf-obs" data-obs="${i}" rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea></label><div class="acoes" style="margin-top:4px"><button class="sec mini" data-obs-salvar="${i}">Salvar observação</button></div>
@@ -767,7 +784,7 @@ function itensPlanilhaUnidade(un, gr, ch = S.comp) {
     const ctx = { chaveCompetencia: ch, relId: x.id, relatorio: { ...x.rel, arquivo: x.rel.arquivo || x.nome }, apoloNome: S.apolo?.nome || '', unidadeCod: un, unidadeNome: uNome, parametros: rod?.parametros || {}, operador: S.operador, rodadaId: rod?.id || '' };
     if (!rod || !S.apolo) return { res: null, ctx, rodada: null };
     const medSel = rod.parametros?.medico || '@prest', medicos = medSel === '*' ? null : medSel === '@prest' ? medicosDoPrestador(S.cfg, x.rel.cab.prestadorCod) : [medSel];
-    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos }), idxDec);
+    const res = aplicarDecisoes(conferirCruzado(x.rel, S.apolo, S.cfg, S.eq, { unidadeCod: un, tol: rod.parametros?.tol ?? S.cfg.parametros.tolConferencia, medicos, pbi: S.pbi }), idxDec);
     return { res, ctx, rodada: rod };
   });
 }
