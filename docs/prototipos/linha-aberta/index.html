@@ -1,0 +1,112 @@
+<title>Linha aberta da conferência</title>
+<link rel="stylesheet" href="app.css">
+<style>
+.la{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:14px 16px;display:grid;gap:14px}
+.la-topo{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.la-topo .tag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.la-topo .meta{font-size:12px;color:var(--muted);margin-left:auto}
+.la-diag{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:8px;padding:10px 12px}
+.la-diag h3{margin:0 0 4px;font-size:14px}.la-diag p{margin:0;font-size:13px}
+.la-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+@media (max-width:900px){.la-grid{grid-template-columns:1fr}}
+.la h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.cmp{width:100%;border-collapse:collapse;font-size:12.5px}
+.cmp th,.cmp td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.cmp th{font-size:11px;color:var(--muted);font-weight:700}
+.cmp td:first-child{color:var(--muted);white-space:nowrap;width:1%}
+.cmp tr.dif td{background:var(--warnbg)}
+.cmp .ok{color:var(--ok);font-weight:700}.cmp .no{color:var(--warn);font-weight:700}
+.esp{width:100%;border-collapse:collapse;font-size:12.5px}
+.esp td,.esp th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.esp th{font-size:11px;color:var(--muted)}.esp td.n,.esp th.n{text-align:center;font-variant-numeric:tabular-nums}
+.esp tr.falta td{color:var(--err)}.esp tr.sobra td{color:var(--warn)}
+.cand{border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;display:grid;gap:6px}
+.cand b{font-size:13px}.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip-s{font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px}
+.chip-s.ok{background:var(--okbg);color:var(--ok)}.chip-s.warn{background:var(--warnbg);color:var(--warn)}.chip-s.err{background:var(--errbg);color:var(--err)}
+.cpv{display:inline-flex;align-items:center;gap:2px;font-variant-numeric:tabular-nums;font-weight:600;background:var(--infobg);border-radius:6px;padding:0 2px 0 6px;white-space:nowrap}
+.cpv button{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:2px 3px;line-height:0}.cpv button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.cpv.okc{background:var(--okbg)}
+.la-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px solid var(--line);padding-top:12px}
+details.la-mais summary{cursor:pointer;font-size:12.5px;color:var(--accent)}
+details.la-mais ul{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+.antes{opacity:.85}
+</style>
+<div class="shell" data-pag="conferencia"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Conferência cruzada</h1></div></header>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · linha aberta na tabela da conferência, reorganizada. Mesmo caso do seu print (dados de exemplo).</div>
+
+<div class="la">
+  <!-- 1. Faixa de situação: o que é e onde está -->
+  <div class="la-topo">
+    <span class="st cl-pend">Pendente</span>
+    <span class="tag">Procedimento diverge</span><span class="tag">Regra composta</span><span class="tag">Composição incompleta</span>
+    <span class="meta">Linha 2 do relatório · origem MV · sem decisão (não entra no fechamento)</span>
+  </div>
+
+  <!-- 2. Diagnóstico em uma frase -->
+  <div class="la-diag">
+    <h3>O MV lançou um código que não faz parte do exame laudado</h3>
+    <p>O laudo «Mamografia Digital» pela regra composta espera <b>MAMOGRAFIA DIGITAL BILATERAL + MAMOGRAFIA DIGITAL UNILATERAL</b>. O MV lançou <b>40808033 MAMOGRAFIA CONVENCIONAL BILATERAL</b>, que não é parte dessa regra.</p>
+  </div>
+
+  <div class="la-grid">
+    <!-- 3. MV × Laudo lado a lado, com IDs -->
+    <div>
+      <h4>MV × laudo</h4>
+      <table class="cmp">
+        <thead><tr><th></th><th>MV</th><th>Laudo (Apolo)</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Paciente</td><td>MELANIE E. A. L. M. BUTARELLO</td><td>Melanie Eiko Aranda Lopes Makiyama Butarello</td><td class="no">truncado</td></tr>
+          <tr><td>Data</td><td>13/10/2026</td><td>13/10/2026</td><td class="ok">igual</td></tr>
+          <tr class="dif"><td>Procedimento</td><td>40808033 · MAMOGRAFIA CONVENCIONAL BILATERAL - OP</td><td>Mamografia Digital</td><td class="no">diverge</td></tr>
+          <tr><td>Convênio</td><td>PARTICULAR - GRUPO SRA</td><td>PARTICULAR - GRUPO SRA</td><td class="ok">igual</td></tr>
+          <tr><td>Médico</td><td>—</td><td>Melanie Eiko Aranda Lopes Makiyama Butarello</td><td></td></tr>
+          <tr><td>Identificação</td><td>atendimento <span class="cpv" data-v="2209601"></span><br><span class="small muted">conta 2545010 · página 1 · repasse 25083</span></td><td>ID Apolo <span class="cpv" data-v="4309370"></span><br><span class="small muted">Ultramed Cambe · MG · linha 18144 da planilha</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:grid;gap:14px;align-content:start">
+      <!-- 4. Esperado × lançado (só quando há regra composta) -->
+      <div>
+        <h4>Regra composta «Mamografia Digital»: esperado × lançado</h4>
+        <table class="esp"><thead><tr><th>Procedimento</th><th class="n">Esperado</th><th class="n">Lançado</th><th></th></tr></thead><tbody>
+          <tr class="falta"><td>MAMOGRAFIA DIGITAL BILATERAL</td><td class="n">1</td><td class="n">0</td><td>falta</td></tr>
+          <tr class="falta"><td>MAMOGRAFIA DIGITAL UNILATERAL</td><td class="n">1</td><td class="n">0</td><td>falta</td></tr>
+          <tr class="sobra"><td>40808033 MAMOGRAFIA CONVENCIONAL BILATERAL</td><td class="n">0</td><td class="n">1</td><td>fora da regra</td></tr>
+        </tbody></table>
+      </div>
+      <!-- 5. Candidatos como cartões com sinais -->
+      <div>
+        <h4>Laudos candidatos (1)</h4>
+        <div class="cand"><b>«Mamografia Digital» · 13/10/2026</b><span class="small muted">Melanie Eiko Aranda Lopes Makiyama Butarello</span>
+          <div class="chips"><span class="chip-s ok">mesma data</span><span class="chip-s warn">nome truncado</span><span class="chip-s warn">título validado p/ outro código</span><span class="chip-s err">sem equivalência</span><span class="chip-s warn">título 50%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <details class="la-mais"><summary>Ver as evidências completas (texto do motor)</summary><ul>
+    <li>Procedimento diverge: MV «40808033 - MAMOGRAFIA CONVENCIONAL BILATERAL - OP» × laudo «Mamografia Digital». Regra composta «MAMOGRAFIA DIGITAL»: «Mamografia Digital» = MAMOGRAFIA DIGITAL BILATERAL + MAMOGRAFIA DIGITAL UNILATERAL; o código 40808033 não faz parte.</li>
+    <li>Composição incompleta: falta MAMOGRAFIA DIGITAL BILATERAL (esperado ×1, lançado ×0), MAMOGRAFIA DIGITAL UNILATERAL (esperado ×1, lançado ×0) no MV.</li></ul></details>
+
+  <!-- 6. Ações no fim, junto da observação -->
+  <div class="la-acoes"><button>Aceitar para pagamento…</button><button class="sec">Apontar como NC…</button><button class="sec">Resolvido no MV…</button><span class="small muted">Depois de decidir, a próxima linha que falta decidir abre sozinha.</span></div>
+  <label class="campo">Observação<textarea rows="2" placeholder="anotação sua sobre esta linha (não muda a classe; fica na competência)"></textarea></label>
+</div>
+
+<div class="card" style="margin-top:14px"><h3>O que muda em relação a hoje</h3><ul class="small">
+  <li><b>Situação no topo</b>: classe e as marcas viram etiquetas numa linha só; linha, origem e decisão à direita.</li>
+  <li><b>Diagnóstico em uma frase</b>, no lugar de três itens que repetiam a mesma regra composta.</li>
+  <li><b>MV × laudo num quadro só</b>, com a diferença destacada e os IDs (atendimento e ID Apolo copiáveis) na última linha. Saem os blocos «Linha do MV» e «Laudo» separados.</li>
+  <li><b>Regra composta como tabela esperado × lançado</b>: falta em vermelho, fora da regra em laranja.</li>
+  <li><b>Candidatos como cartões</b> com sinais coloridos (verde = bate, laranja = atenção, vermelho = impede).</li>
+  <li>O texto completo do motor continua disponível, recolhido em «Ver as evidências completas».</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const ic='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+document.querySelectorAll('.cpv').forEach(s=>{s.innerHTML=`${s.dataset.v}<button type="button" title="Copiar ${s.dataset.v}">${ic}</button>`;});
+document.addEventListener('click',async e=>{const b=e.target.closest('.cpv button');if(!b)return;const s=b.parentNode;try{await navigator.clipboard.writeText(s.dataset.v);}catch(_){}s.classList.add('okc');setTimeout(()=>s.classList.remove('okc'),1200);});
+</script>

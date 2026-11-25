@@ -32,7 +32,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
   - Unidades ignoradas por padrão (laudos saem da planilha na leitura): ISCAL, GRUPO SRA LON, Associação da Santa Casa de Misericórdia de Ourinhos, Hospital Providência Apucarana (`parametros.unidadesIgnoradas`).
   - «Só no laudo»: natureza sugerida da NC passa a ser **Prestador incorreto** (na prática, a conta está para outro médico); o Power BI ainda ajusta quando mostra conta aberta, fora de remessa etc.
   - Títulos com acento quebrado (ex.: «TorÃ¡cica») já são corrigidos na leitura (`fixMojibake`).
-- **Aguardando aprovação da prévia** (https://claude.ai/artifact/VSLSUPPdKQQzL29fARx3Vi): lista de unidades ignoradas editável em Configurações; «Nomes equivalentes» no cadastro de convênios (nome resumido no Apolo / cortado no MV contam como o mesmo convênio).
+- **IMPLEMENTADO na v3.0.0-alpha.43** (prévias aprovadas: https://claude.ai/artifact/VSLSUPPdKQQzL29fARx3Vi e https://claude.ai/artifact/Mzf47r6tyJ1d9P1aFZkhNY; `docs/prototipos/convenios-unidades/` e `docs/prototipos/linha-aberta/`):
+  - Unidades ignoradas editáveis em Configurações → Parâmetros (uma por linha, «Voltar ao padrão»).
+  - «Nomes equivalentes» no cadastro de convênios (Bases e regras), com sugestões dos arquivos carregados; valem na conferência (`convenioCompativel` com o cadastro).
+  - Linha aberta da conferência reorganizada: situação numa linha, diagnóstico em uma frase (`diagnosticoLinha`), MV × laudo com identificação (atendimento e ID Apolo copiáveis), esperado × lançado da regra composta (`compostaDet`), candidatos em cartões com sinais e evidências completas recolhidas.
 
 ## Correção da v3.0.0-alpha.41 — «linha N da planilha» do laudo deslocada (pedido de 25/11/2026)
 - Linhas em branco na planilha do Apolo eram puladas na leitura e o número da linha mostrado no laudo ficava menor que o real. Agora vem o número real da linha no Excel.
