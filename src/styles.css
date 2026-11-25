@@ -617,3 +617,19 @@ tr.nc-sit-tratativa>td:first-child{box-shadow:inset 4px 0 0 var(--warn)}tr.nc-si
 .nc-dobra summary{cursor:pointer;font-weight:700;font-size:13px}.nc-dobra[open] summary{margin-bottom:8px}
 .nc-ind{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media (max-width:1000px){.nc-esteira{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-chamadas,.nc-ind{grid-template-columns:minmax(0,1fr)}.nc-filtros{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-filtros input{grid-column:1/-1}}
+/* Laudos que somam um código (25/11/2026) */
+.sm-lista{display:grid;gap:8px}
+.sm-item{display:grid;grid-template-columns:minmax(0,1.4fr) 24px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:10px 12px;background:var(--card);font-size:13px}
+.sm-item.off{border-left-color:var(--muted);opacity:.75}.sm-tits{display:flex;flex-wrap:wrap;gap:4px;align-items:center}.sm-eq{font-size:18px;color:var(--muted);text-align:center}
+.sm-form{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px;border:1px dashed var(--line);border-radius:10px;padding:12px;margin-top:12px}
+.sm-tits-in,.sm-dir{display:grid;gap:6px;align-content:start}
+@media (max-width:900px){.sm-item,.sm-form{grid-template-columns:minmax(0,1fr)}}
+/* NCs e resolvidos no MV abrem ao clicar (25/11/2026) */
+.cm-l{cursor:pointer}.cm-tab tr.cm-l:hover td{background:var(--infobg)}
+.cm-tab tr.cm-l td:first-child::before,.cm-res li.cm-l::before{content:"▸";color:var(--muted);margin-right:6px}
+.cm-tab tr.cm-l.aberto td:first-child::before,.cm-res li.cm-l.aberto::before{content:"▾"}
+.cm-res{list-style:none;padding-left:0}.cm-res li{margin:4px 0}
+.cm-dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px;padding:12px 14px;background:var(--bg);border-radius:8px;font-size:12.5px;margin:6px 0;cursor:default}
+.cm-dl dt{color:var(--muted);font-size:11.5px}.cm-dl dd{margin:0 0 4px;font-weight:600}
+.cm-acoes{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:900px){.cm-dl{grid-template-columns:minmax(0,1fr)}}

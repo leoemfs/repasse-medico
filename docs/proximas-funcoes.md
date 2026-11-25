@@ -26,13 +26,16 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Laudos que somam um código e NCs do relatório abrindo — **IMPLEMENTADA na v3.0.0-alpha.55** (pedido de 25/11/2026; prévias aprovadas: https://claude.ai/artifact/L1J7iV5uoKR2eyAfAxR9M4 e https://claude.ai/artifact/YVsRv1sbPXL4YP5zyyL4C9; `docs/prototipos/laudos-somam-codigo/` e `docs/prototipos/ncs-do-relatorio/`; testes: `test/ponte.mjs`, `test/somas_tela.mjs`)
+- Regra nova em `eq.somas` (motor: `src/engine/50b-somas.js`): dois ou mais laudos do mesmo paciente, mesmo dia e mesmo médico valem um código da conta (ex.: TC abdome superior + inferior = 41001095 TC ABDOME TOTAL). Na conferência, a linha fica conferida com todos os laudos; faltando um, «Soma de laudos incompleta». Cadastro em Equivalências → Regras, ao lado das compostas; viaja pela pasta com as equivalências.
+- Aba «NCs e correções no MV»: NCs e resolvidos abrem ao clicar, com paciente/ID/conta copiáveis, «Copiar tudo» e «Abrir a NC».
+
 ## Correção da v3.0.0-alpha.54 — NCs: responsável e prestador em colunas separadas (pedido de 25/11/2026)
 - «Responsável» mostra só quem fechou a conta; nova coluna «Prestador lançado → correto» para as NCs de prestador. A exportação para o Qualiex não muda.
 
 ## Pareamento pelo médico do relatório primeiro — **IMPLEMENTADA na v3.0.0-alpha.53** (pedido de 25/11/2026; teste: `test/ponte.mjs`)
 - Com médico escolhido, a linha do MV procura primeiro nos laudos do médico do relatório (todas as faixas); só a que ficar sem par procura nos de outros médicos («laudo de outro médico»). Caso real: conferência do Henrique Pini, «TC abdome total» na conta, laudos dele (superior e inferior) e do Lucca Maricato (total) no mesmo dia, em outro atendimento.
 - Com o Power BI, laudo de outro médico ligado com segurança a OUTRO atendimento não é candidato (o paciente pode ter mais de um atendimento no mesmo dia).
-- **Próximo (prévia):** regra «dois laudos valem um código» (ex.: TC abdome superior + inferior no mesmo dia = TC abdome total na conta).
 
 ## Não conformidades redesenhada e ordenar pelos títulos — **IMPLEMENTADA na v3.0.0-alpha.52** (pedido de 25/11/2026; prévias aprovadas: https://claude.ai/artifact/4W2yMEXh586qjMi82ABDPX e https://claude.ai/artifact/HZQwvfix5SPtee1TYrp6Ut; `docs/prototipos/nc-redesenho/` e `docs/prototipos/ordenar-colunas/`; teste: `test/nc_tela.mjs`)
 - NCs: esteira de situações clicável (filtra), três chamadas (candidatos, prazos, retenção), filtros numa linha, a tabela de sempre (mesmas colunas e «Com as selecionadas») com cor da situação na borda e paciente/ID copiáveis, indicadores e «Como funciona» recolhidos.

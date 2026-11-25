@@ -46,5 +46,23 @@ const r2 = await p.evaluate(() => {
 });
 ok(r2[0] === 'HENRIQUE PINI', `conferindo o Henrique, a linha fica com o laudo dele, não com o do Lucca (${r2[0]})`);
 ok(r2[1] === 'LUCCA MARICATO', `sem médico escolhido, nada muda: fica o laudo validado (${r2[1]})`);
+// Laudos que somam um código: superior + inferior do Henrique = 41001095 (TC abdome total).
+const r3 = await p.evaluate(() => {
+  const cfg = H.cfgPadrao(), eq = H.eqVaziaP();
+  eq.somas = [H.novaSoma({ titulos: ['TC ABDOME SUPERIOR', 'TC ABDOME INFERIOR'], codigo: '41001095', desc: 'TC ABDOME TOTAL' }, 'Leo')];
+  const data = new Date(Date.UTC(2026, 9, 10)), dia = Math.round(data / 864e5);
+  const L = (i, titulo, med) => ({ i, linhaPlanilha: i + 2, idLaudo: 'L' + i, unidade: 'X', paciente: 'JOAO DA SILVA', pn: 'JOAO DA SILVA', idPac: '9', titulo, tn: titulo, descricao: '', data, dia, convenio: 'UNIMED', modalidade: 'CT', medico: med, mn: med });
+  const r = { seq: 1, pagina: 1, codigo: '41001095', procDesc: 'TC ABDOME TOTAL', grupoNome: 'TOMOGRAFIA', conta: '1', atendimento: '100', paciente: 'JOAO DA SILVA', convenio: 'UNIMED', data, vlRepasse: 50, vlTotal: 100, pct: .5, quant: 1, prestadorCod: '10175', prestadorNome: 'HENRIQUE PINI', repasse: '1' };
+  const rel = { cab: { prestadorCod: '10175', prestadorNome: 'HENRIQUE PINI', repasse: '1', descricao: 'REPASSE', competencia: '11/2026' }, regs: [r] };
+  const completa = H.conferirCruzado(rel, { laudos: [L(0, 'TC ABDOME TOTAL', 'LUCCA MARICATO'), L(1, 'TC ABDOME SUPERIOR', 'HENRIQUE PINI'), L(2, 'TC ABDOME INFERIOR', 'HENRIQUE PINI')] }, cfg, eq, { unidadeCod: '*', tol: 7, medicos: ['HENRIQUE PINI'] });
+  const parcial = H.conferirCruzado(rel, { laudos: [L(1, 'TC ABDOME SUPERIOR', 'HENRIQUE PINI')] }, cfg, eq, { unidadeCod: '*', tol: 7, medicos: ['HENRIQUE PINI'] });
+  const lin = res => res.linhas.find(x => x.r), soLaudo = res => res.linhas.filter(x => x.status === 'so-laudo').map(x => x.l.titulo);
+  const m = H.mesclarEq({ itens: [], compostas: [], somas: [] }, eq, null).eq.somas.length;
+  return { st: lin(completa).status, soma: lin(completa).marcadores.has('soma'), so: soLaudo(completa), falta: lin(parcial).marcadores.has('soma-falta'), m };
+});
+ok(r3.st === 'conferido' && r3.soma, `superior + inferior do Henrique fecham «TC abdome total»: conferido (${r3.st})`);
+ok(!r3.so.length, `os dois laudos do Henrique entram na soma e não sobram como «Só no laudo» (${JSON.stringify(r3.so)})`);
+ok(r3.falta, 'só o superior: aviso «Soma de laudos incompleta»');
+ok(r3.m === 1, 'a regra viaja na sincronização das equivalências');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

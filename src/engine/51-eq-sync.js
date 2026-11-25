@@ -9,6 +9,7 @@ function unidadesEq(base) {
   const m = new Map(); if (!base) return m;
   for (const e of base.itens || []) m.set('rel|' + chaveRelacaoEq(e), e);
   for (const c of base.compostas || []) m.set('cmp|' + c.id, c);
+  for (const c of base.somas || []) m.set('som|' + c.id, c);   // laudos que somam um código (25/11/2026)
   return m;
 }
 const RANK_STATUS_EQ = { pendente: 0, coberta: 1, desativada: 2, validada: 3 };
@@ -40,11 +41,12 @@ function mesclarEq(local, remoto, base) {
       if (p.startsWith('rel|') && (l.status === 'pendente' || r.status === 'pendente')) { const v = l.status === 'pendente' ? r : l; out.set(p, juntarHistoricoEq(v, v === l ? r : l)); continue; }
     }
     out.set(p, l);
-    conflitos.push({ p, rotulo: p.startsWith('rel|') ? `«${(l || r).titulo}» → ${(l || r).codigo}` : `Regra composta «${nomeComposta(l || r)}»`, local: l, remoto: r });
+    conflitos.push({ p, rotulo: p.startsWith('rel|') ? `«${(l || r).titulo}» → ${(l || r).codigo}` : p.startsWith('som|') ? `Laudos que somam «${nomeSoma(l || r)}»` : `Regra composta «${nomeComposta(l || r)}»`, local: l, remoto: r });
   }
   const eq = { ...clone(remoto), ...clone(local) };
   eq.itens = [...out].filter(([p, v]) => p.startsWith('rel|') && v).map(([, v]) => clone(v));
   eq.compostas = [...out].filter(([p, v]) => p.startsWith('cmp|') && v).map(([, v]) => clone(v));
+  eq.somas = [...out].filter(([p, v]) => p.startsWith('som|') && v).map(([, v]) => clone(v));
   const cat = new Map([...(remoto.catalogoTUSS || []), ...(local.catalogoTUSS || [])].map(t => [t.codigo, t]));
   if (cat.size) eq.catalogoTUSS = [...cat.values()];
   eq.revisao = Math.max(+local.revisao || 0, +remoto.revisao || 0) + 1;
@@ -54,7 +56,7 @@ function aplicarEscolhasEq(eq, conflitos, escolhas) {
   const r = clone(eq);
   conflitos.forEach((c, i) => {
     const v = juntarHistoricoEq(escolhas[i] === 'remoto' ? c.remoto : c.local, escolhas[i] === 'remoto' ? c.local : c.remoto);
-    const lista = c.p.startsWith('rel|') ? r.itens : (r.compostas ||= []), chave = c.p.slice(4);
+    const lista = c.p.startsWith('rel|') ? r.itens : c.p.startsWith('som|') ? (r.somas ||= []) : (r.compostas ||= []), chave = c.p.slice(4);
     const idx = lista.findIndex(x => (c.p.startsWith('rel|') ? chaveRelacaoEq(x) : x.id) === chave);
     if (idx >= 0) { if (v) lista[idx] = v; else lista.splice(idx, 1); } else if (v) lista.push(v);
   });

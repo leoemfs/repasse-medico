@@ -281,14 +281,14 @@ async function sincronizarEq({ interativo = false } = {}) {
         eq = aplicarEscolhasEq(eq, conflitos, conflitos.map((x, i) => r.campos[`c${i}`] === 'remoto' ? 'remoto' : 'local'));
       }
       aplicarCobertas(eq, S.operador, S.comp);
-      const mudouLocal = JSON.stringify(eq.itens) !== JSON.stringify(S.eq.itens) || JSON.stringify(eq.compostas || []) !== JSON.stringify(S.eq.compostas || []);
+      const mudouLocal = JSON.stringify(eq.itens) !== JSON.stringify(S.eq.itens) || JSON.stringify(eq.compostas || []) !== JSON.stringify(S.eq.compostas || []) || JSON.stringify(eq.somas || []) !== JSON.stringify(S.eq.somas || []);
       if (mudouLocal) {
         const novas = novasValidadasEq(antes, eq); S.eq = eq; gravarEqLocal();
         if (novas.length && remoto) avisar(`${novas.length} relação(ões) validada(s) chegaram pela pasta (${remoto.atualizadoPor || 'outra pessoa'}). Rode de novo as conferências afetadas («O que mais destrava» ou a própria Conferência).`, 'ok');
         if (location.hash === '#equivalencias') RENDER.equivalencias();
       }
-      const remEq = remoto ? JSON.stringify([remoto.eq.itens, remoto.eq.compostas || []]) : '';
-      if (remEq !== JSON.stringify([S.eq.itens, S.eq.compostas || []])) {
+      const remEq = remoto ? JSON.stringify([remoto.eq.itens, remoto.eq.compostas || [], remoto.eq.somas || []]) : '';
+      if (remEq !== JSON.stringify([S.eq.itens, S.eq.compostas || [], S.eq.somas || []])) {
         const fh = await dir.getFileHandle(ARQ_EQ, { create: true });
         if (lm && (await fh.getFile()).lastModified !== lm) continue;
         const meta = { atualizadoEm: agoraISO(), atualizadoPor: S.operador || '' };

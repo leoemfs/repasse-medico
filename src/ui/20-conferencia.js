@@ -578,12 +578,43 @@ function cartaoCorrecoesMV(corr) {
   const lin = x => x ? `${esc(x.r.paciente)} · ${esc(fmtData(x.r.data))} · ${esc(x.r.codigo)} ${esc(x.r.procDesc)} · R$ ${fmtBR(x.r.vlRepasse)}` : '';
   const cont = [...corr.ncs.filter(x => x.situacao === 'continua'), ...corr.resolvidos.filter(x => x.situacao === 'continua'), ...corr.hm.filter(x => x.continua)];
   const SIT = { corrigida: ['ok', 'Corrigida no MV (não está mais no relatório)'], aguardando: ['warn', 'Aguardando correção no MV (reimporte o PDF depois de corrigir)'], continua: ['err', 'Não corrigida: continua no MV'], lancada: ['ok', 'Corrigida: lançada no MV (o laudo agora tem par; a NC não passa para a linha)'] };
-  return `<div class="card"><h2>Correções no MV</h2>
+  return `<div class="card cm-card"><h2>Correções no MV</h2>
     ${cont.length ? `<div class="aviso-mv" role="alert"><b>⚠ ${cont.length} item(ns) que deviam ter saído do MV continuam no relatório reimportado — R$ ${fmtBR(cont.reduce((s, x) => s + (x.linha?.r?.vlRepasse || 0), 0))} ainda compõem a produção que o MV vai pagar.</b> A ferramenta já tira esses valores do fechamento. Retire no MV e reimporte o PDF; se a NC estava errada, marque «não procede».</div>` : '<p class="small muted">Nada que devia ter saído do MV continua no relatório.</p>'}
-    <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map(x => `<tr><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
-    <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small">${corr.resolvidos.map(x => `<li><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})</li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
+    <h3>NCs deste relatório</h3>${corr.ncs.length ? `<div class="tw"><table class="cm-tab"><thead><tr><th>Situação no MV</th><th>Linha</th><th>NC</th></tr></thead><tbody>${corr.ncs.map((x, i) => `<tr class="cm-l" data-cmab="nc${i}"><td><span class="badge ${SIT[x.situacao][0]}">${SIT[x.situacao][1]}</span></td><td class="small">${x.linha ? lin(x.linha) : esc(`${x.nc.paciente || '—'} · ${x.nc.codigo || ''} ${x.nc.titulo || ''}`)}</td><td class="small">${esc(NATUREZA_NC[x.nc.natureza]?.nome || x.nc.natureza || '')} · ${esc(x.nc.criadaPor || '—')} · ${new Date(x.nc.criadaEm).toLocaleDateString('pt-BR')}</td></tr><tr class="cm-det" data-cmdet="nc${i}" hidden><td colspan="3">${detalheCorrecaoMV(x.linha, x.nc, null, `nc${i}`)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="small muted">Nenhuma NC registrada para linhas deste relatório.</p>'}
+    <h3>Resolvidos no MV</h3>${corr.resolvidos.length ? `<ul class="small cm-res">${corr.resolvidos.map((x, i) => `<li class="cm-l" data-cmab="rs${i}"><span class="badge ${SIT[x.situacao][0]}">${x.situacao === 'corrigida' ? 'Confirmado pela reconferência' : x.situacao === 'continua' ? 'Não confirmado: continua no MV' : 'Aguardando reconferência'}</span> ${x.linha ? lin(x.linha) : esc(x.d.resumo?.codigo || '')} — «${esc(x.d.justificativa)}» (${esc(x.d.por || '—')})<div class="cm-det" data-cmdet="rs${i}" hidden>${detalheCorrecaoMV(x.linha, null, x.d, `rs${i}`)}</div></li>`).join('')}</ul><p class="small muted">Ficam pendentes até a reconferência confirmar (a linha sai do novo PDF) ou até você aceitar para pagamento.</p>` : '<p class="small muted">Nenhum.</p>'}
     <h3>HM a excluir do MV</h3>${corr.hm.length ? `<p class="small muted" style="margin-top:0">${corr.hm.some(x => x.linha.marcadores?.has('hm-v3-excluir')) ? 'Curitiba (V3): HM de raio-X, de mamografia e qualquer HM que não seja de USG Unimed (inclusive no 78 PF) não é pago a ninguém.' : 'Fora da V3 nenhum HM é pago, de nenhum grupo'}: estes itens não compõem o repasse — peça a exclusão no MV.</p><ul class="small">${corr.hm.map(x => `<li>${lin(x.linha)}${x.linha.r.grupoNome ? ` · <span class="muted">${esc(x.linha.r.grupoNome)} · ${esc(x.linha.r.convenio || '')}</span>` : ''}${x.continua ? ' — <b style="color:var(--err)">continua no MV depois da reconferência</b>' : ''}</li>`).join('')}</ul>` : '<p class="small muted">Nenhum HM a excluir.</p>'}</div>`;
 }
+
+/* NCs e resolvidos no MV abrem ao clicar (prévia aprovada em 25/11/2026: docs/prototipos/ncs-do-relatorio/): dados da linha
+ * e da NC, paciente / ID / conta copiáveis, «Copiar tudo» e «Abrir a NC». */
+const CM_ITENS = new Map();   // chave → { nc, texto } para «Copiar tudo» e «Abrir a NC»
+function detalheCorrecaoMV(x, nc, d, chave) {
+  const r = x?.r || {}, pac = r.paciente || nc?.paciente || '', id = r.atendimento || nc?.idAtendimento || '', conta = r.conta || nc?.conta || '';
+  const proc = r.codigo ? `${r.codigo} · ${r.procDesc || ''}` : `${nc?.codigo || ''} ${nc?.titulo || ''}`.trim();
+  const data = r.data ? fmtData(r.data) : nc?.data ? fmtData(paraData(nc.data)) : '—';
+  const nat = nc ? (NATUREZA_NC[nc.natureza]?.nome || nc.natureza || '') : 'Resolvido no MV';
+  const det = nc ? (nc.detalhe || '') : (d?.justificativa || '');
+  const texto = [pac, id && `ID ${id}`, conta && `conta ${conta}`, data, proc, r.vlRepasse != null ? `R$ ${fmtBR(r.vlRepasse)}` : '', `${nat}${det ? `: ${det}` : ''}`].filter(Boolean).join(' · ');
+  CM_ITENS.set(chave, { nc, texto });
+  const cv = v => v ? copiavel(v) : '—';
+  return `<dl class="cm-dl"><div><dt>Paciente</dt><dd>${cv(pac)}</dd><dt>ID / atendimento</dt><dd>${cv(id)}</dd><dt>Conta</dt><dd>${cv(conta)}</dd></div>
+    <div><dt>Data</dt><dd>${esc(data)}</dd><dt>Procedimento</dt><dd>${esc(proc || '—')}</dd><dt>Valor do repasse</dt><dd>${r.vlRepasse != null ? `R$ ${fmtBR(r.vlRepasse)}` : '—'}</dd></div>
+    <div><dt>${nc ? 'Natureza' : 'Situação'}</dt><dd>${esc(nat)}</dd><dt>${nc ? 'Detalhe' : 'Justificativa'}</dt><dd>${esc(det || '—')}</dd>${nc ? `<dt>Responsável · situação da NC</dt><dd>${esc(nc.responsavel || '—')} · ${esc(SITUACAO_NC[nc.situacao] || nc.situacao || '')}</dd><dt>Unidade · convênio</dt><dd>${esc(nc.unidade || '—')} · ${esc(nc.convenio || r.convenio || '—')}</dd>` : `<dt>Por</dt><dd>${esc(d?.por || '—')}</dd>`}</div>
+    <div class="cm-acoes"><button type="button" class="mini" data-cmtudo="${chave}">Copiar tudo</button>${nc ? `<button type="button" class="sec mini" data-cmnc="${chave}">Abrir a NC</button>` : ''}${nc ? `<span class="small muted">Registrada por ${esc(nc.criadaPor || '—')} em ${new Date(nc.criadaEm).toLocaleDateString('pt-BR')}</span>` : ''}</div></dl>`;
+}
+document.addEventListener('click', async e => {
+  const card = e.target.closest('.cm-card'); if (!card) return;
+  const cp = e.target.closest('[data-copiar]');
+  if (cp) { e.stopPropagation(); try { await navigator.clipboard.writeText(cp.dataset.copiar); const k = cp.closest('.cpv') || cp; k.classList.add('ok'); setTimeout(() => k.classList.remove('ok'), 1200); } catch (_) { avisar('Não foi possível copiar: selecione o texto e use Ctrl+C.', 'warn'); } return; }
+  const tudo = e.target.closest('[data-cmtudo]');
+  if (tudo) { try { await navigator.clipboard.writeText(CM_ITENS.get(tudo.dataset.cmtudo)?.texto || ''); tudo.textContent = 'Copiado ✓'; setTimeout(() => { tudo.textContent = 'Copiar tudo'; }, 1500); } catch (_) { avisar('Não foi possível copiar.', 'warn'); } return; }
+  const abrir = e.target.closest('[data-cmnc]');
+  if (abrir) { const nc = CM_ITENS.get(abrir.dataset.cmnc)?.nc; if (nc) { location.hash = 'nc'; setTimeout(() => editarNC(nc), 150); } return; }
+  if (e.target.closest('.cm-det')) return;
+  const l = e.target.closest('[data-cmab]'); if (!l) return;
+  const det = card.querySelector(`[data-cmdet="${l.dataset.cmab}"]`); if (!det) return;
+  det.hidden = !det.hidden; l.classList.toggle('aberto', !det.hidden);
+});
 
 function resumoComparacao({ ant, grupos }) {
   const n = k => grupos[k].length;
