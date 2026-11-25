@@ -26,6 +26,9 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Cartões «flutuantes» — **IMPLEMENTADA na v3.0.0-alpha.50** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/MjBUiH4UkQP8FMaFFCFZRU e `docs/prototipos/cartoes-flutuantes/`)
+- Todos os `.card` com borda mais definida (`--card-borda`) e sombra difusa em duas camadas (`--sombra-card`), nos temas claro e escuro.
+
 ## Correção de prestador no padrão da Conferência — **IMPLEMENTADA na v3.0.0-alpha.49** (pedido de 25/11/2026; prévia aprovada: https://claude.ai/artifact/8L5Kbtd7tHx2TLmDb414ku e `docs/prototipos/correcao-padronizada/`; teste: `test/correcao_tela.mjs`)
 - Linha aberta no padrão da Conferência (situação, diagnóstico, linha do MV com atendimento copiável, laudos em cartões); ícone de copiar o nome; «Reler o PDF da pasta / Carregar o PDF novo e identificar de novo» (mantém unidade, tolerância, filtros e busca). Cálculo, filtros, Excel e NC sem mudança.
 - **Prestadores fora da correção** (16 por padrão, `parametros.prestadoresForaCorrecao`): linha com destaque vermelho, etiqueta e resumo no topo com «Mostrar só essas». Lista editável em Configurações.

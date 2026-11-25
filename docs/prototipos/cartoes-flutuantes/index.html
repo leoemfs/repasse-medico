@@ -1,0 +1,36 @@
+<title>Cartões flutuantes</title>
+<link rel="stylesheet" href="app.css">
+<style>
+/* Proposta: tokens novos de contorno e sombra, nos dois temas */
+:root{--card-borda:#b9c5d4;--sombra-card:0 1px 2px rgba(16,32,56,.06),0 4px 14px rgba(16,32,56,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--card-borda:#4a5870;--sombra-card:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--card-borda:#4a5870;--sombra-card:0 1px 2px rgba(0,0,0,.35),0 6px 18px rgba(0,0,0,.35)}
+.lado{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.lado>section{background:var(--bg);border-radius:12px;padding:14px}
+.lado h3.rot{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.novo .card{border-color:var(--card-borda);box-shadow:var(--sombra-card)}
+.novo .tile{box-shadow:0 1px 2px rgba(16,32,56,.05)}
+</style>
+<div class="shell" data-pag="inicio"><main class="main">
+<header class="topo"><div><span class="eyebrow">CONTROLE OPERACIONAL</span><h1>Cartões flutuantes</h1></div></header>
+<div class="acoes" style="margin:0 0 10px"><span class="small muted">Tema da prévia:</span><button type="button" class="sec mini" data-tema="light">Claro</button><button type="button" class="sec mini" data-tema="dark">Escuro</button></div>
+<div class="aviso-fixo warn small" style="margin-bottom:12px"><b>Prévia sem código do app</b> · dados fictícios. À esquerda, como é hoje; à direita, a proposta: contorno um pouco mais marcado e sombra suave em todos os cartões da ferramenta (claro e escuro).</div>
+<div class="lado">
+<section class="atual"><h3 class="rot">Hoje</h3><div id="a"></div></section>
+<section class="novo"><h3 class="rot">Proposta</h3><div id="b"></div></section>
+</div>
+<div class="card novo" style="margin-top:16px;border-color:var(--card-borda);box-shadow:var(--sombra-card)"><h3>O que muda</h3><ul class="small">
+<li>Todos os cartões (<code>.card</code>) ganham uma borda um tom mais escura e uma sombra difusa em duas camadas, curta e longa: parecem flutuar sobre o fundo.</li>
+<li>No tema escuro, a sombra é mais forte e a borda mais clara, para o cartão continuar se destacando do fundo escuro.</li>
+<li>Nada muda em tamanho, espaçamento ou cores internas.</li>
+</ul></div>
+</main></div>
+<script src="app-menu.js"></script>
+<script>
+const conteudo=`<div class="card"><h2>Competência 11/2026</h2><p class="lead">96 relatórios carregados · 81 no passo 2 · 9 enviados.</p><div class="acoes"><button>Conferir</button><button class="sec">Sincronizar pasta</button></div></div>
+<div class="card"><h2>O que falta decidir <span class="muted small">7 decisões</span></h2><p class="small">Código validado para outros títulos: 40801128 RX ADENOIDES × «RADIOGRAFIA DE ADENÓIDES»</p><div class="acoes"><button class="mini">Validar este par</button><button class="sec mini">Lançamento errado → NC</button></div></div>
+<div class="card"><h2>Resumo</h2><dl class="kv"><dt>Conferidas</dt><dd>142</dd><dt>Pendentes</dt><dd>13</dd><dt>Valor</dt><dd>R$ 12.633,19</dd></dl></div>`;
+document.querySelectorAll('[data-tema]').forEach(b=>b.onclick=()=>{document.documentElement.dataset.theme=b.dataset.tema;});
+document.documentElement.dataset.theme='light';
+document.getElementById('a').innerHTML=conteudo;document.getElementById('b').innerHTML=conteudo;
+</script>
