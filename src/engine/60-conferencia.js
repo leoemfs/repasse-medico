@@ -120,15 +120,18 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       const tier = (proc.estado === 'validada' && nm >= 2 && dd === 0) ? 1 : (proc.estado === 'validada' && nm >= 2) ? 2
         : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2 && dd === 0) ? 3
           : ((proc.estado === 'pendente' || proc.estado === 'conflito') && nm >= 2) ? 4
-            : (nm === 1 && ['validada', 'pendente', 'conflito'].includes(proc.estado)) ? 5
-              : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 6
+            // v3.0.0-alpha.46 (caso real de 25/11/2026): a MESMA paciente, na mesma data, vem antes de um nome apenas semelhante,
+            // mesmo quando o título dela está validado para outro código (ex.: «Mamografia Digital» validada para a digital e o MV
+            // cobrou a convencional). Antes o nome semelhante de outra paciente ganhava e o laudo certo sobrava «Só no laudo».
+            : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm >= 2 && dd === 0) ? 5
+              : (nm === 1 && ['validada', 'pendente', 'conflito'].includes(proc.estado)) ? 6
                 // Nome só semelhante, mesma data, convênio compatível e procedimento sem equivalência: par PENDENTE (decisão humana),
                 // em vez de duas linhas soltas («Só no faturamento» + «Só no laudo»).
                 : ((proc.estado === 'divergente' || proc.estado === 'sem-cadastro') && nm === 1 && dd === 0 && convenioCompativel(b.r.convenio, l.convenio, cfg) !== false) ? 7 : 0;
       if (!tier) continue;
-      // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 6 e 7). Com equivalência validada, quem
+      // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 5 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
-      const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 5 && !proc.composta ? af : 0;
+      const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 6 && !proc.composta ? af : 0;
       b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg) });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;

@@ -70,6 +70,7 @@ node test/planilha_unidade.mjs   # v3.0: Excel único da unidade × grupo (IMG/U
 node test/hm_fora_v3.mjs         # v3.0: HM fora da V3 nunca compõe o repasse e é notificado para exclusão (todos os grupos de HM)
 node test/eq_uso.mjs             # v3.0: SOL-F50 — uso das equivalências nas conferências (resumos pela pasta, retenção, impacto, Excel)
 node test/ordem_conferencia.mjs   # v3.0: ordem da tabela da Conferência (paciente A→Z, títulos clicáveis, Excel na mesma ordem)
+node test/mesma_paciente.mjs      # v3.0: pareamento — a mesma paciente na mesma data vem antes de um nome apenas semelhante (caso real 25/11)
 node test/f41_conferencia.mjs   # v3.0: SOL-F41 — filtros por título, médico, intervalo de datas e observação; lote de dispensa e observação; observação no Excel, aceite, NC e retenção
 node test/p3_regras_config.mjs # v3.0: modalidade por grupo e HM da V3 configuráveis em Bases e regras; texto de privacidade
 node test/p1_otimizacoes.mjs   # v3.0: reconferir em um clique, Excel só do filtrado, candidatos a NC no escopo e retenção/leitura das rodadas por competência
