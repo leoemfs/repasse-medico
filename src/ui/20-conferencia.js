@@ -314,7 +314,7 @@ function desenharConferencia() {
     if ($('cfLoteDisp')) $('cfLoteDisp').onclick = async () => { if (await dispensarLaudos(res, slVis.map(x => res.linhas.indexOf(x)))) fim(); };
     $('cfLoteObs').onclick = async () => { if (await observacaoEmLote(alvo)) { S.conf.sel.clear(); desenharConferencia(); } };
   };
-  const t = tabela($('cfTab'), {
+  const t = tabela($('cfTab'), { ordenar: false,   // a Conferência tem a ordenação dela (seletor e títulos)
     linhas: comGrupos(filtrar()), colunas: [
       { t: '', th: ls => { const n = ls.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length;
         return `<input type="checkbox" class="cf-sel" data-seltodos aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"${ls.length && n === ls.length ? ' checked' : ''}>`; },

@@ -357,25 +357,58 @@ function iniciarMenu() {
 }
 
 /* ---------- Tabela paginada com detalhe expansível ---------- */
-function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.' }) {
+/* Ordenar pelos títulos (prévia aprovada em 25/11/2026: docs/prototipos/ordenar-colunas/): toda coluna com texto (v) ou
+ * com «ord» ordena ao clicar no título; clicar de novo inverte. Texto A→Z sem acento/maiúsculas, data dd/mm/aaaa da mais
+ * antiga para a mais nova, número do menor para o maior. A ordem padrão é a da lista recebida; a escolha fica lembrada
+ * neste navegador por tabela (id do contêiner ou «chave»). data-i e o índice de abrir() são SEMPRE a posição na lista
+ * original, para quem lê a linha pelo índice (ex.: NCs). ordenar:false desliga (a Conferência tem a ordenação dela). */
+const chaveOrdTabela = v => {
+  const t = String(v ?? '').trim(), d = t.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (d) return [1, +`${d[3]}${d[2]}${d[1]}`];
+  if (/^-?[\d.]+(,\d+)?$/.test(t) && /\d/.test(t)) return [2, parseFloat(t.replace(/\./g, '').replace(',', '.'))];
+  return [3, norm(t)];
+};
+function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.', ordenar = true, chave = '' }) {
   let pag = 0, aberto = null;
+  const idOrd = ordenar ? `rm2.ordTab.${chave || cont.id || ''}` : '', ordenavel = c => ordenar && !c.th && (c.ord || c.v);
+  let ord = null; try { const o = idOrd && cont.id || chave ? JSON.parse(localStorage.getItem(idOrd) || 'null') : null; if (o && colunas[o.k] && ordenavel(colunas[o.k])) ord = o; } catch (e) { }
+  const guardarOrd = () => { try { if (!idOrd || !(cont.id || chave)) return; ord ? localStorage.setItem(idOrd, JSON.stringify(ord)) : localStorage.removeItem(idOrd); } catch (e) { } };
+  const posicoes = () => {
+    const ix = linhas.map((_, i) => i); if (!ord) return ix;
+    const c = colunas[ord.k], val = x => chaveOrdTabela(c.ord ? c.ord(x) : c.v(x)), ks = linhas.map(val), sg = ord.inv ? -1 : 1;
+    return ix.sort((a, b) => { const x = ks[a], y = ks[b]; if (x[0] !== y[0]) return x[0] - y[0]; return (x[1] < y[1] ? -1 : x[1] > y[1] ? 1 : 0) * sg || a - b; });
+  };
+  const cab = (c, k) => {
+    if (c.th) return c.th(linhas);
+    if (!ordenavel(c)) return esc(c.t);
+    const on = ord?.k === k;
+    return `<span class="th-ord" data-tord="${k}" role="button" tabindex="0" aria-sort="${on ? (ord.inv ? 'descending' : 'ascending') : 'none'}" title="Ordenar por ${esc(c.t)}">${esc(c.t)}<span class="seta${on ? '' : ' apagada'}">${on ? (ord.inv ? '▼' : '▲') : '↕'}</span></span>`;
+  };
   // manter: abrir/fechar uma linha não pode levar a lista de volta ao topo (pedido de 24/11/2026) — guarda a rolagem da
   // área da tabela (.tw) e da página e devolve depois de redesenhar.
+  let vis = [];
   const desenhar = (manter = false) => {
     const tw0 = cont.querySelector('.tw'), rol = manter && tw0 ? [tw0.scrollTop, tw0.scrollLeft] : null, pagY = manter ? window.scrollY : null;
-    const total = linhas.length, ini = pag * porPagina, fatia = linhas.slice(ini, ini + porPagina);
-    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${c.th ? c.th(linhas) : esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
-      const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${ini + i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
-      return linha + (detalhe && aberto === ini + i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
+    vis = posicoes();
+    const total = vis.length, ini = pag * porPagina, fatia = vis.slice(ini, ini + porPagina);
+    const infoOrd = ord ? ` · ordenado por ${esc(colunas[ord.k].t)} <button type="button" class="sec mini" data-tordpad>Voltar à ordem padrão</button>` : '';
+    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map((c, k) => `<th class="${c.n ? 'n' : ''}">${cab(c, k)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map(i => {
+      const x = linhas[i];
+      const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
+      return linha + (detalhe && aberto === i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
     }).join('') : `<tr><td colspan="${colunas.length}" class="muted">${esc(vazio)}</td></tr>`}</tbody></table></div>` +
-      (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)</span></div>`);
+      (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}${infoOrd}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)${infoOrd}</span></div>`);
     cont.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pag += +b.dataset.p; aberto = null; desenhar(); });
+    cont.querySelectorAll('[data-tord]').forEach(h => { h.onclick = e => { e.stopPropagation(); const k = +h.dataset.tord; ord = ord?.k === k ? { k, inv: !ord.inv } : { k, inv: false }; guardarOrd(); pag = 0; desenhar(); };
+      h.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); } }; });
+    const pad = cont.querySelector('[data-tordpad]'); if (pad) pad.onclick = () => { ord = null; guardarOrd(); pag = 0; desenhar(); };
     if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(true); });
     if (rol) { const tw = cont.querySelector('.tw'); if (tw) { tw.scrollTop = rol[0]; tw.scrollLeft = rol[1]; } }
     if (pagY != null && window.scrollY !== pagY) window.scrollTo(window.scrollX, pagY);
   };
   desenhar();
-  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
+  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); },
+    abrir(k) { if (k < 0 || k >= linhas.length) return; const pos = posicoes().indexOf(k); pag = Math.floor(Math.max(0, pos) / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
 const ICONE_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
 // Valor copiável com um clique (atendimento, ID do laudo no Apolo): o clique é tratado por quem tem [data-copiar].

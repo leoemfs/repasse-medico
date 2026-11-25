@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repasse Médico v3.0.0-alpha.51</title>
+<title>Repasse Médico v3.0.0-alpha.52</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=">
 <style>
 :root{--card-borda:#b9c5d4;--sombra-card:0 1px 2px rgba(16,32,56,.06),0 4px 14px rgba(16,32,56,.08);--bg:#f3f6fa;--card:#fff;--text:#1d2939;--muted:#5f6f84;--line:#dde4ee;--accent:#1f5f99;--accent2:#2b74b8;--side:#172536;--side-t:#cbd5e1;
@@ -159,8 +159,8 @@ button.ic{padding:5px 10px}
 .nc-cand .l{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}.nc-cand h3+.l,.nc-cand p+.l{border-top:0}
 .nc-cand small{display:block;color:var(--muted);font-size:12px}.nc-cand .l b{white-space:nowrap}
 button.mini{padding:4px 10px;font-size:12px}
-.nc-abas{display:flex;gap:4px;border-bottom:2px solid var(--line);margin-bottom:10px;overflow-x:auto}
-.nc-abas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;margin-bottom:-2px;white-space:nowrap}
+.nc-abas{display:flex;gap:4px;box-shadow:inset 0 -2px 0 var(--line);margin-bottom:10px;overflow-x:auto;overflow-y:hidden}
+.nc-abas button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:8px 14px;white-space:nowrap}
 .nc-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}.nc-abas button:hover{background:var(--infobg);color:var(--accent)}
 .nc-abas em{font-style:normal;background:var(--infobg);color:var(--info);border-radius:999px;font-size:11px;padding:1px 7px;margin-left:5px}
 .nc-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.nc-filtros select,.nc-filtros input{width:auto;min-width:0;max-width:100%;font-size:12.5px}.nc-filtros input{flex:1 1 220px}
@@ -359,8 +359,8 @@ button.fh-avisos-bt,button.fh-avisos-bt:hover{font-size:11.5px;font-weight:600;p
 .cl-devido{background:var(--cl-devido)}.cl-aceito{background:var(--cl-aceito)}.cl-pend{background:var(--cl-pend)}.cl-nc{background:var(--cl-nc)}.cl-excluido{background:var(--cl-excluido)}
 .st.cl-devido,.st.cl-aceito,.st.cl-pend,.st.cl-nc,.st.cl-excluido{color:var(--s-t)}
 .cf-barra-cl{display:flex}.cf-barra-cl span{display:block;height:100%}
-.cf-abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);margin:4px 0 12px;padding-top:4px}
-.cf-abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;margin-bottom:-2px;white-space:nowrap;font-weight:600}
+.cf-abas{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--bg);display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;box-shadow:inset 0 -2px 0 var(--line);margin:4px 0 12px;padding-top:4px}
+.cf-abas button{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--muted);border-radius:0;padding:8px 12px;white-space:nowrap;font-weight:600}
 .cf-abas button:hover{color:var(--text);background:transparent}
 .cf-abas button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .cf-abas .n{display:inline-block;vertical-align:1px;line-height:16px;margin-left:6px;border-radius:999px;padding:0 7px;font-size:11px;background:var(--line);color:var(--text)}
@@ -546,7 +546,7 @@ th .cf-sel{margin:0}
 
 /* v3.0.0-alpha.38: ordem da tabela da Conferência */
 .cf-ordem{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.cf-ordem select{width:auto;padding:4px 8px}
-.th-ord{cursor:pointer;user-select:none;white-space:nowrap}.th-ord:hover,.th-ord:focus-visible{text-decoration:underline}.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}
+.th-ord{cursor:pointer;user-select:none;white-space:nowrap}.th-ord:hover,.th-ord:focus-visible{text-decoration:underline}.th-ord .seta{font-size:10px;margin-left:4px;opacity:.85}.th-ord .seta.apagada{opacity:.4}
 .tw tr.grp-b td{background:var(--infobg)}.tw tr.grp-ini td{border-top:2px solid var(--line)}.grp-tag{display:inline-block;font-size:11px;color:var(--muted);margin-left:6px}
 /* v3.0.0-alpha.40 — quadro da comparação 1 a 1 MV × laudo (prévia aprovada em 24/11/2026) */
 .qd{border:1.5px solid var(--accent);border-radius:10px;overflow:hidden;background:var(--card);box-shadow:0 2px 10px rgba(16,40,70,.10);margin:0 0 12px}
@@ -607,13 +607,31 @@ tr.fora-corr>td:first-child{box-shadow:inset 4px 0 0 var(--err)}
 .pl-item .cod{font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;color:var(--muted)}.pl-item .nome{flex:1;min-width:0}
 .pl-item button{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
 .pl-item button:hover{color:var(--err);background:var(--errbg)}
+/* Não conformidades redesenhada (prévia aprovada em 25/11/2026: docs/prototipos/nc-redesenho/) */
+.nc-esteira{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--card-borda);border-radius:12px;overflow:hidden;background:var(--card);box-shadow:var(--sombra-card);margin-bottom:12px}
+.nc-esteira button{all:unset;box-sizing:border-box;cursor:pointer;padding:12px 14px;display:grid;gap:2px;border-right:1px solid var(--line);position:relative;color:var(--text)}
+.nc-esteira button:last-child{border-right:0}.nc-esteira button b{font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}
+.nc-esteira button small{font-size:12px;color:var(--muted)}
+.nc-esteira button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--c)}
+.nc-esteira button:hover{background:var(--bg)}.nc-esteira button.on{background:var(--infobg)}.nc-esteira button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.e-aberta{--c:var(--err)}.e-enviada{--c:var(--accent)}.e-tratativa{--c:var(--warn)}.e-regularizada{--c:var(--ok)}.e-nao-procede{--c:var(--muted)}
+.nc-chamadas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.nc-cham{border:1px solid var(--card-borda);border-radius:12px;background:var(--card);box-shadow:var(--sombra-card);padding:12px 14px;font-size:13px}
+.nc-cham h3{margin:0 0 6px;font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:6px}
+.nc-filtros{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr)) minmax(220px,2fr)}.nc-filtros select,.nc-filtros input{width:100%}
+tr.nc-sit-aberta>td:first-child{box-shadow:inset 4px 0 0 var(--err)}tr.nc-sit-enviada>td:first-child{box-shadow:inset 4px 0 0 var(--accent)}
+tr.nc-sit-tratativa>td:first-child{box-shadow:inset 4px 0 0 var(--warn)}tr.nc-sit-regularizada>td:first-child{box-shadow:inset 4px 0 0 var(--ok)}tr.nc-sit-nao-procede>td:first-child{box-shadow:inset 4px 0 0 var(--muted)}
+.nc-dobra{border:1px solid var(--card-borda);border-radius:12px;padding:10px 14px;background:var(--card);box-shadow:var(--sombra-card);margin-top:12px}
+.nc-dobra summary{cursor:pointer;font-weight:700;font-size:13px}.nc-dobra[open] summary{margin-bottom:8px}
+.nc-ind{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:1000px){.nc-esteira{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-chamadas,.nc-ind{grid-template-columns:minmax(0,1fr)}.nc-filtros{grid-template-columns:repeat(3,minmax(0,1fr))}.nc-filtros input{grid-column:1/-1}}
 
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.51 · alpha</small></div>
+    <div class="brand"><img class="brand-mark" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImZjIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjM2ZiNmY3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY2ZmRjIi8+PC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxMTFkM2EiLz4KICA8cGF0aCBkPSJNMTMgOWgyMGw5IDl2MjlhNCA0IDAgMCAxLTQgNEgxM2E0IDQgMCAwIDEtNC00VjEzYTQgNCAwIDAgMSA0LTR6IiBmaWxsPSIjZjRmN2ZjIi8+CiAgPHBhdGggZD0iTTMzIDlsOSA5aC02YTMgMyAwIDAgMS0zLTN6IiBmaWxsPSIjOTNiZGY4Ii8+CiAgPHBhdGggZD0iTTE5IDE0aDV2NWg1djVoLTV2NWgtNXYtNWgtNXYtNWg1eiIgZmlsbD0iIzBkNTdhZCIvPgogIDxyZWN0IHg9IjE0IiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxyZWN0IHg9IjE0IiB5PSI0MCIgd2lkdGg9IjEzIiBoZWlnaHQ9IjMuMiIgcng9IjEuNiIgZmlsbD0iIzY1ODJhYiIvPgogIDxjaXJjbGUgY3g9IjQ0IiBjeT0iNDQiIHI9IjE3IiBmaWxsPSIjMTExZDNhIi8+CiAgPHBhdGggZD0iTTMxLjUgNDEuNWExMyAxMyAwIDAgMSAyMi41LTYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik01Ni42IDI5LjZsLjQgOS40LTkuMi0xLjZ6IiBmaWxsPSIjM2ZiNmY3Ii8+CiAgPHBhdGggZD0iTTU2LjUgNDYuNWExMyAxMyAwIDAgMS0yMi41IDYuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ1cmwoI2ZjKSIgc3Ryb2tlLXdpZHRoPSI0LjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0zMS40IDU4LjRsLS40LTkuNCA5LjIgMS42eiIgZmlsbD0iIzFmNmZkYyIvPgogIDx0ZXh0IHg9IjQ0IiB5PSI1MC4yIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZvbnQtc2l6ZT0iMTciIGZpbGw9IiNmZmZmZmYiPiQ8L3RleHQ+Cjwvc3ZnPgo=" alt=""><div class="brand-nome"><strong>Repasse Médico</strong><small>v3.0.0-alpha.52 · alpha</small></div>
       <button type="button" id="btnMenu" class="hamb" aria-label="Recolher menu" aria-expanded="true" title="Recolher/expandir menu (Ctrl+B)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
     <nav class="nav" id="navPrincipal" aria-label="Navegação principal">
       <h4 class="grupo-nav">Trabalho do mês</h4>
@@ -658,7 +676,7 @@ tr.fora-corr>td:first-child{box-shadow:inset 4px 0 0 var(--err)}
 /* ============================================================
  * Utilidades compartilhadas pelo motor (sem acesso à interface)
  * ============================================================ */
-const MOTOR_VERSAO = '3.0.0-alpha.51';
+const MOTOR_VERSAO = '3.0.0-alpha.52';
 
 const CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86, 0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E, 0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97, 0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
 
@@ -7029,25 +7047,58 @@ function iniciarMenu() {
 }
 
 /* ---------- Tabela paginada com detalhe expansível ---------- */
-function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.' }) {
+/* Ordenar pelos títulos (prévia aprovada em 25/11/2026: docs/prototipos/ordenar-colunas/): toda coluna com texto (v) ou
+ * com «ord» ordena ao clicar no título; clicar de novo inverte. Texto A→Z sem acento/maiúsculas, data dd/mm/aaaa da mais
+ * antiga para a mais nova, número do menor para o maior. A ordem padrão é a da lista recebida; a escolha fica lembrada
+ * neste navegador por tabela (id do contêiner ou «chave»). data-i e o índice de abrir() são SEMPRE a posição na lista
+ * original, para quem lê a linha pelo índice (ex.: NCs). ordenar:false desliga (a Conferência tem a ordenação dela). */
+const chaveOrdTabela = v => {
+  const t = String(v ?? '').trim(), d = t.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (d) return [1, +`${d[3]}${d[2]}${d[1]}`];
+  if (/^-?[\d.]+(,\d+)?$/.test(t) && /\d/.test(t)) return [2, parseFloat(t.replace(/\./g, '').replace(',', '.'))];
+  return [3, norm(t)];
+};
+function tabela(cont, { colunas, linhas, porPagina = 200, detalhe = null, classeLinha = null, vazio = 'Nenhum registro.', ordenar = true, chave = '' }) {
   let pag = 0, aberto = null;
+  const idOrd = ordenar ? `rm2.ordTab.${chave || cont.id || ''}` : '', ordenavel = c => ordenar && !c.th && (c.ord || c.v);
+  let ord = null; try { const o = idOrd && cont.id || chave ? JSON.parse(localStorage.getItem(idOrd) || 'null') : null; if (o && colunas[o.k] && ordenavel(colunas[o.k])) ord = o; } catch (e) { }
+  const guardarOrd = () => { try { if (!idOrd || !(cont.id || chave)) return; ord ? localStorage.setItem(idOrd, JSON.stringify(ord)) : localStorage.removeItem(idOrd); } catch (e) { } };
+  const posicoes = () => {
+    const ix = linhas.map((_, i) => i); if (!ord) return ix;
+    const c = colunas[ord.k], val = x => chaveOrdTabela(c.ord ? c.ord(x) : c.v(x)), ks = linhas.map(val), sg = ord.inv ? -1 : 1;
+    return ix.sort((a, b) => { const x = ks[a], y = ks[b]; if (x[0] !== y[0]) return x[0] - y[0]; return (x[1] < y[1] ? -1 : x[1] > y[1] ? 1 : 0) * sg || a - b; });
+  };
+  const cab = (c, k) => {
+    if (c.th) return c.th(linhas);
+    if (!ordenavel(c)) return esc(c.t);
+    const on = ord?.k === k;
+    return `<span class="th-ord" data-tord="${k}" role="button" tabindex="0" aria-sort="${on ? (ord.inv ? 'descending' : 'ascending') : 'none'}" title="Ordenar por ${esc(c.t)}">${esc(c.t)}<span class="seta${on ? '' : ' apagada'}">${on ? (ord.inv ? '▼' : '▲') : '↕'}</span></span>`;
+  };
   // manter: abrir/fechar uma linha não pode levar a lista de volta ao topo (pedido de 24/11/2026) — guarda a rolagem da
   // área da tabela (.tw) e da página e devolve depois de redesenhar.
+  let vis = [];
   const desenhar = (manter = false) => {
     const tw0 = cont.querySelector('.tw'), rol = manter && tw0 ? [tw0.scrollTop, tw0.scrollLeft] : null, pagY = manter ? window.scrollY : null;
-    const total = linhas.length, ini = pag * porPagina, fatia = linhas.slice(ini, ini + porPagina);
-    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map(c => `<th class="${c.n ? 'n' : ''}">${c.th ? c.th(linhas) : esc(c.t)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map((x, i) => {
-      const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${ini + i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
-      return linha + (detalhe && aberto === ini + i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
+    vis = posicoes();
+    const total = vis.length, ini = pag * porPagina, fatia = vis.slice(ini, ini + porPagina);
+    const infoOrd = ord ? ` · ordenado por ${esc(colunas[ord.k].t)} <button type="button" class="sec mini" data-tordpad>Voltar à ordem padrão</button>` : '';
+    cont.innerHTML = `<div class="tw"><table><thead><tr>${colunas.map((c, k) => `<th class="${c.n ? 'n' : ''}">${cab(c, k)}</th>`).join('')}</tr></thead><tbody>${fatia.length ? fatia.map(i => {
+      const x = linhas[i];
+      const linha = `<tr class="${detalhe ? 'clicavel ' : ''}${classeLinha ? classeLinha(x) : ''}" data-i="${i}">${colunas.map(c => `<td class="${c.n ? 'n' : ''}">${c.html ? c.html(x) : esc(c.v(x))}</td>`).join('')}</tr>`;
+      return linha + (detalhe && aberto === i ? `<tr class="detalhe"><td colspan="${colunas.length}">${detalhe(x)}</td></tr>` : '');
     }).join('') : `<tr><td colspan="${colunas.length}" class="muted">${esc(vazio)}</td></tr>`}</tbody></table></div>` +
-      (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)</span></div>`);
+      (total > porPagina ? `<div class="paginacao"><button class="sec" data-p="-1" ${pag ? '' : 'disabled'}>‹ Anterior</button><span>${ini + 1}–${Math.min(total, ini + porPagina)} de ${total}${infoOrd}</span><button class="sec" data-p="1" ${ini + porPagina < total ? '' : 'disabled'}>Próxima ›</button></div>` : `<div class="paginacao"><span>${total} registro(s)${infoOrd}</span></div>`);
     cont.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { pag += +b.dataset.p; aberto = null; desenhar(); });
+    cont.querySelectorAll('[data-tord]').forEach(h => { h.onclick = e => { e.stopPropagation(); const k = +h.dataset.tord; ord = ord?.k === k ? { k, inv: !ord.inv } : { k, inv: false }; guardarOrd(); pag = 0; desenhar(); };
+      h.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); } }; });
+    const pad = cont.querySelector('[data-tordpad]'); if (pad) pad.onclick = () => { ord = null; guardarOrd(); pag = 0; desenhar(); };
     if (detalhe) cont.querySelectorAll('tbody tr.clicavel').forEach(tr => tr.onclick = e => { if (e.target.closest('input,button,select,a')) return; const i = +tr.dataset.i; aberto = aberto === i ? null : i; desenhar(true); });
     if (rol) { const tw = cont.querySelector('.tw'); if (tw) { tw.scrollTop = rol[0]; tw.scrollLeft = rol[1]; } }
     if (pagY != null && window.scrollY !== pagY) window.scrollTo(window.scrollX, pagY);
   };
   desenhar();
-  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); }, abrir(k) { if (k < 0 || k >= linhas.length) return; pag = Math.floor(k / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
+  return { atualizar(novas) { linhas = novas; pag = 0; aberto = null; desenhar(); },
+    abrir(k) { if (k < 0 || k >= linhas.length) return; const pos = posicoes().indexOf(k); pag = Math.floor(Math.max(0, pos) / porPagina); aberto = k; desenhar(); cont.querySelector('tr.detalhe')?.scrollIntoView({ block: 'nearest' }); } };
 }
 const ICONE_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
 // Valor copiável com um clique (atendimento, ID do laudo no Apolo): o clique é tratado por quem tem [data-copiar].
@@ -7936,7 +7987,7 @@ function desenharConferencia() {
     if ($('cfLoteDisp')) $('cfLoteDisp').onclick = async () => { if (await dispensarLaudos(res, slVis.map(x => res.linhas.indexOf(x)))) fim(); };
     $('cfLoteObs').onclick = async () => { if (await observacaoEmLote(alvo)) { S.conf.sel.clear(); desenharConferencia(); } };
   };
-  const t = tabela($('cfTab'), {
+  const t = tabela($('cfTab'), { ordenar: false,   // a Conferência tem a ordenação dela (seletor e títulos)
     linhas: comGrupos(filtrar()), colunas: [
       { t: '', th: ls => { const n = ls.filter(x => S.conf.sel.has(res.linhas.indexOf(x))).length;
         return `<input type="checkbox" class="cf-sel" data-seltodos aria-label="Selecionar todas as linhas do filtro" title="Selecionar todas as linhas do filtro"${ls.length && n === ls.length ? ' checked' : ''}>`; },
@@ -10565,31 +10616,28 @@ function desenharNC() {
   const tiposCand = [...contar(novos, x => x.c.tipo)];
   p.innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Não conformidades da competência ${rotuloCompetencia(NCV.chave)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="ncImp"${fechada ? ' disabled' : ''}>Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova"${fechada ? ' disabled' : ''}>+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
-    ${vencendo.length ? `<div class="aviso-fixo warn">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias após o registro). Exporte antes se precisar guardar a planilha na rede.</div>` : ''}
-    <div class="nc-kpis">
-      <div class="nc-kpi"><b>${ind.total}</b><small>NCs na competência</small></div>
-      <div class="nc-kpi err"><b>${ind.porSituacao.aberta}</b><small>abertas (não enviadas)</small></div>
-      <div class="nc-kpi"><b>${ind.porSituacao.enviada + ind.porSituacao.tratativa}</b><small>enviadas ao Qualiex (inclui em tratativa)</small></div>
-      <div class="nc-kpi warn"><b>${ind.impactam}</b><small>impactam o pagamento</small></div>
-      <div class="nc-kpi ok"><b>${ind.porSituacao.regularizada}</b><small>regularizadas</small></div></div>
-    <div class="nc-duas">
-      <div class="card barras"><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}<h3 style="margin-top:14px">Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div>
-      <div class="card nc-cand"><h3>Candidatos vindos das análises desta sessão</h3>
+    <div class="nc-esteira" role="group" aria-label="Situação das NCs (clique para filtrar)">${Object.entries(SITUACAO_NC).map(([k, n]) => `<button type="button" class="e-${k}${NCV.f.situacao === k ? ' on' : ''}" data-est="${k}" aria-pressed="${NCV.f.situacao === k}"><b>${ind.porSituacao[k] || 0}</b><small>${esc(n)}</small></button>`).join('')}</div>
+    <div class="nc-chamadas">
+      <div class="nc-cham nc-cand"><h3>Candidatos das análises${novos.length ? ` <span class="badge warn">${novos.length} para revisar</span>` : ''}</h3>
         ${temCand ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
           : '<p class="small muted">Rode uma conferência cruzada ou uma correção de prestador: o que pode ser NC aparece aqui para você revisar. Os candidatos ficam só nesta sessão.</p>'}
-        <h3 style="margin-top:14px">Prazos de envio (Fluxo mensal)</h3>
+</div>
+      <div class="nc-cham nc-cand"><h3>Prazos de envio (Fluxo mensal)</h3>
         ${Object.entries(pr.grupos).map(([k, g]) => { const r = rotuloPrazo(g.data), q = ind.porPrazo[k]; return `<div class="l"><div>${esc(g.nome)}<small>${q.total} NC(s) · ${q.abertas} aberta(s)${g.status ? ` · etapa no fluxo: ${esc(STATUS_TAREFA[g.status])}` : ''}</small></div><b class="${g.status === 'ok' ? 'txt-ok' : r.cls}">${g.status === 'ok' ? fmtCurta(g.data) + ' ✓' : r.txt}</b></div>`; }).join('')}
-        ${pr.iniciada ? '' : '<p class="small muted">Competência ainda não iniciada no Fluxo mensal: datas calculadas pelo modelo.</p>'}</div></div>
+        ${pr.iniciada ? '' : '<p class="small muted">Competência ainda não iniciada no Fluxo mensal: datas calculadas pelo modelo.</p>'}</div>
+      <div class="nc-cham"><h3>Retenção de dados</h3>${vencendo.length ? `<p class="small txt-warn" style="margin:0">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias). Exporte antes se precisar guardar a planilha na rede.</p>` : `<p class="small muted" style="margin:0">Nome e ID do paciente são apagados ${dias} dias após o registro. Nada vence nos próximos 7 dias.</p>`}<p class="small" style="margin:6px 0 0"><a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a></p></div>
+    </div>
     <div id="ncRevisao"></div>
     <div class="card"><div class="nc-abas" role="tablist">${[['todas', 'Todas', ind.total], ...Object.entries(CATEGORIA_NC).map(([k, n]) => [k, n, ind.porCategoria[k]])].map(([k, n, q]) => `<button role="tab" class="${NCV.aba === k ? 'on' : ''}" aria-selected="${NCV.aba === k}" data-aba="${k}">${esc(n)}<em>${q}</em></button>`).join('')}</div>
       <div class="nc-filtros" id="ncFiltros"></div><div id="ncTab"></div>
       <div class="acoes nc-lote"><span class="small muted" id="ncSelInfo"></span><button class="sec mini" data-lote="tudo">Selecionar as filtradas</button><button class="sec mini" data-lote="limpar">Limpar seleção</button>
         ${fechada ? '' : '<button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button>'}<button class="mini" data-lote="seguinte">Levar para a competência seguinte</button>${fechada ? '' : '<button class="perigo mini" data-lote="excluir">Excluir</button>'}</div></div>
-    <div class="card legenda"><h3>Como funciona</h3><ul>
+    <details class="nc-dobra barras"><summary>Indicadores da competência</summary><div class="nc-ind"><div><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}</div><div><h3>Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div></div></details>
+    <details class="nc-dobra legenda"><summary>Como funciona</summary><ul>
       <li><b>Três categorias</b>, iguais às abas da planilha manual. A exportação sai nas mesmas abas e colunas, com situação, observações e uma aba de indicadores; ela pode ser importada de volta.</li>
       <li><b>Natureza padronizada + detalhe</b> («Procedimento não lançado na conta» + «RX patela») e observações livres. Na importação, o texto original fica nas observações.</li>
       <li><b>Situação</b>: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede. A pendência não resolvida pode ir para a competência seguinte, ligada à original.</li>
-      <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores. <a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a>.</li></ul></div>`;
+      <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores.</li></ul></details>`;
 
   $('ncNova').onclick = () => editarNC(null);
   $('ncImp').onclick = () => $('ncArq').click();
@@ -10603,6 +10651,7 @@ function desenharNC() {
     alvo.forEach(anonimizarNC); salvarNC('Dados de pacientes apagados.'); RENDER.nc();
   };
   p.querySelectorAll('[data-rev-tipo]').forEach(b => b.onclick = () => { NCV.revisar = { tipo: b.dataset.revTipo }; NCV.selCand.clear(); desenharRevisao(); $('ncRevisao').scrollIntoView({ behavior: 'smooth' }); });
+  p.querySelectorAll('[data-est]').forEach(b => b.onclick = () => { NCV.f.situacao = NCV.f.situacao === b.dataset.est ? '' : b.dataset.est; NCV.sel.clear(); RENDER.nc(); });
   p.querySelectorAll('[data-aba]').forEach(b => b.onclick = () => { NCV.aba = b.dataset.aba; NCV.sel.clear(); RENDER.nc(); });
   p.querySelectorAll('[data-lote]').forEach(b => b.onclick = () => acaoLoteNC(b.dataset.lote));
   desenharFiltrosNC(itens);
@@ -10632,24 +10681,26 @@ function desenharTabelaNC() {
   NCV.lista = lista;
   tabela(cont, {
     linhas: lista, porPagina: 100, vazio: 'Nenhuma NC nesta competência com esses filtros. Use «+ Nova NC», importe a planilha manual ou revise os candidatos das análises.',
-    classeLinha: () => 'clicavel',
+    classeLinha: x => `clicavel nc-sit-${x.situacao}`,
     colunas: [
       { t: '', html: x => `<input type="checkbox" data-sel="${x.id}"${NCV.sel.has(x.id) ? ' checked' : ''} aria-label="Selecionar">` },
-      { t: 'Situação', html: x => chipSit(x.situacao) },
-      { t: 'Natureza', html: x => `<span class="nc-nat">${esc(NATUREZA_NC[x.natureza].nome)}</span>${x.detalhe ? `<small class="nc-det">${esc(x.detalhe)}</small>` : ''}` },
+      { t: 'Situação', ord: x => SITUACAO_NC[x.situacao], html: x => chipSit(x.situacao) },
+      { t: 'Natureza', ord: x => NATUREZA_NC[x.natureza].nome, html: x => `<span class="nc-nat">${esc(NATUREZA_NC[x.natureza].nome)}</span>${x.detalhe ? `<small class="nc-det">${esc(x.detalhe)}</small>` : ''}` },
       { t: 'Unidade', v: x => x.unidade },
-      { t: 'Paciente', html: x => x.anonimizada ? '<span class="muted small">apagado</span>' : esc(x.paciente) },
-      { t: 'ID / atend.', v: x => x.idAtendimento },
+      { t: 'Paciente', ord: x => x.anonimizada ? '' : x.paciente, html: x => x.anonimizada ? '<span class="muted small">apagado</span>' : `<span class="pac">${esc(x.paciente)}${x.paciente ? `<button type="button" class="cp-nome" data-copiar="${esc(x.paciente)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>` },
+      { t: 'ID / atend.', ord: x => x.idAtendimento, html: x => x.idAtendimento ? `<span class="pac">${esc(x.idAtendimento)}<button type="button" class="cp-nome" data-copiar="${esc(x.idAtendimento)}" title="Copiar o ID" aria-label="Copiar o ID">${ICONE_COPIAR}</button></span>` : '' },
       { t: 'Data', v: x => fmtData(paraData(x.data)) },
       { t: 'Título do laudo', v: x => x.titulo || x.tituloEstudo },
       { t: 'Mod.', v: x => x.modalidade },
       { t: 'Médico', v: x => x.medico },
-      { t: 'Responsável / prestador', html: x => x.categoria === 'prestador' ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : esc(x.responsavel || '—') },
+      { t: 'Responsável / prestador', ord: x => x.categoria === 'prestador' ? x.prestadorIncorreto : x.responsavel, html: x => x.categoria === 'prestador' ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : esc(x.responsavel || '—') },
       { t: 'Impacta pgto.', v: x => x.impactaPagamento ? 'sim' : 'não' },
       { t: 'Origem', html: x => `<span class="nc-orig">${esc(ROTULO_ORIGEM[x.origem?.tipo] || x.origem?.tipo || '')}</span>${x.deCompetencia ? `<small class="nc-det">de ${rotuloCompetencia(x.deCompetencia)}</small>` : ''}${x.levadaPara ? `<small class="nc-det">levada p/ ${rotuloCompetencia(x.levadaPara)}</small>` : ''}` }
     ]
   });
-  cont.onclick = e => {
+  cont.onclick = async e => {
+    const cp = e.target.closest('[data-copiar]');
+    if (cp) { try { await navigator.clipboard.writeText(cp.dataset.copiar); cp.classList.add('ok'); setTimeout(() => cp.classList.remove('ok'), 1200); } catch (_) { avisar('Não foi possível copiar: selecione o texto e use Ctrl+C.', 'warn'); } return; }
     const ch = e.target.closest('[data-sel]');
     if (ch) { ch.checked ? NCV.sel.add(ch.dataset.sel) : NCV.sel.delete(ch.dataset.sel); infoSelNC(); return; }
     if (e.target.closest('input,button,select,a')) return;

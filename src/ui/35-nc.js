@@ -103,31 +103,28 @@ function desenharNC() {
   const tiposCand = [...contar(novos, x => x.c.tipo)];
   p.innerHTML = `<div class="fx-topo"><h2 class="fx-titulo">Não conformidades da competência ${rotuloCompetencia(NCV.chave)}</h2>
     <div class="acoes" style="margin:0"><button class="sec" id="ncImp"${fechada ? ' disabled' : ''}>Importar planilha manual</button><input type="file" id="ncArq" accept=".xlsx" hidden><button class="sec" id="ncNova"${fechada ? ' disabled' : ''}>+ Nova NC</button><button id="ncExp">Exportar para o Qualiex (.xlsx)</button></div></div>
-    ${vencendo.length ? `<div class="aviso-fixo warn">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias após o registro). Exporte antes se precisar guardar a planilha na rede.</div>` : ''}
-    <div class="nc-kpis">
-      <div class="nc-kpi"><b>${ind.total}</b><small>NCs na competência</small></div>
-      <div class="nc-kpi err"><b>${ind.porSituacao.aberta}</b><small>abertas (não enviadas)</small></div>
-      <div class="nc-kpi"><b>${ind.porSituacao.enviada + ind.porSituacao.tratativa}</b><small>enviadas ao Qualiex (inclui em tratativa)</small></div>
-      <div class="nc-kpi warn"><b>${ind.impactam}</b><small>impactam o pagamento</small></div>
-      <div class="nc-kpi ok"><b>${ind.porSituacao.regularizada}</b><small>regularizadas</small></div></div>
-    <div class="nc-duas">
-      <div class="card barras"><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}<h3 style="margin-top:14px">Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div>
-      <div class="card nc-cand"><h3>Candidatos vindos das análises desta sessão</h3>
+    <div class="nc-esteira" role="group" aria-label="Situação das NCs (clique para filtrar)">${Object.entries(SITUACAO_NC).map(([k, n]) => `<button type="button" class="e-${k}${NCV.f.situacao === k ? ' on' : ''}" data-est="${k}" aria-pressed="${NCV.f.situacao === k}"><b>${ind.porSituacao[k] || 0}</b><small>${esc(n)}</small></button>`).join('')}</div>
+    <div class="nc-chamadas">
+      <div class="nc-cham nc-cand"><h3>Candidatos das análises${novos.length ? ` <span class="badge warn">${novos.length} para revisar</span>` : ''}</h3>
         ${temCand ? `<p class="small muted">O sistema separa; você aponta o que é NC, a natureza e o responsável.</p>${tiposCand.length ? tiposCand.map(([t, n]) => `<div class="l"><div>${esc(TIPOS_CANDIDATO_NC[t].nome)}<small>${esc(TIPOS_CANDIDATO_NC[t].dica)}${TIPOS_CANDIDATO_NC[t].natureza ? ` · sugestão: ${esc(NATUREZA_NC[TIPOS_CANDIDATO_NC[t].natureza].nome.toLowerCase())}` : ''}</small></div><button class="mini" data-rev-tipo="${t}">Revisar ${n}</button></div>`).join('') : '<p class="small txt-ok">Todos os candidatos já foram registrados ou dispensados.</p>'}`
           : '<p class="small muted">Rode uma conferência cruzada ou uma correção de prestador: o que pode ser NC aparece aqui para você revisar. Os candidatos ficam só nesta sessão.</p>'}
-        <h3 style="margin-top:14px">Prazos de envio (Fluxo mensal)</h3>
+</div>
+      <div class="nc-cham nc-cand"><h3>Prazos de envio (Fluxo mensal)</h3>
         ${Object.entries(pr.grupos).map(([k, g]) => { const r = rotuloPrazo(g.data), q = ind.porPrazo[k]; return `<div class="l"><div>${esc(g.nome)}<small>${q.total} NC(s) · ${q.abertas} aberta(s)${g.status ? ` · etapa no fluxo: ${esc(STATUS_TAREFA[g.status])}` : ''}</small></div><b class="${g.status === 'ok' ? 'txt-ok' : r.cls}">${g.status === 'ok' ? fmtCurta(g.data) + ' ✓' : r.txt}</b></div>`; }).join('')}
-        ${pr.iniciada ? '' : '<p class="small muted">Competência ainda não iniciada no Fluxo mensal: datas calculadas pelo modelo.</p>'}</div></div>
+        ${pr.iniciada ? '' : '<p class="small muted">Competência ainda não iniciada no Fluxo mensal: datas calculadas pelo modelo.</p>'}</div>
+      <div class="nc-cham"><h3>Retenção de dados</h3>${vencendo.length ? `<p class="small txt-warn" style="margin:0">${vencendo.length} NC(s) terão nome e ID do paciente apagados em até 7 dias (retenção de ${dias} dias). Exporte antes se precisar guardar a planilha na rede.</p>` : `<p class="small muted" style="margin:0">Nome e ID do paciente são apagados ${dias} dias após o registro. Nada vence nos próximos 7 dias.</p>`}<p class="small" style="margin:6px 0 0"><a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a></p></div>
+    </div>
     <div id="ncRevisao"></div>
     <div class="card"><div class="nc-abas" role="tablist">${[['todas', 'Todas', ind.total], ...Object.entries(CATEGORIA_NC).map(([k, n]) => [k, n, ind.porCategoria[k]])].map(([k, n, q]) => `<button role="tab" class="${NCV.aba === k ? 'on' : ''}" aria-selected="${NCV.aba === k}" data-aba="${k}">${esc(n)}<em>${q}</em></button>`).join('')}</div>
       <div class="nc-filtros" id="ncFiltros"></div><div id="ncTab"></div>
       <div class="acoes nc-lote"><span class="small muted" id="ncSelInfo"></span><button class="sec mini" data-lote="tudo">Selecionar as filtradas</button><button class="sec mini" data-lote="limpar">Limpar seleção</button>
         ${fechada ? '' : '<button class="mini" data-lote="enviada">Marcar como enviadas ao Qualiex</button><button class="mini" data-lote="responsavel">Definir responsável</button><button class="mini" data-lote="situacao">Mudar situação</button>'}<button class="mini" data-lote="seguinte">Levar para a competência seguinte</button>${fechada ? '' : '<button class="perigo mini" data-lote="excluir">Excluir</button>'}</div></div>
-    <div class="card legenda"><h3>Como funciona</h3><ul>
+    <details class="nc-dobra barras"><summary>Indicadores da competência</summary><div class="nc-ind"><div><h3>Por natureza (padronizada)</h3>${barras(nat, maxBar)}</div><div><h3>Por responsável pelo fechamento da conta</h3>${barras(resp, maxBar)}</div></div></details>
+    <details class="nc-dobra legenda"><summary>Como funciona</summary><ul>
       <li><b>Três categorias</b>, iguais às abas da planilha manual. A exportação sai nas mesmas abas e colunas, com situação, observações e uma aba de indicadores; ela pode ser importada de volta.</li>
       <li><b>Natureza padronizada + detalhe</b> («Procedimento não lançado na conta» + «RX patela») e observações livres. Na importação, o texto original fica nas observações.</li>
       <li><b>Situação</b>: Aberta → Enviada ao Qualiex → Em tratativa → Regularizada · Não procede. A pendência não resolvida pode ir para a competência seguinte, ligada à original.</li>
-      <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores. <a href="#" id="ncApagar">Apagar agora os dados de pacientes desta competência</a>.</li></ul></div>`;
+      <li><b>Privacidade</b>: tudo fica só neste navegador. Nome e ID do paciente são apagados ${dias} dias após o registro (ajuste em Configurações); natureza, unidade, responsável e situação ficam para os indicadores.</li></ul></details>`;
 
   $('ncNova').onclick = () => editarNC(null);
   $('ncImp').onclick = () => $('ncArq').click();
@@ -141,6 +138,7 @@ function desenharNC() {
     alvo.forEach(anonimizarNC); salvarNC('Dados de pacientes apagados.'); RENDER.nc();
   };
   p.querySelectorAll('[data-rev-tipo]').forEach(b => b.onclick = () => { NCV.revisar = { tipo: b.dataset.revTipo }; NCV.selCand.clear(); desenharRevisao(); $('ncRevisao').scrollIntoView({ behavior: 'smooth' }); });
+  p.querySelectorAll('[data-est]').forEach(b => b.onclick = () => { NCV.f.situacao = NCV.f.situacao === b.dataset.est ? '' : b.dataset.est; NCV.sel.clear(); RENDER.nc(); });
   p.querySelectorAll('[data-aba]').forEach(b => b.onclick = () => { NCV.aba = b.dataset.aba; NCV.sel.clear(); RENDER.nc(); });
   p.querySelectorAll('[data-lote]').forEach(b => b.onclick = () => acaoLoteNC(b.dataset.lote));
   desenharFiltrosNC(itens);
@@ -170,24 +168,26 @@ function desenharTabelaNC() {
   NCV.lista = lista;
   tabela(cont, {
     linhas: lista, porPagina: 100, vazio: 'Nenhuma NC nesta competência com esses filtros. Use «+ Nova NC», importe a planilha manual ou revise os candidatos das análises.',
-    classeLinha: () => 'clicavel',
+    classeLinha: x => `clicavel nc-sit-${x.situacao}`,
     colunas: [
       { t: '', html: x => `<input type="checkbox" data-sel="${x.id}"${NCV.sel.has(x.id) ? ' checked' : ''} aria-label="Selecionar">` },
-      { t: 'Situação', html: x => chipSit(x.situacao) },
-      { t: 'Natureza', html: x => `<span class="nc-nat">${esc(NATUREZA_NC[x.natureza].nome)}</span>${x.detalhe ? `<small class="nc-det">${esc(x.detalhe)}</small>` : ''}` },
+      { t: 'Situação', ord: x => SITUACAO_NC[x.situacao], html: x => chipSit(x.situacao) },
+      { t: 'Natureza', ord: x => NATUREZA_NC[x.natureza].nome, html: x => `<span class="nc-nat">${esc(NATUREZA_NC[x.natureza].nome)}</span>${x.detalhe ? `<small class="nc-det">${esc(x.detalhe)}</small>` : ''}` },
       { t: 'Unidade', v: x => x.unidade },
-      { t: 'Paciente', html: x => x.anonimizada ? '<span class="muted small">apagado</span>' : esc(x.paciente) },
-      { t: 'ID / atend.', v: x => x.idAtendimento },
+      { t: 'Paciente', ord: x => x.anonimizada ? '' : x.paciente, html: x => x.anonimizada ? '<span class="muted small">apagado</span>' : `<span class="pac">${esc(x.paciente)}${x.paciente ? `<button type="button" class="cp-nome" data-copiar="${esc(x.paciente)}" title="Copiar o nome" aria-label="Copiar o nome">${ICONE_COPIAR}</button>` : ''}</span>` },
+      { t: 'ID / atend.', ord: x => x.idAtendimento, html: x => x.idAtendimento ? `<span class="pac">${esc(x.idAtendimento)}<button type="button" class="cp-nome" data-copiar="${esc(x.idAtendimento)}" title="Copiar o ID" aria-label="Copiar o ID">${ICONE_COPIAR}</button></span>` : '' },
       { t: 'Data', v: x => fmtData(paraData(x.data)) },
       { t: 'Título do laudo', v: x => x.titulo || x.tituloEstudo },
       { t: 'Mod.', v: x => x.modalidade },
       { t: 'Médico', v: x => x.medico },
-      { t: 'Responsável / prestador', html: x => x.categoria === 'prestador' ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : esc(x.responsavel || '—') },
+      { t: 'Responsável / prestador', ord: x => x.categoria === 'prestador' ? x.prestadorIncorreto : x.responsavel, html: x => x.categoria === 'prestador' ? `<span class="small">${esc(x.prestadorIncorreto || '?')} → ${esc(x.prestadorCorrigido || x.medico || '?')}</span>` : esc(x.responsavel || '—') },
       { t: 'Impacta pgto.', v: x => x.impactaPagamento ? 'sim' : 'não' },
       { t: 'Origem', html: x => `<span class="nc-orig">${esc(ROTULO_ORIGEM[x.origem?.tipo] || x.origem?.tipo || '')}</span>${x.deCompetencia ? `<small class="nc-det">de ${rotuloCompetencia(x.deCompetencia)}</small>` : ''}${x.levadaPara ? `<small class="nc-det">levada p/ ${rotuloCompetencia(x.levadaPara)}</small>` : ''}` }
     ]
   });
-  cont.onclick = e => {
+  cont.onclick = async e => {
+    const cp = e.target.closest('[data-copiar]');
+    if (cp) { try { await navigator.clipboard.writeText(cp.dataset.copiar); cp.classList.add('ok'); setTimeout(() => cp.classList.remove('ok'), 1200); } catch (_) { avisar('Não foi possível copiar: selecione o texto e use Ctrl+C.', 'warn'); } return; }
     const ch = e.target.closest('[data-sel]');
     if (ch) { ch.checked ? NCV.sel.add(ch.dataset.sel) : NCV.sel.delete(ch.dataset.sel); infoSelNC(); return; }
     if (e.target.closest('input,button,select,a')) return;

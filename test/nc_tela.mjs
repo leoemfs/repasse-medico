@@ -1,0 +1,42 @@
+// v3.0.0-alpha.52 — Aba de Não conformidades redesenhada (esteira, chamadas, filtros numa linha, indicadores recolhidos)
+// e ordenação pelos títulos das tabelas: abrir a NC certa depois de ordenar. Dados fictícios.
+import { createRequire } from 'module';
+import fs from 'fs';
+const { chromium } = createRequire(import.meta.url)('playwright');
+const raiz = new URL('..', import.meta.url).pathname;
+const html = 'file://' + raiz + 'dist/' + fs.readdirSync(raiz + 'dist').find(f => f.startsWith('Repasse_Medico_v'));
+const ok = (cond, msg) => { console.log((cond ? '✔ ' : '✘ ') + msg); if (!cond) process.exitCode = 1; };
+const b = await chromium.launch(), erros = [];
+const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
+await p.clock.install({ time: new Date('2026-11-17T10:00:00') });
+await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste NC')));
+await p.goto(html + '#inicio'); await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
+await p.evaluate(() => { const { S, t } = window.__RM;
+  const nc = (paciente, data, natureza) => ({ categoria: 'convenio', natureza, competencia: '2026-11', paciente, idAtendimento: '77' + paciente.length, data, titulo: 'USG TIREOIDE', unidade: 'AlphaSonic Palhano' });
+  t.registrarNCs(S.nc, [nc('CARLOS DIAS', '2026-10-09', 'nao-lancado'), nc('ANA ROCHA', '2026-10-21', 'conta-aberta'), nc('BRUNA LIMA', '2026-10-03', 'nao-lancado')], 'Teste NC');
+  S.nc.itens.find(x => x.paciente === 'BRUNA LIMA').situacao = 'regularizada';
+  window.__RM.irPara('nc'); });
+await p.waitForSelector('.nc-esteira'); await p.waitForTimeout(200);
+const est = await p.$$eval('.nc-esteira button', bs => bs.map(b => b.textContent.replace(/\s+/g, ' ').trim()));
+ok(est.length === 5 && /^2\s*Aberta/.test(est[0]) && /^1\s*Regularizada/.test(est[3]), `esteira com as 5 situações e as contagens (${est.join(' | ')})`);
+ok(await p.locator('.nc-chamadas .nc-cham').count() === 3 && await p.locator('#ncApagar').count() === 1, 'três chamadas: candidatos, prazos e retenção (com «Apagar agora»)');
+ok(await p.locator('details.nc-dobra').count() === 2, 'indicadores e «Como funciona» recolhidos');
+await p.click('.nc-esteira [data-est="aberta"]'); await p.waitForTimeout(200);
+ok(await p.locator('#ncTab tbody tr[data-i]').count() === 2, 'clicar em «Aberta» na esteira filtra as NCs abertas');
+await p.click('.nc-esteira [data-est="aberta"]'); await p.waitForTimeout(200);
+ok(await p.locator('#ncTab tbody tr[data-i]').count() === 3, 'clicar de novo tira o filtro');
+// Ordenar por paciente (A→Z) e abrir a primeira linha: tem de ser a NC de ANA ROCHA.
+const th = p.locator('#ncTab .th-ord', { hasText: 'Paciente' }); await th.click(); await p.waitForTimeout(150);
+const nomes = await p.$$eval('#ncTab tbody tr[data-i] td:nth-child(5)', tds => tds.map(t => t.textContent.trim()));
+ok(nomes.join(',') === 'ANA ROCHA,BRUNA LIMA,CARLOS DIAS', `título «Paciente» ordena A→Z (${nomes.join(', ')})`);
+await th.click(); await p.waitForTimeout(150);
+ok((await p.$$eval('#ncTab tbody tr[data-i] td:nth-child(5)', tds => tds.map(t => t.textContent.trim()))).join(',') === 'CARLOS DIAS,BRUNA LIMA,ANA ROCHA', 'clicar de novo inverte (Z→A)');
+await th.click(); await p.waitForTimeout(150);
+await p.locator('#ncTab tbody tr[data-i]').first().locator('td:nth-child(3)').click(); await p.waitForSelector('#dlg[open]');
+ok(/ANA ROCHA/.test(await p.inputValue('#dlgCorpo [name=paciente]').catch(() => '')) || /ANA ROCHA/.test(await p.textContent('#dlgCorpo')), 'depois de ordenar, clicar na linha abre a NC certa (ANA ROCHA)');
+await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+ok(await p.locator('#ncTab [data-tordpad]').count() === 1, '«Voltar à ordem padrão» aparece quando há ordenação');
+ok(await p.locator('#ncTab .cp-nome').count() >= 6, 'paciente e ID copiáveis');
+ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.slice(0, 3).join(' | ') : ''));
+await b.close();
