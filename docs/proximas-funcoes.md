@@ -27,6 +27,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.59 — laudo de outro médico só pareia com exame compatível (pedido de 26/11/2026; teste: `test/ponte.mjs`)
+- Com médico escolhido, laudo de OUTRO médico só vira par se a equivalência estiver validada, pendente ou em conflito, ou (sem cadastro) se o título for parecido com a descrição do MV. Exame de outra região ou título validado para outro código não pareia: a linha fica «Só no faturamento», para o controle de NC e de laudos lançados no mês seguinte (ex.: atendimento 31/10, laudo 07/11, fora da planilha do mês).
+- Verificado com o relatório real do Dr. Marcelo Miyazaki Yoshida (Ultramed Apucarana, 11/2026): o par 41001109 × «TOMOGRAFIA DE CRÂNIO» de outro médico virou «Só no faturamento»; o resto não mudou.
+
 ## Botões da barra das linhas marcadas visíveis — **CORRIGIDO na v3.0.0-alpha.58** (pedido de 26/11/2026; teste: `test/ordem_conferencia.mjs`)
 Na Conferência, ao marcar linhas, a barra azul mostrava «Aceitar para pagamento…», «Registrar NC…» e os outros botões só ao passar o mouse: o texto era da cor da barra. Agora o botão principal fica claro com texto da cor de destaque, e os outros ficam com contorno e texto claros, nos temas claro e escuro. Só estilo (`styles.css`).
 

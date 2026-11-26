@@ -150,6 +150,11 @@ function conferirCruzado(relatorio, apolo, cfg, eqBase, opc) {
       // A afinidade só desempata onde a equivalência não decide (faixas 3, 4, 5 e 7). Com equivalência validada, quem
       // decide é a base; e o título de uma regra composta descreve vários procedimentos, não dá para comparar com um só.
       const af = afinidadeTitulo(b.r.procDesc, l.titulo), afd = tier >= 3 && tier !== 6 && !proc.composta ? af : 0;
+      // Laudo de OUTRO médico só vira par se o exame for compatível (26/11/2026): equivalência validada, pendente ou em
+      // conflito, ou, sem cadastro, título parecido com a descrição do MV. Exame de outra região (ex.: crânio × abdome
+      // superior) ou título validado para outro código não pareia: a linha fica «Só no faturamento» — pode ser NC ou laudo
+      // lançado no mês seguinte, e quem avalia é a pessoa.
+      if (medicos && !medicos.has(l.mn) && !(['validada', 'pendente', 'conflito'].includes(proc.estado) || (proc.estado === 'sem-cadastro' && af >= AF_MIN))) continue;
       b.cands.push({ l, nm, dd, proc, tier, contra, af, afd, mesmoMedico: medicos ? medicos.has(l.mn) : null, conv: convenioCompativel(b.r.convenio, l.convenio, cfg), ponte });
     }
     const ordem = (x, y) => x.tier - y.tier || (y.mesmoMedico === true) - (x.mesmoMedico === true) || x.contra - y.contra || y.nm - x.nm || x.dd - y.dd || y.afd - x.afd || (y.conv === true) - (x.conv === true) || x.l.i - y.l.i;

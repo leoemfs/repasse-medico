@@ -81,5 +81,18 @@ const r4 = await p.evaluate(() => {
 ok(r4.dois.join(',') === 'conferido,conferido', `superior + pelve na conta com laudo de abdome total: as duas linhas conferidas (${r4.dois})`);
 ok(r4.um.join(',') === 'conferido', `abdome total como código único continua conferido (${r4.um})`);
 ok(r4.n === 1 && r4.de2 === false, 'a regra entra uma vez só na base (não duplica nem volta se for tirada)');
+// Laudo de outro médico só pareia com exame compatível (26/11/2026): crânio × abdome superior vira «Só no faturamento».
+const r5 = await p.evaluate(() => {
+  const cfg = H.cfgPadrao(), eq = H.eqVaziaP();
+  eq.itens.push({ id: 'e5', codigo: '41001109', titulo: 'TC ABDOME SUPERIOR', status: 'validada', escopo: { unidade: '*', modalidade: '*' }, historico: [], responsavel: 'T' });
+  const data = new Date(Date.UTC(2026, 9, 31)), dia = Math.round(data / 864e5);
+  const L = (titulo, med) => ({ i: 0, linhaPlanilha: 2, idLaudo: 'L0', unidade: 'X', paciente: 'JOSE LIMA', pn: 'JOSE LIMA', idPac: '9', titulo, tn: titulo, descricao: '', data, dia, convenio: 'UNIMED', modalidade: 'CT', medico: med, mn: med });
+  const r = { seq: 1, pagina: 1, codigo: '41001109', procDesc: 'TC ABDOME SUPERIOR-OP', grupoNome: 'TOMOGRAFIA', conta: '1', atendimento: '1', paciente: 'JOSE LIMA', convenio: 'UNIMED', data, vlRepasse: 27, vlTotal: 54, pct: .5, quant: 1, prestadorCod: '15', prestadorNome: 'MARCELO', repasse: '1' };
+  const rel = { cab: { prestadorCod: '15', prestadorNome: 'MARCELO', repasse: '1', descricao: 'REPASSE', competencia: '11/2026' }, regs: [r] };
+  const st = laudo => H.conferirCruzado(rel, { laudos: [laudo] }, cfg, eq, { unidadeCod: '*', tol: 7, medicos: ['MARCELO'] }).linhas.find(x => x.r).status;
+  return { cranio: st(L('TOMOGRAFIA DE CRANIO', 'OUTRO MEDICO')), compat: st(L('TC ABDOME SUPERIOR', 'OUTRO MEDICO')) };
+});
+ok(r5.cranio === 'so-faturamento', `laudo de crânio de outro médico não pareia com abdome superior: «Só no faturamento» (${r5.cranio})`);
+ok(r5.compat === 'pendente', `laudo compatível de outro médico continua pareando, como «laudo de outro médico» para avaliar (${r5.compat})`);
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();
