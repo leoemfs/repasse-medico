@@ -64,6 +64,14 @@ ok(l1.dec.join() === 'laudo do mês seguinte:Ana Teste', `a decisão da Ana cheg
 ok(l1.obs.join() === 'conferir com a unidade:Ana Teste', `a observação da Ana chega ao Leo (${l1.obs})`);
 ok(l1.rod.join() === 'aceite:Ana Teste', `a rodada com o aceite da Ana chega ao Leo (${l1.rod})`);
 ok(fs.existsSync(pasta + '02 - Repasse 2026/2026-11 - Novembro/conferencias_compartilhadas.json'), 'arquivo «conferencias_compartilhadas.json» na pasta do mês');
+// 1b) Decisão sozinha não sincroniza (só o aceite ou «Atualizar agora»): a tela não trava a cada decisão.
+const mt = () => fs.statSync(pasta + '02 - Repasse 2026/2026-11 - Novembro/conferencias_compartilhadas.json').mtimeMs;
+await sync(ana); await sync(leo); await ana.clock.runFor(2000); await leo.clock.runFor(2000); await ana.waitForTimeout(500); const m0 = mt(); await sync(leo);
+ok(mt() === m0, 'sincronizar sem mudança não regrava o arquivo (sem vaivém entre os dois)');
+await ana.evaluate(() => { const { S, t } = window.__RM; t.registrarConsiderar(S.compReg, '2026-11', ['MV|teste|9'], 'só local por enquanto', 'Ana Teste', {}); t.salvarCompReg(); });
+await ana.clock.runFor(5000); await ana.waitForTimeout(300);
+ok(mt() === m0, 'uma decisão sozinha não grava na pasta (sem travar a tela)');
+await ana.evaluate(() => { const { S, t } = window.__RM, c = S.compReg.itens['2026-11']; t.removerConsiderar(S.compReg, '2026-11', c.decisoes.find(d => d.justificativa === 'só local por enquanto').id); t.salvarCompReg(); });
 // 2) Leo decide outra linha; Ana recebe. 3) Leo remove a decisão da Ana; some para os dois.
 await leo.evaluate(() => { const { S, t } = window.__RM; t.registrarConsiderar(S.compReg, '2026-11', ['MV|teste|3'], 'convênio igual', 'Leo Teste', {}); t.salvarCompReg(); });
 await sync(leo); await sync(ana);
