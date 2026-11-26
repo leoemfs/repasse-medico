@@ -171,6 +171,7 @@ async function guardarRodada(r, { reter = true } = {}) {
   const i = S.rodadas.findIndex(x => x.id === r.id);
   if (i >= 0) S.rodadas[i] = r; else S.rodadas.push(r);
   const ok = await dbGravar(r);
+  if (typeof agendarSincronizacao === 'function') agendarSincronizacao('conf');   // rodadas e aceites vão para a pasta (26/11/2026)
   if (r.tipo === 'conferencia' && typeof registrarUsoDaRodada === 'function') registrarUsoDaRodada(r);   // SOL-F50, antes da retenção
   if (reter) await reterRodadas(new Set([grupoRodada(r)]));
   return ok;
@@ -250,7 +251,7 @@ function zonaArquivo(el, input, aoReceber) {
 /* ---------- Competência no topo (vale para todas as abas) ---------- */
 const PAGINAS_GLOBAIS = new Set(['equivalencias', 'bases', 'configuracoes']);
 let paginaAtual = 'inicio';
-function salvarCompReg() { if (!gravarLocal(CHAVES.compReg, S.compReg)) avisar('Não foi possível gravar o registro de competências neste navegador.', 'err'); }
+function salvarCompReg() { if (!gravarLocal(CHAVES.compReg, S.compReg)) avisar('Não foi possível gravar o registro de competências neste navegador.', 'err'); if (typeof agendarSincronizacao === 'function') agendarSincronizacao('conf'); }   // decisões e observações vão para a pasta (26/11/2026)
 function carregarCompetencia() {
   const r = lerLocal(CHAVES.compReg);
   S.compReg = r && !validarRegistroCompetencias(r).length ? r : registroCompetenciasVazio();
@@ -261,6 +262,7 @@ function mudarCompetencia(chave) {
   if (!/^\d{4}-\d{2}$/.test(chave || '') || chave === S.comp) return;
   S.comp = chave; gravarLocal(CHAVES.comp, chave);
   agendarSincronizacao('nc');   // SOL-F18: NCs da competência nova vêm da pasta
+  agendarSincronizacao('conf');   // decisões, observações e rodadas da competência nova vêm da pasta
   // P1: as telas usam as rodadas da competência aberta e das vizinhas; recarrega e redesenha.
   if (typeof DB !== 'undefined' && DB.ok) dbRodadasJanela(chave).then(r => { if (S.comp !== chave) return; S.rodadas = r; irPara(paginaAtual, true); });
   if (typeof NCV !== 'undefined') { NCV.sel.clear(); NCV.revisar = null; NCV.selCand.clear(); }
