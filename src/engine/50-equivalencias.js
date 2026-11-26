@@ -30,6 +30,22 @@ function eqVazia() {
  * - Alternativas na mesma posição (qualquer um dos códigos).
  * - Excludente de convênio: «não exigido» ou outra quantidade naquele convênio (ex.: UNIMED paga só o Doppler).
  * Só regra VALIDADA vale na conferência. A versão antiga {titulo, codigos, porConvenio} é lida como v2. */
+/* Regras compostas que a ferramenta já traz (pedido do usuário). Entram uma vez em cada base (eq.padroes guarda o que já
+ * entrou): se a pessoa tirar ou mudar a regra depois, ela não volta sozinha. */
+const COMPOSTAS_PADRAO = [
+  { id: 'cmp-padrao-tc-abdome-total', nome: 'TC abdome total = abdome superior + pelve', titulos: ['TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL'],
+    itens: [{ rotulo: 'TC ABDOME SUPERIOR', codigos: ['41001109'], qtd: 1, excecoes: [] }, { rotulo: 'TC PELVE OU BACIA', codigos: ['41001117'], qtd: 1, excecoes: [] }],
+    aceitaSimples: true, responsavel: 'Leo (pedido de 26/11/2026)', justificativa: 'Laudo de abdome total lançado como abdome superior + pelve; o código único de abdome total continua valendo.' }
+];
+function garantirCompostasPadrao(eq) {
+  if (!eq) return false; eq.padroes = eq.padroes || []; eq.compostas = eq.compostas || []; let mudou = false;
+  for (const c of COMPOSTAS_PADRAO) {
+    if (eq.padroes.includes(c.id)) continue;
+    if (!eq.compostas.some(x => x.id === c.id)) eq.compostas.push({ ...novaComposta({ ...clone(c) }), status: 'validada', validadoEm: '2026-11-26T12:00:00.000Z', historico: [{ em: '2026-11-26T12:00:00.000Z', por: c.responsavel, de: '', para: 'validada', motivo: 'regra trazida pela ferramenta' }] });
+    eq.padroes.push(c.id); mudou = true;
+  }
+  return mudou;
+}
 function novaComposta(campos) {
   return { id: novoId('cmp'), nome: '', titulos: [], palavras: null, itens: [], escopo: { unidade: '*', modalidade: '*' }, status: 'pendente', responsavel: '', validadoEm: '', justificativa: '', historico: [], ...campos };
 }
@@ -232,7 +248,11 @@ function _avaliarProcedimento(idx, codigo, titulo, unidade, modalidade, convenio
     const item = esp.find(e => e.qtd > 0 && e.codigos.includes(codigo));
     if (item) return { estado: 'validada', composta: comp, esperados: esp, itemIdx: item.i, motivo: `Regra composta «${nome}» validada: «${titulo}» = ${textoEsperados(esp)}${porConv ? ` (convênio ${convenio})` : ''} (${comp.responsavel || 'sem responsável'})` };
     const dispensado = esp.find(e => e.qtd === 0 && e.codigos.includes(codigo));
-    return { estado: 'divergente', composta: comp, esperados: esp, sobra: true, motivo: dispensado
+    // «Aceita também o código único» (26/11/2026): o mesmo laudo pode vir na conta como os itens da regra OU como o código
+    // único já validado para o título (ex.: abdome total = 41001095, ou superior 41001109 + pelve 41001117). Nesse caso a
+    // relação simples decide (segue abaixo), em vez de «não faz parte da regra».
+    const simplesOk = regraComposta(comp).aceitaSimples && !dispensado && (idx.porTitulo.get(kt) || []).some(e => e.codigo === codigo && e.status === 'validada' && escopoCobre(e.escopo, unidade, modalidade));
+    if (!simplesOk) return { estado: 'divergente', composta: comp, esperados: esp, sobra: true, motivo: dispensado
       ? `Regra composta «${nome}»: no convênio ${convenio}, ${dispensado.rotulo} não é exigido (excludente do convênio); o código ${codigo} não deveria estar na conta`
       : `Regra composta «${nome}»: «${titulo}» = ${textoEsperados(esp)}; o código ${codigo} não faz parte` };
   }

@@ -11,6 +11,8 @@ const p = await (await b.newContext({ viewport: { width: 1440, height: 900 } }))
 p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type() === 'error') erros.push(m.text()); });
 await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Tela')));
 await p.goto(html + '#inicio'); await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
+// Estes testes partem de uma base sem regras compostas: tira a regra trazida pela ferramenta (testada em test/ponte.mjs).
+await p.evaluate(() => { const { S } = window.__RM; S.eq.compostas = (S.eq.compostas || []).filter(c => !String(c.id).startsWith('cmp-padrao')); window.__RM.irPara && location.hash && window.dispatchEvent(new HashChangeEvent('hashchange')); });
 await p.evaluate(() => {
   const { S, t } = window.__RM, R = (id, codigo, titulo, status) => ({ ...t.novaRelacao({ codigo, titulo, descMV: 'DESC ' + codigo }), id, status });
   S.eq.itens.push(R('a', '40901122', 'USG ABDOME TOTAL', 'validada'), R('b', '40901300', 'USG TRANSVAGINAL', 'pendente'), R('c', '40901173', 'USG TIREOIDE', 'pendente'), R('d', '40804011', 'RX BACIA', 'desativada'));

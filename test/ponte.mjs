@@ -64,5 +64,22 @@ ok(r3.st === 'conferido' && r3.soma, `superior + inferior do Henrique fecham «T
 ok(!r3.so.length, `os dois laudos do Henrique entram na soma e não sobram como «Só no laudo» (${JSON.stringify(r3.so)})`);
 ok(r3.falta, 'só o superior: aviso «Soma de laudos incompleta»');
 ok(r3.m === 1, 'a regra viaja na sincronização das equivalências');
+// Regra trazida pela ferramenta (26/11/2026): laudo «TC ABDOME TOTAL» = 41001109 (superior) + 41001117 (pelve); o código
+// único 41001095, validado para o título, continua valendo.
+const r4 = await p.evaluate(() => {
+  const cfg = H.cfgPadrao(), eq = H.eqVaziaP(); H.garantirCompostasPadrao(eq);
+  eq.itens.push({ id: 'e9', codigo: '41001095', titulo: 'TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', status: 'validada', escopo: { unidade: '*', modalidade: '*' }, historico: [], responsavel: 'T' });
+  const data = new Date(Date.UTC(2026, 9, 13)), dia = Math.round(data / 864e5);
+  const L = { i: 0, linhaPlanilha: 2, idLaudo: 'L0', unidade: 'X', paciente: 'GACIR FELIX', pn: 'GACIR FELIX', idPac: '9', titulo: 'TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL', tn: '', descricao: '', data, dia, convenio: 'UNIMED', modalidade: 'CT', medico: 'DR', mn: 'DR' };
+  const R = (seq, codigo, desc) => ({ seq, pagina: 1, codigo, procDesc: desc, grupoNome: 'TOMOGRAFIA', conta: '1', atendimento: '100', paciente: 'GACIR FELIX', convenio: 'UNIMED', data, vlRepasse: 27, vlTotal: 54, pct: .5, quant: 1, prestadorCod: '1', prestadorNome: 'DR', repasse: '1' });
+  const rel = regs => ({ cab: { prestadorCod: '1', prestadorNome: 'DR', repasse: '1', descricao: 'REPASSE', competencia: '11/2026' }, regs });
+  const dois = H.conferirCruzado(rel([R(1, '41001109', 'TC ABDOME SUPERIOR-OP'), R(2, '41001117', 'TC PELVE OU BACIA-OP')]), { laudos: [L] }, cfg, eq, { unidadeCod: '*', tol: 7, medicos: null });
+  const um = H.conferirCruzado(rel([R(1, '41001095', 'TC ABDOME TOTAL-OP')]), { laudos: [L] }, cfg, eq, { unidadeCod: '*', tol: 7, medicos: null });
+  const de2 = H.garantirCompostasPadrao(eq);
+  return { dois: dois.linhas.filter(x => x.r).map(x => x.status), um: um.linhas.filter(x => x.r).map(x => x.status), n: eq.compostas.length, de2 };
+});
+ok(r4.dois.join(',') === 'conferido,conferido', `superior + pelve na conta com laudo de abdome total: as duas linhas conferidas (${r4.dois})`);
+ok(r4.um.join(',') === 'conferido', `abdome total como código único continua conferido (${r4.um})`);
+ok(r4.n === 1 && r4.de2 === false, 'a regra entra uma vez só na base (não duplica nem volta se for tirada)');
 ok(!erros.length, 'sem erros no console' + (erros.length ? ': ' + erros.join(' | ') : ''));
 await b.close();

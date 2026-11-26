@@ -26,6 +26,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Regra «TC abdome total = abdome superior + pelve» — **IMPLEMENTADA na v3.0.0-alpha.57** (pedido de 26/11/2026; teste: `test/ponte.mjs`)
+- Regra composta trazida pela ferramenta (`COMPOSTAS_PADRAO`, entra uma vez em cada base): laudo «TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL» = 41001109 TC ABDOME SUPERIOR + 41001117 TC PELVE OU BACIA. Validada em nome de Leo (pedido de 26/11/2026); dá para editar ou tirar a validação em Equivalências → Regras.
+- Opção nova da regra composta, `aceitaSimples`: o código único já validado para o título (41001095 TC abdome total) continua valendo, em vez de «não faz parte da regra».
+
 ## Correção da v3.0.0-alpha.56 — «ir para o próximo relatório» segue a lista do roteiro (pedido de 25/11/2026; teste: `test/proximo_relatorio.mjs`)
 - Antes o próximo era o seguinte na ordem de carregamento dos PDFs. Agora segue a lista «Em que passo está cada relatório» (ordem do seletor «Relatório MV»: unidade, grupo, prestador), com o filtro de unidade e grupo e, se escolhido, o do passo. A unidade do próximo vem do próprio relatório.
 
