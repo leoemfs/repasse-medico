@@ -27,6 +27,14 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## ⚑ PRIORIDADE da próxima melhoria — sincronização das conferências mais leve (pedido de 26/11/2026)
+A v3.0.0-alpha.61 só sincroniza no aceite, mas quando roda ainda faz tudo na tela (lê rodadas, junta, monta e grava um JSON grande na rede). Plano, nesta ordem:
+1. **Medir antes** com dados reais (relatório do Dr. Marcelo M. Yoshida, Ultramed Apucarana, 11/2026): tamanho de `conferencias_compartilhadas.json` e tempo da junção.
+2. **Web Worker**: junção, JSON.parse/stringify fora da tela; só a barra mostra «Sincronizando…». (maior ganho na sensação de travar)
+3. **Mandar menos rodadas**: só a última de cada relatório × unidade e as com aceite (o que o Fechamento e o histórico usam).
+4. Se ainda pesar: **um arquivo por pessoa** (`conferencias_<operador>.json`, cada um grava só o seu e lê o do outro) e **gzip** (CompressionStream).
+Código atual: `src/engine/87c-conf-sync.js` (mescla) e `src/ui/29e-conf-sync.js` (pasta, barra, gatilhos); teste `test/conf_sync.mjs`.
+
 ## Correção da v3.0.0-alpha.61 — sincronização das conferências só no aceite (pedido de 26/11/2026; teste: `test/conf_sync.mjs`)
 - Cada decisão disparava a sincronização completa e a tela travava por alguns instantes. Agora decisões e observações ficam no navegador e vão para a pasta no **aceite** (ou «desfazer aceite») do relatório, junto com as rodadas, ou em «Atualizar agora». O relógio de 30 s continua trazendo o que a outra pessoa gravou (e, nessa hora, leva junto o que estiver pendente).
 - Abrir a Conferência só sincroniza na primeira vez da competência; a sincronização lê só as rodadas da competência; sem mudança, o arquivo não é regravado.
