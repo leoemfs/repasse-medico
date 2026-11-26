@@ -27,6 +27,11 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Conferências compartilhadas pela pasta — **IMPLEMENTADA na v3.0.0-alpha.60** (pedido de 26/11/2026; teste: `test/conf_sync.mjs`)
+- Decisões de linha (aceitar para pagamento, resolvido no MV, dispensar laudo), observações e rodadas com o aceite do relatório vão para «AAAA-MM - Mês › conferencias_compartilhadas.json» (motor: `src/engine/87c-conf-sync.js`; tela: `src/ui/29e-conf-sync.js`). Antes ficavam só no navegador de quem fez (caso: decisões do Victor não apareciam para o Leo).
+- Mescla pelo id: o que cada um fez entra para os dois, com o nome de quem fez; «Remover decisão» e «Desfazer aceite» valem para os dois; na mesma linha vale a decisão mais recente; rodadas nunca são apagadas pela pasta. Barra na Conferência com quem fez o quê.
+- O que foi feito antes desta versão só sobe quando a pessoa abrir a ferramenta com a pasta conectada.
+
 ## Correção da v3.0.0-alpha.59 — laudo de outro médico só pareia com exame compatível (pedido de 26/11/2026; teste: `test/ponte.mjs`)
 - Com médico escolhido, laudo de OUTRO médico só vira par se a equivalência estiver validada, pendente ou em conflito, ou (sem cadastro) se o título for parecido com a descrição do MV. Exame de outra região ou título validado para outro código não pareia: a linha fica «Só no faturamento», para o controle de NC e de laudos lançados no mês seguinte (ex.: atendimento 31/10, laudo 07/11, fora da planilha do mês).
 - Verificado com o relatório real do Dr. Marcelo Miyazaki Yoshida (Ultramed Apucarana, 11/2026): o par 41001109 × «TOMOGRAFIA DE CRÂNIO» de outro médico virou «Só no faturamento»; o resto não mudou.
