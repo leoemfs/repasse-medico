@@ -27,6 +27,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+## Correção da v3.0.0-alpha.61 — sincronização das conferências só no aceite (pedido de 26/11/2026; teste: `test/conf_sync.mjs`)
+- Cada decisão disparava a sincronização completa e a tela travava por alguns instantes. Agora decisões e observações ficam no navegador e vão para a pasta no **aceite** (ou «desfazer aceite») do relatório, junto com as rodadas, ou em «Atualizar agora». O relógio de 30 s continua trazendo o que a outra pessoa gravou (e, nessa hora, leva junto o que estiver pendente).
+- Abrir a Conferência só sincroniza na primeira vez da competência; a sincronização lê só as rodadas da competência; sem mudança, o arquivo não é regravado.
+
 ## Conferências compartilhadas pela pasta — **IMPLEMENTADA na v3.0.0-alpha.60** (pedido de 26/11/2026; teste: `test/conf_sync.mjs`)
 - Decisões de linha (aceitar para pagamento, resolvido no MV, dispensar laudo), observações e rodadas com o aceite do relatório vão para «AAAA-MM - Mês › conferencias_compartilhadas.json» (motor: `src/engine/87c-conf-sync.js`; tela: `src/ui/29e-conf-sync.js`). Antes ficavam só no navegador de quem fez (caso: decisões do Victor não apareciam para o Leo).
 - Mescla pelo id: o que cada um fez entra para os dois, com o nome de quem fez; «Remover decisão» e «Desfazer aceite» valem para os dois; na mesma linha vale a decisão mais recente; rodadas nunca são apagadas pela pasta. Barra na Conferência com quem fez o quê.

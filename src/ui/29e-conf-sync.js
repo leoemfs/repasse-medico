@@ -20,7 +20,7 @@ async function sincronizarConf({ interativo = false } = {}) {
       let dir = await dirConfSync(chave, false), remoto = null, lm = 0;
       if (dir) try { const f = await (await dir.getFileHandle(ARQ_CONF_SYNC)).getFile(); lm = f.lastModified; const d = JSON.parse(await f.text()); if (d.schema !== SCHEMA_CONF_SYNC) throw new Error(`${ARQ_CONF_SYNC} não é a base de conferências`); remoto = d; }
       catch (e) { if (e.name !== 'NotFoundError') throw e; }
-      const todas = DB.ok ? await dbTodas() : S.rodadas, local = partesConfSync(S.compReg, todas, chave);
+      const todas = await dbRodadasJanela(chave, true), local = partesConfSync(S.compReg, todas, chave);   // só as rodadas da competência (índice do banco)
       const rem = remoto ? { decisoes: remoto.decisoes || [], observacoes: remoto.observacoes || [], rodadas: remoto.rodadas || [] } : null;
       const { partes, novas } = mesclarConf(local, rem, baseConfSync(chave));
       // Decisões e observações → registro da competência; rodadas novas ou mudadas → banco do navegador.
@@ -61,12 +61,14 @@ async function checarConfPasta() {
 function barraConf() {
   if (!SY.handle || SY.legado) return `<div class="sy-barra off" id="confSync"><span class="sy-dot"></span><b>Conferências só neste navegador.</b><span class="muted">Conecte a pasta raiz do aplicativo para dividir decisões, observações, rodadas e aceites com a outra pessoa.</span></div>`;
   const cls = SYD.status === 'ok' ? 'ok' : 'warn';
-  const txt = SYD.ocupado ? 'Sincronizando…' : { ok: 'Decisões, observações e aceites sincronizados', permissao: 'Acesso à pasta precisa ser liberado', erro: `Sem acesso à pasta — guardado neste navegador (${esc(SYD.erro)})`, off: 'Conectando…' }[SYD.status] || SYD.status;
+  const txt = SYD.ocupado ? 'Sincronizando…' : { ok: 'Conferências sincronizadas no aceite', permissao: 'Acesso à pasta precisa ser liberado', erro: `Sem acesso à pasta — guardado neste navegador (${esc(SYD.erro)})`, off: 'Conectando…' }[SYD.status] || SYD.status;
   const quem = SYD.autores.filter(a => a.quem !== '—' || a.decisoes || a.rodadas).map(a => `<b>${esc(a.quem)}</b>: ${[a.decisoes && `${a.decisoes} decisão(ões)`, a.observacoes && `${a.observacoes} obs.`, a.rodadas && `${a.rodadas} rodada(s)`, a.aceites && `${a.aceites} aceite(s)`].filter(Boolean).join(', ')}`).join(' · ');
-  return `<div class="sy-barra ${cls}" id="confSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(SYD.local || nomePastaMes(S.comp))}\\${ARQ_CONF_SYNC}</code><span class="muted">${quem ? ` · ${quem}` : ''}</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syd="agora">${SYD.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
+  return `<div class="sy-barra ${cls}" id="confSync"><span class="sy-dot"></span><b>${txt}</b> <code>${esc(SY.handle.name)}\\${esc(SYD.local || nomePastaMes(S.comp))}\\${ARQ_CONF_SYNC}</code><span class="muted">${quem ? ` · ${quem}` : ''} · decisões e observações vão para a pasta no aceite do relatório (ou em «Atualizar agora»)</span><span class="sy-esp"></span><button class="${cls === 'ok' ? 'sec ' : ''}mini" data-syd="agora">${SYD.status === 'permissao' ? 'Liberar acesso' : 'Atualizar agora'}</button></div>`;
 }
 function atualizarBarraConf() { const b = $('confSync'); if (!b) return; b.outerHTML = barraConf(); ligarBarraConf(); }
 function ligarBarraConf() { document.querySelectorAll('#confSync [data-syd]').forEach(b => b.onclick = () => sincronizarConf({ interativo: true })); }
-window.addEventListener('hashchange', () => { if (location.hash === '#conferencia' && SY.handle && !SY.legado && SYD.status !== 'permissao') sincronizarConf(); });
+// Ao abrir a Conferência, sincroniza só se a competência ainda não foi sincronizada nesta sessão (o relógio de 30 s traz o
+// que a outra pessoa gravar).
+window.addEventListener('hashchange', () => { if (location.hash === '#conferencia' && SY.handle && !SY.legado && SYD.status !== 'permissao' && SYD.comp !== S.comp) sincronizarConf(); });
 // Barra no topo da Conferência (como a das NCs).
 { const desenhar = RENDER.conferencia; RENDER.conferencia = (...a) => { desenhar(...a); const p = $('pag-conferencia'); if (p && !$('confSync')) { p.insertAdjacentHTML('afterbegin', barraConf()); ligarBarraConf(); } }; }
