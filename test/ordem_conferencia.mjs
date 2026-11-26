@@ -58,5 +58,13 @@ ok(X.join('|') === az.join('|'), `Excel: aba «Conferência» na ordem da tela (
 // Lembrada no navegador.
 await p.goto(html + '#inicio'); await p.goto(html + '#conferencia'); await p.waitForSelector('#cfRodar'); await p.click('#cfRodar'); await p.waitForSelector('#cfOrdem', { timeout: 15000 });
 ok((await p.inputValue('#cfOrdem')) === 'pac', 'a ordem escolhida fica lembrada ao rodar de novo');
+// 26/11/2026: botões da barra das linhas marcadas visíveis sem passar o mouse (antes: texto da cor da barra), nos dois temas.
+for (const tema of ['light', 'dark']) {
+  await p.evaluate(t => document.documentElement.setAttribute('data-theme', t), tema);
+  if (!(await p.$('#cfSelInfo.cf-selbar'))) { await p.click('#cfTab tbody tr:not(.detalhe) input.cf-sel'); await p.waitForTimeout(200); }
+  const cores = await p.$$eval('#cfSelInfo.cf-selbar button', (bs) => { const bar = getComputedStyle(document.getElementById('cfSelInfo')).backgroundColor;
+    return bs.filter(b => b.offsetParent).map(b => { const c = getComputedStyle(b); const fundo = c.backgroundColor === 'rgba(0, 0, 0, 0)' ? bar : c.backgroundColor; return { t: b.textContent.trim().slice(0, 24), ok: c.color !== fundo }; }); });
+  ok(cores.length > 0 && cores.every(c => c.ok), `tema ${tema}: botões da barra das linhas marcadas com texto visível (${cores.map(c => c.t).join(' · ')})`);
+}
 ok(!erros.length, `sem erros na tela${erros.length ? ': ' + erros.join(' | ') : ''}`);
 await b.close();
