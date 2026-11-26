@@ -26,6 +26,10 @@ Os detalhes de cada item estão na própria auditoria, em «Como ficou». Os tes
 
 
 
+
+## Botões da barra das linhas marcadas visíveis — **CORRIGIDO na v3.0.0-alpha.58** (pedido de 26/11/2026; teste: `test/ordem_conferencia.mjs`)
+Na Conferência, ao marcar linhas, a barra azul mostrava «Aceitar para pagamento…», «Registrar NC…» e os outros botões só ao passar o mouse: o texto era da cor da barra. Agora o botão principal fica claro com texto da cor de destaque, e os outros ficam com contorno e texto claros, nos temas claro e escuro. Só estilo (`styles.css`).
+
 ## Regra «TC abdome total = abdome superior + pelve» — **IMPLEMENTADA na v3.0.0-alpha.57** (pedido de 26/11/2026; teste: `test/ponte.mjs`)
 - Regra composta trazida pela ferramenta (`COMPOSTAS_PADRAO`, entra uma vez em cada base): laudo «TOMOGRAFIA COMPUTADORIZADA DE ABDOME TOTAL» = 41001109 TC ABDOME SUPERIOR + 41001117 TC PELVE OU BACIA. Validada em nome de Leo (pedido de 26/11/2026); dá para editar ou tirar a validação em Equivalências → Regras.
 - Opção nova da regra composta, `aceitaSimples`: o código único já validado para o título (41001095 TC abdome total) continua valendo, em vez de «não faz parte da regra».
