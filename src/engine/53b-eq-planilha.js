@@ -13,8 +13,9 @@ function leituraRegraComposta(c0, descDe = () => '', curta = false) {
   const exc = c.itens.flatMap(it => (it.excecoes || []).map(e => `No convênio ${e.convenio}, ${it.rotulo || it.codigos[0]} ${e.tipo === 'nao-exigido' ? 'não é exigido (se vier na conta, sobra)' : `é esperado ${qt(e.qtd)}`}.`));
   const unid = c.escopo?.unidade && c.escopo.unidade !== '*' ? ` Vale só na unidade ${c.escopo.unidade}.` : '';
   const me = (c.titulosMesmoEstudo || []).length ? ` Laudos do mesmo estudo (mesmo paciente e dia, não cobram outra linha): ${c.titulosMesmoEstudo.map(t => `«${t}»`).join(', ')}.` : '';
-  if (curta) return `Espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${(c.titulosMesmoEstudo || []).length ? ' Laudos do mesmo estudo não cobram outra linha.' : ''}`;
-  return `${reconhece}${pal} espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${unid}${me}`;
+  const simples = c.aceitaSimples ? ' Também vale lançado como o código único já validado para o título.' : '';
+  if (curta) return `Espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${(c.titulosMesmoEstudo || []).length ? ' Laudos do mesmo estudo não cobram outra linha.' : ''}${simples}`;
+  return `${reconhece}${pal} espera na conta: ${esp}.${exc.length ? ' ' + exc.join(' ') : ''}${unid}${me}${simples}`;
 }
 function xlsxEquivalencias(eq, { usoTitulo = new Map(), operador = '' } = {}) {
   const desc = new Map(); for (const t of eq.catalogoTUSS || []) desc.set(String(t.codigo), t.desc || t.descricao || '');

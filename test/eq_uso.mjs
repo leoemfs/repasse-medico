@@ -18,6 +18,8 @@ p.on('pageerror', e => erros.push(e.message)); p.on('console', m => { if (m.type
 await p.addInitScript(() => localStorage.setItem('rm2.operador', JSON.stringify('Teste Uso')));
 await p.goto(html + '#inicio');
 await p.waitForFunction(() => document.getElementById('stInit').textContent.includes('Pronto'), null, { timeout: 30000 });
+// Estes testes partem de uma base sem regras compostas: tira a regra trazida pela ferramenta (testada em test/ponte.mjs).
+await p.evaluate(() => { const { S } = window.__RM; S.eq.compostas = (S.eq.compostas || []).filter(c => !String(c.id).startsWith('cmp-padrao')); window.__RM.irPara && location.hash && window.dispatchEvent(new HashChangeEvent('hashchange')); });
 const okDlg = async (botao = 'ok') => { await p.waitForSelector('#dlg[open]'); await p.click(`#dlgBotoes button[value="${botao}"]`); await p.waitForFunction(() => !document.getElementById('dlg').open); await p.waitForTimeout(250); };
 const MAMAS = '40901114', TV = '40901300', DOP = '40901386', TIR = '40901122', ESC = '40901203';
 
